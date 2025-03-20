@@ -1,12 +1,12 @@
 import { createBrowserRouter } from "react-router-dom";
 import ThemeConfig from "./config/ThemeConfig";
 import MainLayoutComponent from "./layouts/MainLayoutComponent";
-import SplashComponent from "./pages/Auth/SplashComponent";
+import SplashComponent from "./pages/SplashComponent";
 import AuthLayout from "./layouts/AuthLayoutComponent";
 import LoginComponent from "./pages/Auth/login/LoginComponent";
 import RegisterComponent from "./pages/Auth/RegisterComponent";
 import PrivateLayoutContent from "./layouts/PrivateLayoutContent";
-import EcommerceComponent from "./pages/Ecommerce/EcommerceComponent";
+import EcommerceComponent from "./pages/Catalogs/EcommerceComponent";
 
 const router = createBrowserRouter([
     {

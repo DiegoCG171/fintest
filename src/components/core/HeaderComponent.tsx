@@ -38,7 +38,8 @@ function HeaderComponent(
         p: 2,
         backgroundColor: 'common.white',
         alignItems: 'center',
-        justifyContent: 'flex-end'
+        justifyContent: 'flex-end',
+        boxShadow: '2px 2px 2px 1px rgba(0, 0, 0, 0.1)'
       }}>
       <BaseBadge badgeContent={alerts}>
         <NotificationsNoneOutlinedIcon/>

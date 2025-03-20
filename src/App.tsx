@@ -3,8 +3,8 @@ import { Routes, Route } from "react-router-dom";
 import MainLayoutComponent from "./layouts/MainLayoutComponent";
 import LoginComponent from "./pages/Auth/login/LoginComponent";
 import PrivateLayoutContent from "./layouts/PrivateLayoutContent";
-import EcommerceComponent from "./pages/Ecommerce/EcommerceComponent";
-import SplashComponent from "./pages/Auth/SplashComponent";
+import EcommerceComponent from "./pages/Catalogs/EcommerceComponent";
+import SplashComponent from "./pages/SplashComponent";
 import AuthLayoutComponent from "./layouts/AuthLayoutComponent";
 import RegisterComponent from "./pages/Auth/RegisterComponent";
 

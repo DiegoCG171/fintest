@@ -1,14 +1,34 @@
-import FooterComponent from "../components/core/FooterComponent";
 import { Outlet } from "react-router-dom";
+import FooterComponent from "../components/core/FooterComponent";
 import { Box } from "@mui/material";
 
 function MainLayoutComponent() {
     return (
-        <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-        <Box component="main" sx={{ flex: 1, minHeight: '100%'}}>
+        <Box sx={{ position: "relative", height: "100vh", overflow: "hidden" }}>
+        
+
+        <Box
+            sx={{
+            display: "flex",
+            height: "100%",
+            }}
+        >
+            <Box sx={{ flex: 1 }}>
             <Outlet />
+            </Box>
         </Box>
-        <FooterComponent />
+
+        <Box
+            sx={{
+            position: "fixed",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            zIndex: 1100,
+            }}
+        >
+            <FooterComponent />
+        </Box>
         </Box>
     );
 }

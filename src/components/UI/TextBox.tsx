@@ -1,27 +1,39 @@
 import { Box, Typography } from "@mui/material";
 import logo from "../../assets/logo.svg";
 
-function TextBox() {
+interface TextBoxProps {
+    title: string;
+    welcomeText: string;
+    description: React.ReactNode;
+}
+
+function TextBox({ title, welcomeText, description }: TextBoxProps) {
     return (
-        <Box sx={{ width: "100%", display: 'flex', flexDirection: 'column', alignItems:'' }}>
+        <Box
+        sx={{
+            width: "100%",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "",
+        }}
+        >
         <Box
             component="img"
             src={logo}
             alt="Logo"
-            sx={{ height: 50, mb: 4, alignSelf:'flex-start' }}
+            sx={{ height: 50, mb: 4, alignSelf: "flex-start" }}
         />
         <Typography
             gutterBottom
             variant="h5"
         >
-            <strong>Registro</strong>
+            <strong>{title}</strong>
         </Typography>
         <Typography variant="body1">
-            <strong>¡Bienvenido! 👋</strong>
+            <strong>{welcomeText}</strong>
         </Typography>
         <Typography variant="body2">
-            Ingresa tus datos para poder crear tu cuenta en{" "}
-            <strong>fintest.</strong>
+            {description}
         </Typography>
         </Box>
     );

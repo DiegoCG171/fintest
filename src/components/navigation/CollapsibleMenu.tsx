@@ -54,6 +54,118 @@ function CollapsibleMenu() {
                 primary={<Typography variant="body2">Venta con #DS</Typography>}
                 />
             </ListItemButton>
+            <ListItemButton>
+                <ListItemIcon>
+                <InsertDriveFileIcon />
+                </ListItemIcon>
+                <ListItemText
+                primary={<Typography variant="body2">Venta con #DS</Typography>}
+                />
+            </ListItemButton>
+            <ListItemButton>
+                <ListItemIcon>
+                <InsertDriveFileIcon />
+                </ListItemIcon>
+                <ListItemText
+                primary={<Typography variant="body2">Venta con #DS</Typography>}
+                />
+            </ListItemButton>
+            <ListItemButton>
+                <ListItemIcon>
+                <InsertDriveFileIcon />
+                </ListItemIcon>
+                <ListItemText
+                primary={<Typography variant="body2">Venta con #DS</Typography>}
+                />
+            </ListItemButton>
+            <ListItemButton>
+                <ListItemIcon>
+                <InsertDriveFileIcon />
+                </ListItemIcon>
+                <ListItemText
+                primary={<Typography variant="body2">Venta con #DS</Typography>}
+                />
+            </ListItemButton>
+            <ListItemButton>
+                <ListItemIcon>
+                <InsertDriveFileIcon />
+                </ListItemIcon>
+                <ListItemText
+                primary={<Typography variant="body2">Venta con #DS</Typography>}
+                />
+            </ListItemButton>
+            <ListItemButton>
+                <ListItemIcon>
+                <InsertDriveFileIcon />
+                </ListItemIcon>
+                <ListItemText
+                primary={<Typography variant="body2">Venta con #DS</Typography>}
+                />
+            </ListItemButton>
+            <ListItemButton>
+                <ListItemIcon>
+                <InsertDriveFileIcon />
+                </ListItemIcon>
+                <ListItemText
+                primary={<Typography variant="body2">Venta con #DS</Typography>}
+                />
+            </ListItemButton>
+            <ListItemButton>
+                <ListItemIcon>
+                <InsertDriveFileIcon />
+                </ListItemIcon>
+                <ListItemText
+                primary={<Typography variant="body2">Venta con #DS</Typography>}
+                />
+            </ListItemButton>
+            <ListItemButton>
+                <ListItemIcon>
+                <InsertDriveFileIcon />
+                </ListItemIcon>
+                <ListItemText
+                primary={<Typography variant="body2">Venta con #DS</Typography>}
+                />
+            </ListItemButton>
+            <ListItemButton>
+                <ListItemIcon>
+                <InsertDriveFileIcon />
+                </ListItemIcon>
+                <ListItemText
+                primary={<Typography variant="body2">Venta con #DS</Typography>}
+                />
+            </ListItemButton>
+            <ListItemButton>
+                <ListItemIcon>
+                <InsertDriveFileIcon />
+                </ListItemIcon>
+                <ListItemText
+                primary={<Typography variant="body2">Venta con #DS</Typography>}
+                />
+            </ListItemButton>
+            <ListItemButton>
+                <ListItemIcon>
+                <InsertDriveFileIcon />
+                </ListItemIcon>
+                <ListItemText
+                primary={<Typography variant="body2">Venta con #DS</Typography>}
+                />
+            </ListItemButton>
+            <ListItemButton>
+                <ListItemIcon>
+                <InsertDriveFileIcon />
+                </ListItemIcon>
+                <ListItemText
+                primary={<Typography variant="body2">Venta con #DS</Typography>}
+                />
+            </ListItemButton>
+            <ListItemButton>
+                <ListItemIcon>
+                <InsertDriveFileIcon />
+                </ListItemIcon>
+                <ListItemText
+                primary={<Typography variant="body2">Venta con #DS</Typography>}
+                />
+            </ListItemButton>
             </List>
         </Collapse>
 

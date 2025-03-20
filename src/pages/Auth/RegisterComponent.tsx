@@ -1,5 +1,13 @@
-import { Box, Button, Checkbox, Stack, Typography } from "@mui/material";
+import {
+    Box,
+    Button,
+    Checkbox,
+    FormControlLabel,
+    Stack,
+    Typography,
+} from "@mui/material";
 import Link from "@mui/material/Link";
+import { Link as RouterLink } from 'react-router-dom';
 import Grid from "@mui/material/Grid2";
 import { Formik } from "formik";
 import { Form } from "react-router-dom";
@@ -24,7 +32,16 @@ const validationSchema = Yup.object({
 function RegisterComponent() {
     return (
         <Box sx={{ width: "100%" }}>
-        <TextBox></TextBox>
+        <TextBox
+            title={"Registro"}
+            welcomeText={"¡Bienvenido! 👋"}
+            description={
+            <>
+                Ingresa tus datos para poder crear tu cuenta en{" "}
+                <strong>fintest.</strong>
+            </>
+            }
+        ></TextBox>
         <Box sx={{ flexGrow: 1, my: 4 }}>
             <Formik
             initialValues={{
@@ -104,8 +121,13 @@ function RegisterComponent() {
                     spacing={1}
                     sx={{ ml: -1, display: "flex", alignItems: "center" }}
                     >
-                    <Checkbox defaultChecked />
-                    <Typography>Aceptar</Typography>
+                    <FormControlLabel
+                        value="accepted"
+                        control={<Checkbox />}
+                        label="Aceptar"
+                        labelPlacement="end"
+                        sx={{ mb: 1, fontSize: 14, fontWeight: "bold" }}
+                    />
                     <Link
                         component="button"
                         variant="body2"
@@ -123,6 +145,25 @@ function RegisterComponent() {
                     >
                     Iniciar sesión
                     </Button>
+                    <Stack
+                    direction="row"
+                    spacing={1}
+                    sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: "100%",
+                    }}
+                    >
+                    <Typography>¿Ya tienes cuenta?</Typography>
+                    <Link
+                        variant="body2"
+                        component={RouterLink}
+                            to="/login"
+                    >
+                        Ingresa aquí
+                    </Link>
+                    </Stack>
                 </Grid>
                 </Form>
             )}

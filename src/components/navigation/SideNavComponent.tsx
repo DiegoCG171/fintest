@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import {
     Box,
     Container,
@@ -12,10 +13,29 @@ import MenuOpenOutlinedIcon from "@mui/icons-material/MenuOpenOutlined";
 import CreateNewFolderOutlinedIcon from '@mui/icons-material/CreateNewFolderOutlined';
 import SearchIcon from "@mui/icons-material/Search";
 import CollapsibleMenu from "./CollapsibleMenu";
+import { getRules } from '../../services/catalogs/rules.service';
 
 const drawerWidth = 240;
 
 function SideNavComponent() {
+
+    const [rules, setRules] = useState<unknown[]>([]);
+
+    useEffect(() => {
+        const fetchRules = async () => {
+            try {
+                const data = await getRules();
+                setRules(data);
+            } catch (error) {
+                console.error("Error al obtener las reglas:", error);
+            }
+            };
+        
+            fetchRules();
+        }, []);
+    
+    console.log(rules)
+
     return (
         <Drawer
         variant="permanent"

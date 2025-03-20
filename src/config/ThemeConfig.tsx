@@ -25,7 +25,7 @@ const theme = createTheme({
         main: "#2196F3",
         },
         background: {
-        default: "#E7E7E7",
+        default: "#F6F6F6",
         paper: "#FFFFFF",
         },
         text: {
@@ -63,7 +63,7 @@ const theme = createTheme({
         styleOverrides: {
             root: {
             textDecoration: "none",
-            fontSize: '14px',
+            fontSize: "14px",
             fontWeight: "bold",
             "&:hover": {
                 textDecoration: "none",
@@ -71,14 +71,68 @@ const theme = createTheme({
             },
         },
         },
+        MuiCard: {
+        styleOverrides: {
+            root: {
+            borderRadius: "12px",
+            boxShadow: "none",
+            padding: "24px",
+            },
+        },
+        },
+        MuiTableContainer: {
+        styleOverrides: {
+            root: {
+            borderRadius: "12px",
+            boxShadow: "none",
+            border: "1px solid #D1D1D1",
+            },
+        },
+        },
+        MuiTableCell: {
+        styleOverrides: {
+            root: {
+            fontSize: "12px"
+            },
+        },
+        },
+        MuiTab: {
+        styleOverrides: {
+            root: {
+            fontSize: "12px",
+            minHeight: "32px",
+            paddingTop: "8px",
+            paddingBottom: "8px",
+            "&.Mui-selected": {
+                backgroundColor: "#EEF7FF",
+                color: "#1A71F6",
+                inHeight: '32px',
+            },
+            },
+        },
+        },
+        MuiTablePagination: {
+        styleOverrides: {
+            root: {
+            fontSize: "12px",
+            },
+        },
+        },
+        MuiTableRow: {
+            styleOverrides: {
+                root: {
+                maxHeight: "18px"
+                },
+            },
+            },
     },
-    });
+});
 
-    interface ThemeConfigProps {
+interface ThemeConfigProps {
     children: ReactNode;
-    }
+}
 
-    const ThemeConfig = ({ children }: ThemeConfigProps) => {
+const ThemeConfig = ({ children }: ThemeConfigProps) => {
     return (
         <ThemeProvider theme={theme}>
         <CssBaseline />

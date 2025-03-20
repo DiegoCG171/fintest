@@ -2,8 +2,8 @@ import { Box, Button, Container, Stack, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import PersonAltOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
-import logo from '../../assets/logo.svg';
-import backgroundImage from '../../assets/bg-fintest.svg';
+import logo from '../assets/logo.svg';
+import backgroundImage from '../assets/bg-fintest.svg';
 
 function SplashComponent() {
     return (
