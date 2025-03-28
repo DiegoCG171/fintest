@@ -27,7 +27,6 @@ export const login = async (body: LoginCredentials): Promise<LoginResponse> => {
     console.log(body)
     try {
         const response = await api.post<LoginResponse>(ENDPOINTS.login, body);
-        localStorage.setItem('token', response.data.token)
         return response.data
     } catch (error: unknown) {
         console.error("Error en el servicio de login:", error);

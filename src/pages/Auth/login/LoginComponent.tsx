@@ -7,7 +7,7 @@ import * as Yup from 'yup';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import CustomInputComponent from '../../../components/forms/CustomInputComponent';
 import TextBox from '../../../components/UI/TextBox';
-import { login } from '../../../services/auth/login.service';
+import { useAuth } from '../../../hooks/useAuth';
 
 const validationSchema = Yup.object({
   user: Yup.string().required('El usuario es requerido'),
@@ -16,6 +16,7 @@ const validationSchema = Yup.object({
 
 const LoginComponent = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   return (
     <Box sx={{ width: '100%' }}>
       <TextBox title={'Iniciar Sesión'} welcomeText={'¡Bienvenido! 👋'} description={<>Ingresa tu correo y contraseña para iniciar sesión.</>}></TextBox>
@@ -28,11 +29,10 @@ const LoginComponent = () => {
           validationSchema={validationSchema}
           onSubmit={async (values, { setSubmitting }) => {
             try {
-              const loginResponse = await login({
+              await login({
                 user: values.user,
                 password: values.password,
               });
-              console.log('Login exitoso:', loginResponse);
               navigate('/ecommerce');
             } catch (error) {
               console.error('Error durante el login:', error);

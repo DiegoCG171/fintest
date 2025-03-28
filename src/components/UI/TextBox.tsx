@@ -21,7 +21,12 @@ function TextBox({ title, welcomeText, description }: TextBoxProps) {
             component="img"
             src={logo}
             alt="Logo"
-            sx={{ height: 50, mb: 4, alignSelf: "flex-start" }}
+            sx={{ 
+                height: 50, 
+                mb: 4,
+                mt: 4, 
+                alignSelf: "flex-start" 
+            }}
         />
         <Typography
             gutterBottom

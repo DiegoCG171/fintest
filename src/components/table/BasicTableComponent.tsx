@@ -1,4 +1,4 @@
-import { SetStateAction, useState } from 'react';
+import { SetStateAction, useState } from "react";
 import {
   Table,
   TableBody,
@@ -9,20 +9,35 @@ import {
   Paper,
   TablePagination,
   Box,
-} from '@mui/material';
-import { TableRowData } from '../../config/interfaces/type.interface';
-
+} from "@mui/material";
+import { TableRowData } from "../../config/interfaces/type.interface";
 
 interface BasicTableProps {
   initialRows: TableRowData[];
   showPagination?: boolean;
 }
 
+function insertWordBreaks(text, chunkSize = 20) {
+  const chunks = [];
+  for (let i = 0; i < text.length; i += chunkSize) {
+    chunks.push(text.substring(i, i + chunkSize));
+  }
+  return chunks.reduce((acc, chunk, index) => {
+    if (index > 0) {
+      return [...acc, <wbr key={index} />, chunk];
+    }
+    return [chunk];
+  }, []);
+}
+
 function BasicTable({ initialRows, showPagination = false }: BasicTableProps) {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const handleChangePage = (event: unknown, newPage: SetStateAction<number>) => {
+  const handleChangePage = (
+    event: unknown,
+    newPage: SetStateAction<number>
+  ) => {
     setPage(newPage);
   };
 
@@ -38,15 +53,15 @@ function BasicTable({ initialRows, showPagination = false }: BasicTableProps) {
   const dynamicKeys = Object.keys(initialRows[0] || {});
 
   return (
-    <Paper sx={{ width: '100%', boxShadow: 'none' }}>
+    <Paper sx={{ width: "100%", boxShadow: "none" }}>
       <TableContainer>
-        <Table stickyHeader aria-label="tabla-dinamica">
+        <Table stickyHeader>
           <TableHead>
             <TableRow>
               {dynamicKeys.map((key) => (
                 <TableCell
                   key={key}
-                  sx={{ fontWeight: 'bold', padding: '8px', paddingLeft: 4 }}
+                  sx={{ fontWeight: "bold", padding: "8px", paddingLeft: 4 }}
                 >
                   {key.toUpperCase()}
                 </TableCell>
@@ -56,18 +71,33 @@ function BasicTable({ initialRows, showPagination = false }: BasicTableProps) {
           <TableBody>
             {rowsToShow.map((row: TableRowData, rowIndex: number) => (
               <TableRow key={rowIndex}>
-                {dynamicKeys.map((key) => (
-                  <TableCell key={key} sx={{ padding: '8px', paddingLeft: 4 }}>
-                    <Box
-                      sx={{
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                      }}
+                {dynamicKeys.map((key) => {
+                  const cellValue = row[key];
+                  const cellText =
+                    typeof cellValue === "string" ||
+                    typeof cellValue === "number"
+                      ? String(cellValue)
+                      : "";
+
+                  return (
+                    <TableCell
+                      key={key}
+                      sx={{ padding: "8px", paddingLeft: 4 }}
                     >
-                      {row[key] ?? ''}
-                    </Box>
-                  </TableCell>
-                ))}
+                      <Box
+                        sx={{
+                          width: "100%",
+                          whiteSpace: "normal",
+                          overflowWrap: "break-word",
+                        }}
+                      >
+                        {cellText.length > 25
+                          ? insertWordBreaks(cellText)
+                          : cellText}
+                      </Box>
+                    </TableCell>
+                  );
+                })}
               </TableRow>
             ))}
           </TableBody>
@@ -75,7 +105,7 @@ function BasicTable({ initialRows, showPagination = false }: BasicTableProps) {
       </TableContainer>
       {showPagination && (
         <TablePagination
-          rowsPerPageOptions={[5, 10, 25, { label: 'Todos', value: -1 }]}
+          rowsPerPageOptions={[5, 10, 25, { label: "Todos", value: -1 }]}
           component="div"
           count={initialRows.length}
           rowsPerPage={rowsPerPage}

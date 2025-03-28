@@ -35,6 +35,7 @@ function CustomTabPanel(props: TabPanelProps) {
 function TabTableComponent({ tabs }: TabTableComponentProps) {
   const [value, setValue] = useState(0);
 
+
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
@@ -43,28 +44,20 @@ function TabTableComponent({ tabs }: TabTableComponentProps) {
     <Box
       sx={{
         height: "100%",
-        display: "flex",
+        display: tabs.length >= 3 ? "flex" : "block",
         flexDirection: "column",
       }}
     >
       <Tabs
         value={value}
-        variant="fullWidth"
+        variant= "standard"
         textColor="inherit"
         indicatorColor="primary"
         onChange={handleChange}
-        sx={{
-          borderRadius: 3,
-          border: "1px solid #D1D1D1",
-          minHeight: "32px",
-          "& .MuiTabs-flexContainer": {
-            minHeight: "32px",
-          },
-        }}
       >
         {tabs.map((tab, index) => (
           <Tab
-            key={index}
+            key={index+'-tab-chip'}
             label={tab.label}
             value={index}
           />
@@ -74,7 +67,7 @@ function TabTableComponent({ tabs }: TabTableComponentProps) {
       <Box sx={{ flexGrow: 1, overflow: "auto" }}>
         {tabs.map((tab, index) => (
           <CustomTabPanel
-            key={index}
+            key={index + '-tab-content'}
             value={value}
             index={index}
           >

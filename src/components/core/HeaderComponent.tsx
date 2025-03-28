@@ -1,5 +1,6 @@
 import { Badge as BaseBadge, Box, Divider, Stack, Typography } from '@mui/material';
 import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
+import { useAuth } from '../../hooks/useAuth';
 
 interface HeaderComponentProps {
   alerts: number;
@@ -29,6 +30,10 @@ const BadgeContent = () => {
 function HeaderComponent(
   { alerts }: HeaderComponentProps
 ) {
+  const { 
+    user, 
+    //logout 
+  } = useAuth();
   return (
     <Stack 
       spacing={2} 
@@ -48,8 +53,8 @@ function HeaderComponent(
       <Stack spacing={2} direction='row'>
         <BadgeContent></BadgeContent>
         <Stack spacing={0}>
-          <Typography variant='subtitle2' >Nombre</Typography>
-          <Typography variant='caption' >Perfil</Typography>
+          <Typography variant='subtitle2' >{`${user?.names} ${user?.surnames}`}</Typography>
+          <Typography variant='caption' >{user?.username}</Typography>
         </Stack>
       </Stack>
       </BaseBadge>

@@ -3,7 +3,7 @@ import { ENDPOINTS } from "../../config/constants/endpoints";
 
 export const getRules = async () => {
     try {
-        const response = await api.get(ENDPOINTS.rules);
+        const response = await api.get(ENDPOINTS.getRules);
         console.log('Reglas:', response.data);
         return response.data;
     } catch (error) {

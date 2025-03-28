@@ -11,18 +11,21 @@ const AuthLayout = () => {
       sx={{
         display: "flex",
         width: "100%",
-        height: "calc(100vh - 50px)",
+        height: { xs: "100%", sm: "100%", lg: "100vh" },
+        overflow: "auto",
       }}
     >
       {/* Panel Izquierdo */}
       <Box
         sx={{
-          width: "50%",
+          width: { xs: "100%", sm: "50%" },
           display: "flex",
           flexDirection: "column",
-          alignItems: "flex-start",
-          py: 16,
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "100vh",
           px: 8,
+          overflow: "auto",
           backgroundColor: "common.white",
         }}
       >
@@ -34,7 +37,6 @@ const AuthLayout = () => {
             gap: 4,
           }}
         >
-          
           <Outlet />
         </Container>
       </Box>
@@ -42,7 +44,8 @@ const AuthLayout = () => {
       {/* Panel Derecho */}
       <Box
         sx={{
-          width: "50%",
+          display: { xs: "none", sm: "block" },
+          width: { xs: "0%", sm: "50%" }, 
           height: "100%",
           position: "relative",
           overflow: "hidden",
@@ -62,24 +65,38 @@ const AuthLayout = () => {
             alignItems: "center",
           }}
         >
-          <Stack spacing={4} alignItems="center">
+          <Stack
+            spacing={{ xs: 2, xl: 4 }}
+            alignItems="center"
+          >
             <Box
               component="img"
               src={mockupImage}
-              alt="Mockup de la aplicación"
-              sx={{ maxWidth: 450, width: "100%" }}
+              alt="Fintest Web"
+              sx={{
+                maxWidth: { xs: "100%", md: 450 },
+                width: "100%",
+                maxHeight: "50vh",
+                height: "auto",
+                objectFit: "contain",
+              }}
             />
-            <Typography align="center" variant="h6" color="common.white">
+
+            <Typography
+              align="center"
+              variant="h6"
+              color="common.white"
+            >
               <strong>Simula y gestiona</strong> transacciones bancarias con
               precisión en un <strong>entorno seguro y eficiente.</strong>
             </Typography>
             <Box
               component="img"
               src={icon}
-              alt="Icono decorativo"
+              alt="Fintest logo"
               sx={{
                 filter: "brightness(0) invert(1)",
-                height: 50,
+                maxHeight: 50,
               }}
             />
           </Stack>
