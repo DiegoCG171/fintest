@@ -4,10 +4,10 @@ import { Formik } from 'formik';
 import { Form } from 'react-router-dom';
 import Link from '@mui/material/Link';
 import * as Yup from 'yup';
-import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import CustomInputComponent from '../../../components/forms/CustomInputComponent';
 import TextBox from '../../../components/UI/TextBox';
 import { useAuth } from '../../../hooks/useAuth';
+import { useToast } from '../../../hooks/useToast';
 
 const validationSchema = Yup.object({
   user: Yup.string().required('El usuario es requerido'),
@@ -15,6 +15,7 @@ const validationSchema = Yup.object({
 });
 
 const LoginComponent = () => {
+  const { showToast } = useToast();
   const navigate = useNavigate();
   const { login } = useAuth();
   return (
@@ -33,9 +34,10 @@ const LoginComponent = () => {
                 user: values.user,
                 password: values.password,
               });
-              navigate('/ecommerce');
+              navigate('/');
             } catch (error) {
-              console.error('Error durante el login:', error);
+              const errorMessage = error instanceof Error ? error.message : "Ocurrió un error inesperado";
+    showToast(errorMessage, "error");
             } finally {
               setSubmitting(false);
             }
@@ -54,7 +56,8 @@ const LoginComponent = () => {
                 <CustomInputComponent
                   label='Contraseña'
                   id='password'
-                  endIcon={<VisibilityOffOutlinedIcon />}
+                  type='password'
+                  endIconType='password'
                   {...getFieldProps('password')}
                   error={Boolean(touched.password && errors.password)}
                   helperText={touched.password && errors.password}
@@ -67,8 +70,14 @@ const LoginComponent = () => {
                   variant='contained' 
                   type='submit'
                   onClick={() => {
-                    console.log('Click');
-                    submitForm();
+                    if (Object.keys(errors).length > 0) {
+                      showToast(
+                        "Revisa la información antes de enviarla.",
+                        "info"
+                      );
+                    } else {
+                      submitForm();
+                    }
                   }}
                   >
                   Iniciar sesión

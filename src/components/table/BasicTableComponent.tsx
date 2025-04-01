@@ -17,7 +17,7 @@ interface BasicTableProps {
   showPagination?: boolean;
 }
 
-function insertWordBreaks(text, chunkSize = 20) {
+function insertWordBreaks(text: any, chunkSize = 20) {
   const chunks = [];
   for (let i = 0; i < text.length; i += chunkSize) {
     chunks.push(text.substring(i, i + chunkSize));
@@ -61,7 +61,7 @@ function BasicTable({ initialRows, showPagination = false }: BasicTableProps) {
               {dynamicKeys.map((key) => (
                 <TableCell
                   key={key}
-                  sx={{ fontWeight: "bold", padding: "8px", paddingLeft: 4 }}
+                  sx={{ fontWeight: "bold", padding: "8px", paddingLeft: 4, height: "100%" }}
                 >
                   {key.toUpperCase()}
                 </TableCell>
@@ -82,7 +82,11 @@ function BasicTable({ initialRows, showPagination = false }: BasicTableProps) {
                   return (
                     <TableCell
                       key={key}
-                      sx={{ padding: "8px", paddingLeft: 4 }}
+                      sx={{ 
+                        padding: "8px", 
+                        paddingLeft: 4,
+                        height: "100%"
+                      }}
                     >
                       <Box
                         sx={{

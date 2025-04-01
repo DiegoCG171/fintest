@@ -1,10 +1,11 @@
-import { ReactNode, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
     LoginCredentials,
     LoginResponse,
     login as loginService,
 } from "../services/auth/login.service";
 import { AuthContext } from "./AuthContext";
+import { DefaultConfigProps } from "../config/interfaces/type.interface";
 
 export interface AuthContextType {
     user: LoginResponse | null;
@@ -13,11 +14,7 @@ export interface AuthContextType {
     logout: () => void;
 }
 
-interface AuthProviderProps {
-    children: ReactNode;
-}
-
-export const AuthProvider = ({ children }: AuthProviderProps) => {
+export const AuthProvider = ({ children }: DefaultConfigProps) => {
     const [user, setUser] = useState<LoginResponse | null>(null);
     const [loading, setLoading] = useState(true);
 

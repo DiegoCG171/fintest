@@ -1,39 +1,16 @@
-import { Badge as BaseBadge, Box, Divider, Stack, Typography } from '@mui/material';
+import { Badge as BaseBadge, Divider, Stack } from '@mui/material';
 import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
-import { useAuth } from '../../hooks/useAuth';
+import AccountMenu from './AccountMenu';
 
 interface HeaderComponentProps {
   alerts: number;
 }
 
-const BadgeContent = () => {
-  return (
-    <Box
-      component="span"
-      sx={{
-        width: 40,
-        height: 40,
-        minWidth: 40,
-        minHeight: 40,
-        maxWidth: 40,
-        maxHeight: 40,
-        borderRadius: '12px',
-        background: (theme) =>
-          theme.palette.primary.light,
-        display: 'inline-block',
-        verticalAlign: 'middle',
-      }}
-    />
-  )
-}
+
 
 function HeaderComponent(
   { alerts }: HeaderComponentProps
 ) {
-  const { 
-    user, 
-    //logout 
-  } = useAuth();
   return (
     <Stack 
       spacing={2} 
@@ -50,13 +27,7 @@ function HeaderComponent(
         <NotificationsNoneOutlinedIcon/>
       </BaseBadge>
       <BaseBadge>
-      <Stack spacing={2} direction='row'>
-        <BadgeContent></BadgeContent>
-        <Stack spacing={0}>
-          <Typography variant='subtitle2' >{`${user?.names} ${user?.surnames}`}</Typography>
-          <Typography variant='caption' >{user?.username}</Typography>
-        </Stack>
-      </Stack>
+      <AccountMenu/>
       </BaseBadge>
     </Stack>
   )

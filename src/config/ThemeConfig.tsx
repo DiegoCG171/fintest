@@ -1,5 +1,5 @@
-import { ReactNode } from "react";
 import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
+import { DefaultConfigProps } from "./interfaces/type.interface";
 
 const theme = createTheme({
   palette: {
@@ -45,6 +45,28 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: "12px",
+          backgroundColor: "#FFFFFF",
+          "&.Mui-focused": {
+            backgroundColor: "#FFFFFF",
+          },
+          "&:hover": {
+            backgroundColor: "#FFFFFF",
+          },
+          "&.MuiInputBase-root": {
+            backgroundColor: "#FFFFFF",
+          },
+          "&.MuiFilledInput-root": {
+            backgroundColor: "#FFFFFF",
+          },
+          "&.MuiOutlinedInput-notchedOutline": {
+            borderColor: "#D1D1D1",
+          },
+        },
+        input: {
+          backgroundColor: "#FFFFFF",
+        },
+        notchedOutline: {
+          borderColor: "#D1D1D1",
         },
       },
     },
@@ -93,6 +115,7 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           fontSize: "12px",
+          height: "100%"
         },
       },
     },
@@ -159,11 +182,7 @@ const theme = createTheme({
   },
 });
 
-interface ThemeConfigProps {
-  children: ReactNode;
-}
-
-const ThemeConfig = ({ children }: ThemeConfigProps) => {
+const ThemeConfig = ({ children }: DefaultConfigProps) => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />

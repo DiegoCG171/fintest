@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 
-export interface ThemeConfigProps {
+export interface DefaultConfigProps {
     children: ReactNode;
 }
 

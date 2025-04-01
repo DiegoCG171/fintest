@@ -6,7 +6,7 @@ const PublicGuard = () => {
 
   if (loading) return null;
 
-  return !user ? <Outlet /> : <Navigate to="/ecommerce" />;
+  return !user ? <Outlet /> : <Navigate to="/main" />;
 };
 
 export default PublicGuard;

@@ -1,70 +1,118 @@
-import { Box, Card } from "@mui/material";
+import { Box } from "@mui/material";
 import BasicTable from "../../components/table/BasicTableComponent";
-import TabTableComponent from "../../components/table/TabTableComponent";
-import { TableRowData } from "../../config/interfaces/type.interface";
-import TitleHeaderComponent from "../../components/core/TitleHeaderComponent";
+import TitleHeaderComponent from "../../components/UI/TitleHeaderComponent";
+import { ReactNode, useState } from "react";
+import TabbedCardContainer from "../../components/UI/TabbedCardContainer";
 
-const initialRows: TableRowData[] = [];
-const initialEventRows: TableRowData[] = [];
+// Definición del tipo para las pestañas
+interface TabData {
+    label: string;
+    content: ReactNode;
+}
 
-const tabsData = [
-    { label: "Detalle", content: <BasicTable initialRows={initialRows}></BasicTable> },
-    { label: "Error", content: <BasicTable initialRows={initialRows}></BasicTable> },
-];
+// Definición del tipo para el mapa de configuración
+interface TabConfig {
+    [key: string]: TabData[];
+}
 
-const tabsDataEvents = [
-    { label: "Eventos", content: <BasicTable initialRows={initialEventRows}></BasicTable> }
-];
+// Definición de los datos base
+const dataMap = {
+    detail: [
+        {
+            campo: "",
+            nombre: "",
+            longitud: "",
+            estado: "",
+            contenido: "",
+        },
+    ],
+    errors: [
+        {
+            campo: "",
+            nombre: "",
+            longitud: "",
+            estado: "",
+            contenido: "",
+        },
+    ],
+    events: [
+        {
+            ID: "",
+            Fecha: "",
+            "Tipo de Mensaje": "",
+            "Tipo de Transacción": "",
+            contenido: "",
+            estado: "",
+        },
+    ],
+};
+
+// Configuración de pestañas adicionales según la ruta
+const tabConfig: TabConfig = {
+    "ecommerce/ventas": [
+        {
+            label: "Ventas",
+            content: <BasicTable initialRows={dataMap.events} />
+        }
+    ],
+    "ecommerce/compras": [
+        {
+            label: "Compras",
+            content: <BasicTable initialRows={dataMap.detail} />
+        }
+    ],
+    "admin/usuarios": [
+        {
+            label: "Usuarios",
+            content: <BasicTable initialRows={dataMap.errors} />
+        }
+    ],
+};
+
+// Generador dinámico de pestañas según el tipo y la ruta
+const generateTabs = (type: string, route: string): TabData[] => {
+    const baseTabs: TabData[] = [
+        { label: "Detalles", content: <BasicTable initialRows={dataMap.detail} /> },
+        { label: "Errores", content: <BasicTable initialRows={dataMap.errors} /> },
+    ];
+
+    if (type === "events") {
+        return [
+            { label: "Eventos", content: <BasicTable initialRows={dataMap.events} /> },
+        ];
+    }
+
+    if (route in tabConfig) {
+        baseTabs.push(...tabConfig[route]);
+    }
+
+    return baseTabs;
+};
 
 function MainPage() {
+    const [viewType] = useState("detail");
+    const currentRoute = "/"; 
+
     return (
         <Box
             sx={{
-            height: "100%",
-            display: "flex",
-            flexDirection: "column",
-            gap: 2,
-            overflow: "hidden",
-            }}
-        >
-            <TitleHeaderComponent/>
-    
-            <Box
-            sx={{
-                flex: 1,
+                height: "100%",
                 display: "flex",
                 flexDirection: "column",
                 gap: 2,
                 overflow: "hidden",
+                padding: 2,
+                backgroundColor: "#f7f7f7",
             }}
-            >
-            <Card
-                sx={{
-                flex: 2,
-                minHeight: 0,
-                overflow: "auto", 
-                display: "flex",
-                flexDirection: "column",
-                }}
-            >
-                <TabTableComponent tabs={tabsData} />
-            </Card>
-    
-            <Card
-                sx={{
-                flex: 1,
-                minHeight: 0,
-                overflow: "auto",
-                display: "flex",
-                flexDirection: "column",
-                }}
-            >
-                <TabTableComponent tabs={tabsDataEvents} />
-            </Card>
-            </Box>
-        </Box>
-        );
-    }
+        >
+            <TitleHeaderComponent />
 
+            <TabbedCardContainer
+                tabs={generateTabs(viewType, currentRoute)}
+                eventTabs={generateTabs("events", currentRoute)}
+            />
+        </Box>
+    );
+}
 
 export default MainPage;

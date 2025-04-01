@@ -6,12 +6,29 @@ import AuthLayout from "./layouts/AuthLayoutComponent";
 import LoginComponent from "./pages/Auth/login/LoginComponent";
 import RegisterComponent from "./pages/Auth/RegisterComponent";
 import PrivateLayoutContent from "./layouts/PrivateLayoutContent";
-import EcommerceComponent from "./pages/Catalogs/EcommerceComponent";
 import RootRedirect from "./guards/RootRedirect";
 import PublicGuard from "./guards/PublicGuard";
 import PrivateGuard from "./guards/PrivateGuard";
 import NotFoundComponent from "./pages/Generic/NotFoundComponent";
 import MainPage from "./pages/Catalogs/MainPageComponent";
+
+const mainPageRoutes = [
+  "main", 
+  "ecommerce", 
+  "ecommerce/ventas", 
+  "ecommerce/reverso", 
+  "ecommerce/cancelacion", 
+  "ecommerce/ventas-ds", 
+  "ecommerce/ventas-visa", 
+  "ecommerce/ventas-mastercard", 
+  "moto",
+  "moto/ventas", 
+  "moto/reverso", 
+  "moto/cancelacion", 
+  "moto/ventas-ds", 
+  "moto/ventas-visa", 
+  "moto/ventas-mastercard", 
+];
 
 const router = createBrowserRouter([
   {
@@ -57,18 +74,10 @@ const router = createBrowserRouter([
           {
             element: <PrivateLayoutContent />,
             children: [
-              {
-                path: "main",
+              ...mainPageRoutes.map((route) => ({
+                path: route,
                 element: <MainPage />,
-              },
-              {
-                path: "ecommerce",
-                element: <EcommerceComponent />,
-              },
-              {
-                path: "moto",
-                element: <EcommerceComponent />,
-              },
+              })),
             ],
           },
         ],

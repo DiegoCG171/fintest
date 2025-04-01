@@ -1,6 +1,7 @@
 import api from "../../api/api";
 import { ENDPOINTS } from "../../config/constants/endpoints";
 import { getEncrypted } from "../../config/utils/passwordEncrypt";
+import { handleAxiosError } from "../../config/utils/axiosErrorHandler";
 
 export interface LoginCredentials {
     user: string;
@@ -24,12 +25,12 @@ export interface LoginResponse {
 
 export const login = async (body: LoginCredentials): Promise<LoginResponse> => {
     body.password = getEncrypted(body.password);
-    console.log(body)
     try {
         const response = await api.post<LoginResponse>(ENDPOINTS.login, body);
-        return response.data
-    } catch (error: unknown) {
-        console.error("Error en el servicio de login:", error);
-        throw error
+        return response.data;
+    } catch (error) {
+        const errorMessage = handleAxiosError(error);
+        throw new Error(errorMessage);
     }
-}
+};
+
