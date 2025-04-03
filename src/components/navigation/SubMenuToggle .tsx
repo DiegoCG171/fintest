@@ -3,14 +3,10 @@ import KeyboardArrowRightRoundedIcon from '@mui/icons-material/KeyboardArrowRigh
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 import ItemListComponent from "./ItemListComponent";
 import { useState } from "react";
-import { MenuItem } from "./MenuToggle";
 import { JSX } from "@emotion/react/jsx-runtime";
+import { SubMenuToggleProps } from "../../config/interfaces";
 
-interface SubMenuToggleProps {
-    title: string;
-    icon: React.ReactNode;
-    items: MenuItem[];
-}
+
 
 const SubMenuToggle = ({ title, icon, items }: SubMenuToggleProps): JSX.Element => {
     const [open, setOpen] = useState(false);
@@ -33,12 +29,13 @@ const SubMenuToggle = ({ title, icon, items }: SubMenuToggleProps): JSX.Element 
                     justifyContent: "space-between",
                     cursor: "pointer",
                     borderRadius: 2,
-                    border: "1px solid #D1D1D1",
                     p: "4px",
                     height: "32px",
                     backgroundColor: active ? "primary.light" : "transparent",
                     "&:hover": {
-                        backgroundColor: active ? "primary.light" : "rgba(0, 0, 0, 0.08)",
+                        backgroundColor: active ? "primary.light" : "rgba(0, 0, 0, 0.01)",
+                        
+                    border: "1px solid #D1D1D1",
                     },
                     transition: "background-color 0.2s ease",
                 }}

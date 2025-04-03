@@ -1,20 +1,15 @@
 import { Box, Typography } from "@mui/material";
 import logo from "../../assets/logo.svg";
+import { TextBoxProps } from "../../config/interfaces";
 
-interface TextBoxProps {
-    title: string;
-    welcomeText: string;
-    description: React.ReactNode;
-}
-
-function TextBox({ title, welcomeText, description }: TextBoxProps) {
+function TextBox({ title, welcomeText, description, align }: TextBoxProps) {
     return (
         <Box
         sx={{
             width: "100%",
             display: "flex",
             flexDirection: "column",
-            alignItems: "",
+            alignItems: align || "flex-start" ,
         }}
         >
         <Box
@@ -25,7 +20,7 @@ function TextBox({ title, welcomeText, description }: TextBoxProps) {
                 height: 50, 
                 mb: 4,
                 mt: 4, 
-                alignSelf: "flex-start" 
+                alignSelf: align || "flex-start" 
             }}
         />
         <Typography
@@ -34,10 +29,10 @@ function TextBox({ title, welcomeText, description }: TextBoxProps) {
         >
             <strong>{title}</strong>
         </Typography>
-        <Typography variant="body1">
+        <Typography variant="body1" sx={{ textAlign: align || "left" }}>
             <strong>{welcomeText}</strong>
         </Typography>
-        <Typography variant="body2">
+        <Typography variant="body2" sx={{ textAlign: align || "left" }}>
             {description}
         </Typography>
         </Box>

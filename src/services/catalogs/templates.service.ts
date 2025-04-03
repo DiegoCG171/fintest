@@ -1,6 +1,6 @@
 import api from "../../api/api";
 import { ENDPOINTS } from "../../config/constants/endpoints";
-import { TemplateContextType } from "../../config/interfaces/template.interface";
+import { TemplateContextType } from "../../config/interfaces";
 
 export const getTemplate = async (): Promise<TemplateContextType> => {
     try {

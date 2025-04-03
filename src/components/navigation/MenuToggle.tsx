@@ -2,22 +2,7 @@ import React, { useState } from "react";
 import { Box, Typography, Collapse } from "@mui/material";
 import ItemListComponent from "./ItemListComponent";
 import { SubMenuToggle } from "./SubMenuToggle ";
-
-export interface MenuItem {
-    title: string;
-    onClick: (() => void) | undefined;
-    link: string | undefined;
-    name: string;
-    icon: React.ReactNode;
-    subItems?: MenuItem[];
-}
-
-interface MenuToggleProps {
-    title: string;
-    icon: React.ReactNode;
-    index: string | number;
-    items: MenuItem[];
-}
+import { MenuToggleProps } from "../../config/interfaces";
 
 const MenuToggle = ({ title, icon, items, index }: MenuToggleProps): React.ReactNode => {
     const [open, setOpen] = useState(false);

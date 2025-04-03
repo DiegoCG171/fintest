@@ -1,10 +1,8 @@
 import api from "../../api/api";
 import { ENDPOINTS } from "../../config/constants/endpoints";
+import { clientsConection } from "../../config/interfaces";
 
-export interface clientsConection {
-    host?: string
-    port: number
-    }
+
 export const startClient = async (body: clientsConection) => {
     try{
         const response = await api.post(ENDPOINTS.startClient, body);

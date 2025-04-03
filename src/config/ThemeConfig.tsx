@@ -119,7 +119,7 @@ const theme = createTheme({
         },
       },
     },
-    MuiTabs: {
+    /* MuiTabs: {
       styleOverrides: {
         root: {
           display: "inline-flex",
@@ -156,7 +156,7 @@ const theme = createTheme({
           },
         },
       },
-    },
+    }, */
     MuiTablePagination: {
       styleOverrides: {
         root: {

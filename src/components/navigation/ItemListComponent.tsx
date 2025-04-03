@@ -1,13 +1,6 @@
 import React from "react";
 import { Box, Typography, IconButton } from "@mui/material";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-
-interface ItemListProps {
-    title: string;
-    icon: React.ReactNode;
-    onClick?: () => void;
-    link?: string;
-}
+import { useLocation, useNavigate } from "react-router-dom";
 
 const ItemListComponent = ({ title, icon, onClick, link }: ItemListProps) => {
     const location = useLocation();
@@ -16,7 +9,6 @@ const ItemListComponent = ({ title, icon, onClick, link }: ItemListProps) => {
     // Verificar si el link actual está activo
     const isActive = link ? location.pathname === `/${link}` : false;
 
-    // Manejador de clic genérico
     const handleClick = (event: React.MouseEvent) => {
         if (onClick) onClick();
         if (link) {

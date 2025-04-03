@@ -59,7 +59,7 @@ const CustomInputComponent: React.FC<CustomTextFieldProps> = ({
     const mergedInputSlotProps = {
         ...slotProps?.input,
         ...(endIconType && {
-            endAdornment: <InputAdornment position="end">{renderEndIcon()}</InputAdornment>,
+            endAdornment: <InputAdornment position="end" sx={{ backgroundColor: "transparent", p: 0 }}>{renderEndIcon()} </InputAdornment>,
         }),
     };
 

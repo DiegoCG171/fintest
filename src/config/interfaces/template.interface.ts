@@ -37,3 +37,8 @@ export interface GenerationTransaction {
     fields: unknown[]
     _id: string
 }
+
+export interface TemplateContextState {
+    template: TemplateContextType | null;
+    getTemplates: () => Promise<void>;
+}

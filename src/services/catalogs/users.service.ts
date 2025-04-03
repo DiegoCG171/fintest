@@ -1,13 +1,6 @@
 import api from "../../api/api";
 import { ENDPOINTS } from "../../config/constants/endpoints";
-
-export interface createUserInterface {
-    username: string
-    password: string
-    email: string
-    names: string
-    surnames: string
-}
+import { createUserInterface } from "../../config/interfaces";
 
 export const getUser = async () => {
     try {

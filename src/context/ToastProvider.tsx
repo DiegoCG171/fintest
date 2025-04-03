@@ -1,20 +1,9 @@
 import { useState } from "react";
-import { DefaultConfigProps } from "../config/interfaces/type.interface";
 import { Alert, Snackbar } from "@mui/material";
 import { ToastContext } from "./ToastContext";
+import { DefaultConfigProps, ToastState } from "../config/interfaces";
 
-export interface ToastState {
-  open: boolean;
-  message: string;
-  type: "success" | "error" | "warning" | "info";
-}
-
-export interface ToastContextType {
-    showToast: (message: string, type?: "success" | "error" | "warning" | "info") => void;
-  }
-  
-
-export const ToastProvider = ({ children }: DefaultConfigProps) => {
+export const ToastProvider = ( { children }: DefaultConfigProps ) => {
   const [toast, setToast] = useState<ToastState>({
     open: false,
     message: "",

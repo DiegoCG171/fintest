@@ -62,7 +62,11 @@ const LoginComponent = () => {
                   error={Boolean(touched.password && errors.password)}
                   helperText={touched.password && errors.password}
                 />
-                <Link sx={{ alignSelf: 'flex-end' }}>
+                <Link 
+                  sx={{ alignSelf: 'flex-end' }}
+                  component={RouterLink}
+                        to="/recovery-pssw"
+                  >
                   ¿Olvidaste tu contraseña?
                 </Link>
                 <Button 

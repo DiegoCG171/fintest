@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 import HeaderComponent from "../components/core/HeaderComponent";
 import { Box } from "@mui/material";
-import SideNavComponent from "../components/navigation/SideNavComponent";
+import SideNavComponent, { drawerWidth } from "../components/navigation/SideNavComponent";
 
 function PrivateLayoutContent() {
     return (
@@ -15,12 +15,12 @@ function PrivateLayoutContent() {
             flexDirection: "column",
             }}
         >
-            <Box sx={{ position: "sticky", top: 0, zIndex: 1100 }}>
+            <Box sx={{ position: "sticky", top: 0, zIndex: 800 }}>
             <HeaderComponent alerts={9} />
             </Box>
 
-            <Box sx={{ flex: 1, overflow: "hidden", m: 2, mb:8}}>
-            <Outlet />
+            <Box sx={{ marginLeft: `${drawerWidth}px`, flexGrow: 1, p: 3 }}>
+                <Outlet />
             </Box>
         </Box>
         </Box>

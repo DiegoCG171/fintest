@@ -1,13 +1,8 @@
 import { Box, Card } from "@mui/material";
 import TabTableComponent from "../../components/table/TabTableComponent";
-import { ReactNode } from "react";
+import { TabbedCardContainerProps } from "../../config/interfaces";
 
-interface TabbedCardContainerProps {
-    tabs: { label: string; content: ReactNode }[];
-    eventTabs: { label: string; content: ReactNode }[];
-}
-
-const TabbedCardContainer = ({ tabs, eventTabs }: TabbedCardContainerProps) => {
+const TabbedCardContainer = ({ tabs, eventTabs, initialTabIndex }: TabbedCardContainerProps) => {
     return (
         <Box
             sx={{
@@ -28,7 +23,10 @@ const TabbedCardContainer = ({ tabs, eventTabs }: TabbedCardContainerProps) => {
                     flexDirection: "column",
                 }}
             >
-                <TabTableComponent tabs={tabs} />
+                <TabTableComponent 
+                    tabs={tabs} 
+                    initialTabIndex={initialTabIndex} 
+                />
             </Card>
 
             {/* Card para Eventos */}
@@ -41,7 +39,10 @@ const TabbedCardContainer = ({ tabs, eventTabs }: TabbedCardContainerProps) => {
                     flexDirection: "column",
                 }}
             >
-                <TabTableComponent tabs={eventTabs} />
+                <TabTableComponent 
+                    tabs={eventTabs} 
+                    initialTabIndex={0}  
+                />
             </Card>
         </Box>
     );

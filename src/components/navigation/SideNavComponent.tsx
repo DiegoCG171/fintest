@@ -1,7 +1,6 @@
 import { useContext, useState } from "react";
 import {
   Box,
-  Drawer,
   InputAdornment,
   TextField,
   IconButton,
@@ -16,7 +15,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import { TemplateContext } from "../../context/TemplateContext";
 import MenuToggle from "./MenuToggle";
 
-const drawerWidth = 240;
+export const drawerWidth = 240;
 
 function SideNavComponent() {
   const [menuItems, setMenuItems] = useState<any[]>([]);
@@ -39,19 +38,31 @@ function SideNavComponent() {
         icon: <CreateNewFolderOutlinedIcon />,
         subItems: [
           {
-            name: "Ecommerce",
+            name: "Pos",
             icon: <FolderOutlinedIcon />,
             expanded: true,
             subItems: [
                 {
                   title: "Venta",
                   icon: <DescriptionOutlinedIcon />,
-                  onClick: () => console.log("Venta desde ecommerce"),
+                  expand: true,
+                  subItems: [
+                    {
+                      title: "Venta",
+                      icon: <DescriptionOutlinedIcon />,
+                      onClick: () => console.log("Venta desde ecommerce"),
+                    },
+                    {
+                      title: "Venta",
+                      icon: <DescriptionOutlinedIcon />,
+                      onClick: () => console.log("Venta desde ecommerce"),
+                    },
+                  ],
                 },
               ],
           },
           {
-            name: "Moto",
+            name: "ATM",
             icon: <FolderOutlinedIcon />,
             expanded: true,
             subItems: [
@@ -148,21 +159,19 @@ function SideNavComponent() {
   }
 
   return (
-    <Drawer
-      variant="permanent"
+    <Box
       sx={{
         width: drawerWidth,
-        flexShrink: 0,
-        "& .MuiDrawer-paper": {
-          width: drawerWidth,
-          boxSizing: "border-box",
-          boxShadow: "none",
-          borderRight: "none",
-          height: "100vh",
-          padding: "8px",
-          display: "flex",
-          flexDirection: "column",
-        },
+        position: "fixed", // Fijo en la pantalla
+        height: "100vh",
+        backgroundColor: "#fff",
+        boxSizing: "border-box",
+        display: "flex",
+        flexDirection: "column",
+        zIndex: 1100,
+        overflowY: "auto",
+        padding: "8px",
+        
       }}
     >
       {/* Header del menú lateral */}
@@ -180,10 +189,7 @@ function SideNavComponent() {
           alt="Fintest"
           style={{ height: "32px", marginBottom: "10px" }}
         />
-        <IconButton
-          size="small"
-          sx={{ padding: 0 }}
-        >
+        <IconButton size="small" sx={{ padding: 0 }}>
           <MenuOpenOutlinedIcon />
         </IconButton>
       </Box>
@@ -195,14 +201,12 @@ function SideNavComponent() {
           size="small"
           fullWidth
           placeholder="Buscar..."
-          slotProps={{
-            input: {
-              endAdornment: (
-                <InputAdornment position="end">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            },
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <SearchIcon />
+              </InputAdornment>
+            ),
           }}
           sx={{
             "& .MuiOutlinedInput-root": {
@@ -215,7 +219,7 @@ function SideNavComponent() {
       </Box>
 
       {/* Menú desplegable */}
-      <Box sx={{ px: 1, overflowY: "auto", flexGrow: 1 }}>
+      <Box sx={{ px: 1, overflowY: "auto", flexGrow: 1, my:4 }}>
         {menuItems.map((menu, index) => (
           <MenuToggle
             key={`${index}-menu-toggle`}
@@ -226,7 +230,7 @@ function SideNavComponent() {
           />
         ))}
       </Box>
-    </Drawer>
+    </Box>
   );
 }
 

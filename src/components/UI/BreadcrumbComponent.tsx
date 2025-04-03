@@ -4,11 +4,12 @@ import Link from "@mui/material/Link";
 import { useLocation, Link as RouterLink } from "react-router-dom";
 
 const BREADCRUMB_NAMES: Record<string, string> = {
-  "dashboard": "Panel",
-  "ecommerce": "Tienda",
-  "productos": "Productos",
-  "editar": "Editar",
-  "detalle": "Detalle",
+  "ventas": "Ventas",
+  "reverso": "Reverso",
+  "cancelacion": "Cancelación",
+  "ventas-ds": "Venta con #DS",
+  "ventas-visa": "Venta visa",
+  "ventas-mastercard": "Cuenta con 3DS mastercard",
 };
 
 function BreadcrumbComponent() {
@@ -21,7 +22,10 @@ function BreadcrumbComponent() {
 
     const isLast = index === pathnames.length - 1;
     return isLast ? (
-      <Typography key={to} sx={{ color: "inherit", fontSize: "14px" }}>
+      <Typography
+        key={to}
+        sx={{ color: "inherit", fontSize: "14px" }}
+      >
         {name}
       </Typography>
     ) : (
@@ -41,17 +45,8 @@ function BreadcrumbComponent() {
   return (
     <Breadcrumbs
       separator={<ArrowRightIcon sx={{ color: "text.disabled" }} />}
-      sx={{ color: "#888888" }}
+      sx={{ color: "#888888", textTransform: "capitalize" }}
     >
-      <Link
-        underline="hover"
-        color="inherit"
-        component={RouterLink}
-        to="/"
-        sx={{ fontSize: "14px" }}
-      >
-        {BREADCRUMB_NAMES[""] || "Inicio"}
-      </Link>
       {crumbs}
     </Breadcrumbs>
   );

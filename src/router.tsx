@@ -11,6 +11,8 @@ import PublicGuard from "./guards/PublicGuard";
 import PrivateGuard from "./guards/PrivateGuard";
 import NotFoundComponent from "./pages/Generic/NotFoundComponent";
 import MainPage from "./pages/Catalogs/MainPageComponent";
+import ResetPassword from "./pages/Auth/ResetPassword";
+import RecoveryPassword from "./pages/Auth/RecoveryPassword";
 
 const mainPageRoutes = [
   "main", 
@@ -52,6 +54,14 @@ const router = createBrowserRouter([
           {
             path: "home",
             element: <SplashComponent />,
+          },
+          {
+            path: "reset-pssw",
+            element: <ResetPassword />,
+          },
+          {
+            path: "recovery-pssw",
+            element: <RecoveryPassword />,
           },
           {
             element: <AuthLayout />,

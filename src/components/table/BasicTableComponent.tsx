@@ -10,12 +10,7 @@ import {
   TablePagination,
   Box,
 } from "@mui/material";
-import { TableRowData } from "../../config/interfaces/type.interface";
-
-interface BasicTableProps {
-  initialRows: TableRowData[];
-  showPagination?: boolean;
-}
+import { BasicTableProps, TableRowData } from "../../config/interfaces";
 
 function insertWordBreaks(text: any, chunkSize = 20) {
   const chunks = [];
@@ -35,7 +30,7 @@ function BasicTable({ initialRows, showPagination = false }: BasicTableProps) {
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const handleChangePage = (
-    event: unknown,
+    _event: unknown,
     newPage: SetStateAction<number>
   ) => {
     setPage(newPage);

@@ -2,12 +2,6 @@ import { Badge as BaseBadge, Divider, Stack } from '@mui/material';
 import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
 import AccountMenu from './AccountMenu';
 
-interface HeaderComponentProps {
-  alerts: number;
-}
-
-
-
 function HeaderComponent(
   { alerts }: HeaderComponentProps
 ) {

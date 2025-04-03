@@ -1,40 +1,19 @@
-import { Box, Tab, Tabs } from "@mui/material";
-import { useState } from "react";
+import { Box, Stack, Tab, Tabs } from "@mui/material";
+import { useState, useEffect } from "react";
+import CustomTabPanel from "../core/CustomTabPanel";
+import { TabTableComponentProps } from "../../config/interfaces";
 
-interface TabItem {
-  label: string;
-  content: React.ReactNode;
-}
+function TabTableComponent({
+  tabs = [],
+  initialTabIndex = 0,
+}: TabTableComponentProps) {
+  const [value, setValue] = useState(initialTabIndex);
 
-interface TabTableComponentProps {
-  tabs: TabItem[];
-}
-
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
-
-function CustomTabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tab-panel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && <Box sx={{ marginTop: 3 }}>{children}</Box>}
-    </div>
-  );
-}
-
-function TabTableComponent({ tabs }: TabTableComponentProps) {
-  const [value, setValue] = useState(0);
-
+  const variants = tabs.length >= 3 ? "fullWidth" : "standard";
+  const display = tabs.length >= 3 ? "block" : "inline-flex";
+  useEffect(() => {
+    setValue(initialTabIndex);
+  }, [initialTabIndex]);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -44,30 +23,65 @@ function TabTableComponent({ tabs }: TabTableComponentProps) {
     <Box
       sx={{
         height: "100%",
-        display: tabs.length >= 3 ? "flex" : "block",
+        display: "block",
         flexDirection: "column",
       }}
     >
+        <Stack>
+            
+        </Stack>
       <Tabs
         value={value}
-        variant= "standard"
+        variant={variants}
         textColor="inherit"
-        indicatorColor="primary"
         onChange={handleChange}
+        sx={{
+          border: "1px solid #D1D1D1",
+          borderRadius: 4,
+          margin: 0,
+          minHeight: 4,
+          display: { display },
+          "& .MuiTabs-indicator": {
+            display: "none",
+          },
+          ...(tabs.length > 2 && {
+            '& .MuiTabs-scroller': {
+                marginBottom: '-6px !important',
+            },
+            '& .MuiTabs-root': {
+                marginBottom: '-6px !important',
+            },
+        }),
+        }}
       >
-        {tabs.map((tab, index) => (
+        {tabs?.map((tab, index) => (
           <Tab
-            key={index+'-tab-chip'}
+            key={index + "-tab-table"}
             label={tab.label}
             value={index}
+            sx={{
+              minWidth: "20vw",
+              padding: "0 64px",
+              minHeight: "36px",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              margin: 1,
+              textTransform: "capitalize",
+              textOverflow: "ellipsis",
+              "&.Mui-selected": {
+                color: "primary.main",
+                fontWeight: "bold",
+                backgroundColor: "primary.light",
+              },
+            }}
           />
         ))}
       </Tabs>
 
       <Box sx={{ flexGrow: 1, overflow: "auto" }}>
-        {tabs.map((tab, index) => (
+        {tabs?.map((tab, index) => (
           <CustomTabPanel
-            key={index + '-tab-content'}
+            key={index + "-tab-content"}
             value={value}
             index={index}
           >

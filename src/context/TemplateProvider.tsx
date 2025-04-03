@@ -1,13 +1,7 @@
 import { useState } from "react";
-import { DefaultConfigProps } from "../config/interfaces/type.interface";
-import { TemplateContextType } from "../config/interfaces/template.interface";
 import { getTemplate } from "../services/catalogs/templates.service";
 import { TemplateContext } from "./TemplateContext";
-
-export interface TemplateContextState {
-    template: TemplateContextType | null;
-    getTemplates: () => Promise<void>;
-}
+import { DefaultConfigProps, TemplateContextState } from "../config/interfaces";
 
 function TemplateProvider({ children }: DefaultConfigProps) {
     const [template, setTemplate] = useState<TemplateContextState["template"]>(null);
