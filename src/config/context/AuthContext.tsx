@@ -1,4 +1,4 @@
 import { createContext } from "react";
-import { AuthContextType } from "./AuthProvider";
+import { AuthContextType } from "../interfaces";
 
 export const AuthContext = createContext<AuthContextType | null>(null);

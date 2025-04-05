@@ -1,9 +1,9 @@
 import { Box, Container, Stack, Typography } from "@mui/material";
 import { Outlet } from "react-router-dom";
-import backgroundImage from "../assets/bg-fintest.png";
-import backgroundIcon from "../assets/bg-fintest-icon.svg";
-import mockupImage from "../assets/mockup-fintes.png";
-import icon from "../assets/icon.svg";
+import backgroundImage from "../../assets/bg-fintest.png";
+import backgroundIcon from "../../assets/bg-fintest-icon.svg";
+import mockupImage from "../../assets/mockup-fintes.png";
+import icon from "../../assets/icon.svg";
 
 const AuthLayout = () => {
   return (

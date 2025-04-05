@@ -1,0 +1,33 @@
+export interface FieldRules {
+    positionsLength?: PositionsLength | null;
+    idBitmap: string;
+    displayName: string;
+    dataType: string;
+    isLengthVariable: boolean;
+    length: number;
+    regex: string;
+    isBreakeable: boolean;
+    breakingRules?: BreakingRule[];
+    _id: string;
+}
+
+export interface PositionsLength {
+    initPos: number;
+    finalPos: number;
+}
+
+export interface BreakingRule {
+    id: string;
+    length: number;
+    idToken?: string;
+    displayName: string;
+    specification: Specification[];
+    _id: string;
+}
+
+export interface Specification {
+    id: string;
+    length: number;
+    displayName: string;
+    _id: string;
+}

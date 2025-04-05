@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { login as loginService } from "../services/auth/login.service";
+import { login as loginService } from "../../services/auth/login.service";
 import { AuthContext } from "./AuthContext";
-import { DefaultConfigProps, LoginCredentials, LoginResponse } from "../config/interfaces";
+import { WithChildrenProps, LoginCredentials, LoginResponse } from "../interfaces";
 
 
-export const AuthProvider = ({ children }: DefaultConfigProps) => {
+export const AuthProvider = ({ children }: WithChildrenProps) => {
     const [user, setUser] = useState<LoginResponse | null>(null);
     const [loading, setLoading] = useState(true);
 

@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Alert, Snackbar } from "@mui/material";
 import { ToastContext } from "./ToastContext";
-import { DefaultConfigProps, ToastState } from "../config/interfaces";
+import { WithChildrenProps, ToastState } from "../interfaces";
 
-export const ToastProvider = ( { children }: DefaultConfigProps ) => {
+export const ToastProvider = ( { children }: WithChildrenProps ) => {
   const [toast, setToast] = useState<ToastState>({
     open: false,
     message: "",

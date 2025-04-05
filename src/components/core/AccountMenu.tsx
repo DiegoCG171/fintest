@@ -1,5 +1,5 @@
 import { Box, Stack, Typography } from "@mui/material"
-import { useAuth } from "../../hooks/useAuth";
+import { useAuth } from "../../config/hooks/useAuth";
 
 const BadgeContent = () => {
     return (

@@ -1,6 +1,6 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import SplashComponent from "../pages/SplashComponent";
+import SplashComponent from "../../pages/SplashComponent";
 
 const RootRedirect = () => {
   const { user, loading } = useAuth();

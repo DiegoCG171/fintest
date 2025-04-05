@@ -1,7 +1,7 @@
 import { Breadcrumbs, Typography } from "@mui/material";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import Link from "@mui/material/Link";
-import { useLocation, Link as RouterLink } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 const BREADCRUMB_NAMES: Record<string, string> = {
   "ventas": "Ventas",
@@ -24,7 +24,7 @@ function BreadcrumbComponent() {
     return isLast ? (
       <Typography
         key={to}
-        sx={{ color: "inherit", fontSize: "14px" }}
+        sx={{ color: "blue", fontSize: "12px", fontWeight: "bold" }}
       >
         {name}
       </Typography>
@@ -33,9 +33,7 @@ function BreadcrumbComponent() {
         key={to}
         underline="hover"
         color="inherit"
-        component={RouterLink}
-        to={to}
-        sx={{ fontSize: "14px" }}
+        sx={{ fontSize: "12px" }}
       >
         {name}
       </Link>
@@ -45,7 +43,7 @@ function BreadcrumbComponent() {
   return (
     <Breadcrumbs
       separator={<ArrowRightIcon sx={{ color: "text.disabled" }} />}
-      sx={{ color: "#888888", textTransform: "capitalize" }}
+      sx={{ color: "text.disabled", textTransform: "capitalize" }}
     >
       {crumbs}
     </Breadcrumbs>

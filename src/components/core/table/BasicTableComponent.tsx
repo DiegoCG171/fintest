@@ -1,4 +1,4 @@
-import { SetStateAction, useState } from "react";
+import { ReactNode, SetStateAction, useState } from "react";
 import {
   Table,
   TableBody,
@@ -10,20 +10,21 @@ import {
   TablePagination,
   Box,
 } from "@mui/material";
-import { BasicTableProps, TableRowData } from "../../config/interfaces";
+import { BasicTableProps, TableRowData } from "../../../config/interfaces";
 
-function insertWordBreaks(text: any, chunkSize = 20) {
-  const chunks = [];
+function insertWordBreaks(text: string, chunkSize = 20): ReactNode[] {
+  const chunks: string[] = [];
   for (let i = 0; i < text.length; i += chunkSize) {
     chunks.push(text.substring(i, i + chunkSize));
   }
-  return chunks.reduce((acc, chunk, index) => {
+  return chunks.reduce<ReactNode[]>((acc, chunk, index) => {
     if (index > 0) {
       return [...acc, <wbr key={index} />, chunk];
     }
     return [chunk];
   }, []);
 }
+
 
 function BasicTable({ initialRows, showPagination = false }: BasicTableProps) {
   const [page, setPage] = useState(0);
@@ -56,7 +57,7 @@ function BasicTable({ initialRows, showPagination = false }: BasicTableProps) {
               {dynamicKeys.map((key) => (
                 <TableCell
                   key={key}
-                  sx={{ fontWeight: "bold", padding: "8px", paddingLeft: 4, height: "100%" }}
+                  sx={{ fontWeight: "bold", padding: "4px", paddingLeft: 4, height: "100%" }}
                 >
                   {key.toUpperCase()}
                 </TableCell>

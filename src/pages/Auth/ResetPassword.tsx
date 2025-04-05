@@ -1,8 +1,8 @@
 import { Form, Link as RouterLink } from "react-router-dom";
-import CustomInputComponent from "../../components/forms/CustomInputComponent";
+import CustomInputComponent from "../../components/core/forms/CustomInput";
 import { Box, Button, Stack, Typography, Link } from "@mui/material";
 import { Formik } from "formik";
-import { useToast } from "../../hooks/useToast";
+import { useToast } from "../../config/hooks/useToast";
 import * as Yup from "yup";
 import TextBox from "../../components/UI/TextBox";
 

@@ -12,7 +12,7 @@ import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
 import ArrowRightAltOutlinedIcon from "@mui/icons-material/ArrowRightAltOutlined";
 import SearchIcon from "@mui/icons-material/Search";
-import { TemplateContext } from "../../context/TemplateContext";
+import { TemplateContext } from "../../config/context/TemplateContext";
 import MenuToggle from "./MenuToggle";
 
 export const drawerWidth = 240;

@@ -10,10 +10,10 @@ import Link from "@mui/material/Link";
 import { Link as RouterLink } from "react-router-dom";
 import Grid from "@mui/material/Grid2";
 import { Formik, Form } from "formik";
-import CustomInputComponent from "../../components/forms/CustomInputComponent";
+import CustomInputComponent from "../../components/core/forms/CustomInput";
 import * as Yup from "yup";
 import TextBox from "../../components/UI/TextBox";
-import { useToast } from "../../hooks/useToast";
+import { useToast } from "../../config/hooks/useToast";
 
 const validationSchema = Yup.object({
   email: Yup.string()

@@ -1,6 +1,7 @@
 import React from "react";
 import { Box, Typography, IconButton } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
+import { ItemListProps } from "../../config/interfaces";
 
 const ItemListComponent = ({ title, icon, onClick, link }: ItemListProps) => {
     const location = useLocation();
@@ -13,7 +14,7 @@ const ItemListComponent = ({ title, icon, onClick, link }: ItemListProps) => {
         if (onClick) onClick();
         if (link) {
             event.preventDefault();
-            navigate(`/${link}`);  // Usar navigate en lugar de cambiar el href directamente
+            navigate(`/${link}`); 
         }
     };
 

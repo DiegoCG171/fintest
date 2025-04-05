@@ -1,5 +1,5 @@
 import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
-import { DefaultConfigProps } from "./interfaces/type.interface";
+import { WithChildrenProps } from "./interfaces/type.interface";
 
 const theme = createTheme({
   palette: {
@@ -114,7 +114,7 @@ const theme = createTheme({
     MuiTableCell: {
       styleOverrides: {
         root: {
-          fontSize: "12px",
+          fontSize: "10px",
           height: "100%"
         },
       },
@@ -160,14 +160,14 @@ const theme = createTheme({
     MuiTablePagination: {
       styleOverrides: {
         root: {
-          fontSize: "12px",
+          fontSize: "10px",
         },
       },
     },
     MuiTableRow: {
       styleOverrides: {
         root: {
-          maxHeight: "18px",
+          maxHeight: "16px",
         },
       },
     },
@@ -182,7 +182,7 @@ const theme = createTheme({
   },
 });
 
-const ThemeConfig = ({ children }: DefaultConfigProps) => {
+const ThemeConfig = ({ children }: WithChildrenProps) => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />

@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { getTemplate } from "../services/catalogs/templates.service";
+import { getTemplate } from "../../services/catalogs/templates.service";
 import { TemplateContext } from "./TemplateContext";
-import { DefaultConfigProps, TemplateContextState } from "../config/interfaces";
+import { WithChildrenProps, TemplateContextState } from "../interfaces";
 
-function TemplateProvider({ children }: DefaultConfigProps) {
+function TemplateProvider({ children }: WithChildrenProps) {
     const [template, setTemplate] = useState<TemplateContextState["template"]>(null);
 
     const getTemplates = async () => {

@@ -1,6 +1,7 @@
 import { Badge as BaseBadge, Divider, Stack } from '@mui/material';
 import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
-import AccountMenu from './AccountMenu';
+import AccountMenu from '../core/AccountMenu';
+import { HeaderComponentProps } from '../../config/interfaces';
 
 function HeaderComponent(
   { alerts }: HeaderComponentProps
@@ -11,7 +12,8 @@ function HeaderComponent(
       direction="row"
       divider={<Divider orientation="vertical" flexItem />}
       sx={{ 
-        p: 2,
+        p: 1,
+        pr: 2,
         backgroundColor: 'common.white',
         alignItems: 'center',
         justifyContent: 'flex-end',

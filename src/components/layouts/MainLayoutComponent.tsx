@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import FooterComponent from "../components/core/FooterComponent";
+import FooterComponent from "../core/FooterComponent";
 import { Box } from "@mui/material";
 
 function MainLayoutComponent() {

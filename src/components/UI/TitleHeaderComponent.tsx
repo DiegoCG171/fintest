@@ -15,7 +15,7 @@ function TitleHeaderComponent() {
     const resolvedTitle = TITLE_HEADER[pathnames[0]] || "";
 
     return (
-        <Stack spacing={1}>
+        <Stack sx={{mt: -1}}>
             {resolvedTitle && (
                 <Typography
                     variant="h6"

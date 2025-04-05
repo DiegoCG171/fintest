@@ -7,7 +7,7 @@ function FooterComponent() {
         sx={{
             backgroundColor: (theme) => theme.palette.primary.main,
             p: 2,
-            height: 50,
+            height: 40,
         }}
         >
         <Typography variant="body2" color="common.white">

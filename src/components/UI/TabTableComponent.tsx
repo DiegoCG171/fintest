@@ -15,7 +15,7 @@ function TabTableComponent({
     setValue(initialTabIndex);
   }, [initialTabIndex]);
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
 
@@ -37,8 +37,9 @@ function TabTableComponent({
         onChange={handleChange}
         sx={{
           border: "1px solid #D1D1D1",
-          borderRadius: 4,
+          borderRadius: 2,
           margin: 0,
+          fontSize: '10px',
           minHeight: 4,
           display: { display },
           "& .MuiTabs-indicator": {
@@ -62,9 +63,10 @@ function TabTableComponent({
             sx={{
               minWidth: "20vw",
               padding: "0 64px",
-              minHeight: "36px",
+              minHeight: "24px",
               whiteSpace: "nowrap",
               overflow: "hidden",
+              fontSize: '12px',
               margin: 1,
               textTransform: "capitalize",
               textOverflow: "ellipsis",

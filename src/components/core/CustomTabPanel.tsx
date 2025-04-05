@@ -1,4 +1,5 @@
 import { Box } from "@mui/material";
+import { TabPanelProps } from "../../config/interfaces";
 
 function CustomTabPanel({children, value, index, ...other}: TabPanelProps) {
     return (
