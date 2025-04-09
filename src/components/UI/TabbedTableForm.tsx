@@ -10,7 +10,6 @@ function TabbedTableForm({
   initialTabIndex = 0,
 }: TabTableComponentProps) {
   const [value, setValue] = useState(initialTabIndex);
-
   useEffect(() => {
     setValue(initialTabIndex);
   }, [initialTabIndex]);

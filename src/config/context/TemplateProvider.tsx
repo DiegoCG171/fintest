@@ -9,7 +9,7 @@ function TemplateProvider({ children }: WithChildrenProps) {
     const getTemplates = async () => {
         try {
             const data = await getTemplate();
-            console.log("Datos obtenidos:", data);
+            
             setTemplate(data);
         } catch (error) {
             console.error("Error al obtener la plantilla:", error);

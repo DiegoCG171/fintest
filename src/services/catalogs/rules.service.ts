@@ -4,7 +4,6 @@ import { ENDPOINTS } from "../../config/constants/endpoints";
 export const getRules = async () => {
     try {
         const response = await api.get(ENDPOINTS.getRules);
-        console.log('Reglas:', response.data);
         return response.data;
     } catch (error) {
         console.error('Error al obtener las reglas:', error);

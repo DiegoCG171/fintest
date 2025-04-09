@@ -1,6 +1,7 @@
 import { SelectProps, TextFieldProps } from "@mui/material";
 import { ReactNode } from "react";
 import { FieldRules } from "./rules.interface";
+import { serviceConfig } from "../utils/serviceConfig";
 
 //Default Props
 
@@ -12,7 +13,7 @@ export interface WithChildrenProps {
 //Table props
 
 export interface TableRowData {
-    [key: string]: ReactNode;
+    [key: string]: ReactNode | TableRowData[];
 }
 export interface TabPanelProps {
     children?: React.ReactNode;
@@ -27,6 +28,10 @@ export interface BasicTableProps {
 
 export interface DynamicTableProps {
     fields: FieldRules[];
+}
+
+export interface ComplexFormTableProps {
+    data: TableRowData[];
 }
 
 //Tabs props
@@ -85,7 +90,7 @@ export type CustomSelectProps = SelectProps & {
     isValid?: boolean;
     inputSize?: "small" | "medium";
     options: OptionsSelect;
-  };
+};
 
 export interface OptionsSelect {
     [key: string]: string | number;
@@ -152,3 +157,16 @@ export interface TextBoxProps {
     description: React.ReactNode;
     align?: string
 }
+
+//Middelware or handlers
+
+export type DataMiddlewareProps = {
+    payload?: {
+        [key: string]: string | boolean | null | number | undefined;
+    };
+    dataCase: dataServiceType,
+}
+
+export type dataServiceType = keyof typeof serviceConfig;
+
+

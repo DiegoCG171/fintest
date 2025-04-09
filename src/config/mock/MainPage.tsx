@@ -2,6 +2,7 @@ import { TabConfigInterface } from "../interfaces";
 import TabbedTableForm from "../../components/UI/TabbedTableForm";
 import TableForm from "../../components/core/table/TableForm";
 import { mockFields } from "./services/rules";
+import CatalogsDataMiddleware from "../../components/middlewares/CatalogsDataMiddleware";
 
 export const dataMap = {
   detail: [{ campo: "", nombre: "", longitud: "", estado: "", contenido: "" }],
@@ -24,7 +25,7 @@ const tabsContent = [
 ];
 
 export const tabConfig: TabConfigInterface = {
-  "ecommerce/ventas": [{ label: "Ventas", content: <TabbedTableForm tabs={tabsContent} /> }],
+  "ecommerce/ventas": [{ label: "Ventas", content: <CatalogsDataMiddleware dataCase="rules" /> }],
   "ecommerce/reverso": [{ label: "Reverso", content: <TabbedTableForm tabs={tabsContent} />}],
   "ecommerce/cancelacion": [{ label: "Cancelación", content: <TabbedTableForm tabs={tabsContent} />}],
   "ecommerce/ventas-ds": [{ label: "Venta con #DS", content: <TabbedTableForm tabs={tabsContent} />}],
