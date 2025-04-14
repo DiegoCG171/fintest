@@ -6,7 +6,7 @@ export interface AuthContextType {
 }
 
 export interface LoginCredentials {
-    user: string;
+    username: string;
     password: string;
 }
 

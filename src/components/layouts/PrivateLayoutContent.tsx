@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 import HeaderComponent from "../UI/HeaderComponent";
 import { Box } from "@mui/material";
-import SideNavComponent, { drawerWidth } from "../navigation/SideNavComponent";
+import SideNavComponent, { drawerWidth } from "../UI/SideNavComponent";
 
 function PrivateLayoutContent() {
     return (

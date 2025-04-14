@@ -1,6 +1,4 @@
 import {
-  Collapse,
-  IconButton,
   Paper,
   Table,
   TableBody,
@@ -9,18 +7,12 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
-import {
-  ComplexFormTableProps,
-  TableRowData,
-} from "../../../config/interfaces";
+import { ComplexFormTableProps } from "../../../config/interfaces";
 import { useEffect, useState } from "react";
-import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
-import KeyboardArrowUpRoundedIcon from '@mui/icons-material/KeyboardArrowUpRounded';
+import ComplexFormSubTable from "./ComplexFormSubTable";
 
-function ComplexFormTable({ data }: ComplexFormTableProps) {
-  console.log(data);
+function ComplexFormTable({ data, columns }: ComplexFormTableProps) {
   const [visibleHeaders, setVisibleHeaders] = useState<string[]>([]);
-  const [open, setOpen] = useState(false)
 
   useEffect(() => {
     if (data.length > 0) {
@@ -41,32 +33,11 @@ function ComplexFormTable({ data }: ComplexFormTableProps) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {data.map((row: TableRowData, rowIndex: number) => {
-            return (
-              <TableRow key={rowIndex}>
-                {visibleHeaders.map((header) => {
-                  const value = row[header];
-
-                  if (Array.isArray(value)) {
-                    return (
-                      <TableCell colSpan={visibleHeaders.length}>
-                        <IconButton aria-label="expandir" onClick={() => setOpen(!open)}>
-                        {open ? <KeyboardArrowDownRoundedIcon /> : <KeyboardArrowUpRoundedIcon />}
-                        </IconButton>
-                        <Collapse in={true}>
-                          {/* <ComplexFormTable
-                              data={row[header] as TableRowData[]}
-                            /> */}
-                        </Collapse>
-                      </TableCell>
-                    );
-                  }
-
-                  return <TableCell key={header}>{value}</TableCell>;
-                })}
-              </TableRow>
-            );
-          })}
+          <ComplexFormSubTable
+            data={data}
+            visibleHeaders={visibleHeaders}
+            columns={columns}
+          />
         </TableBody>
       </Table>
     </TableContainer>

@@ -11,7 +11,7 @@ import { useToast } from "../../../config/hooks/useToast";
 import { getErrorMessage } from "../../../config/utils";
 
 const validationSchema = Yup.object({
-  user: Yup.string().required("El usuario es requerido"),
+  username: Yup.string().required("El usuario es requerido"),
   password: Yup.string().required("La contraseña es requerida"),
 });
 
@@ -29,14 +29,14 @@ const LoginComponent = () => {
       <Box sx={{ flexGrow: 1, my: 4 }}>
         <Formik
           initialValues={{
-            user: "",
+            username: "",
             password: "",
           }}
           validationSchema={validationSchema}
           onSubmit={async (values, { setSubmitting }) => {
             try {
               await login({
-                user: values.user,
+                username: values.username,
                 password: values.password,
               });
               navigate("/");
@@ -53,10 +53,10 @@ const LoginComponent = () => {
               <Stack spacing={2}>
                 <CustomInputComponent
                   label="Usuario"
-                  id="user"
-                  {...getFieldProps("user")}
-                  error={Boolean(touched.user && errors.user)}
-                  helperText={touched.user && errors.user}
+                  id="username"
+                  {...getFieldProps("username")}
+                  error={Boolean(touched.username && errors.username)}
+                  helperText={touched.username && errors.username}
                 />
                 <CustomInputComponent
                   label="Contraseña"

@@ -32,6 +32,28 @@ export interface DynamicTableProps {
 
 export interface ComplexFormTableProps {
     data: TableRowData[];
+    columns: { id: string; label: string; width: number; }[]
+}
+
+export interface PropsComplexFormSubTable {
+    data: TableRowData[];
+    visibleHeaders: string[];
+    columns: { id: string; label: string; width: number; }[]
+};
+
+//Menu props
+
+export interface MenuItem {
+    title: string;
+    iconMenu?: React.ReactNode;
+    linkMenu?: string;
+    onClickMenu?: () => void;
+    subItems?: MenuItem[];
+}
+
+export interface RecursiveMenuItemProps {
+    item: MenuItem;
+    depth?: number;
 }
 
 //Tabs props
@@ -51,7 +73,6 @@ export interface TabConfigInterface {
         content: ReactNode;
     }>;
 }
-
 
 export interface TabbedCardContainerProps {
     tabs: { label: string; content: ReactNode }[];
@@ -103,36 +124,6 @@ export interface StyleObject {
     fontSize: string;
     fontWeight: string;
 };
-
-//Sidebar props
-export interface ItemListProps {
-    title: string;
-    icon: React.ReactNode;
-    onClick?: () => void;
-    link?: string;
-}
-
-export interface MenuItem {
-    title: string;
-    onClick: (() => void);
-    link: string | undefined;
-    name: string;
-    icon: React.ReactNode;
-    subItems?: MenuItem[];
-}
-
-export interface MenuToggleProps {
-    title: string;
-    icon: React.ReactNode;
-    index: string | number;
-    items: MenuItem[];
-}
-
-export interface SubMenuToggleProps {
-    title: string;
-    icon: React.ReactNode;
-    items: MenuItem[];
-}
 
 
 //Toast props

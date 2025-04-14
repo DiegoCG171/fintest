@@ -9,7 +9,7 @@ function CatalogsDataMiddleware({
     dataCase = "rules",
 }: DataMiddlewareProps) {
     const [data, setData] = useState<Array<TableRowData>>([]);
-    console.log(dataCase);
+    const columns = serviceConfig.rules.columns;
     useEffect(() => {
         const config = serviceConfig[dataCase as keyof typeof serviceConfig];
         if (!config) {
@@ -32,7 +32,7 @@ function CatalogsDataMiddleware({
 
     return (
     <>
-        <ComplexFormTable data={data}></ComplexFormTable>
+        <ComplexFormTable data={data} columns={columns}></ComplexFormTable>
     </>
 );
 }

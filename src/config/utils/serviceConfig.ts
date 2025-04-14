@@ -9,24 +9,25 @@ export const serviceConfig = {
                 // Nivel 3: specification
                 const level3Children = (children: BreakingRule) =>
                     children.specification?.map((spec: Specification) => ({
-                        '': '',
+                        '': 'true',
                         Campo: spec.id,
                         Nombre: spec.displayName,
                         Requerido: '',
-                        'Función': '',
-                        'Parámetro': '',
+                        'Función': ' ',
+                        'Parámetro': ' ',
+                        ' ': '',
                         _id: spec._id,
                     })) ?? [];
 
                 // Nivel 2: breakingRules
                 const level2Children = Array.isArray(rule.breakingRules)
                     ? rule.breakingRules.map((br: BreakingRule) => ({
-                        '': '',
+                        '': 'true',
                         Campo: br.id,
                         Nombre: br.displayName,
                         Requerido: '',
-                        'Función': '',
-                        'Parámetro': '',
+                        'Función': ' ',
+                        'Parámetro': ' ',
                         ' ': level3Children(br),
                         _id: br._id,
                     }))
@@ -44,6 +45,15 @@ export const serviceConfig = {
                     _id: rule._id,
                 };
             }),
+        columns: [
+            { id: "", label: "", width: 40 },
+            { id: "Campo", label: "Campo", width: 100 },
+            { id: "Nombre", label: "Nombre", width: 200 },
+            { id: "Requerido", label: "Requerido", width: 100 },
+            { id: "Función", label: "Función", width: 150 },
+            { id: "Parámetro", label: "Parámetro", width: 150 },
+            { id: " ", label: "", width: 40 }
+        ],
     },
     /* orders: {
         //serviceMethod: (payload: any) => apiService.postOrders(payload),
