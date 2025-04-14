@@ -37,7 +37,6 @@ export interface ComplexFormTableProps {
 
 export interface PropsComplexFormSubTable {
     data: TableRowData[];
-    visibleHeaders: string[];
     columns: { id: string; label: string; width: number; }[]
 };
 
@@ -124,6 +123,13 @@ export interface StyleObject {
     fontSize: string;
     fontWeight: string;
 };
+
+export interface DynamicFieldProps {
+    name: string;
+    type: "text" | "select" | "checkbox";
+    label?: string;
+    options?: { value: string; label: string }[]; 
+}
 
 
 //Toast props

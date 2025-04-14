@@ -4,8 +4,8 @@ import { WithChildrenProps } from "./interfaces/type.interface";
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#1A71F6",
-      contrastText: "#184190",
+      main: "#1C4D8C",
+      contrastText: "#048ABF",
       dark: "#1154D4",
       light: "#EEF7FF",
     },
@@ -39,8 +39,27 @@ const theme = createTheme({
     body1: {
       color: "#454545",
     },
-  },
+    body2: {
+      fontSize: "0.75rem",
+      [`@media (min-width:600px)`]: {
+        fontSize: "0.8rem",
+      },
+      [`@media (min-width:900px)`]: {
+        fontSize: "0.8rem",
+      },
+      [`@media (min-width:1200px)`]: {
+        fontSize: "0.8rem",
+      },
+    },
+  },  
   components: {
+    MuiTypography: {
+      defaultProps: {
+        variantMapping: {
+          body2: "p",
+        },
+      },
+    },
     MuiOutlinedInput: {
       styleOverrides: {
         root: {

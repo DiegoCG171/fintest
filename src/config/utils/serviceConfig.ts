@@ -46,13 +46,13 @@ export const serviceConfig = {
                 };
             }),
         columns: [
-            { id: "", label: "", width: 40 },
-            { id: "Campo", label: "Campo", width: 100 },
-            { id: "Nombre", label: "Nombre", width: 200 },
-            { id: "Requerido", label: "Requerido", width: 100 },
-            { id: "Función", label: "Función", width: 150 },
-            { id: "Parámetro", label: "Parámetro", width: 150 },
-            { id: " ", label: "", width: 40 }
+            { id: "", label: "", width: "5%" },
+            { id: "Campo", label: "Campo", width: "10%" },
+            { id: "Nombre", label: "Nombre", width: "30%" },
+            { id: "Requerido", label: "Requerido", width: "15%" },
+            { id: "Función", label: "Función", width: "20%" },
+            { id: "Parámetro", label: "Parámetro", width: "20%" },
+            { id: " ", label: "", width: "5%" }
         ],
     },
     /* orders: {

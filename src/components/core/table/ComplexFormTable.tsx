@@ -8,34 +8,33 @@ import {
   TableRow,
 } from "@mui/material";
 import { ComplexFormTableProps } from "../../../config/interfaces";
-import { useEffect, useState } from "react";
 import ComplexFormSubTable from "./ComplexFormSubTable";
 
 function ComplexFormTable({ data, columns }: ComplexFormTableProps) {
-  const [visibleHeaders, setVisibleHeaders] = useState<string[]>([]);
-
-  useEffect(() => {
-    if (data.length > 0) {
-      const allHeaders = Object.keys(data[0]);
-      const filteredHeaders = allHeaders.filter((h) => !h.startsWith("_"));
-      setVisibleHeaders(filteredHeaders);
-    }
-  }, [data]);
-
   return (
     <TableContainer component={Paper}>
       <Table>
         <TableHead>
           <TableRow>
-            {visibleHeaders.map((header) => (
-              <TableCell key={header}>{header}</TableCell>
+            {columns.map((col) => (
+              <TableCell
+                key={col.id}
+                sx={{ minWidth: col.width }}
+              >
+                {col.label}
+              </TableCell>
             ))}
           </TableRow>
         </TableHead>
-        <TableBody>
+        <TableBody
+          sx={{
+            "& tr:last-child td": {
+              borderBottom: "none",
+            },
+          }}
+        >
           <ComplexFormSubTable
             data={data}
-            visibleHeaders={visibleHeaders}
             columns={columns}
           />
         </TableBody>

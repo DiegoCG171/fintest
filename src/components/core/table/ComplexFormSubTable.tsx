@@ -17,8 +17,7 @@ import React from "react";
 
 export default function ComplexFormSubTable({
   data,
-  visibleHeaders,
-  columns
+  columns,
 }: PropsComplexFormSubTable) {
   const [openRows, setOpenRows] = useState<Set<number>>(new Set());
 
@@ -36,23 +35,25 @@ export default function ComplexFormSubTable({
 
   return (
     <>
-      {data.map((row: TableRowData, rowIndex: number) => {
+      {data.map((row, rowIndex) => {
         const isOpen = openRows.has(rowIndex);
+        const childColumn = columns.find((col) => Array.isArray(row[col.id]));
+
         return (
-          <React.Fragment key={rowIndex + "fragment"}>
-            <TableRow key={rowIndex + "table-row"}>
-              {visibleHeaders.map((header) => {
-                const value = row[header];
-                if (Array.isArray(value)) {
+          <React.Fragment key={rowIndex + "-fragment"}>
+            <TableRow>
+              {columns.map((col) => {
+                const value = row[col.id];
+                const isExpandable = Array.isArray(value);
+
+                if (isExpandable) {
                   return (
                     <TableCell
-                      colSpan={visibleHeaders.length}
-                      key={rowIndex + "tab-cell"}
+                      key={col.id}
+                      colSpan={columns.length}
+                      sx={{ width: col.width }}
                     >
-                      <IconButton
-                        aria-label="expandir"
-                        onClick={() => toggleRow(rowIndex)}
-                      >
+                      <IconButton onClick={() => toggleRow(rowIndex)}>
                         {value.length ? (
                           isOpen ? (
                             <KeyboardArrowUpRoundedIcon />
@@ -66,25 +67,34 @@ export default function ComplexFormSubTable({
                     </TableCell>
                   );
                 }
-                return <TableCell key={header}>{value}</TableCell>;
+
+                return (
+                  <TableCell
+                    key={col.id}
+                    sx={{ width: col.width }}
+                  >
+                    {value}
+                  </TableCell>
+                );
               })}
             </TableRow>
 
-            {isOpen && (
-              <TableRow sx={{margin:0, padding:0}}>
-                <TableCell colSpan={visibleHeaders.length}>
-                  <Collapse in={isOpen} timeout="auto" unmountOnExit>
-                    <Table>
+            {/* Fila colapsable */}
+            {isOpen && childColumn && Array.isArray(row[childColumn.id]) && (
+              <TableRow sx={{ p: 0, m: 0 }}>
+                <TableCell
+                  colSpan={columns.length}
+                  sx={{ p: 0 }}
+                >
+                  <Collapse
+                    in={isOpen}
+                    timeout="auto"
+                    unmountOnExit
+                  >
+                    <Table sx={{ p: 0 }}>
                       <TableBody>
                         <ComplexFormSubTable
-                          data={
-                            row[
-                              visibleHeaders.find((h) =>
-                                Array.isArray(row[h])
-                              )!
-                            ] as TableRowData[]
-                          }
-                          visibleHeaders={visibleHeaders}
+                          data={row[childColumn.id] as TableRowData[]}
                           columns={columns}
                         />
                       </TableBody>

@@ -17,9 +17,10 @@ function TextBox({ title, welcomeText, description, align }: TextBoxProps) {
             src={logo}
             alt="Logo"
             sx={{ 
-                height: 50, 
+                width: 200, 
                 mb: 4,
                 mt: 4, 
+                ml: -2,
                 alignSelf: align || "flex-start" 
             }}
         />
