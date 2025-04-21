@@ -1,6 +1,6 @@
 import { Box, ButtonBase, Menu, MenuItem, Stack, Typography } from "@mui/material";
 import React from "react";
-import { useAppDispatch } from "../../store/hooks";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { logout } from "../../store/slices";
 
 const BadgeContent = () => {
@@ -27,6 +27,7 @@ function AccountMenu() {
   const dispatch = useAppDispatch();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const user = useAppSelector((state) => state.authReducer.user);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -48,8 +49,8 @@ function AccountMenu() {
       <BadgeContent></BadgeContent>
       <ButtonBase onClick={handleClick}>
         <Stack spacing={0} alignItems="flex-start">
-          <Typography variant="subtitle2">{`99`}</Typography>
-          <Typography variant="caption">{'user?.username'}</Typography>
+          <Typography variant="subtitle2">{`${user?.names} ${user?.surnames}`}</Typography>
+          <Typography variant="caption">{`${user?.username} `}</Typography>
         </Stack>
       </ButtonBase>
       <Menu
