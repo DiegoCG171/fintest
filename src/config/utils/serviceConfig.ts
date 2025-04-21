@@ -9,70 +9,73 @@ export const serviceConfig = {
                 // Nivel 3: specification
                 const level3Children = (children: BreakingRule) =>
                     children.specification?.map((spec: Specification) => ({
-                        '': 'true',
-                        Campo: spec.id,
-                        Nombre: spec.displayName,
-                        Requerido: '',
-                        'Función': ' ',
-                        'Parámetro': ' ',
-                        ' ': '',
+                        isRequired: '',
+                        idBitmap: spec.id,
+                        displayName: spec.displayName,
+                        canRequired: false,
+                        function: ['Value', 'Echo', 'Calculated', 'De request'],
+                        value: '',
+                        breakingRules: '',
                         _id: spec._id,
                     })) ?? [];
 
                 // Nivel 2: breakingRules
                 const level2Children = Array.isArray(rule.breakingRules)
                     ? rule.breakingRules.map((br: BreakingRule) => ({
-                        '': 'true',
-                        Campo: br.id,
-                        Nombre: br.displayName,
-                        Requerido: '',
-                        'Función': ' ',
-                        'Parámetro': ' ',
-                        ' ': level3Children(br),
+                        isRequired: '',
+                        idBitmap: br.id,
+                        displayName: br.displayName,
+                        canRequired: false,
+                        function: br.specification.length ? '' : ['Value', 'Echo', 'Calculated', 'De request'],
+                        value: '',
+                        breakingRules: level3Children(br),
                         _id: br._id,
                     }))
                     : [];
 
                 // Nivel 1: field rule principal
                 return {
-                    '': 'true',
-                    Campo: rule.idBitmap,
-                    Nombre: rule.displayName,
-                    Requerido: rule.isLengthVariable,
-                    'Función': rule.dataType,
-                    'Parámetro': rule.length,
-                    ' ': level2Children,
+                    isRequired: true,
+                    idBitmap: rule.idBitmap,
+                    displayName: rule.displayName,
+                    canRequired: false,
+                    function: rule.isBreakeable ? '' : ['Value', 'Echo', 'Calculated', 'De request'],
+                    value: '',
+                    breakingRules: level2Children,
                     _id: rule._id,
                 };
             }),
         columns: [
-            { id: "", label: "", width: "5%" },
-            { id: "Campo", label: "Campo", width: "10%" },
-            { id: "Nombre", label: "Nombre", width: "30%" },
-            { id: "Requerido", label: "Requerido", width: "15%" },
-            { id: "Función", label: "Función", width: "20%" },
-            { id: "Parámetro", label: "Parámetro", width: "20%" },
-            { id: " ", label: "", width: "5%" }
+            { id: "isRequired", label: "", affects: ["canRequired"], width: "5%", type: "checkbox" },
+            { id: "idBitmap", label: "Campo", width: "10%",  type: "static" },
+            { id: "displayName", label: "Nombre", width: "35%", type: "static" },
+            { id: "canRequired", label: "Requerido", dependsOn: "isRequired", width: "10%", type: "checkbox"},
+            {
+                id: "function",
+                label: "Función",
+                options: [],
+                affects: ["value"],
+                width: "20%",
+                type: "select"
+            },
+            {
+                id: "value",
+                label: "Parámetro",
+                dependsOn: "function",
+                dynamicRender: {
+                    Echo: { render: false },
+                    Calculated: { render: false },
+                    Value: { render: true, type: "input" },
+                    "De request": {
+                        render: true,
+                        type: "select",
+                        options: ["Opción 1", "Opción 1", "Opción 1"],
+                    },
+                },
+                width: "20%",
+                type: "input"
+            },
+            { id: "breakingRules", label: "", width: "5%", type: "static" }
         ],
     },
-    /* orders: {
-        //serviceMethod: (payload: any) => apiService.postOrders(payload),
-        serviceMethod: getRules,
-        mapData: (response: any) => response.orders.map((order: any) => {
-            // Si el pedido tiene hijos (detalles), los mapeamos
-            const children = order.details?.map((detail: any) => ({
-                ID: detail.id,
-                'Product Name': detail.productName,
-                Quantity: detail.quantity,
-                Price: detail.price,
-            })) || [];
-
-            return {
-                'Order ID': order.id,
-                Customer: order.customerName,
-                Total: order.totalAmount,
-                children,  // Guardamos los hijos en una propiedad
-            };
-        }),
-    }, */
 };

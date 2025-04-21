@@ -1,6 +1,7 @@
 import { Box, ButtonBase, Menu, MenuItem, Stack, Typography } from "@mui/material";
-import { useAuth } from "../../config/hooks/useAuth";
 import React from "react";
+import { useAppDispatch } from "../../store/hooks";
+import { logout } from "../../store/slices";
 
 const BadgeContent = () => {
   return (
@@ -23,6 +24,7 @@ const BadgeContent = () => {
 };
 
 function AccountMenu() {
+  const dispatch = useAppDispatch();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -33,14 +35,10 @@ function AccountMenu() {
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const {
-    user,
-    logout
-  } = useAuth();
 
   const handleLogout = () => {
     handleClose(); 
-    logout();  
+    dispatch(logout());  
   };
   return (
     <Stack
@@ -50,8 +48,8 @@ function AccountMenu() {
       <BadgeContent></BadgeContent>
       <ButtonBase onClick={handleClick}>
         <Stack spacing={0} alignItems="flex-start">
-          <Typography variant="subtitle2">{`${user?.names} ${user?.surnames}`}</Typography>
-          <Typography variant="caption">{user?.username}</Typography>
+          <Typography variant="subtitle2">{`99`}</Typography>
+          <Typography variant="caption">{'user?.username'}</Typography>
         </Stack>
       </ButtonBase>
       <Menu

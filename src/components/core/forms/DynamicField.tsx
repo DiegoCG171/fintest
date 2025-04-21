@@ -1,74 +1,122 @@
-import { useField } from "formik";
 import {
-    TextField,
-    Select,
-    MenuItem,
-    Checkbox,
-    FormControlLabel,
+  Checkbox,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
 } from "@mui/material";
-import { DynamicFieldProps } from "../../../config/interfaces";
+import { useField, useFormikContext } from "formik";
+import { DynamicFieldProps, FormValues } from "../../../config/interfaces";
 
-const DynamicField: React.FC<DynamicFieldProps> = ({
-    name,
-    type,
-    label,
-    options,
-    }) => {
-    const [field, meta] = useField(name);
-    const error = Boolean(meta.touched && meta.error);
+const fontSize = "0.75rem";
 
-    if (type === "select" && options) {
+const getFinalKey = (name: string): string => {
+  const parts = name.split(".");
+  const last = parts[parts.length - 1];
+  return last.replace(/\["(.+?)"\]/g, "$1");
+};
+
+const DynamicField = ({ name, row, column, id }: DynamicFieldProps) => {
+  const [field, meta, helpers] = useField(name);
+  const formik = useFormikContext<FormValues>();
+  const dependsOn = column?.dependsOn;
+  const dependsValue = dependsOn
+    ? formik.values.items?.[id]?.[dependsOn]
+    : undefined;
+  const key = getFinalKey(name);
+  const value = row?.[key];
+  console.log(column, "la columna");
+
+
+  if (column) {
+    if (column.type === "checkbox") {
+      const isDisabled = dependsOn && !dependsValue;
+
+      return (
+        <Checkbox
+          disabled={Boolean(isDisabled)}
+          checked={Boolean(field.value)}
+          onChange={(e) => helpers.setValue(e.target.checked)}
+        />
+      );
+    }
+
+    if (column.type === "select" && !column.dependsOn) {
+      if (Array.isArray(value)) {
+        if (dependsOn) {
+          console.log(dependsOn, "demendiente");
+        }
+        const renderOptionLabel = (item: unknown) => {
+          if (typeof item === "string" || typeof item === "number") {
+            return item;
+          } else return "";
+        };
+
+        const getOptionValue = (item: unknown) =>
+          typeof item === "string" || typeof item === "number"
+            ? item
+            : JSON.stringify(item);
+
         return (
-        <Select
-            fullWidth
+          <Select
             {...field}
-            error={error}
-            displayEmpty
+            fullWidth
+            value={field.value || ""}
+            onChange={(e) => helpers.setValue(e.target.value)}
+            size="small"
             variant="outlined"
-        >
+            sx={{
+              height: "28px",
+              fontSize,
+              borderRadius: 2,
+              "& .MuiSelect-select": {
+                padding: "4px 8px",
+              },
+            }}
+          >
             <MenuItem
-            value=""
-            disabled
+              value=""
+              sx={{ fontSize }}
             >
-            {label}
+              <em>Seleccione una opción</em>
             </MenuItem>
-            {options.map((opt) => (
-            <MenuItem
-                key={opt.value}
-                value={opt.value}
-            >
-                {opt.label}
-            </MenuItem>
+
+            {value.map((item, idx) => (
+              <MenuItem
+                key={idx}
+                value={getOptionValue(item)}
+                sx={{ fontSize }}
+              >
+                {renderOptionLabel(item)}
+              </MenuItem>
             ))}
-        </Select>
+          </Select>
         );
+      }
     }
 
-    if (type === "checkbox") {
-        return (
-        <FormControlLabel
-            control={
-            <Checkbox
-                {...field}
-                checked={field.value}
-            />
-            }
-            label={label}
-        />
-        );
+    if (column.type === "input" && !column.dependsOn) {
+      <TextField
+        sx={{
+            height: "28px",
+            fontSize,
+            borderRadius: 2,
+            "& .MuiSelect-select": {
+            padding: "4px 8px",
+            },
+        }}/>;
     }
 
-    // default: text
-    return (
-        <TextField
-        fullWidth
-        {...field}
-        label={label}
-        error={error}
-        helperText={error ? meta.error : ""}
-        variant="outlined"
-        />
-    );
+    if (column.type === "dynamic" && column.dependsOn) {
+      console.log("Es dinámico");
+    }
+  }
+
+  return (
+    <Typography variant="body2">
+      {typeof value === "string" ? value : "—"}
+    </Typography>
+  );
 };
 
 export default DynamicField;

@@ -1,12 +1,10 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+import { useAppSelector } from "../../store/hooks";
 
 const PublicGuard = () => {
-  const { user, loading } = useAuth();
+  const isAuthenticated = useAppSelector((state) => state.authReducer.isAuthenticated);
 
-  if (loading) return null;
-
-  return !user ? <Outlet /> : <Navigate to="/main" />;
+  return !isAuthenticated ? <Outlet /> : <Navigate to="/main" />;
 };
 
 export default PublicGuard;

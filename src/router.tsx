@@ -4,15 +4,15 @@ import MainLayoutComponent from "./components/layouts/MainLayoutComponent";
 import SplashComponent from "./pages/SplashComponent";
 import AuthLayout from "./components/layouts/AuthLayoutComponent";
 import LoginComponent from "./pages/Auth/login/LoginComponent";
-import RegisterComponent from "./pages/Auth/RegisterComponent";
+import RegisterComponent from "./pages/Auth/register/RegisterComponent";
 import PrivateLayoutContent from "./components/layouts/PrivateLayoutContent";
 import RootRedirect from "./config/guards/RootRedirect";
 import PublicGuard from "./config/guards/PublicGuard";
 import PrivateGuard from "./config/guards/PrivateGuard";
 import NotFoundComponent from "./pages/Generic/NotFoundComponent";
 import MainPage from "./pages/Catalogs/MainPageComponent";
-import ResetPassword from "./pages/Auth/ResetPassword";
-import RecoveryPassword from "./pages/Auth/RecoveryPassword";
+import ResetPassword from "./pages/Auth/reset-password/ResetPassword";
+import RecoveryPassword from "./pages/Auth/reset-password/RecoveryPassword";
 
 const mainPageRoutes = [
   "main", 

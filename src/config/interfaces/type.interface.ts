@@ -9,7 +9,6 @@ export interface WithChildrenProps {
     children: ReactNode;
 }
 
-
 //Table props
 
 export interface TableRowData {
@@ -32,12 +31,45 @@ export interface DynamicTableProps {
 
 export interface ComplexFormTableProps {
     data: TableRowData[];
-    columns: { id: string; label: string; width: number; }[]
+    columns: ColumnDynamicConfig[]
+}
+
+export interface DynamicRenderConfig {
+    render: boolean;
+    type?: "input" | "select";
+    options?: string[];
+}
+
+export interface ColumnDynamicConfig {
+    id: string;
+    label: string;
+    width: number | string;
+    type?: string;
+    dependsOn?: string;
+    affects?: string[];
+    options?: string[];
+    dynamicRender?: Record<string, DynamicRenderConfig>;
 }
 
 export interface PropsComplexFormSubTable {
-    data: TableRowData[];
-    columns: { id: string; label: string; width: number; }[]
+    data: Record<string, TableRowData>;
+    columns: ColumnConfig[];
+    parentPath?: string;
+}
+
+export interface ColumnConfig {
+    id: string;
+    label: string;
+    width: string | number;
+}
+
+export interface FormValues {
+    items: Record<string, Record<string, unknown>>;
+};
+
+
+export type FormRefHandle = {
+    submitForm: () => void;
 };
 
 //Menu props
@@ -59,6 +91,7 @@ export interface RecursiveMenuItemProps {
 export interface TabItem {
     label: string;
     content: ReactNode;
+    ref?: React.Ref<FormRefHandle>;
 }
 
 export interface TabTableComponentProps {
@@ -126,11 +159,11 @@ export interface StyleObject {
 
 export interface DynamicFieldProps {
     name: string;
-    type: "text" | "select" | "checkbox";
     label?: string;
-    options?: { value: string; label: string }[]; 
+    row?: TableRowData;
+    column?: ColumnDynamicConfig;
+    id: string | number;
 }
-
 
 //Toast props
 

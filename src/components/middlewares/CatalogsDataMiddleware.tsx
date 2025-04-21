@@ -1,13 +1,11 @@
-import { useEffect, useState } from "react";
-import { DataMiddlewareProps, TableRowData } from "../../config/interfaces";
+import { forwardRef, useEffect, useState } from "react";
+import { DataMiddlewareProps, FormRefHandle, TableRowData } from "../../config/interfaces";
 import { serviceConfig } from "../../config/utils/serviceConfig";
 import { safeCall } from "../../config/utils/safeCall";
 import ComplexFormTable from "../core/table/ComplexFormTable";
 
-function CatalogsDataMiddleware({
-    payload = undefined,
-    dataCase = "rules",
-}: DataMiddlewareProps) {
+const CatalogsDataMiddleware = forwardRef<FormRefHandle, DataMiddlewareProps>(
+    ({ payload = undefined, dataCase = "rules" }, ref) => {
     const [data, setData] = useState<Array<TableRowData>>([]);
     const columns = serviceConfig.rules.columns;
     useEffect(() => {
@@ -32,8 +30,8 @@ function CatalogsDataMiddleware({
 
     return (
     <>
-        <ComplexFormTable data={data} columns={columns}></ComplexFormTable>
+        <ComplexFormTable data={data} columns={columns} ref={ref}></ComplexFormTable>
     </>
 );
-}
+})
 export default CatalogsDataMiddleware;

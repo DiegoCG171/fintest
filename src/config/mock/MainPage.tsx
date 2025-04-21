@@ -1,11 +1,10 @@
 import { TabConfigInterface } from "../interfaces";
 import TabbedTableForm from "../../components/UI/TabbedTableForm";
-import TableForm from "../../components/core/table/TableForm";
-import { mockFields } from "./services/rules";
 import CatalogsDataMiddleware from "../../components/middlewares/CatalogsDataMiddleware";
+import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
 
 export const dataMap = {
-  detail: [{ campo: "", nombre: "", longitud: "", estado: "", contenido: "" }],
+  detail: [{ campo: "yrtyrtr", nombre: "tryrtyrt", longitud: "fjhf", estado: "", contenido: "" }, { campo: "yrtyrtr", nombre: "tryrtyrt", longitud: "fjhf", estado: <EditNoteRoundedIcon/>, contenido: "" }],
   errors: [{ campo: "", nombre: "", longitud: "", estado: "", contenido: "" }],
   events: [
     {
@@ -20,7 +19,7 @@ export const dataMap = {
 };
 
 const tabsContent = [
-  { label: "Validación", content: <TableForm fields={mockFields} /> },
+  { label: "Validación", content: <CatalogsDataMiddleware dataCase="rules" /> },
   { label: "Generación", content: "Sección de generación..." },
 ];
 

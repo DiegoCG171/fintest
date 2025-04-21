@@ -1,9 +1,8 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { Box, InputAdornment, TextField, IconButton } from "@mui/material";
 import logo from "../../assets/logo.svg";
 import MenuOpenOutlinedIcon from "@mui/icons-material/MenuOpenOutlined";
 import SearchIcon from "@mui/icons-material/Search";
-import { TemplateContext } from "../../config/context/TemplateContext";
 import RecursiveMenuItem from "../navigation/RecursiveMenuItem";
 import { MenuItem } from "../../config/interfaces";
 import { staticMenuItems } from "../../config/mock";
@@ -12,19 +11,10 @@ export const drawerWidth = 240;
 
 function SideNavComponent() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-  const context = useContext(TemplateContext);
 
-  if (!context) {
-    console.error("El contexto de Template no está disponible.");
-    return null;
-  }
+  
 
-  const { template, getTemplates } = context;
-  if (!template) {
-    getTemplates();
-  }
-
-  if (template && menuItems.length === 0) {
+  if (menuItems.length === 0) {
     setMenuItems(staticMenuItems);
   }
 

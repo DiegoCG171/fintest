@@ -12,7 +12,7 @@ export const login = async (body: LoginCredentials): Promise<LoginResponse> => {
         return response.data;
     } catch (error) {
         const errorMessage = handleAxiosError(error);
-        throw new Error(errorMessage);
+        throw errorMessage;
     }
 };
 

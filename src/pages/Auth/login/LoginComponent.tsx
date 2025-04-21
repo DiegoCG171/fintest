@@ -6,9 +6,10 @@ import Link from "@mui/material/Link";
 import * as Yup from "yup";
 import CustomInputComponent from "../../../components/core/forms/CustomInput";
 import TextBox from "../../../components/UI/TextBox";
-import { useAuth } from "../../../config/hooks/useAuth";
 import { useToast } from "../../../config/hooks/useToast";
-import { getErrorMessage } from "../../../config/utils";
+import { useAppDispatch } from "../../../store/hooks";
+import { loginThunk } from "../../../store/slices";
+import { clearError } from "../../../store/slices/auth/auth.slice";
 
 const validationSchema = Yup.object({
   username: Yup.string().required("El usuario es requerido"),
@@ -18,7 +19,7 @@ const validationSchema = Yup.object({
 const LoginComponent = () => {
   const { showToast } = useToast();
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const dispatch = useAppDispatch();
   return (
     <Box sx={{ width: "100%" }}>
       <TextBox
@@ -34,15 +35,17 @@ const LoginComponent = () => {
           }}
           validationSchema={validationSchema}
           onSubmit={async (values, { setSubmitting }) => {
+            dispatch(clearError());
             try {
-              await login({
+              await dispatch(
+                loginThunk({
                 username: values.username,
                 password: values.password,
-              });
+              })).unwrap();;
               navigate("/");
             } catch (error) {
-              const errorMessage = getErrorMessage(error);
-              showToast(errorMessage, "error");
+              console.log(error)
+              showToast(error as string, "error");
             } finally {
               setSubmitting(false);
             }

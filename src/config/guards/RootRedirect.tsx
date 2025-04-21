@@ -1,13 +1,11 @@
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
 import SplashComponent from "../../pages/SplashComponent";
+import { useAppSelector } from "../../store/hooks";
 
 const RootRedirect = () => {
-  const { user, loading } = useAuth();
+  const isAuthenticated = useAppSelector((state) => state.authReducer.isAuthenticated);
 
-  if (loading) return null;
-
-  return user ? <Navigate to="/main" /> : <SplashComponent />;
+  return isAuthenticated ? <Navigate to="/main" /> : <SplashComponent />;
 };
 
 export default RootRedirect;
