@@ -1,3 +1,5 @@
+import { AsyncStatus } from "."
+
 export type RootRules = Rules[]
 
 export interface Rules {
@@ -41,3 +43,9 @@ export interface Specification {
     displayName: string
     _id: string
 }
+
+export interface RulesState {
+    rules: FieldRules[];
+    status: AsyncStatus;
+    error: string | null;
+}  

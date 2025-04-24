@@ -1,37 +1,45 @@
-import { forwardRef, useEffect, useState } from "react";
-import { DataMiddlewareProps, FormRefHandle, TableRowData } from "../../config/interfaces";
+import { forwardRef, useMemo } from "react";
+import {
+  DataMiddlewareProps,
+  FormRefHandle,
+  TableRowData,
+} from "../../config/interfaces";
 import { serviceConfig } from "../../config/utils/serviceConfig";
-import { safeCall } from "../../config/utils/safeCall";
 import ComplexFormTable from "../core/table/ComplexFormTable";
+import { useAppSelector } from "../../store";
+import { mapFieldRulesToFormStructure } from "../../config/utils/mappers";
 
 const CatalogsDataMiddleware = forwardRef<FormRefHandle, DataMiddlewareProps>(
-    ({ payload = undefined, dataCase = "rules" }, ref) => {
-    const [data, setData] = useState<Array<TableRowData>>([]);
-    const columns = serviceConfig.rules.columns;
-    useEffect(() => {
+    ({ dataCase = "rules", formType }, ref) => {
         const config = serviceConfig[dataCase as keyof typeof serviceConfig];
-        if (!config) {
-        console.warn(`${dataCase.toUpperCase} no se encuentra configurado`);
-        return;
-        }
-        const fetchData = async () => {
-        try {
-            const response = await safeCall(config.serviceMethod, payload);
-            const mapped = config.mapData(response);
-            setData(mapped);
-            
-        } catch (error) {
-            console.error("Error fetching data:", error); 
-        }
-        };
+        const columns = config.columns;
 
-        fetchData();
-    }, [dataCase, payload]);
+        const rawRules = useAppSelector((state) => state.rules.rules);
 
-    return (
-    <>
-        <ComplexFormTable data={data} columns={columns} ref={ref}></ComplexFormTable>
-    </>
+        const mapped = useMemo<TableRowData[]>(() => {
+            if (!rawRules?.length) return [];
+            return mapFieldRulesToFormStructure(rawRules);
+        }, [rawRules]);
+
+        console.log(mapped, 'mapped')
+
+        /* const filtered = useMemo(() => {
+        return formType
+            ? mapped.filter((row) => row.formType === formType)
+            : mapped;
+        }, [mapped, formType]); */
+
+        console.log(formType)
+
+        return (
+        <ComplexFormTable
+            data={mapped}
+            columns={columns}
+            ref={ref}
+            parentpath = {formType}
+        />
+        );
+    }
 );
-})
+
 export default CatalogsDataMiddleware;

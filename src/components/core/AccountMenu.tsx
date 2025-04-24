@@ -1,7 +1,6 @@
 import { Box, ButtonBase, Menu, MenuItem, Stack, Typography } from "@mui/material";
 import React from "react";
-import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { logout } from "../../store/slices";
+import { logout, useAppDispatch, useAppSelector } from "../../store";
 
 const BadgeContent = () => {
   return (
@@ -27,7 +26,7 @@ function AccountMenu() {
   const dispatch = useAppDispatch();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const user = useAppSelector((state) => state.authReducer.user);
+  const user = useAppSelector((state) => state.auth.user);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);

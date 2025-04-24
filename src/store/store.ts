@@ -1,9 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { authSlice } from "./slices";
+import { authSlice } from ".";
+import { templateSlice } from "./slices/templates/template.slice";
+import { rulesSlice } from "./slices/rules/rules.slice";
 
 export const store = configureStore({
     reducer: {
-        authReducer: authSlice.reducer
+        auth: authSlice.reducer,
+        templates: templateSlice.reducer,
+        rules: rulesSlice.reducer
     }
 });
 

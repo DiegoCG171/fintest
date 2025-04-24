@@ -20,7 +20,7 @@ export const authSlice = createSlice({
             localStorage.removeItem('user');
             state.isAuthenticated = false; 
         },
-        clearError(state) {
+        clearAuthError(state) {
             state.error = null
         }
     },
@@ -42,4 +42,4 @@ export const authSlice = createSlice({
     },
 });
 
-export const { logout, clearError } = authSlice.actions; 
+export const { logout, clearAuthError } = authSlice.actions; 

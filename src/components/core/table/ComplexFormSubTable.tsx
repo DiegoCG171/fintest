@@ -17,11 +17,11 @@ import { useState } from "react";
 import React from "react";
 import DynamicField from "../forms/DynamicField";
 
-export default function ComplexFormSubTable({
+ const  ComplexFormSubTable = ({
   data,
   columns,
   parentPath = "items",
-}: PropsComplexFormSubTable) {
+}: PropsComplexFormSubTable) => {
   const [openRows, setOpenRows] = useState<Set<string>>(new Set());
 
   const decisionSwitch = (index: string, canEdit?: boolean) => {
@@ -78,7 +78,7 @@ export default function ComplexFormSubTable({
                         ) : <EditNoteRoundedIcon onClick={() => decisionSwitch(id, true)}/>}
                       </IconButton>
                     ) : (
-                      <DynamicField name={fieldPath} label={col.label} row={row} column={col} id={id}/>
+                      <DynamicField name={fieldPath} label={col.label} row={row} column={col} id={id} parentPath={parentPath}/>
                     )}
                   </TableCell>
                 );
@@ -108,3 +108,11 @@ export default function ComplexFormSubTable({
     </>
   );
 }
+
+export default React.memo(ComplexFormSubTable, (prev, next) => {
+  return (
+    prev.parentPath === next.parentPath &&
+    JSON.stringify(prev.data) === JSON.stringify(next.data) &&
+    JSON.stringify(prev.columns) === JSON.stringify(next.columns)
+  );
+});

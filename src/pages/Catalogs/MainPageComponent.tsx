@@ -4,11 +4,11 @@ import TitleHeaderComponent from "../../components/UI/TitleHeaderComponent";
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import TabbedCardContainer from "../../components/UI/TabbedCardContainer";
-import { TabItem } from "../../config/interfaces";
+import { StaticTabItem } from "../../config/interfaces";
 import { dataMap, tabConfig } from "../../config/mock";
 
-const generateTabs = (type: string, route: string): TabItem[] => {
-    const baseTabs: TabItem[] = [
+const generateTabs = (type: string, route: string): StaticTabItem[] => {
+    const baseTabs: StaticTabItem[] = [
         { label: "Detalles", content: <BasicTable initialRows={dataMap.detail} /> },
         { label: "Errores", content: <BasicTable initialRows={dataMap.errors} /> },
     ];

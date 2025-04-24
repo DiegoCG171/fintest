@@ -32,11 +32,12 @@ export interface DynamicTableProps {
 export interface ComplexFormTableProps {
     data: TableRowData[];
     columns: ColumnDynamicConfig[]
+    parentpath: string
 }
 
 export interface DynamicRenderConfig {
     render: boolean;
-    type?: "input" | "select";
+    type?: "input" | "select" | "checkbox" | "static";
     options?: string[];
 }
 
@@ -64,8 +65,8 @@ export interface ColumnConfig {
 }
 
 export interface FormValues {
-    items: Record<string, Record<string, unknown>>;
-};
+    [rootKey: string]: Record<string, Record<string, unknown>>;
+}  
 
 
 export type FormRefHandle = {
@@ -88,14 +89,28 @@ export interface RecursiveMenuItemProps {
 }
 
 //Tabs props
-export interface TabItem {
+// Para tabs dinámicos de formularios
+export interface FormTabItem {
     label: string;
-    content: ReactNode;
+    templateId: string;
+    formType: string;
     ref?: React.Ref<FormRefHandle>;
-}
+  }
+  
+  // Para tabs que pintan JSX directamente
+  export interface StaticTabItem {
+    label: string;
+    content: React.ReactNode;
+  }
+   
 
 export interface TabTableComponentProps {
-    tabs: TabItem[];
+    tabs: StaticTabItem[];
+    initialTabIndex?: number;
+}
+
+export interface TabTableFormComponentProps {
+    tabs: FormTabItem[];
     initialTabIndex?: number;
 }
 
@@ -163,6 +178,7 @@ export interface DynamicFieldProps {
     row?: TableRowData;
     column?: ColumnDynamicConfig;
     id: string | number;
+    parentPath: string;
 }
 
 //Toast props
@@ -194,9 +210,12 @@ export type DataMiddlewareProps = {
     payload?: {
         [key: string]: string | boolean | null | number | undefined;
     };
-    dataCase: dataServiceType,
+    dataCase: string,
+    templateId: string
+    formType: string
 }
 
 export type dataServiceType = keyof typeof serviceConfig;
 
+export type AsyncStatus = 'idle' | 'loading' | 'success' | 'error';
 

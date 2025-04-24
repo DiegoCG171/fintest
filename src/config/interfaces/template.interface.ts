@@ -1,3 +1,5 @@
+import { AsyncStatus } from "."
+
 export interface TemplateContextType {
     _id: string
     name: string
@@ -41,4 +43,10 @@ export interface GenerationTransaction {
 export interface TemplateContextState {
     template: TemplateContextType | null;
     getTemplates: () => Promise<void>;
+}
+
+export interface TemplateState {
+    templates: TemplateContextType | [],
+    status: AsyncStatus,
+    error: null | string,
 }

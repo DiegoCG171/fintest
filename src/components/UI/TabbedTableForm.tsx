@@ -1,18 +1,28 @@
 import { useEffect, useState } from "react";
 import { Box, Button, Stack, Tab, Tabs } from "@mui/material";
 import CustomTabPanel from "../core/CustomTabPanel";
-import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
-import { TabTableComponentProps } from "../../config/interfaces";
-
+import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
+import { TabTableFormComponentProps } from "../../config/interfaces";
+import CatalogsDataMiddleware from "../middlewares/CatalogsDataMiddleware";
+import { getRulesThunk, useAppDispatch, useAppSelector } from "../../store";
 
 function TabbedTableForm({
   tabs,
   initialTabIndex = 0,
-}: TabTableComponentProps) {
+}: TabTableFormComponentProps) {
   const [value, setValue] = useState(initialTabIndex);
   useEffect(() => {
     setValue(initialTabIndex);
   }, [initialTabIndex]);
+
+  const dispatch = useAppDispatch();
+  const status = useAppSelector((state) => state.rules.status);
+
+  useEffect(() => {
+    if (status === "idle") {
+      dispatch(getRulesThunk());
+    }
+  }, [status, dispatch]);
 
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -61,7 +71,12 @@ function TabbedTableForm({
             />
           ))}
         </Tabs>
-        <Button startIcon={<SaveOutlinedIcon />} sx={{paddingX: 2, fontSize: "12px",}}>Guardar</Button>
+        <Button
+          startIcon={<SaveOutlinedIcon />}
+          sx={{ paddingX: 2, fontSize: "12px" }}
+        >
+          Guardar
+        </Button>
       </Stack>
 
       <Box sx={{ flexGrow: 1, overflow: "auto", mt: -2 }}>
@@ -71,7 +86,12 @@ function TabbedTableForm({
             value={value}
             index={index}
           >
-            {tab.content}
+            <CatalogsDataMiddleware
+              key={`${tab.templateId}-${tab.formType}`} // 👈 esto asegura que React lo trate como nuevo
+              dataCase="rules"
+              templateId={tab.templateId}
+              formType={tab.formType}
+            />
           </CustomTabPanel>
         ))}
       </Box>
