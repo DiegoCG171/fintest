@@ -42,7 +42,6 @@ const LoginComponent = () => {
               })).unwrap();;
               navigate("/");
             } catch (error) {
-              console.log(error)
               showToast(error as string, "error");
             } finally {
               setSubmitting(false);

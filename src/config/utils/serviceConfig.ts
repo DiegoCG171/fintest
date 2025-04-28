@@ -17,7 +17,8 @@ export const serviceConfig = {
                 options: ["Value", "Echo", "Calculated", "De request"],
                 affects: ["value"],
                 width: "20%",
-                type: "select" as const
+                type: "select" as const,
+                hide: true
             },
             {
                 id: "value",

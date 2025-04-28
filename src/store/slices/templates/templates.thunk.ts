@@ -1,19 +1,23 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import { getTemplate } from "../../../services"
-import { TemplateContextType as TemplateResponse } from "../../../config/interfaces"
+import { TemplateRoot } from "../../../config/interfaces"
+import { setLoading } from "../loader/loader.slice";
 
 export const getTemplatesThunk = createAsyncThunk<
-    TemplateResponse, 
+    TemplateRoot, 
     void,
     { rejectValue: string }
 >(
     'templates/getAll',
-    async (_, { rejectWithValue }) => {
+    async (_, { dispatch, rejectWithValue }) => {
         try {
+            dispatch(setLoading(true));
             const template = await getTemplate();
             return template
         } catch (error: unknown) {
             return rejectWithValue(error as string)
+        } finally {
+            dispatch(setLoading(false));
         }
     }
 )

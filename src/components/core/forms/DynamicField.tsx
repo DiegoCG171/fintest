@@ -5,8 +5,7 @@ import DynamicFieldRender from "./DynamicFieldRender";
 
 const DynamicField: React.FC<DynamicFieldProps> = (props) => {
   const { name, column } = props;
-  const shouldUseFastField = !column?.dependsOn && !column?.dynamicRender;
-
+  const shouldUseFastField = !column?.dependsOn && !column?.dynamicRender && !column?.hide;
   const FieldComponent = shouldUseFastField ? FastField : Field;
 
   return (
@@ -24,6 +23,7 @@ export default React.memo(DynamicField, (prev, next) => {
     prev.id === next.id &&
     prev.parentPath === next.parentPath &&
     prev.column?.id === next.column?.id &&
-    JSON.stringify(prev.row) === JSON.stringify(next.row)
+    JSON.stringify(prev.row) === JSON.stringify(next.row) &&
+    prev.isVisible === next.isVisible
   );
 });

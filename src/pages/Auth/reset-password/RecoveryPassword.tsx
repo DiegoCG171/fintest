@@ -50,8 +50,7 @@ function RecoveryPassword() {
               email: "",
             }}
             validationSchema={validationSchema}
-            onSubmit={(values, { setSubmitting }) => {
-              console.log("Formulario enviado:", values);
+            onSubmit={(_, { setSubmitting }) => {
               showToast("Formulario enviado correctamente", "success");
               setSubmitting(false);
             }}

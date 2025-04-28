@@ -15,7 +15,7 @@ import KeyboardArrowUpRoundedIcon from "@mui/icons-material/KeyboardArrowUpRound
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
 import { useState } from "react";
 import React from "react";
-import DynamicField from "../forms/DynamicField";
+import DynamicField from "../../core/forms/DynamicField";
 
  const  ComplexFormSubTable = ({
   data,
@@ -23,12 +23,25 @@ import DynamicField from "../forms/DynamicField";
   parentPath = "items",
 }: PropsComplexFormSubTable) => {
   const [openRows, setOpenRows] = useState<Set<string>>(new Set());
+  const [visibleField, setVisibleField] = useState<Set<string>>(new Set())
 
   const decisionSwitch = (index: string, canEdit?: boolean) => {
-    if(canEdit) {
-      console.log(index, 'Seleccionar para ediatr')
-    } else toggleRow(index)
+    if (canEdit) {
+      console.log(canEdit, 'puede editar')
+      setVisibleField((prev) => {
+        const updated = new Set(prev);
+        if (updated.has(index)) {
+          updated.delete(index);
+        } else {
+          updated.add(index);
+        }
+        return new Set(updated);
+      });
+    } else {
+      toggleRow(index);
   }
+  };
+  
   
   const toggleRow = (index: string) => {
     setOpenRows((prev) => {
@@ -78,7 +91,7 @@ import DynamicField from "../forms/DynamicField";
                         ) : <EditNoteRoundedIcon onClick={() => decisionSwitch(id, true)}/>}
                       </IconButton>
                     ) : (
-                      <DynamicField name={fieldPath} label={col.label} row={row} column={col} id={id} parentPath={parentPath}/>
+                      <DynamicField name={fieldPath} label={col.label} row={row} column={col} id={id} parentPath={parentPath} isVisible={visibleField.has(id)} />
                     )}
                   </TableCell>
                 );

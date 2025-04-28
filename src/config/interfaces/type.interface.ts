@@ -49,6 +49,7 @@ export interface ColumnDynamicConfig {
     dependsOn?: string;
     affects?: string[];
     options?: string[];
+    hide?: boolean;
     dynamicRender?: Record<string, DynamicRenderConfig>;
 }
 
@@ -179,6 +180,7 @@ export interface DynamicFieldProps {
     column?: ColumnDynamicConfig;
     id: string | number;
     parentPath: string;
+    isVisible?: boolean;
 }
 
 //Toast props

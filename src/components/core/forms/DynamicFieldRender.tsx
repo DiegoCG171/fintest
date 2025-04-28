@@ -20,10 +20,12 @@ const DynamicFieldRender = ({
   //meta,
   custom,
 }: FieldProps & { custom: DynamicFieldProps }) => {
+  const formik = useFormikContext<FormValues>();
+
   const { name, column, row, id, parentPath } = custom;
   const getFinalKey = (name?: string): string => {
-    if (!name) return ""; 
-     const parts = name.split(".");
+    if (!name) return "";
+    const parts = name.split(".");
     const last = parts[parts.length - 1];
     return last.replace(/\["(.+?)"\]/g, "$1");
   };
@@ -33,7 +35,6 @@ const DynamicFieldRender = ({
       ? item
       : JSON.stringify(item);
   };
-  const formik = useFormikContext<FormValues>();
 
   const dependsOn = column?.dependsOn;
   const dependencyPath = `${parentPath}.${id}.${dependsOn}`;
@@ -42,16 +43,18 @@ const DynamicFieldRender = ({
 
   const key = getFinalKey(name);
   const value = row?.[key];
+  const isParent =
+    Array.isArray(row?.breakingRules) && row.breakingRules.length > 0;
+  const isDisabled = dependsOn && !dependsValue && isParent;
+  const isHide = column?.hide && row?.breakingRules as boolean
 
-  const isDisabled = dependsOn && !dependsValue;
-
-  /* console.log("🧩 DynamicField render");
-  console.log("→ name:", name);
-  console.log("→ id:", id);
-    console.log("→ dependsOn:", dependsOn);
-    console.log("→ formik.values:", JSON.stringify(formik.values, null, 2));
-    console.log("→ dependsValue:", dependsValue);
-    console.log("→ target depends path:", `${parentPath}[${id}][${column?.dependsOn}]`); */
+  // Aplicar visibilidad solo a campos independientes
+  if ((isHide && !custom.isVisible) && ["input", "select"].includes(custom.column?.type || '')) {
+    return (
+      <Typography variant="body2" fontSize="0.75rem">
+      </Typography>
+    );
+  }
 
   // 1. Checkbox simple
   if (column?.type === "checkbox") {

@@ -12,3 +12,7 @@ export { getTemplatesThunk } from './slices/templates/templates.thunk'
 //Rules
 export { clearRules, clearRulesError } from './slices/rules/rules.slice'
 export { getRulesThunk } from './slices/rules/rules.thunk'
+
+//UI
+//----Loader
+export { setLoading } from './slices/loader/loader.slice'

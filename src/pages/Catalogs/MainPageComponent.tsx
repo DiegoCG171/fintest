@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import BasicTable from "../../components/core/table/BasicTableComponent";
+import BasicTable from "../../components/UI/table/BasicTableComponent";
 import TitleHeaderComponent from "../../components/UI/TitleHeaderComponent";
 import { useState } from "react";
 import { useLocation } from "react-router-dom";

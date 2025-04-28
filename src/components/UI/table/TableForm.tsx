@@ -13,10 +13,10 @@ import {
 } from "@mui/material";
 import { ExpandMore, ExpandLess } from "@mui/icons-material";
 import { Formik, Form } from "formik";
-import CustomInputComponent from "../forms/CustomInput";
-import CustomSelect from "../forms/CustomSelect";
+import CustomInputComponent from "../../core/forms/CustomInput";
+import CustomSelect from "../../core/forms/CustomSelect";
 import { DynamicTableProps } from "../../../config/interfaces";
-import CustomCheckbox from "../forms/CheckboxCell";
+import CustomCheckbox from "../../core/forms/CheckboxCell";
 
 const TableForm: React.FC<DynamicTableProps> = ({ fields }) => {
   const [openRows, setOpenRows] = useState<{ [key: string]: boolean }>({});

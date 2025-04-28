@@ -60,8 +60,7 @@ function ResetPassword() {
               retryPassword: "",
             }}
             validationSchema={validationSchema}
-            onSubmit={(values, { setSubmitting }) => {
-              console.log("Formulario enviado:", values);
+            onSubmit={(_values, { setSubmitting }) => {
               showToast("Formulario enviado correctamente", "success");
               setSubmitting(false);
             }}

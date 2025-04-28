@@ -5,41 +5,75 @@ import {
   TableRowData,
 } from "../../config/interfaces";
 import { serviceConfig } from "../../config/utils/serviceConfig";
-import ComplexFormTable from "../core/table/ComplexFormTable";
+import ComplexFormTable from "../UI/table/ComplexFormTable";
 import { useAppSelector } from "../../store";
-import { mapFieldRulesToFormStructure } from "../../config/utils/mappers";
+import {
+  combineTemplateData,
+  mapFieldRulesToFormStructure,
+} from "../../config/utils/mappers";
+import { useToast } from "../../config/hooks/useToast";
 
 const CatalogsDataMiddleware = forwardRef<FormRefHandle, DataMiddlewareProps>(
-    ({ dataCase = "rules", formType }, ref) => {
-        const config = serviceConfig[dataCase as keyof typeof serviceConfig];
-        const columns = config.columns;
+  ({ dataCase = "rules", formType, templateId }, ref) => {
+    const { showToast } = useToast();
+    const config = serviceConfig[dataCase as keyof typeof serviceConfig];
+    const columns = config.columns;
 
-        const rawRules = useAppSelector((state) => state.rules.rules);
+    const rawRules = useAppSelector((state) => state.rules.rules);
+    const templates = useAppSelector((state) => state.templates.templates);
 
-        const mapped = useMemo<TableRowData[]>(() => {
-            if (!rawRules?.length) return [];
-            return mapFieldRulesToFormStructure(rawRules);
-        }, [rawRules]);
+    const mappedRules = useMemo<TableRowData[]>(() => {
+      if (!rawRules?.length) return [];
+      return mapFieldRulesToFormStructure(rawRules);
+    }, [rawRules]);
 
-        console.log(mapped, 'mapped')
+    const templateById = useMemo(() => {
+      if (templateId) return templates.find((t) => t._id === templateId);
+    }, [templateId, templates]);
 
-        /* const filtered = useMemo(() => {
-        return formType
-            ? mapped.filter((row) => row.formType === formType)
-            : mapped;
-        }, [mapped, formType]); */
+    const combinedData = useMemo(() => {
+      if (!templateById) return [];
+      switch (formType) {
+        case "validation":
+          return combineTemplateData(
+            templateById.validationTransaction,
+            mappedRules
+          );
+        case "generation":
+          return combineTemplateData(
+            templateById.generationTransaction,
+            mappedRules
+          );
+        default:
+          return [];
+      }
+    }, [formType, mappedRules, templateById]);
 
-        console.log(formType)
+    const isLoading = !templateById || !combinedData.length;
 
-        return (
-        <ComplexFormTable
-            data={mapped}
-            columns={columns}
-            ref={ref}
-            parentpath = {formType}
-        />
-        );
+    if (isLoading) {
+      return (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "2rem",
+          }}
+        >
+          <p>Cargando datos del template...</p>
+        </div>
+      );
     }
+
+    return (
+      <ComplexFormTable
+        data={combinedData}
+        columns={columns}
+        ref={ref}
+        parentpath={formType}
+      />
+    );
+  }
 );
 
 export default CatalogsDataMiddleware;

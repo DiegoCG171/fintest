@@ -18,7 +18,7 @@ const ComplexFormTable = forwardRef(({ data, columns, parentpath }: ComplexFormT
     Object.fromEntries(data.map((row) => [row._id, row]))
   ), [data]);  
   const formikRef = useRef<FormikProps<FormikValues>>(null);
-  const initialValues = useMemo(() => ({ items: dataById }), [dataById]);
+  const initialValues = useMemo(() => ({ [parentpath]: dataById }), [dataById, parentpath]);
 
 
   useImperativeHandle(ref, () => ({
