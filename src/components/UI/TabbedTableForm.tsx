@@ -113,10 +113,7 @@ function TabbedTableForm({
             index={index}
           >
             <CatalogsDataMiddleware
-              key={`${tab.templateId}-${tab.formType}`}
-              dataCase="rules"
-              templateId={tab.templateId}
-              formType={tab.formType}
+              tabId={`${tab.templateId}-${tab.label}`}
             />
           </CustomTabPanel>
         ))}

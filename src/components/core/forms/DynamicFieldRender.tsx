@@ -1,6 +1,6 @@
 import { FieldProps, useFormikContext } from "formik";
 import {
-  DynamicFieldProps,
+  DynamicFieldPropsOld,
   DynamicRenderConfig,
   FormValues,
 } from "../../../config/interfaces";
@@ -19,10 +19,10 @@ const DynamicFieldRender = ({
   form,
   //meta,
   custom,
-}: FieldProps & { custom: DynamicFieldProps }) => {
+}: FieldProps & { custom: DynamicFieldPropsOld }) => {
   const formik = useFormikContext<FormValues>();
 
-  const { name, column, row, id, parentPath } = custom;
+  const { name, column, row, id, parentPath, isVisible } = custom;
   const getFinalKey = (name?: string): string => {
     if (!name) return "";
     const parts = name.split(".");
@@ -49,7 +49,7 @@ const DynamicFieldRender = ({
   const isHide = column?.hide && row?.breakingRules as boolean
 
   // Aplicar visibilidad solo a campos independientes
-  if ((isHide && !custom.isVisible) && ["input", "select"].includes(custom.column?.type || '')) {
+  if ((isHide && !isVisible) && ["input", "select"].includes(column?.type || '')) {
     return (
       <Typography variant="body2" fontSize="0.75rem">
       </Typography>
@@ -69,6 +69,9 @@ const DynamicFieldRender = ({
 
   // 2. Select estático (sin dependencia)
   if (column?.type === "select" && !column.dependsOn) {
+    if(isVisible){
+      console.log(column, isVisible)
+    }
     if (Array.isArray(value)) {
       return (
         <Select

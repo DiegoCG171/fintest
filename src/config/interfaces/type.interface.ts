@@ -1,6 +1,6 @@
 import { SelectProps, TextFieldProps } from "@mui/material";
 import { ReactNode } from "react";
-import { FieldRules } from "./rules.interface";
+import { Field } from "./rules.interface";
 import { serviceConfig } from "../utils/serviceConfig";
 
 //Default Props
@@ -11,8 +11,8 @@ export interface WithChildrenProps {
 
 //Table props
 
-export interface TableRowData {
-    [key: string]: ReactNode | TableRowData[];
+export interface TableRowDataOld {
+    [key: string]: ReactNode | TableRowDataOld[];
 }
 export interface TabPanelProps {
     children?: React.ReactNode;
@@ -21,16 +21,16 @@ export interface TabPanelProps {
 }
 
 export interface BasicTableProps {
-    initialRows: TableRowData[];
+    initialRows: TableRowDataOld[];
     showPagination?: boolean;
 }
 
 export interface DynamicTableProps {
-    fields: FieldRules[];
+    fields: Field[];
 }
 
 export interface ComplexFormTableProps {
-    data: TableRowData[];
+    data: TableRowDataOld[];
     columns: ColumnDynamicConfig[]
     parentpath: string
 }
@@ -54,9 +54,9 @@ export interface ColumnDynamicConfig {
 }
 
 export interface PropsComplexFormSubTable {
-    data: Record<string, TableRowData>;
+    data: Record<string, TableRowDataOld>;
     columns: ColumnConfig[];
-    parentPath?: string;
+    parentPath: string;
 }
 
 export interface ColumnConfig {
@@ -173,10 +173,10 @@ export interface StyleObject {
     fontWeight: string;
 };
 
-export interface DynamicFieldProps {
+export interface DynamicFieldPropsOld {
     name: string;
     label?: string;
-    row?: TableRowData;
+    row?: TableRowDataOld;
     column?: ColumnDynamicConfig;
     id: string | number;
     parentPath: string;

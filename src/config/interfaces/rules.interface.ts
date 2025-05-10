@@ -6,11 +6,11 @@ export interface Rules {
     _id: string
     version: number
     type: string
-    fields: FieldRules[]
+    fields: Field[]
     __v: number
 }
 
-export interface FieldRules {
+export interface Field {
     positionsLength?: PositionsLength
     idBitmap: string
     displayName: string
@@ -45,7 +45,7 @@ export interface Specification {
 }
 
 export interface RulesState {
-    rules: FieldRules[];
+    rules: Field[];
     status: AsyncStatus;
     error: string | null;
 }  

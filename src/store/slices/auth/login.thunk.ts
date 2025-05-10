@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { login as loginService } from "../../../services";
 import { LoginCredentials, LoginResponse } from "../../../config/interfaces";
-import { setLoading } from "../loader/loader.slice";
+import { setLoading } from "../UI/loader/loader.slice";
 
 export const loginThunk = createAsyncThunk<
     LoginResponse,

@@ -1,7 +1,7 @@
-import { BreakingRule, FieldRules, FieldValidation, Specification, TableRowData, ValidationTransaction } from "../interfaces";
+import { BreakingRule, Field, FieldValidation, Specification, TableRowDataFormBuilder, ValidationTransaction } from "../interfaces";
 
-export const mapFieldRulesToFormStructure = (fields: FieldRules[]): TableRowData[] =>
-    fields.map((rule: FieldRules) => {
+export const mapFieldRulesToFormStructure = (fields: Field[]): TableRowDataFormBuilder[] =>
+    fields.map((rule: Field) => {
         const level3Children = (children: BreakingRule) =>
             children.specification?.map((spec: Specification) => ({
                 idBitmap: spec.id,
@@ -38,7 +38,7 @@ export const mapFieldRulesToFormStructure = (fields: FieldRules[]): TableRowData
     });
 
 
-export const mapValidationTemplate = (validation: ValidationTransaction[]): TableRowData[] =>
+export const mapValidationTemplate = (validation: ValidationTransaction[]): TableRowDataFormBuilder[] =>
     validation.map((v: ValidationTransaction) => {
         const level3Children = (children: FieldValidation) =>
             children.fields?.map((field: FieldValidation) => ({
@@ -76,20 +76,20 @@ export const mapValidationTemplate = (validation: ValidationTransaction[]): Tabl
     });
 
 
-export const combineTemplateData = (data: ValidationTransaction[], mappedRules: TableRowData[]): TableRowData[] => {
+export const combineTemplateData = (data: ValidationTransaction[], mappedRules: TableRowDataFormBuilder[]): TableRowDataFormBuilder[] => {
     const mapData = mapValidationTemplate(data);
 
-    const updateRules = (rules: TableRowData[], data: TableRowData[], level = 0): TableRowData[] => {
+    const updateRules = (rules: TableRowDataFormBuilder[], data: TableRowDataFormBuilder[], level = 0): TableRowDataFormBuilder[] => {
         return rules.map(rule => {
             const matched = data.find(d => d.idBitmap === rule.idBitmap);
 
-            const updatedRule: TableRowData = {
+            const updatedRule: TableRowDataFormBuilder = {
                 ...rule,
                 isRequired: level === 0 ? Boolean(matched?.isRequired ?? rule.isRequired) : undefined,
                 function: matched?.function ?? rule.function,
                 value: matched?.value ?? rule.value,
                 breakingRules: Array.isArray(rule.breakingRules) && rule.breakingRules.length > 0
-                    ? updateRules(rule.breakingRules as TableRowData[], matched?.breakingRules as TableRowData[] ?? [], level + 1)
+                    ? updateRules(rule.breakingRules as TableRowDataFormBuilder[], matched?.breakingRules as TableRowDataFormBuilder[] ?? [], level + 1)
                     : rule.breakingRules,
             };
 

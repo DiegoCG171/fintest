@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import {
   PropsComplexFormSubTable,
-  TableRowData,
+  TableRowDataOld
 } from "../../../config/interfaces";
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 import KeyboardArrowUpRoundedIcon from "@mui/icons-material/KeyboardArrowUpRounded";
@@ -20,7 +20,7 @@ import DynamicField from "../../core/forms/DynamicField";
  const  ComplexFormSubTable = ({
   data,
   columns,
-  parentPath = "items",
+  parentPath,
 }: PropsComplexFormSubTable) => {
   const [openRows, setOpenRows] = useState<Set<string>>(new Set());
   const [visibleField, setVisibleField] = useState<Set<string>>(new Set())
@@ -105,7 +105,7 @@ import DynamicField from "../../core/forms/DynamicField";
                     <Table sx={{ p: 0 }}>
                       <TableBody>
                         <ComplexFormSubTable
-                          data={row[childColumn.id] as unknown as Record<string, TableRowData>}
+                          data={row[childColumn.id] as unknown as Record<string, TableRowDataOld>}
                           columns={columns}
                           parentPath={`${parentPath}["${id}"]["${childColumn.id}"]`}
                         />

@@ -1,10 +1,10 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
-import { FieldRules } from "../../../config/interfaces"
+import { Field } from "../../../config/interfaces"
 import { getRules } from "../../../services"
-import { setLoading } from "../loader/loader.slice";
+import { setLoading } from "../UI/loader/loader.slice";
 
 export const getRulesThunk = createAsyncThunk<
-    FieldRules[],
+    Field[],
     void,
     { rejectValue: string }
 >(

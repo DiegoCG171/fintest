@@ -31,11 +31,11 @@ export const serviceConfig = {
                     "De request": {
                         render: true,
                         type: "select" as const,
-                        options: ["Opción 1", "Opción 1", "Opción 1"],
+                        options: ["Opción 1", "Opción 2", "Opción 3"],
                     },
                 },
                 width: "20%",
-                type: "input" as const
+                type: "dynamic" as const
             },
             { id: "breakingRules", label: "", width: "5%", type: "static" as const }
         ],

@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import { getTemplate } from "../../../services"
 import { TemplateRoot } from "../../../config/interfaces"
-import { setLoading } from "../loader/loader.slice";
+import { setLoading } from "../UI/loader/loader.slice";
 
 export const getTemplatesThunk = createAsyncThunk<
     TemplateRoot, 

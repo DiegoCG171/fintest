@@ -1,9 +1,9 @@
 import React from "react";
 import { Field, FastField } from "formik";
-import { DynamicFieldProps } from "../../../config/interfaces";
+import { DynamicFieldPropsOld } from "../../../config/interfaces";
 import DynamicFieldRender from "./DynamicFieldRender";
 
-const DynamicField: React.FC<DynamicFieldProps> = (props) => {
+const DynamicField: React.FC<DynamicFieldPropsOld> = (props) => {
   const { name, column } = props;
   const shouldUseFastField = !column?.dependsOn && !column?.dynamicRender && !column?.hide;
   const FieldComponent = shouldUseFastField ? FastField : Field;

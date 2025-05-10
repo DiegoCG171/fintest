@@ -20,7 +20,6 @@ const ComplexFormTable = forwardRef(({ data, columns, parentpath }: ComplexFormT
   const formikRef = useRef<FormikProps<FormikValues>>(null);
   const initialValues = useMemo(() => ({ [parentpath]: dataById }), [dataById, parentpath]);
 
-
   useImperativeHandle(ref, () => ({
     submitForm: () => formikRef.current?.submitForm(),
   }));
