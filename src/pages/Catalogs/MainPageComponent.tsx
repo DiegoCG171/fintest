@@ -3,7 +3,7 @@ import BasicTable from "../../components/UI/table/BasicTableComponent";
 import TitleHeaderComponent from "../../components/UI/TitleHeaderComponent";
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
-import TabbedCardContainer from "../../components/UI/TabbedCardContainer";
+import TabbedCardContainer from "../../components/UI/Tabs/TabbedCardContainer";
 import { StaticTabItem } from "../../config/interfaces";
 import { dataMap, tabConfig } from "../../config/mock";
 

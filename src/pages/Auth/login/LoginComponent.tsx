@@ -39,7 +39,7 @@ const LoginComponent = () => {
                 loginThunk({
                 username: values.username,
                 password: values.password,
-              })).unwrap();;
+              })).unwrap();
               navigate("/");
             } catch (error) {
               showToast(error as string, "error");

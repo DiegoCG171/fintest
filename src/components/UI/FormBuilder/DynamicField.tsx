@@ -8,19 +8,23 @@ import {
 
 const fontSize = "0.75rem";
 
-function DynamicField({ column, value, row, path, tabId }: DynamicFieldProps) {
-  //console.log("Inicio de Dato");
-  /* console.log(column);
-  console.log(value);
-  console.log(row);
-  console.log(path);
-  console.log(tabId); */
+function DynamicField({
+  column,
+  value,
+  row,
+  path,
+  tabId,
+  isEditable,
+}: DynamicFieldProps) {
 
   const dispatch = useAppDispatch();
   const dependsOn = column?.dependsOn;
   const dependsValue = dependsOn ? row[dependsOn] : undefined;
+  const isChild = path.length > 1;
+  const isParent = row.breakingRules ? row.breakingRules.length > 0 : false;
 
   const handleChange = (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | any
   ) => {
     const newValue = e.target.value;
@@ -47,9 +51,16 @@ function DynamicField({ column, value, row, path, tabId }: DynamicFieldProps) {
     }
   };
 
-  function shouldDisableCheckbox(isChild: boolean, dependsValue: string | unknown): boolean {
-  if (isChild) return false; 
-  return !dependsValue; 
+  function shouldDisableCheckbox(
+    isChild: boolean,
+    dependsValue: string | unknown
+  ): boolean {
+    if (isChild) return false;
+    return !dependsValue;
+  }
+
+  if (!isEditable && column.id === "value" || !isEditable && column.id === "function") {
+  return <Typography sx={{fontSize}}>{typeof value === "string" ? value : ""}</Typography>;
 }
 
 
@@ -114,11 +125,7 @@ function DynamicField({ column, value, row, path, tabId }: DynamicFieldProps) {
 
   if (column.dependsOn) {
     if (column.type === "checkbox") {
-      const isChild = path.length > 1;
       const isDisabled = shouldDisableCheckbox(isChild, dependsValue);
-
-      console.log(isDisabled);
-
       return (
         <input
           disabled={Boolean(isDisabled)}
@@ -132,8 +139,8 @@ function DynamicField({ column, value, row, path, tabId }: DynamicFieldProps) {
     }
   }
 
-  if (!column.dependsOn && path.length === 1) {
-    if (column.type === "checkbox") {
+  if (!column.dependsOn) {
+    if (column.type === "checkbox" && path.length === 1) {
       return (
         <input
           type="checkbox"
@@ -164,7 +171,7 @@ function DynamicField({ column, value, row, path, tabId }: DynamicFieldProps) {
         />
       );
     }
-    if (column.type === "select") {
+    if (column.type === "select" && !isParent) {
       return (
         <Select
           fullWidth

@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Box, Button, Stack, Tab, Tabs } from "@mui/material";
-import CustomTabPanel from "../core/CustomTabPanel";
+import CustomTabPanel from "../../core/CustomTabPanel";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
-import { TabTableFormComponentProps } from "../../config/interfaces";
-import CatalogsDataMiddleware from "../middlewares/CatalogsDataMiddleware";
+import { TabTableFormComponentProps } from "../../../config/interfaces";
+import CatalogsDataMiddleware from "../../middlewares/CatalogsDataMiddleware";
 import {
   clearRulesError,
   clearTemplateError,
@@ -11,8 +11,10 @@ import {
   getTemplatesThunk,
   useAppDispatch,
   useAppSelector,
-} from "../../store";
-import { useToast } from "../../config/hooks/useToast";
+} from "../../../store";
+import { useToast } from "../../../config/hooks/useToast";
+import { prepareUpdatePayload as preparePayload} from "../../../config/utils";
+import { updateTemplateThunk } from "../../../store/slices/templates/templates.thunk";
 
 function TabbedTableForm({
   tabs,
@@ -28,9 +30,20 @@ function TabbedTableForm({
     (state) => state.rules
   );
 
-  const { error: templatesError, status: statusTemplates } = useAppSelector(
+  const { getError: templatesError, getStatus: statusTemplates } = useAppSelector(
     (state) => state.templates
   );
+
+  const currentTabId = useMemo(
+    () => `${tabs[value].templateId}-${tabs[value].formType}`,
+    [tabs, value]
+  );
+
+  const tabForm = useAppSelector(
+    (state) => state.formBuilder.tabForms[currentTabId]
+  );
+
+  const valuesToSend = tabForm?.values ?? [];
 
   useEffect(() => {
     const fetchRules = async () => await dispatch(getRulesThunk());
@@ -38,7 +51,7 @@ function TabbedTableForm({
     if (statusRules === "error") {
       showToast(rulesError as string, "error");
       dispatch(clearRulesError());
-    };
+    }
   }, [dispatch, rulesError, showToast, statusRules]);
 
   useEffect(() => {
@@ -47,12 +60,26 @@ function TabbedTableForm({
     if (statusTemplates === "error") {
       showToast(templatesError as string, "error");
       dispatch(clearTemplateError());
-    };
+    }
   }, [dispatch, showToast, statusTemplates, templatesError]);
+
 
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
+
+  const handleSave = async () => {
+  const payload = preparePayload(valuesToSend, tabs[value].formType);
+  const id = tabs[value].templateId;
+
+  try {
+    await dispatch(updateTemplateThunk({ id, payload }));
+    showToast("Plantilla actualizada correctamente", "success");
+  } catch (error) {
+    showToast(error as string, "error");
+  }
+};
+
 
   return (
     <Box
@@ -100,21 +127,22 @@ function TabbedTableForm({
         <Button
           startIcon={<SaveOutlinedIcon />}
           sx={{ paddingX: 2, fontSize: "12px" }}
+          onClick={() => {
+            handleSave();
+          }}
         >
           Guardar
         </Button>
       </Stack>
 
       <Box sx={{ flexGrow: 1, overflow: "auto", mt: -2 }}>
-        {tabs.map((tab, index) => (
+        {tabs.map((template,index) => (
           <CustomTabPanel
             key={index + "-tab-form-content"}
             value={value}
             index={index}
           >
-            <CatalogsDataMiddleware
-              tabId={`${tab.templateId}-${tab.label}`}
-            />
+            <CatalogsDataMiddleware tabId={currentTabId} template={template} />
           </CustomTabPanel>
         ))}
       </Box>

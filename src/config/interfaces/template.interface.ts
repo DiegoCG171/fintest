@@ -1,5 +1,9 @@
 import { AsyncStatus } from "."
 
+/*TODO: Mejorar interfaces*/
+
+// GET
+
 export type TemplateRoot = TemplateContextType[]
 
 export interface TemplateContextType {
@@ -33,8 +37,43 @@ export interface FieldValidation {
     _id: string
 }
 
+// PATCH
+
+export interface PatchGenerationTemplate {
+    generationTransaction?: GenerationTransaction[]
+    validationTransaction?: GenerationTransaction[]
+}
+
+export interface GenerationTransaction {
+    idBitmap: string
+    function: string | undefined
+    value?: string | number | boolean | undefined
+    fields?: FieldUpdateTemplate[]
+    isRequired?: boolean
+}
+
+export interface FieldUpdateTemplate {
+    idBitmap: string
+    function?: string | undefined,
+    value?: string | number | boolean | undefined,
+    fields?: Field2[]
+    isRequired?: boolean
+}
+
+export interface Field2 {
+    idBitmap: string
+    function: string
+    value?: string | number | boolean | undefined,
+    isRequired?: boolean
+}
+
+
+// Slice
+
 export interface TemplateState {
     templates: TemplateRoot | [],
-    status: AsyncStatus,
-    error: null | string,
+    getStatus: AsyncStatus,
+    getError: null | string,
+    updateStatus: AsyncStatus,
+    updateError: null | string,
 }

@@ -29,7 +29,6 @@ const ComplexFormTable = forwardRef(({ data, columns, parentpath }: ComplexFormT
       initialValues={initialValues}
       innerRef={formikRef} 
       onSubmit={(values) => {
-        console.log("✅ Valores del formulario:");
         console.table(values.items);
       }}
     >

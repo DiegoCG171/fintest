@@ -1,9 +1,12 @@
 
 //Component's interface
 
+import { FormTabItem } from ".";
+
 /**Form Builder */
 export interface FormBuilderProps {
     tabId: string;
+    template?: FormTabItem
 }
 
 /**Form Row Builder */
@@ -21,6 +24,7 @@ export interface DynamicFieldProps {
     row: TableRowDataFormBuilder;
     path: number[];
     tabId: string;
+    isEditable: boolean
 }
 
 //Slice's interfaces
@@ -49,7 +53,7 @@ export interface TableRowDataFormBuilder {
     displayName: string;
     isRequired?: boolean;
     canRequired?: boolean;
-    function?: string | string[];
+    function?: string | undefined;
     value?: string | number | boolean;
     breakingRules?: TableRowDataFormBuilder[] | string;
     _id?: string;

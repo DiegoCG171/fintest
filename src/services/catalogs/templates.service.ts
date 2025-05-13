@@ -1,6 +1,6 @@
 import api from "../../api/api";
 import { ENDPOINTS } from "../../config/constants/endpoints";
-import { TemplateRoot } from "../../config/interfaces";
+import { PatchGenerationTemplate, TemplateRoot } from "../../config/interfaces";
 import { handleAxiosError } from "../../config/utils/axiosErrorHandler";
 
 export const getTemplate = async (): Promise<TemplateRoot> => {
@@ -12,3 +12,12 @@ export const getTemplate = async (): Promise<TemplateRoot> => {
         throw errorMessage;
     }
 }
+export const updateTemplate = async (id: string, payload: PatchGenerationTemplate ): Promise<unknown> => {
+    try{
+        const response = await api.patch(`${ENDPOINTS.template}/${id}`, payload);
+        return response.data
+    } catch (error) {
+        const errorMessage = handleAxiosError(error);
+        throw errorMessage;
+    }
+} 

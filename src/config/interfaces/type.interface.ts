@@ -67,7 +67,7 @@ export interface ColumnConfig {
 
 export interface FormValues {
     [rootKey: string]: Record<string, Record<string, unknown>>;
-}  
+}
 
 
 export type FormRefHandle = {
@@ -96,14 +96,14 @@ export interface FormTabItem {
     templateId: string;
     formType: string;
     ref?: React.Ref<FormRefHandle>;
-  }
-  
-  // Para tabs que pintan JSX directamente
-  export interface StaticTabItem {
+}
+
+// Para tabs que pintan JSX directamente
+export interface StaticTabItem {
     label: string;
     content: React.ReactNode;
-  }
-   
+}
+
 
 export interface TabTableComponentProps {
     tabs: StaticTabItem[];

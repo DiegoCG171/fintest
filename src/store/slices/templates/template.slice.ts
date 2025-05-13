@@ -1,12 +1,15 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { getTemplatesThunk } from './templates.thunk';
+import { getTemplatesThunk, updateTemplateThunk } from './templates.thunk';
 import { TemplateState } from '../../../config/interfaces';
 
 const initialState: TemplateState = {
     templates: [],
-    status: 'idle',
-    error: null,
-}
+    getStatus: 'idle',
+    getError: null,
+    updateStatus: 'idle',
+    updateError: null,
+};
+
 
 export const templateSlice = createSlice({
     name: 'templates',
@@ -14,27 +17,42 @@ export const templateSlice = createSlice({
     reducers: {
         clearTemplates: (state) => {
             state.templates = [];
-            state.status = 'idle';
+            state.getStatus = 'idle';
         },
         clearTemplateError(state) {
-            state.error = null
+            state.getError = null
+        },
+        clearUpdateError(state) {
+            state.updateError = null;
+            state.updateStatus = 'idle';
         }
     },
     extraReducers: (builder) => {
         builder
             .addCase(getTemplatesThunk.pending, (state) => {
-                state.error = null;
-                state.status = 'loading';
+                state.getError = null;
+                state.getStatus = 'loading';
             })
             .addCase(getTemplatesThunk.fulfilled, (state, action) => {
                 state.templates = action.payload
-                state.status = 'success';
+                state.getStatus = 'success';
             })
             .addCase(getTemplatesThunk.rejected, (state, action) => {
-                state.error = action.payload ?? "Error desconocido";
-                state.status = 'error';
+                state.getError = action.payload ?? "Error desconocido";
+                state.getStatus = 'error';
+            })
+            .addCase(updateTemplateThunk.pending, (state) => {
+                state.updateError = null;
+                state.updateStatus = 'loading';
+            })
+            .addCase(updateTemplateThunk.fulfilled, (state) => {
+                state.updateStatus = 'success';
+            })
+            .addCase(updateTemplateThunk.rejected, (state, action) => {
+                state.updateError = action.payload ?? "Error desconocido";
+                state.updateStatus = 'error';
             })
     }
 })
 
-export const { clearTemplates, clearTemplateError } = templateSlice.actions
+export const { clearTemplates, clearTemplateError, clearUpdateError } = templateSlice.actions

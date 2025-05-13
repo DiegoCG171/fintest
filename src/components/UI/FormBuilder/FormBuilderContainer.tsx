@@ -18,7 +18,6 @@ function FormBuilderContainer({ tabId }: FormBuilderProps) {
 
   return (
     <Box>
-      {tabId}
       <TableContainer>
         <Table>
           <TableHead>

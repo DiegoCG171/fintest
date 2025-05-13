@@ -10,7 +10,7 @@ import {
   TablePagination,
   Box,
 } from "@mui/material";
-import { BasicTableProps, TableRowData } from "../../../config/interfaces";
+import { BasicTableProps, TableRowDataOld as TableRowData } from "../../../config/interfaces";
 
 function insertWordBreaks(text: string, chunkSize = 20): ReactNode[] {
   const chunks: string[] = [];

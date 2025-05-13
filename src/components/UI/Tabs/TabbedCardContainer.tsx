@@ -1,6 +1,6 @@
 import { Box, Card } from "@mui/material";
 import TabTableComponent from "./TabTableComponent";
-import { TabbedCardContainerProps } from "../../config/interfaces";
+import { TabbedCardContainerProps } from "../../../config/interfaces";
 
 const TabbedCardContainer = ({ tabs, eventTabs, initialTabIndex }: TabbedCardContainerProps) => {
     return (
