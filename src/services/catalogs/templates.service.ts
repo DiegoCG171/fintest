@@ -1,6 +1,6 @@
 import api from "../../api/api";
 import { ENDPOINTS } from "../../config/constants/endpoints";
-import { PatchGenerationTemplate, TemplateRoot } from "../../config/interfaces";
+import { CreateTemplate, PatchGenerationTemplate, TemplateContextType, TemplateRoot } from "../../config/interfaces";
 import { handleAxiosError } from "../../config/utils/axiosErrorHandler";
 
 export const getTemplate = async (): Promise<TemplateRoot> => {
@@ -21,3 +21,13 @@ export const updateTemplate = async (id: string, payload: PatchGenerationTemplat
         throw errorMessage;
     }
 } 
+
+export const createTemplate = async (template: CreateTemplate): Promise<TemplateContextType> => {
+    try {
+        const response = await api.post<TemplateContextType>(ENDPOINTS.template, template);
+        return response.data;
+    } catch (error) {
+        const errorMessage = handleAxiosError(error);
+        throw errorMessage;
+    }
+}

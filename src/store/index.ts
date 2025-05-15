@@ -7,7 +7,7 @@ export { loginThunk } from './slices/auth/login.thunk'
 
 //Templates
 export { clearTemplateError, clearTemplates } from './slices/templates/template.slice'
-export { getTemplatesThunk } from './slices/templates/templates.thunk'
+export { getTemplatesThunk, updateTemplateThunk, createTemplateThunk } from './slices/templates/templates.thunk'
 
 //Rules
 export { clearRules, clearRulesError } from './slices/rules/rules.slice'
@@ -16,4 +16,4 @@ export { getRulesThunk } from './slices/rules/rules.thunk'
 //UI
 //----Loader
 export { setLoading } from './slices/UI/loader/loader.slice'
-export { setConfig, setValuesForTab, updateFieldValue, updateNestedFieldValue, setVisibility } from './slices/UI/formBuilder/formBuilder.slice'
+export { setConfig, setValuesForTab, updateFieldValue, updateNestedFieldValue, setVisibility } from './slices/UI/form/formBuilder.slice'

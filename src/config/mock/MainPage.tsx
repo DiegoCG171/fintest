@@ -3,7 +3,7 @@ import TabbedTableForm from "../../components/UI/Tabs/TabbedTableForm";
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
 
 export const dataMap = {
-  detail: [{ campo: "yrtyrtr", nombre: "tryrtyrt", longitud: "fjhf", estado: "", contenido: "" }, { campo: "yrtyrtr", nombre: "tryrtyrt", longitud: "fjhf", estado: <EditNoteRoundedIcon/>, contenido: "" }],
+  detail: [{ campo: "HD-1", nombre: "Header ISO", longitud: "fjhf", estado: "", contenido: "" }, { campo: "yrtyrtr", nombre: "tryrtyrt", longitud: "fjhf", estado: <EditNoteRoundedIcon/>, contenido: "" }],
   errors: [{ campo: "", nombre: "", longitud: "", estado: "", contenido: "" }],
   events: [
     {

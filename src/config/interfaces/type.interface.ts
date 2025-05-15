@@ -2,6 +2,7 @@ import { SelectProps, TextFieldProps } from "@mui/material";
 import { ReactNode } from "react";
 import { Field } from "./rules.interface";
 import { serviceConfig } from "../utils/serviceConfig";
+import { CreateTemplate } from "./template.interface";
 
 //Default Props
 
@@ -220,4 +221,16 @@ export type DataMiddlewareProps = {
 export type dataServiceType = keyof typeof serviceConfig;
 
 export type AsyncStatus = 'idle' | 'loading' | 'success' | 'error';
+
+
+//Modal
+export interface FullScreenModalProps {
+    open: boolean;
+    onClose: () => void;
+    container?: HTMLElement | null;
+}
+
+export interface JsonTemplateState {
+    data: CreateTemplate;
+}
 

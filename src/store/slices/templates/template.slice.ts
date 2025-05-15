@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { getTemplatesThunk, updateTemplateThunk } from './templates.thunk';
+import { createTemplateThunk, getTemplatesThunk, updateTemplateThunk } from './templates.thunk';
 import { TemplateState } from '../../../config/interfaces';
 
 const initialState: TemplateState = {
@@ -8,6 +8,8 @@ const initialState: TemplateState = {
     getError: null,
     updateStatus: 'idle',
     updateError: null,
+    createError: null,
+    createStatus: 'idle'
 };
 
 
@@ -25,6 +27,10 @@ export const templateSlice = createSlice({
         clearUpdateError(state) {
             state.updateError = null;
             state.updateStatus = 'idle';
+        },
+        clearCreateError(state) {
+            state.createError = null;
+            state.createStatus = 'idle';
         }
     },
     extraReducers: (builder) => {
@@ -52,7 +58,18 @@ export const templateSlice = createSlice({
                 state.updateError = action.payload ?? "Error desconocido";
                 state.updateStatus = 'error';
             })
+            .addCase(createTemplateThunk.pending, (state) => {
+                state.createError = null;
+                state.createStatus = 'loading';
+            })
+            .addCase(createTemplateThunk.fulfilled, (state) => {
+                state.createStatus = 'success';
+            })
+            .addCase(createTemplateThunk.rejected, (state, action) => {
+                state.createError = action.payload ?? "Error desconocido";
+                state.createStatus = 'error';
+            })
     }
 })
 
-export const { clearTemplates, clearTemplateError, clearUpdateError } = templateSlice.actions
+export const { clearTemplates, clearTemplateError, clearUpdateError, clearCreateError } = templateSlice.actions

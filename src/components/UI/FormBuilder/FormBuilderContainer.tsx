@@ -1,5 +1,5 @@
 import {
-  Box,
+  Paper,
   Table,
   TableBody,
   TableCell,
@@ -17,9 +17,9 @@ function FormBuilderContainer({ tabId }: FormBuilderProps) {
   const rows = tabForm?.values || [];
 
   return (
-    <Box>
-      <TableContainer>
-        <Table>
+    <Paper>
+      <TableContainer sx={{ maxHeight: 360 }}>
+        <Table stickyHeader>
           <TableHead>
             <TableRow>
               {headers.map((col) => (
@@ -29,6 +29,7 @@ function FormBuilderContainer({ tabId }: FormBuilderProps) {
                     width: col.width,
                     px: 1,
                     py: 0.5,
+                    fontWeight: "bold",
                   }}
                 >
                   {col.label}
@@ -60,7 +61,7 @@ function FormBuilderContainer({ tabId }: FormBuilderProps) {
           </TableBody>
         </Table>
       </TableContainer>
-    </Box>
+    </Paper>
   );
 }
 export default FormBuilderContainer;

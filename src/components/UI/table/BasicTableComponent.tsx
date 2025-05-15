@@ -11,6 +11,7 @@ import {
   Box,
 } from "@mui/material";
 import { BasicTableProps, TableRowDataOld as TableRowData } from "../../../config/interfaces";
+import { toCapitalCase } from "../../../config/utils";
 
 function insertWordBreaks(text: string, chunkSize = 20): ReactNode[] {
   const chunks: string[] = [];
@@ -59,7 +60,7 @@ function BasicTable({ initialRows, showPagination = false }: BasicTableProps) {
                   key={key}
                   sx={{ fontWeight: "bold", padding: "4px", paddingLeft: 4, height: "100%" }}
                 >
-                  {key.toUpperCase()}
+                  {toCapitalCase(key)}
                 </TableCell>
               ))}
             </TableRow>
