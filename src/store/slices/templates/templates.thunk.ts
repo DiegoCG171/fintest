@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
-import { createTemplate, getTemplate, updateTemplate } from "../../../services"
+import { createTemplate, getTemplate, getTemplateById, updateTemplate } from "../../../services"
 import { CreateTemplate, PatchGenerationTemplate, TemplateContextType, TemplateRoot } from "../../../config/interfaces"
 import { setLoading } from "../UI/loader/loader.slice";
 
@@ -27,7 +27,7 @@ export const updateTemplateThunk = createAsyncThunk<
     { id: string; payload: PatchGenerationTemplate }, // lo que recibe
     { rejectValue: string }
 >(
-    'templates/updateById',
+    'templates/update',
     async ({ id, payload }, { dispatch, rejectWithValue }) => {
         try {
             dispatch(setLoading(true));
@@ -52,6 +52,25 @@ export const createTemplateThunk = createAsyncThunk<
             const response = await createTemplate(template);
             return response;
         } catch (error) {
+            return rejectWithValue(error as string)
+        } finally {
+            dispatch(setLoading(false));
+        }
+    }
+);
+
+export const getTemplateByIdThunk = createAsyncThunk<
+    TemplateContextType,
+    string,
+    { rejectValue: string }
+>(
+    'templates/getById',
+    async (id, { dispatch, rejectWithValue }) => {
+        try {
+            dispatch(setLoading(true));
+            const template = await getTemplateById(id);
+            return template
+        } catch (error: unknown) {
             return rejectWithValue(error as string)
         } finally {
             dispatch(setLoading(false));

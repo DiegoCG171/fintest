@@ -80,7 +80,6 @@ function TabbedTableForm({
   }
 };
 
-
   return (
     <Box
       sx={{

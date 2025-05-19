@@ -228,7 +228,7 @@ function DynamicField({
       variant="body2"
       style={{
         ...getStyles(),
-        padding: isParent ? 0 : 12
+        padding: isChild ? 6 : 0
       }}
     >
       {typeof value === "string" ? value : ""}

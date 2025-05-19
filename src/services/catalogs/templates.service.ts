@@ -31,3 +31,13 @@ export const createTemplate = async (template: CreateTemplate): Promise<Template
         throw errorMessage;
     }
 }
+
+export const getTemplateById = async (id: string): Promise<TemplateContextType> => {
+    try {
+        const response = await api.get(`${ENDPOINTS.template}/${id}`);
+        return response.data;
+    } catch (error) {
+        const errorMessage = handleAxiosError(error);
+        throw errorMessage;
+    }
+}

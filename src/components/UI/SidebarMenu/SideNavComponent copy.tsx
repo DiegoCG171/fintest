@@ -3,9 +3,9 @@ import { Box, InputAdornment, TextField, IconButton, Button } from "@mui/materia
 import logo from "../../assets/logo.svg";
 import MenuOpenOutlinedIcon from "@mui/icons-material/MenuOpenOutlined";
 import SearchIcon from "@mui/icons-material/Search";
-import RecursiveMenuItem from "../navigation/RecursiveMenuItem";
-import { MenuItem } from "../../config/interfaces";
-import { staticMenuItems } from "../../config/mock";
+//import RecursiveMenuItem from "../../navigation/RecursiveMenuItem";
+import { MenuItem } from "../../../config/interfaces";
+import { staticMenuItems } from "../../../config/mock";
 
 export const drawerWidth = 240;
 
@@ -87,15 +87,15 @@ function SideNavComponent({ onOpenModal }: SidebarProps) {
         <Button variant="text" onClick={onOpenModal}>Crear Template</Button>
 
       {/* Menú desplegable */}
-      <Box sx={{ px: 1, overflowY: "auto", flexGrow: 1, my: 4 }}>
+      {/* <Box sx={{ px: 1, overflowY: "auto", flexGrow: 1, my: 4 }}>
         {menuItems.map((item, index) => (
           <RecursiveMenuItem
             key={index}
-            item={item}
+            item={[item]}
             depth={0}
           />
         ))}
-      </Box>
+      </Box> */}
     </Box>
   );
 }

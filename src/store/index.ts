@@ -6,8 +6,8 @@ export { authSlice, logout, clearAuthError } from './slices/auth/auth.slice'
 export { loginThunk } from './slices/auth/login.thunk'
 
 //Templates
-export { clearTemplateError, clearTemplates } from './slices/templates/template.slice'
-export { getTemplatesThunk, updateTemplateThunk, createTemplateThunk } from './slices/templates/templates.thunk'
+export { clearTemplates, clearTemplateError, clearUpdateError, clearCreateError, clearByIdTemplate, clearByIdTemplateError } from './slices/templates/template.slice'
+export { getTemplatesThunk, updateTemplateThunk, createTemplateThunk, getTemplateByIdThunk } from './slices/templates/templates.thunk'
 
 //Rules
 export { clearRules, clearRulesError } from './slices/rules/rules.slice'
@@ -17,3 +17,5 @@ export { getRulesThunk } from './slices/rules/rules.thunk'
 //----Loader
 export { setLoading } from './slices/UI/loader/loader.slice'
 export { setConfig, setValuesForTab, updateFieldValue, updateNestedFieldValue, setVisibility } from './slices/UI/form/formBuilder.slice'
+export { setMenuData, resetMenuData }  from './slices/UI/sidebarMenu/sidebarMenu.slice'
+export { openModal, closeModal } from './slices/UI/form/modalForm.slice'

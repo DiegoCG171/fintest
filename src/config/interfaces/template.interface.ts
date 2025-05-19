@@ -45,6 +45,10 @@ export interface FieldValidation {
 // PATCH
 
 export interface PatchGenerationTemplate {
+    name?: string
+    description?: string
+    category?:string
+    type?: string
     generationTransaction?: GenerationTransaction[]
     validationTransaction?: GenerationTransaction[]
 }
@@ -83,4 +87,8 @@ export interface TemplateState {
     updateError: null | string,
     createStatus: AsyncStatus,
     createError: null | string
+    getStatusById: AsyncStatus,
+    getErrorById: null | string,
+    templateById: TemplateContextType | null,
+
 }

@@ -56,6 +56,7 @@ function FormBuilderContainer({ tabId }: FormBuilderProps) {
                 path={[index]}
                 tabId={tabId}
                 headers={headers}
+                isChild= {false}
               />
             ))}
           </TableBody>
