@@ -4,6 +4,8 @@ export { useAppDispatch, useAppSelector } from './hooks'
 //Autenticación
 export { authSlice, logout, clearAuthError } from './slices/auth/auth.slice'
 export { loginThunk } from './slices/auth/login.thunk'
+export { clearRecoveryState, clearRecoveryError } from './slices/recoveryPssw/recovery.slice'
+export * from './slices/recoveryPssw/recovery.thunk'
 
 //Templates
 export { clearTemplates, clearTemplateError, clearUpdateError, clearCreateError, clearByIdTemplate, clearByIdTemplateError } from './slices/templates/template.slice'
@@ -12,6 +14,10 @@ export { getTemplatesThunk, updateTemplateThunk, createTemplateThunk, getTemplat
 //Rules
 export { clearRules, clearRulesError } from './slices/rules/rules.slice'
 export { getRulesThunk } from './slices/rules/rules.thunk'
+
+//Server
+export { clearServer, clearServerError, clearStopServer, clearStopServerError } from './slices/server/server.slice'
+export { startServerThunk, stopServerThunk} from './slices/server/server.thunk'
 
 //UI
 //----Loader

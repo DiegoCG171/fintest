@@ -22,8 +22,8 @@ function FormBuilderRow({
       <TableRow
         sx={{
           backgroundColor:
-            expanded || isChild
-              ? (theme) => theme.palette.background.default
+            isChild
+              ? "#fafbfd"
               : null,
           "&:hover": {
             backgroundColor: "#eaeaea",

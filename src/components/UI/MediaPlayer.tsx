@@ -2,8 +2,61 @@ import { Box, Stack, Typography } from "@mui/material";
 import PlayCircleFilledWhiteIcon from "@mui/icons-material/PlayCircleFilledWhite";
 import PauseIcon from "@mui/icons-material/Pause";
 import StopIcon from "@mui/icons-material/Stop";
+import { clearServerError, clearStopServerError, startServerThunk, stopServerThunk, useAppDispatch, useAppSelector } from "../../store";
 
 function MediaPlayer() {
+
+const dispatch = useAppDispatch();
+
+const playStatus = useAppSelector((state) => state.server.status);
+const stopStatus = useAppSelector((state) => state.server.stopServerStatus);
+const serverId = useAppSelector((state)=> state.server.server?.id)
+
+const clearErrors = () => {
+  dispatch(clearServerError());
+  dispatch(clearStopServerError())
+}
+
+const startServer = () => {
+  if (playStatus === 'loading' || playStatus === 'success') return;
+  console.log('Start server')
+  clearErrors()
+  dispatch(startServerThunk())
+    .unwrap()
+    .then(() => {
+
+    })
+    .catch(error => {
+      console.error("Error al iniciar el servidor:", error);
+    })
+}
+
+const stopServer = () => {
+  console.log('Stop server')
+  clearErrors();
+  if(serverId) {
+    dispatch(stopServerThunk(serverId))
+      .unwrap()
+      .then(() => {
+  
+      })
+      .catch(error => {
+        console.error("Error al detener el servidor:", error);
+      })
+  } else {
+    console.error('No existe un servidor activo')
+  }
+}
+
+const playerMessage = (() => {
+  if (playStatus === 'loading') return 'Iniciando servidor...';
+  if (stopStatus === 'loading') return 'Deteniendo servidor...';
+  if (stopStatus === 'success') return `Deteniendo servidor ${serverId}`;
+  if (playStatus === 'error' || stopStatus === 'error') return 'Ocurrió un error';
+  if (playStatus === 'success') return `Escuchando ${serverId}`;
+  return 'Detenido';
+})();
+
   return (
     <Box
       sx={{
@@ -20,7 +73,7 @@ function MediaPlayer() {
             color: (theme) => theme.palette.text.disabled, fontSize: 13,
         }}
       >
-        Escuchando 127.0.0.1:3001
+        {playerMessage}
       </Typography>
       <Stack
         direction="row"
@@ -39,8 +92,9 @@ function MediaPlayer() {
             fontSize: 36,
             cursor: "pointer",
         }}
+        onClick={startServer}
         />
-        <StopIcon sx={{cursor: "pointer"}} />
+        <StopIcon sx={{cursor: "pointer"}} onClick={stopServer} />
       </Stack>
     </Box>
   );

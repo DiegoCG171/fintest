@@ -1,10 +1,12 @@
-import { Form, Link as RouterLink } from "react-router-dom";
+import { Form, Link as RouterLink, useNavigate } from "react-router-dom";
 import CustomInputComponent from "../../../components/core/forms/CustomInput";
 import { Box, Button, Stack, Typography, Link } from "@mui/material";
 import { Formik } from "formik";
 import { useToast } from "../../../config/hooks/useToast";
 import * as Yup from "yup";
 import TextBox from "../../../components/UI/TextBox";
+import { useAppDispatch, useAppSelector } from "../../../store";
+import { resetPsswThunk } from "../../../store/slices/resetPssw/resetPssw.thunk";
 
 const validationSchema = Yup.object({
   password: Yup.string()
@@ -23,6 +25,10 @@ const validationSchema = Yup.object({
 
 function ResetPassword() {
   const { showToast } = useToast();
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const _token = useAppSelector((state) => state.recovery.user?.token);
+  console.log(_token);
   return (
     <Box
       sx={{
@@ -60,9 +66,21 @@ function ResetPassword() {
               retryPassword: "",
             }}
             validationSchema={validationSchema}
-            onSubmit={(_values, { setSubmitting }) => {
-              showToast("Formulario enviado correctamente", "success");
-              setSubmitting(false);
+            onSubmit={async (values, { setSubmitting }) => {
+              try {
+                await dispatch(
+                  resetPsswThunk({
+                    pssw: values.password,
+                    token: _token,
+                  })
+                );
+                navigate("/login");
+                showToast('Contraseña restablecida correctamente', 'success')
+              } catch (error) {
+                console.log(error)
+              } finally {
+                setSubmitting(false);
+              }
             }}
           >
             {({ errors, touched, getFieldProps, submitForm }) => (
@@ -75,7 +93,7 @@ function ResetPassword() {
                     <CustomInputComponent
                       label="Nueva contraseña"
                       id="password"
-                      type='password'
+                      type="password"
                       endIconType="password"
                       isValid={!errors.password}
                       {...getFieldProps("password")}
@@ -86,7 +104,7 @@ function ResetPassword() {
                     <CustomInputComponent
                       label="Confirmar nueva contraseña"
                       id="retryPassword"
-                      type='password'
+                      type="password"
                       endIconType="password"
                       isValid={!errors.retryPassword}
                       {...getFieldProps("retryPassword")}

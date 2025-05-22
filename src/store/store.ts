@@ -7,6 +7,8 @@ import { formBuilderSlice } from "./slices/UI/form/formBuilder.slice";
 import { jsonTemplateDraftSlice } from "./slices/UI/form/jsonTemplateDraft.slice";
 import { sidebarMenuSlice } from "./slices/UI/sidebarMenu/sidebarMenu.slice";
 import { modalFormSlice } from "./slices/UI/form/modalForm.slice";
+import { serverSlice } from "./slices/server/server.slice";
+import { recoveryPsswSlice } from "./slices/recoveryPssw/recovery.slice";
 
 export const store = configureStore({
     reducer: {
@@ -17,7 +19,9 @@ export const store = configureStore({
         formBuilder: formBuilderSlice.reducer,
         jsonTemplate: jsonTemplateDraftSlice.reducer,
         sidebarMenu: sidebarMenuSlice.reducer,
-        modalForm: modalFormSlice.reducer
+        modalForm: modalFormSlice.reducer,
+        server: serverSlice.reducer,
+        recovery: recoveryPsswSlice.reducer
     }
 });
 
