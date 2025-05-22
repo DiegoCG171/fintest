@@ -6,197 +6,211 @@ import { serviceConfig } from "../utils/serviceConfig";
 //Default Props
 
 export interface WithChildrenProps {
-    children: ReactNode;
+  children: ReactNode;
 }
 
 //Table props
 
+export interface FieldError {
+  code: string;
+  data: {
+    length: number;
+    regex: string;
+    validation: string;
+  }
+}
+
 export interface TableRowData {
-    [key: string]: ReactNode | TableRowData[];
+  ID?: number | string;
+  error?: FieldError;
+  [key: string]: ReactNode | TableRowData[] | FieldError;
 }
 export interface TabPanelProps {
-    children?: React.ReactNode;
-    index: number;
-    value: number;
+  children?: React.ReactNode;
+  index: number;
+  value: number;
 }
 
 export interface BasicTableProps {
-    initialRows: TableRowData[];
-    showPagination?: boolean;
+  initialRows: TableRowData[];
+  showPagination?: boolean;
+  customRenderers?: {
+    [columnKey: string]: (
+      value: string | number | null | undefined
+    ) => React.ReactNode;
+  };
+  type?: 'detail' | 'errors' | 'events';
 }
 
 export interface DynamicTableProps {
-    fields: FieldRules[];
+  fields: FieldRules[];
 }
 
 export interface ComplexFormTableProps {
-    data: TableRowData[];
-    columns: ColumnDynamicConfig[]
+  data: TableRowData[];
+  columns: ColumnDynamicConfig[];
 }
 
 export interface DynamicRenderConfig {
-    render: boolean;
-    type?: "input" | "select";
-    options?: string[];
+  render: boolean;
+  type?: "input" | "select";
+  options?: string[];
 }
 
 export interface ColumnDynamicConfig {
-    id: string;
-    label: string;
-    width: number | string;
-    type?: string;
-    dependsOn?: string;
-    affects?: string[];
-    options?: string[];
-    dynamicRender?: Record<string, DynamicRenderConfig>;
+  id: string;
+  label: string;
+  width: number | string;
+  type?: string;
+  dependsOn?: string;
+  affects?: string[];
+  options?: string[];
+  dynamicRender?: Record<string, DynamicRenderConfig>;
 }
 
 export interface PropsComplexFormSubTable {
-    data: Record<string, TableRowData>;
-    columns: ColumnConfig[];
-    parentPath?: string;
+  data: Record<string, TableRowData>;
+  columns: ColumnConfig[];
+  parentPath?: string;
 }
 
 export interface ColumnConfig {
-    id: string;
-    label: string;
-    width: string | number;
+  id: string;
+  label: string;
+  width: string | number;
 }
 
 export interface FormValues {
-    items: Record<string, Record<string, unknown>>;
-};
-
+  items: Record<string, Record<string, unknown>>;
+}
 
 export type FormRefHandle = {
-    submitForm: () => void;
+  submitForm: () => void;
 };
 
 //Menu props
 
 export interface MenuItem {
-    title: string;
-    iconMenu?: React.ReactNode;
-    linkMenu?: string;
-    onClickMenu?: () => void;
-    subItems?: MenuItem[];
+  title: string;
+  iconMenu?: React.ReactNode;
+  linkMenu?: string;
+  onClickMenu?: () => void;
+  subItems?: MenuItem[];
 }
 
 export interface RecursiveMenuItemProps {
-    item: MenuItem;
-    depth?: number;
+  item: MenuItem;
+  depth?: number;
 }
 
 //Tabs props
 export interface TabItem {
-    label: string;
-    content: ReactNode;
-    ref?: React.Ref<FormRefHandle>;
+  label: string;
+  content: ReactNode;
+  ref?: React.Ref<FormRefHandle>;
 }
 
 export interface TabTableComponentProps {
-    tabs: TabItem[];
-    initialTabIndex?: number;
+  tabs: TabItem[];
+  initialTabIndex?: number;
 }
 
 export interface TabConfigInterface {
-    [key: string]: Array<{
-        label: string;
-        content: ReactNode;
-    }>;
+  [key: string]: Array<{
+    label: string;
+    content: ReactNode;
+  }>;
 }
 
 export interface TabbedCardContainerProps {
-    tabs: { label: string; content: ReactNode }[];
-    eventTabs: { label: string; content: ReactNode }[];
-    initialTabIndex: number;
+  tabs: { label: string; content: ReactNode }[];
+  eventTabs: { label: string; content: ReactNode }[];
+  initialTabIndex: number;
 }
 
 //Form props
 export type CustomCheckboxProps = {
-    id?: string;
-    label?: string;
-    checked?: boolean;
-    onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
-    color?: 'primary' | 'secondary' | 'default';
-    size?: 'small' | 'medium';
-    required?: boolean;
-    errorMessage?: string;
+  id?: string;
+  label?: string;
+  checked?: boolean;
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  color?: "primary" | "secondary" | "default";
+  size?: "small" | "medium";
+  required?: boolean;
+  errorMessage?: string;
 };
 
 export type CustomTextFieldProps = TextFieldProps & {
-    label?: string;
-    id: string;
-    error?: boolean;
-    helperText?: React.ReactNode;
-    endIconType?: "password" | "validation";
-    isValid?: boolean;
-    inputSize?: InputSize;
+  label?: string;
+  id: string;
+  error?: boolean;
+  helperText?: React.ReactNode;
+  endIconType?: "password" | "validation";
+  isValid?: boolean;
+  inputSize?: InputSize;
 };
 
 export type CustomSelectProps = SelectProps & {
-    label?: string;
-    defaultValue?: string;
-    id: string;
-    error?: boolean;
-    helperText?: React.ReactNode;
-    isValid?: boolean;
-    inputSize?: "small" | "medium";
-    options: OptionsSelect;
+  label?: string;
+  defaultValue?: string;
+  id: string;
+  error?: boolean;
+  helperText?: React.ReactNode;
+  isValid?: boolean;
+  inputSize?: "small" | "medium";
+  options: OptionsSelect;
 };
 
 export interface OptionsSelect {
-    [key: string]: string | number;
+  [key: string]: string | number;
 }
 
 export type InputSize = "sm" | "default" | "lg";
 
 export interface StyleObject {
-    mb: number;
-    fontSize: string;
-    fontWeight: string;
-};
+  mb: number;
+  fontSize: string;
+  fontWeight: string;
+}
 
 export interface DynamicFieldProps {
-    name: string;
-    label?: string;
-    row?: TableRowData;
-    column?: ColumnDynamicConfig;
-    id: string | number;
+  name: string;
+  label?: string;
+  row?: TableRowData;
+  column?: ColumnDynamicConfig;
+  id: string | number;
 }
 
 //Toast props
 
 export type ToastType = "success" | "error" | "warning" | "info";
 export interface ToastState {
-    open: boolean;
-    message: string;
-    type: ToastType;
+  open: boolean;
+  message: string;
+  type: ToastType;
 }
 export interface ToastContextType {
-    showToast: (message: string, type?: ToastType) => void;
+  showToast: (message: string, type?: ToastType) => void;
 }
 
 // UI props
 export interface HeaderComponentProps {
-    alerts: number;
+  alerts: number;
 }
 export interface TextBoxProps {
-    title: string;
-    welcomeText: string;
-    description: React.ReactNode;
-    align?: string
+  title: string;
+  welcomeText: string;
+  description: React.ReactNode;
+  align?: string;
 }
 
 //Middelware or handlers
 
 export type DataMiddlewareProps = {
-    payload?: {
-        [key: string]: string | boolean | null | number | undefined;
-    };
-    dataCase: dataServiceType,
-}
+  payload?: {
+    [key: string]: string | boolean | null | number | undefined;
+  };
+  dataCase: dataServiceType;
+};
 
 export type dataServiceType = keyof typeof serviceConfig;
-
-
