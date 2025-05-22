@@ -31,14 +31,16 @@ export interface TabPanelProps {
   value: number;
 }
 
-export interface BasicTableProps {
-  initialRows: TableRowData[];
-  showPagination?: boolean;
-  customRenderers?: {
+export interface CustomRenders {
     [columnKey: string]: (
       value: string | number | null | undefined
     ) => React.ReactNode;
-  };
+  }
+
+export interface BasicTableProps {
+  initialRows: TableRowData[];
+  showPagination?: boolean;
+  customRenderers?: CustomRenders;
   type?: 'detail' | 'errors' | 'events';
 }
 
