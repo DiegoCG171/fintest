@@ -1,12 +1,14 @@
 import api from "../../api/api";
 import { ENDPOINTS } from "../../config/constants/endpoints";
+import { RootRules } from "../../config/interfaces";
+import { handleAxiosError } from "../../config/utils/axiosErrorHandler";
 
-export const getRules = async () => {
+export const getRules = async (): Promise<RootRules> => {
     try {
-        const response = await api.get(ENDPOINTS.getRules);
+        const response = await api.get<RootRules>(ENDPOINTS.getRules);
         return response.data;
     } catch (error) {
-        console.error('Error al obtener las reglas:', error);
-        throw error;
+        const errorMessage = handleAxiosError(error);
+        throw errorMessage;
     }
 }

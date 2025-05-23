@@ -1,3 +1,11 @@
+import { AsyncStatus } from "."
+
+/*TODO: Mejorar interfaces*/
+
+// GET
+
+export type TemplateRoot = TemplateContextType[]
+
 export interface TemplateContextType {
     _id: string
     name: string
@@ -5,7 +13,7 @@ export interface TemplateContextType {
     category: string
     type: string
     validationTransaction: ValidationTransaction[]
-    generationTransaction: GenerationTransaction[]
+    generationTransaction: ValidationTransaction[]
     uuid: string
     __v: number
     createdAt: string
@@ -14,31 +22,58 @@ export interface TemplateContextType {
 
 export interface ValidationTransaction {
     idBitmap: string
-    isRequired: boolean
+    isRequired?: boolean
     function: string
     value: string
-    fields: Field[]
+    fields: FieldValidation[]
     _id: string
 }
 
-export interface Field {
+export interface FieldValidation {
     idBitmap: string
     function: string
     value: string
-    fields: unknown[]
+    fields: FieldValidation[]
     _id: string
+}
+
+// PATCH
+
+export interface PatchGenerationTemplate {
+    generationTransaction?: GenerationTransaction[]
+    validationTransaction?: GenerationTransaction[]
 }
 
 export interface GenerationTransaction {
     idBitmap: string
-    isRequired: boolean
-    function: string
-    value: string
-    fields: unknown[]
-    _id: string
+    function: string | undefined
+    value?: string | number | boolean | undefined
+    fields?: FieldUpdateTemplate[]
+    isRequired?: boolean
 }
 
-export interface TemplateContextState {
-    template: TemplateContextType | null;
-    getTemplates: () => Promise<void>;
+export interface FieldUpdateTemplate {
+    idBitmap: string
+    function?: string | undefined,
+    value?: string | number | boolean | undefined,
+    fields?: Field2[]
+    isRequired?: boolean
+}
+
+export interface Field2 {
+    idBitmap: string
+    function: string
+    value?: string | number | boolean | undefined,
+    isRequired?: boolean
+}
+
+
+// Slice
+
+export interface TemplateState {
+    templates: TemplateRoot | [],
+    getStatus: AsyncStatus,
+    getError: null | string,
+    updateStatus: AsyncStatus,
+    updateError: null | string,
 }

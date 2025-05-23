@@ -1,6 +1,6 @@
 import { SelectProps, TextFieldProps } from "@mui/material";
 import { ReactNode } from "react";
-import { FieldRules } from "./rules.interface";
+import { Field } from "./rules.interface";
 import { serviceConfig } from "../utils/serviceConfig";
 
 //Default Props
@@ -17,7 +17,15 @@ export interface FieldError {
     length: number;
     regex: string;
     validation: string;
-  }
+  };
+}
+export interface TableRowDataOld {
+  [key: string]: ReactNode | TableRowDataOld[];
+}
+export interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
 }
 
 export interface TableRowData {
@@ -32,30 +40,31 @@ export interface TabPanelProps {
 }
 
 export interface CustomRenders {
-    [columnKey: string]: (
-      value: string | number | null | undefined
-    ) => React.ReactNode;
-  }
+  [columnKey: string]: (
+    value: string | number | null | undefined
+  ) => React.ReactNode;
+}
 
 export interface BasicTableProps {
-  initialRows: TableRowData[];
+  initialRows: TableRowDataOld[];
   showPagination?: boolean;
   customRenderers?: CustomRenders;
   type?: 'detail' | 'errors' | 'events';
 }
 
 export interface DynamicTableProps {
-  fields: FieldRules[];
+  fields: Field[];
 }
 
 export interface ComplexFormTableProps {
-  data: TableRowData[];
+  data: TableRowDataOld[];
   columns: ColumnDynamicConfig[];
+  parentpath: string;
 }
 
 export interface DynamicRenderConfig {
   render: boolean;
-  type?: "input" | "select";
+  type?: "input" | "select" | "checkbox" | "static";
   options?: string[];
 }
 
@@ -67,13 +76,14 @@ export interface ColumnDynamicConfig {
   dependsOn?: string;
   affects?: string[];
   options?: string[];
+  hide?: boolean;
   dynamicRender?: Record<string, DynamicRenderConfig>;
 }
 
 export interface PropsComplexFormSubTable {
-  data: Record<string, TableRowData>;
+  data: Record<string, TableRowDataOld>;
   columns: ColumnConfig[];
-  parentPath?: string;
+  parentPath: string;
 }
 
 export interface ColumnConfig {
@@ -83,7 +93,7 @@ export interface ColumnConfig {
 }
 
 export interface FormValues {
-  items: Record<string, Record<string, unknown>>;
+  [rootKey: string]: Record<string, Record<string, unknown>>;
 }
 
 export type FormRefHandle = {
@@ -106,14 +116,27 @@ export interface RecursiveMenuItemProps {
 }
 
 //Tabs props
-export interface TabItem {
+// Para tabs dinámicos de formularios
+export interface FormTabItem {
   label: string;
-  content: ReactNode;
+  templateId: string;
+  formType: string;
   ref?: React.Ref<FormRefHandle>;
 }
 
+// Para tabs que pintan JSX directamente
+export interface StaticTabItem {
+  label: string;
+  content: React.ReactNode;
+}
+
 export interface TabTableComponentProps {
-  tabs: TabItem[];
+  tabs: StaticTabItem[];
+  initialTabIndex?: number;
+}
+
+export interface TabTableFormComponentProps {
+  tabs: FormTabItem[];
   initialTabIndex?: number;
 }
 
@@ -175,12 +198,14 @@ export interface StyleObject {
   fontWeight: string;
 }
 
-export interface DynamicFieldProps {
+export interface DynamicFieldPropsOld {
   name: string;
   label?: string;
-  row?: TableRowData;
+  row?: TableRowDataOld;
   column?: ColumnDynamicConfig;
   id: string | number;
+  parentPath: string;
+  isVisible?: boolean;
 }
 
 //Toast props
@@ -212,7 +237,11 @@ export type DataMiddlewareProps = {
   payload?: {
     [key: string]: string | boolean | null | number | undefined;
   };
-  dataCase: dataServiceType;
+  dataCase: string;
+  templateId: string;
+  formType: string;
 };
 
 export type dataServiceType = keyof typeof serviceConfig;
+
+export type AsyncStatus = "idle" | "loading" | "success" | "error";

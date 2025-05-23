@@ -1,7 +1,7 @@
 import { Box, Stack, Tab, Tabs } from "@mui/material";
 import { useState, useEffect } from "react";
-import CustomTabPanel from "../core/CustomTabPanel";
-import { TabTableComponentProps } from "../../config/interfaces";
+import CustomTabPanel from "../../core/CustomTabPanel";
+import { TabTableComponentProps } from "../../../config/interfaces";
 
 function TabTableComponent({
   tabs = [],

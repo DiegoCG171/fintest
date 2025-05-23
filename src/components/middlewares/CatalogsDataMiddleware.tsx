@@ -1,37 +1,58 @@
-import { forwardRef, useEffect, useState } from "react";
-import { DataMiddlewareProps, FormRefHandle, TableRowData } from "../../config/interfaces";
+import { useEffect, useMemo, useRef } from "react";
 import { serviceConfig } from "../../config/utils/serviceConfig";
-import { safeCall } from "../../config/utils/safeCall";
-import ComplexFormTable from "../core/table/ComplexFormTable";
+import {
+  setConfig,
+  setValuesForTab,
+  useAppDispatch,
+  useAppSelector,
+} from "../../store";
+import FormBuilderContainer from "../UI/FormBuilder/FormBuilderContainer";
+import { combineTemplateData, mapFieldRulesToFormStructure } from "../../config/utils/mappers";
+import {
+  ColumnConfigFormBuilder,
+  FormTabItem,
+} from "../../config/interfaces";
+import { getTransactionByType } from "../../config/utils";
 
-const CatalogsDataMiddleware = forwardRef<FormRefHandle, DataMiddlewareProps>(
-    ({ payload = undefined, dataCase = "rules" }, ref) => {
-    const [data, setData] = useState<Array<TableRowData>>([]);
-    const columns = serviceConfig.rules.columns;
-    useEffect(() => {
-        const config = serviceConfig[dataCase as keyof typeof serviceConfig];
-        if (!config) {
-        console.warn(`${dataCase.toUpperCase} no se encuentra configurado`);
-        return;
-        }
-        const fetchData = async () => {
-        try {
-            const response = await safeCall(config.serviceMethod, payload);
-            const mapped = config.mapData(response);
-            setData(mapped);
-            
-        } catch (error) {
-            console.error("Error fetching data:", error); 
-        }
-        };
+interface FormBuilderProps {
+    tabId: string;
+    template: FormTabItem
+}
 
-        fetchData();
-    }, [dataCase, payload]);
 
-    return (
-    <>
-        <ComplexFormTable data={data} columns={columns} ref={ref}></ComplexFormTable>
-    </>
-);
-})
+function CatalogsDataMiddleware({ tabId, template }: FormBuilderProps) {
+  const dispatch = useAppDispatch();
+  const { formType, templateId } = template;
+
+  const rawRules = useAppSelector((state) => state.rules.rules);
+  const templates = useAppSelector((state) => state.templates.templates);
+  const formState = useAppSelector((state) => state.formBuilder.tabForms[tabId]);
+
+  const alreadyInitialized = useRef(false);
+
+
+  const mappedRules = useMemo(() => {
+    return mapFieldRulesToFormStructure(rawRules || []);
+  }, [rawRules]);
+
+  const transactionData = useMemo(() => {
+    return getTransactionByType(templates, templateId, formType);
+  }, [templates, templateId, formType]);
+
+  useEffect(() => {
+    dispatch(setConfig(serviceConfig.rules.columns as ColumnConfigFormBuilder[]));
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (alreadyInitialized.current) return;
+    if (!rawRules?.length || !transactionData?.length || formState?.values?.length) return;
+
+    const values = combineTemplateData(transactionData, mappedRules);
+    dispatch(setValuesForTab({ tabId, values }));
+    alreadyInitialized.current = true;
+  }, [dispatch, tabId, rawRules, transactionData, mappedRules, formState]);
+
+  return <FormBuilderContainer tabId={tabId} />;
+}
+
 export default CatalogsDataMiddleware;

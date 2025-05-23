@@ -6,10 +6,12 @@ import { Provider } from 'react-redux';
 import router from './router.tsx'
 import ToastProvider from './config/context/ToastProvider.tsx'
 import { store } from './store/store.ts';
+import LoaderComponent from './components/core/LoaderComponent.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
         <Provider store={store}>
+        <LoaderComponent />
           <ToastProvider>
             <RouterProvider router={router}/>
           </ToastProvider>

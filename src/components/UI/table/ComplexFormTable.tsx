@@ -11,11 +11,14 @@ import {
 import { ComplexFormTableProps } from "../../../config/interfaces";
 import ComplexFormSubTable from "./ComplexFormSubTable";
 import { Form, Formik, FormikProps, FormikValues } from "formik";
-import { forwardRef, useImperativeHandle, useRef } from "react";
+import { forwardRef, useImperativeHandle, useMemo, useRef } from "react";
 
-const ComplexFormTable = forwardRef(({ data, columns }: ComplexFormTableProps, ref) => {
-  const dataById = Object.fromEntries(data.map((row) => [row._id, row]));
+const ComplexFormTable = forwardRef(({ data, columns, parentpath }: ComplexFormTableProps, ref) => {
+  const dataById = useMemo(() => (
+    Object.fromEntries(data.map((row) => [row._id, row]))
+  ), [data]);  
   const formikRef = useRef<FormikProps<FormikValues>>(null);
+  const initialValues = useMemo(() => ({ [parentpath]: dataById }), [dataById, parentpath]);
 
   useImperativeHandle(ref, () => ({
     submitForm: () => formikRef.current?.submitForm(),
@@ -23,10 +26,9 @@ const ComplexFormTable = forwardRef(({ data, columns }: ComplexFormTableProps, r
 
   return (
     <Formik
-      initialValues={{ items: dataById }}
+      initialValues={initialValues}
       innerRef={formikRef} 
       onSubmit={(values) => {
-        console.log("✅ Valores del formulario:");
         console.table(values.items);
       }}
     >
@@ -72,7 +74,7 @@ const ComplexFormTable = forwardRef(({ data, columns }: ComplexFormTableProps, r
                   <ComplexFormSubTable
                     data={dataById}
                     columns={columns}
-                    parentPath="items"
+                    parentPath={parentpath}
                   />
                 </TableBody>
               </Table>

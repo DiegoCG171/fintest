@@ -53,6 +53,11 @@ const theme = createTheme({
     },
   },  
   components: {
+    MuiButtonBase: {
+      defaultProps: {
+        disableRipple: true,
+      },
+    },
     MuiTypography: {
       defaultProps: {
         variantMapping: {
@@ -138,44 +143,11 @@ const theme = createTheme({
         },
       },
     },
-    /* MuiTabs: {
-      styleOverrides: {
-        root: {
-          display: "inline-flex",
-          justifyContent: "space-between",
-          border: "1px solid #D1D1D1",
-          borderRadius: 12,
-          padding: "4px",
-          minHeight: "40px",
-          
-        },
-        flexContainer: {
-          display: "inline-flex",
-        },
-        indicator: {
-          display: "none",
-        },
+    MuiTab: {
+      defaultProps: {
+        disableRipple: true,
       },
     },
-    MuiTab: {
-      styleOverrides: {
-        root: {
-          fontSize: "12px",
-          fontWeight: "bold",
-          textTransform: "capitalize",
-          borderRadius: 2,
-          margin:2,
-          padding: "6px 16px",
-          minHeight: "12px",
-          minWidth: "20vw",
-          color: "#333",
-          "&.Mui-selected": {
-            backgroundColor: "#EEF7FF",
-            color: "#1A71F6",
-          },
-        },
-      },
-    }, */
     MuiTablePagination: {
       styleOverrides: {
         root: {
@@ -190,6 +162,11 @@ const theme = createTheme({
         },
       },
     },
+    MuiCheckbox: {
+      defaultProps: {
+        disableRipple: true,
+      },
+    },    
     MuiBreadcrumbs: {
       styleOverrides: {
         root: {

@@ -1,14 +1,16 @@
+import { AsyncStatus } from "."
+
 export type RootRules = Rules[]
 
 export interface Rules {
     _id: string
     version: number
     type: string
-    fields: FieldRules[]
+    fields: Field[]
     __v: number
 }
 
-export interface FieldRules {
+export interface Field {
     positionsLength?: PositionsLength
     idBitmap: string
     displayName: string
@@ -41,3 +43,9 @@ export interface Specification {
     displayName: string
     _id: string
 }
+
+export interface RulesState {
+    rules: Field[];
+    status: AsyncStatus;
+    error: string | null;
+}  
