@@ -3,21 +3,20 @@ import BasicTable from "../../components/UI/table/BasicTableComponent";
 import TitleHeaderComponent from "../../components/UI/TitleHeaderComponent";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-<<<<<<< HEAD
-import TabbedCardContainer from "../../components/UI/TabbedCardContainer";
-import { TabItem } from "../../config/interfaces";
 import { tabConfig } from "../../config/mock";
 import { useMultiSocket } from "../../config/hooks/useMultiSocket";
 import { MessagesState } from "../../config/interfaces/messages.interface";
 import { useAppSelector } from "../../store/hooks";
-import { StatusRender } from "../../components/core/table/StatusRender";
+import { StaticTabItem } from "../../config/interfaces";
+import { StatusRender } from "../../components/UI/table/StatusRender";
+import TabbedCardContainer from "../../components/UI/Tabs/TabbedCardContainer";
 
 const generateTabs = (
   type: string,
   route: string,
   messagesData: MessagesState
-): TabItem[] => {
-  const baseTabs: TabItem[] = [
+): StaticTabItem[] => {
+  const baseTabs: StaticTabItem[] = [
     {
       label: "Detalles",
       content: (
@@ -57,16 +56,6 @@ const generateTabs = (
           />
         ),
       },
-=======
-import TabbedCardContainer from "../../components/UI/Tabs/TabbedCardContainer";
-import { StaticTabItem } from "../../config/interfaces";
-import { dataMap, tabConfig } from "../../config/mock";
-
-const generateTabs = (type: string, route: string): StaticTabItem[] => {
-    const baseTabs: StaticTabItem[] = [
-        { label: "Detalles", content: <BasicTable initialRows={dataMap.detail} /> },
-        { label: "Errores", content: <BasicTable initialRows={dataMap.errors} /> },
->>>>>>> e4b0c1ca5860c57fbb6329ededce04178db71b17
     ];
   }
 

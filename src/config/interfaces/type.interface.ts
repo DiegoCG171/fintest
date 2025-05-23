@@ -46,7 +46,7 @@ export interface CustomRenders {
 }
 
 export interface BasicTableProps {
-  initialRows: TableRowDataOld[];
+  initialRows: TableRowData[];
   showPagination?: boolean;
   customRenderers?: CustomRenders;
   type?: 'detail' | 'errors' | 'events';
