@@ -1,34 +1,37 @@
-import { ReactNode, SetStateAction, useState } from "react";
+import { ReactNode, SetStateAction, useEffect, useState } from "react";
 import {
   Table,
   TableBody,
-  TableCell,
   TableContainer,
-  TableHead,
-  TableRow,
   Paper,
   TablePagination,
-  Box,
 } from "@mui/material";
-import { BasicTableProps, TableRowDataOld as TableRowData } from "../../../config/interfaces";
+import {
+  BasicTableProps,
+  FieldError,
+  TableRowData,
+} from "../../../config/interfaces";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+import { setActiveMessage } from "../../../store/slices/messages/messages.slice";
+import { TableRowComponent } from "./TableRowComponent";
+import { TableHeader } from "./TableHeader";
 
-function insertWordBreaks(text: string, chunkSize = 20): ReactNode[] {
-  const chunks: string[] = [];
-  for (let i = 0; i < text.length; i += chunkSize) {
-    chunks.push(text.substring(i, i + chunkSize));
-  }
-  return chunks.reduce<ReactNode[]>((acc, chunk, index) => {
-    if (index > 0) {
-      return [...acc, <wbr key={index} />, chunk];
-    }
-    return [chunk];
-  }, []);
-}
-
-
-function BasicTable({ initialRows, showPagination = false }: BasicTableProps) {
+function BasicTable({
+  initialRows,
+  showPagination = false,
+  customRenderers = {},
+  type = "events",
+}: BasicTableProps) {
+  const dispatch = useAppDispatch();
+  const { activeMessage } = useAppSelector((state) => state.messagesReducer);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [keys, setKeys] = useState<string[]>([]);
+  const [openRows, setOpenRows] = useState<{ [key: string]: boolean }>({});
+
+  const handleToggle = (id: string) => {
+    setOpenRows((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
 
   const handleChangePage = (
     _event: unknown,
@@ -42,63 +45,48 @@ function BasicTable({ initialRows, showPagination = false }: BasicTableProps) {
     setPage(0);
   };
 
+  const handleSetActiveMessage = (
+    id: number | string | undefined,
+    message: TableRowData[] | ReactNode | FieldError
+  ) => {
+    if (type === "events" && Array.isArray(message)) {
+      dispatch(setActiveMessage({ data: message, id }));
+    }
+  };
+
   const rowsToShow = showPagination
     ? initialRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
     : initialRows;
 
-  const dynamicKeys = Object.keys(initialRows[0] || {});
+  useEffect(() => {
+    const dynamicKeys = Object.keys(initialRows[0] || {});
+    const filteredKeys =
+      type === "events"
+        ? dynamicKeys.filter((key) => key !== "fields")
+        : dynamicKeys;
+
+    setKeys(filteredKeys);
+  }, [initialRows, type]);
 
   return (
     <Paper sx={{ width: "100%", boxShadow: "none" }}>
-      <TableContainer>
+      <TableContainer sx={{ height: type === "events" ? "9vh" : "50vh" }}>
         <Table stickyHeader>
-          <TableHead>
-            <TableRow>
-              {dynamicKeys.map((key) => (
-                <TableCell
-                  key={key}
-                  sx={{ fontWeight: "bold", padding: "4px", paddingLeft: 4, height: "100%" }}
-                >
-                  {key.toUpperCase()}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
+          <TableHeader keys={keys} />
           <TableBody>
             {rowsToShow.map((row: TableRowData, rowIndex: number) => (
-              <TableRow key={rowIndex}>
-                {dynamicKeys.map((key) => {
-                  const cellValue = row[key];
-                  const cellText =
-                    typeof cellValue === "string" ||
-                    typeof cellValue === "number"
-                      ? String(cellValue)
-                      : "";
-
-                  return (
-                    <TableCell
-                      key={key}
-                      sx={{ 
-                        padding: "8px", 
-                        paddingLeft: 4,
-                        height: "100%"
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          width: "100%",
-                          whiteSpace: "normal",
-                          overflowWrap: "break-word",
-                        }}
-                      >
-                        {cellText.length > 25
-                          ? insertWordBreaks(cellText)
-                          : cellText}
-                      </Box>
-                    </TableCell>
-                  );
-                })}
-              </TableRow>
+              <TableRowComponent
+                key={rowIndex}
+                row={row}
+                rowIndex={rowIndex}
+                keys={keys}
+                customRenderers={customRenderers}
+                type={type}
+                activeMessageId={activeMessage.id}
+                onSetActiveMessage={handleSetActiveMessage}
+                onToggle={handleToggle}
+                openRows={openRows}
+              />
             ))}
           </TableBody>
         </Table>
