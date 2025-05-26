@@ -28,7 +28,6 @@ function CatalogsDataMiddleware({ tabId, template }: FormBuilderProps) {
   const formState = useAppSelector(
     (state) => state.formBuilder.tabForms[tabId]
   );
-  console.log(formState);
 
   const alreadyInitialized = useRef(false);
 

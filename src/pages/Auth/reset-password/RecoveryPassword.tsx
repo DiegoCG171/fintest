@@ -5,7 +5,7 @@ import { Formik } from "formik";
 import { useToast } from "../../../config/hooks/useToast";
 import { Form, Link as RouterLink, useNavigate } from "react-router-dom";
 import CustomInputComponent from "../../../components/core/forms/CustomInput";
-import { useAppDispatch } from "../../../store";
+import { setLoading, useAppDispatch } from "../../../store";
 import { recoveryPsswThunk } from "../../../store/slices/recoveryPssw/recovery.thunk";
 
 const validationSchema = Yup.object({
@@ -57,6 +57,7 @@ function RecoveryPassword() {
             }}
             validationSchema={validationSchema}
             onSubmit={async (values, { setSubmitting }) => {
+              dispatch(setLoading(true));
               try {
                 await dispatch(
                   recoveryPsswThunk(values.email)
@@ -66,6 +67,7 @@ function RecoveryPassword() {
                 showToast(error as string, "error");
               } finally {
                 setSubmitting(false);
+                dispatch(setLoading(false));
               }
             }}
           >
@@ -89,7 +91,6 @@ function RecoveryPassword() {
                     <Button
                       fullWidth
                       variant="contained"
-                      type="submit"
                       onClick={() => {
                         if (Object.keys(errors).length > 0) {
                           showToast(

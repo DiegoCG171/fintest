@@ -24,9 +24,9 @@ const tabsContent = (templateId: string) => [
 
 
 export const tabConfig: TabConfigInterface = {
-  "ecommerce/ventas": [{ label: "Ventas", content: <TabbedTableForm tabs={tabsContent("67bce37437eeb9b499cc6e22")} /> }],
-  "ecommerce/reverso": [{ label: "Reverso", content: <TabbedTableForm tabs={tabsContent("67bce37437eeb9b499cc6e3f")} /> }],
-  "ecommerce/cancelacion": [{ label: "Cancelación", content: <TabbedTableForm tabs={tabsContent("6823cc839c06815d4f491991")} /> }],
+  "ecommerce/ventas": [{ label: "Ventas", content: <TabbedTableForm tabs={tabsContent("682f865672a39eae1f5974c0")} /> }],
+  "ecommerce/reverso": [{ label: "Reverso", content: <TabbedTableForm tabs={tabsContent("682f865772a39eae1f597746")} /> }],
+  "ecommerce/cancelacion": [{ label: "Cancelación", content: <TabbedTableForm tabs={tabsContent("6831394309f8bae2bb8bfe9b")} /> }],
   "ecommerce/ventas-ds": [{ label: "Venta con 3DS", content: <TabbedTableForm tabs={tabsContent("ventas-ds-ecommerce")} /> }],
   "ecommerce/ventas-visa": [{ label: "Venta visa", content: <TabbedTableForm tabs={tabsContent("ventas-visa-ecommerce")} /> }],
   "ecommerce/ventas-mastercard": [{ label: "Cuenta con 3DS mastercard", content: <TabbedTableForm tabs={tabsContent("ventas-mc-ecommerce")} /> }],

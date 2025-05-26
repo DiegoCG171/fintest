@@ -15,31 +15,30 @@ const generateTabs = (type: string, route: string): StaticTabItem[] => {
 
     if (type === "events") {
         return [
-            {
-                label: "Eventos",
-                content: <BasicTable initialRows={dataMap.events} />,
-            },
+        {
+            label: "Eventos",
+            content: <BasicTable initialRows={dataMap.events} />,
+        },
         ];
     }
 
     if (route in tabConfig) {
         const existingTab = baseTabs.find(
-            (tab) => tab.label === tabConfig[route][0].label
+        (tab) => tab.label === tabConfig[route][0].label
         );
         if (!existingTab) {
-            const newTabs = tabConfig[route].map((tab) => ({
-                label: tab.label,
-                content: tab.content,
-            }));
-            baseTabs.push(...newTabs);
+        const newTabs = tabConfig[route].map((tab) => ({
+            label: tab.label,
+            content: tab.content,
+        }));
+        baseTabs.push(...newTabs);
         }
     }
 
     return baseTabs;
-};
+    };
 
-
-const calculateTabIndex = (route: string): number => {
+    const calculateTabIndex = (route: string): number => {
     const tabs = generateTabs("detail", route);
 
     const matchedIndex = tabs.findIndex((tab) =>
@@ -49,16 +48,15 @@ const calculateTabIndex = (route: string): number => {
     );
 
     return matchedIndex !== -1 ? matchedIndex : tabs.length - 1;
-};
+    };
 
-function MainPage() {
+    function MainPage() {
     const location = useLocation();
     const [
-        viewType, 
+        viewType,
         //setViewType
     ] = useState("detail");
     const currentRoute = location.pathname.slice(1);
-
 
     const initialTabIndex = calculateTabIndex(currentRoute);
 
@@ -80,7 +78,7 @@ function MainPage() {
             initialTabIndex={initialTabIndex}
         />
         </Box>
-  );
+    );
 }
 
 export default MainPage;

@@ -854,7 +854,7 @@ export const mockCategories = [
         ],
         "items": [
             {
-                "id": "6823cca09c06815d4f4919e9",
+                "id": "682f865672a39eae1f5974c0",
                 "name": "Venta Template Pruebaaa",
             },
             {
@@ -862,7 +862,7 @@ export const mockCategories = [
                 "name": "Logon Template",
             },
             {
-                "id": "67bce37437eeb9b499cc6e3f",
+                "id": "682f865772a39eae1f597746",
                 "name": "Venta Template",
             },
             {
@@ -870,7 +870,7 @@ export const mockCategories = [
                 "name": "Venta Template Prueba",
             },
             {
-                "id": "682515b4d1dd3757181de0ca",
+                "id": "6831394309f8bae2bb8bfe9b",
                 "name": "Plantilla de una venta con su respuesta",
             },
         ]

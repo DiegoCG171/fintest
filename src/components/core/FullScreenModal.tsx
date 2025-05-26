@@ -6,6 +6,7 @@ import {
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import FormJSON from "../UI/FormBuilder/FormJSON";
 import {
+    closeModal,
     createTemplateThunk,
     updateTemplateThunk,
     useAppDispatch,
@@ -18,19 +19,21 @@ import {
 import { saleTemplate } from "../../config/mock";
 import { useEffect } from "react";
 import { deepClean } from "../../config/utils/deepClean";
+import { useToast } from "../../config/hooks/useToast";
 
 function FullScreenModal({ open, onClose, container }: FullScreenModalProps) {
     const dispatch = useAppDispatch();
+    const { showToast } = useToast();
     const modalStateMode = useAppSelector((state) => state.modalForm.mode);
     const templateData = useAppSelector((state) => state.templates.templateById);
+    const templateId = useAppSelector((state) => state.templates.templateById?._id);
+
     const isEditMode = modalStateMode === "edit";
-
-
     const title = isEditMode ? "Actualizar template" : "Crear nuevo template";
-
     const description = isEditMode
         ? "Edita el contenido del templete en formato JSON. Asegúrate de que los cambios cumplan con el formato y la estructura requerida antes de guardar."
         : "Completa los campos necesarios para crear un nuevo template que podrás utilizar más adelante. Asegúrate de que toda la información esté correcta antes de guardar.";
+
     useEffect(() => {
         if (modalStateMode === "create") {
         dispatch(setJsonTemplate(saleTemplate));
@@ -47,44 +50,47 @@ function FullScreenModal({ open, onClose, container }: FullScreenModalProps) {
             "uuid",
         ]);
         dispatch(setJsonTemplate(cleanTemplate));
-
-        dispatch(setJsonTemplate(cleanTemplate));
         }
     }, [modalStateMode, templateData, dispatch]);
 
     const jsonData = useAppSelector((state) => state.jsonTemplate.data);
+
     const handleSubmit = () => {
-        if (modalStateMode === "create") {
-        dispatch(createTemplateThunk({ template: jsonData }))
-            .unwrap()
-            .then(() => {
-            dispatch(resetJsonTemplate());
-            onClose();
-            })
-            .catch((error) => {
-            console.error("Error al crear template:", error);
-            });
-        } else if (templateData && templateData._id) {
-        dispatch(
+        if(modalStateMode === "create") {
+            createTemplate()
+        } else {
+            editTemplate()
+        }
+    }
+
+    const createTemplate = async() => {
+        try {
+            await dispatch(createTemplateThunk({ template: jsonData })).unwrap();
+            dispatch(closeModal())
+            showToast('Template creado correctamente', 'success')
+            dispatch(resetJsonTemplate())
+        } catch (error) {
+            showToast(error as string, 'error');
+        }
+    }
+
+    const editTemplate = async() => {
+        if(!templateId) return null;
+        try {
+            await dispatch(
             updateTemplateThunk({
-            id: templateData._id,
+            id: templateId,
             payload: jsonData as PatchGenerationTemplate,
             })
-        )
-            .unwrap()
-            .then(() => {
-            dispatch(resetJsonTemplate());
-            onClose();
-            })
-            .catch((error) => {
-            console.error("Error al editar template:", error);
-            });
-        } else {
-        console.warn(
-            "No se puede editar: el template aún no está listo o no tiene ID."
-        );
+        ).unwrap();
+            dispatch(closeModal())
+            showToast('Template creado correctamente.', 'success')
+            dispatch(resetJsonTemplate())
+        } catch (error) {
+            showToast(error as string, 'error');
         }
-    };
+    }
+
     if (!open) return null;
     return (
         <Portal container={container}>

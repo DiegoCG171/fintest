@@ -9,6 +9,7 @@ import { sidebarMenuSlice } from "./slices/UI/sidebarMenu/sidebarMenu.slice";
 import { modalFormSlice } from "./slices/UI/form/modalForm.slice";
 import { serverSlice } from "./slices/server/server.slice";
 import { recoveryPsswSlice } from "./slices/recoveryPssw/recovery.slice";
+import { userSlice } from "./slices/users/user.slice";
 
 export const store = configureStore({
     reducer: {
@@ -21,7 +22,8 @@ export const store = configureStore({
         sidebarMenu: sidebarMenuSlice.reducer,
         modalForm: modalFormSlice.reducer,
         server: serverSlice.reducer,
-        recovery: recoveryPsswSlice.reducer
+        recovery: recoveryPsswSlice.reducer,
+        user: userSlice.reducer
     }
 });
 

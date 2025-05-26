@@ -11,6 +11,7 @@ import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { setLoading, useAppDispatch } from "../../store";
 
 const RecursiveMenuItem = ({
   item,
@@ -18,20 +19,27 @@ const RecursiveMenuItem = ({
   onSelectItem,
 }: RecursiveMenuItemProps) => {
   const [expanded, setExpanded] = useState(false);
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const isActive = (link?: string) => {
     return link && location.pathname === `/${link}`;
   };
 
-  const onDecisionHandler = (item: MenuServiceInterface | ItemsServiceMenu) => {
-    if (item.linkMenu) {
-      navigate(`/${item.linkMenu}`);
-    }
-    if (onSelectItem) {
-      onSelectItem(item);
-    }
-  };
+  const onDecisionHandler = async (item: MenuServiceInterface | ItemsServiceMenu) => {
+  if (item.linkMenu) {
+    dispatch(setLoading(true));
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    dispatch(setLoading(false));
+    navigate(`/${item.linkMenu}`);
+    return; 
+  }
+
+  if (onSelectItem) {
+    onSelectItem(item);
+  }
+};
+
 
   return (
     <Box sx={{ width: "100%", pl: depth * 0.25, my: 0.5 }}>

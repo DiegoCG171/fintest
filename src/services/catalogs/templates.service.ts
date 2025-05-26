@@ -12,15 +12,15 @@ export const getTemplate = async (): Promise<TemplateRoot> => {
         throw errorMessage;
     }
 }
-export const updateTemplate = async (id: string, payload: PatchGenerationTemplate ): Promise<unknown> => {
-    try{
+export const updateTemplate = async (id: string, payload: PatchGenerationTemplate): Promise<unknown> => {
+    try {
         const response = await api.patch(`${ENDPOINTS.template}/${id}`, payload);
         return response.data
     } catch (error) {
         const errorMessage = handleAxiosError(error);
         throw errorMessage;
     }
-} 
+}
 
 export const createTemplate = async (template: CreateTemplate): Promise<TemplateContextType> => {
     try {
@@ -32,12 +32,14 @@ export const createTemplate = async (template: CreateTemplate): Promise<Template
     }
 }
 
-export const getTemplateById = async (id: string): Promise<TemplateContextType> => {
+export const getTemplateById = async (id: string): Promise<TemplateContextType[]> => {
     try {
-        const response = await api.get(`${ENDPOINTS.template}/${id}`);
+        const response = await api.get(`${ENDPOINTS.template}`, {
+            params: { id }
+        });
         return response.data;
     } catch (error) {
         const errorMessage = handleAxiosError(error);
         throw errorMessage;
     }
-}
+};

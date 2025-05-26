@@ -5,7 +5,7 @@ import { Formik } from "formik";
 import { useToast } from "../../../config/hooks/useToast";
 import * as Yup from "yup";
 import TextBox from "../../../components/UI/TextBox";
-import { useAppDispatch, useAppSelector } from "../../../store";
+import { setLoading, useAppDispatch, useAppSelector } from "../../../store";
 import { resetPsswThunk } from "../../../store/slices/resetPssw/resetPssw.thunk";
 
 const validationSchema = Yup.object({
@@ -28,7 +28,6 @@ function ResetPassword() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const _token = useAppSelector((state) => state.recovery.user?.token);
-  console.log(_token);
   return (
     <Box
       sx={{
@@ -67,19 +66,26 @@ function ResetPassword() {
             }}
             validationSchema={validationSchema}
             onSubmit={async (values, { setSubmitting }) => {
-              try {
-                await dispatch(
-                  resetPsswThunk({
-                    pssw: values.password,
-                    token: _token,
-                  })
-                );
-                navigate("/login");
-                showToast('Contraseña restablecida correctamente', 'success')
-              } catch (error) {
-                console.log(error)
-              } finally {
-                setSubmitting(false);
+              dispatch(setLoading(true));
+              if(_token) {
+                try {
+                  await dispatch(
+                    resetPsswThunk({
+                      pssw: values.password,
+                      token: _token,
+                    })
+                  );
+                  navigate("/login");
+                  showToast('Contraseña restablecida correctamente', 'success')
+                } catch (error) {
+                  showToast(error as string, 'error')
+                } finally {
+                  setSubmitting(false);
+                  dispatch(setLoading(false));
+                }
+              } else {
+                dispatch(setLoading(false));
+                showToast('Ha ocurrido un error, vuelva a intentarlo.', 'error')
               }
             }}
           >
@@ -117,7 +123,6 @@ function ResetPassword() {
                     <Button
                       fullWidth
                       variant="contained"
-                      type="submit"
                       onClick={() => {
                         if (Object.keys(errors).length > 0) {
                           showToast(

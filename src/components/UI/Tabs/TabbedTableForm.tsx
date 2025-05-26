@@ -9,11 +9,12 @@ import {
   clearTemplateError,
   getRulesThunk,
   getTemplatesThunk,
+  setLoading,
   useAppDispatch,
   useAppSelector,
 } from "../../../store";
 import { useToast } from "../../../config/hooks/useToast";
-import { prepareUpdatePayload as preparePayload} from "../../../config/utils";
+import { prepareUpdatePayload as preparePayload } from "../../../config/utils";
 import { updateTemplateThunk } from "../../../store/slices/templates/templates.thunk";
 
 function TabbedTableForm({
@@ -30,9 +31,8 @@ function TabbedTableForm({
     (state) => state.rules
   );
 
-  const { getError: templatesError, getStatus: statusTemplates } = useAppSelector(
-    (state) => state.templates
-  );
+  const { getError: templatesError, getStatus: statusTemplates } =
+    useAppSelector((state) => state.templates);
 
   const currentTabId = useMemo(
     () => `${tabs[value].templateId}-${tabs[value].formType}`,
@@ -63,22 +63,24 @@ function TabbedTableForm({
     }
   }, [dispatch, showToast, statusTemplates, templatesError]);
 
-
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
-
   const handleSave = async () => {
-  const payload = preparePayload(valuesToSend, tabs[value].formType);
-  const id = tabs[value].templateId;
+    dispatch(setLoading(true));
+    const payload = preparePayload(valuesToSend, tabs[value].formType);
+    const id = tabs[value].templateId;
 
-  try {
-    await dispatch(updateTemplateThunk({ id, payload }));
-    showToast("Plantilla actualizada correctamente", "success");
-  } catch (error) {
-    showToast(error as string, "error");
-  }
-};
+    try {
+      await dispatch(updateTemplateThunk({ id, payload })).unwrap();
+      dispatch(getTemplatesThunk());
+      showToast("Plantilla actualizada correctamente", "success");
+    } catch (error) {
+      showToast(error as string, "error");
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
 
   return (
     <Box
@@ -135,13 +137,16 @@ function TabbedTableForm({
       </Stack>
 
       <Box sx={{ flexGrow: 1, overflow: "auto", mt: -2 }}>
-        {tabs.map((template,index) => (
+        {tabs.map((template, index) => (
           <CustomTabPanel
             key={index + "-tab-form-content"}
             value={value}
             index={index}
           >
-            <CatalogsDataMiddleware tabId={currentTabId} template={template} />
+            <CatalogsDataMiddleware
+              tabId={currentTabId}
+              template={template}
+            />
           </CustomTabPanel>
         ))}
       </Box>

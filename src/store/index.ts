@@ -19,6 +19,9 @@ export { getRulesThunk } from './slices/rules/rules.thunk'
 export { clearServer, clearServerError, clearStopServer, clearStopServerError } from './slices/server/server.slice'
 export { startServerThunk, stopServerThunk} from './slices/server/server.thunk'
 
+//User
+export * from './slices/users/user.thunk'
+
 //UI
 //----Loader
 export { setLoading } from './slices/UI/loader/loader.slice'

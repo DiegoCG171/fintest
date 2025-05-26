@@ -5,6 +5,7 @@ import { mockCategories, staticMenuItems } from "../../../config/mock";
 import {
   getTemplateByIdThunk,
   openModal,
+  setLoading,
   useAppDispatch,
 } from "../../../store";
 import {
@@ -12,9 +13,11 @@ import {
   MenuServiceInterface,
 } from "../../../config/interfaces";
 import { useCallback } from "react";
+import { useToast } from "../../../config/hooks/useToast";
 
 function SidebarBlock() {
   const dispatch = useAppDispatch();
+  const { showToast } = useToast();
 
   const handleModal = useCallback(
     (mode: "create" | "edit") => {
@@ -24,11 +27,19 @@ function SidebarBlock() {
   );
 
   const handleSelectItem = useCallback(
-    (item: MenuServiceInterface | ItemsServiceMenu) => {
-      dispatch(getTemplateByIdThunk(item.id));
-      handleModal("edit");
+    async (item: MenuServiceInterface | ItemsServiceMenu) => {
+      dispatch(setLoading(true));
+      try {
+        await dispatch(getTemplateByIdThunk(item.id)).unwrap()
+        dispatch(openModal({mode: 'edit'}));
+      } catch (error) {
+        showToast(error as string, "error");
+        console.error(error);
+      } finally {
+        dispatch(setLoading(false));
+      }
     },
-    [dispatch, handleModal]
+    [dispatch, showToast]
   );
 
   return (
@@ -53,12 +64,10 @@ function SidebarBlock() {
         sx={{ px: 1, overflowY: "auto", flexGrow: 1, my: 4, marginRight: 1 }}
         key={"box-colecciones"}
       >
-        <SeparatorMenu
-          label="Colecciones"
-        ></SeparatorMenu>
+        <SeparatorMenu label="Colecciones"></SeparatorMenu>
         {staticMenuItems.map((rootItem, index) => (
           <RecursiveMenuItem
-            key={`${index}-${rootItem?.id ?? rootItem.name}` }
+            key={`${index}-${rootItem?.id ?? rootItem.name}`}
             item={rootItem}
           />
         ))}

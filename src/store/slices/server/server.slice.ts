@@ -21,6 +21,7 @@ export const serverSlice = createSlice({
         },
         clearServerError: (state) => {
             state.error = null;
+            state.stopServerStatus = 'idle'
         },
         clearStopServer: (state) => {
             state.stopServerResponse = null;
@@ -28,6 +29,7 @@ export const serverSlice = createSlice({
         },
         clearStopServerError: (state) => {
             state.stopServererror = null;
+            state.stopServerStatus = 'idle'
         }
     },
     extraReducers: (builder) => {
