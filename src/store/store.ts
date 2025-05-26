@@ -10,6 +10,7 @@ import { modalFormSlice } from "./slices/UI/form/modalForm.slice";
 import { serverSlice } from "./slices/server/server.slice";
 import { recoveryPsswSlice } from "./slices/recoveryPssw/recovery.slice";
 import { userSlice } from "./slices/users/user.slice";
+import { messagesSlice } from "./slices/messages/messages.slice";
 
 export const store = configureStore({
     reducer: {
@@ -18,6 +19,7 @@ export const store = configureStore({
         rules: rulesSlice.reducer,
         loader: loaderSlice.reducer,
         formBuilder: formBuilderSlice.reducer,
+        messagesReducer: messagesSlice.reducer,
         jsonTemplate: jsonTemplateDraftSlice.reducer,
         sidebarMenu: sidebarMenuSlice.reducer,
         modalForm: modalFormSlice.reducer,
