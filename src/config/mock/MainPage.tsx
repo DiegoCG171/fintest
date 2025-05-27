@@ -39,8 +39,8 @@ const tabsContent = (templateId: string) => [
 
 
 export const tabConfig: TabConfigInterface = {
-  "ecommerce/ventas": [{ label: "Ventas", content: <TabbedTableForm tabs={tabsContent("682f865672a39eae1f5974c0")} /> }],
-  "ecommerce/reverso": [{ label: "Reverso", content: <TabbedTableForm tabs={tabsContent("682f865772a39eae1f597746")} /> }],
+  "ecommerce/ventas": [{ label: "Ventas", content: <TabbedTableForm tabs={tabsContent("6835dbfdc9433ace61787028")} /> }],
+  "ecommerce/reverso": [{ label: "Reverso", content: <TabbedTableForm tabs={tabsContent("6835dbfdc9433ace61787086")} /> }],
   "ecommerce/cancelacion": [{ label: "Cancelación", content: <TabbedTableForm tabs={tabsContent("6831394309f8bae2bb8bfe9b")} /> }],
   "ecommerce/ventas-ds": [{ label: "Venta con 3DS", content: <TabbedTableForm tabs={tabsContent("ventas-ds-ecommerce")} /> }],
   "ecommerce/ventas-visa": [{ label: "Venta visa", content: <TabbedTableForm tabs={tabsContent("ventas-visa-ecommerce")} /> }],

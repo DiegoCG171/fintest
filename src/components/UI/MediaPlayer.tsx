@@ -11,7 +11,7 @@ import {
   useAppDispatch,
   useAppSelector,
 } from "../../store";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 function MediaPlayer() {
   const dispatch = useAppDispatch();
@@ -23,32 +23,40 @@ function MediaPlayer() {
   const playError = useAppSelector((state) => state.server.error);
   const stopError = useAppSelector((state) => state.server.stopServererror);
 
+  const hasStarted = useRef(false);
+
   const [playerMessage, setPlayerMessage] = useState("");
 
-  const clearErrors = () => {
+  const clearErrors = useCallback(() => {
     dispatch(clearServerError());
     dispatch(clearStopServerError());
-  };
+  }, [dispatch]);
 
-  const startServer = async () => {
+  const startServer = useCallback(async () => {
     clearErrors();
     try {
       await dispatch(startServerThunk()).unwrap();
     } catch (error) {
       console.error("Error al iniciar el servidor:", error);
     }
-  };
+  }, [dispatch, clearErrors]);
+
+  useEffect(() => {
+    if (!hasStarted.current && playStatus !== "success") {
+      hasStarted.current = true;
+      startServer();
+    }
+  }, [playStatus, startServer]);
 
   const stopServer = () => {
     clearErrors();
-    if(serverId) {
+    if (serverId) {
       try {
-        dispatch(stopServerThunk(serverId))
-          .unwrap()
+        dispatch(stopServerThunk(serverId)).unwrap();
       } catch (error) {
         console.error("Error al detener el servidor:", error);
       } finally {
-        dispatch(clearServer())
+        dispatch(clearServer());
       }
     }
   };
@@ -67,7 +75,7 @@ function MediaPlayer() {
       setPlayerMessage("Desconectando...");
     }
     if (stopStatus === "success") {
-      setPlayerMessage("");
+      setPlayerMessage("Detenido...");
     }
     if (stopStatus === "error") {
       setPlayerMessage(stopError ?? "Ocurrió un error");

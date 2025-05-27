@@ -2,7 +2,6 @@ import { SelectProps, TextFieldProps } from "@mui/material";
 import { ReactNode } from "react";
 import { Field } from "./rules.interface";
 import { serviceConfig } from "../utils/serviceConfig";
-import { CreateTemplate } from "./template.interface";
 
 //Default Props
 
@@ -100,21 +99,6 @@ export interface FormValues {
 export type FormRefHandle = {
   submitForm: () => void;
 };
-
-//Menu props
-
-export interface MenuItem {
-  title: string;
-  iconMenu?: React.ReactNode;
-  linkMenu?: string;
-  onClickMenu?: () => void;
-  subItems?: MenuItem[];
-}
-
-export interface RecursiveMenuItemProps {
-  item: MenuItem;
-  depth?: number;
-}
 
 //Tabs props
 // Para tabs dinámicos de formularios
@@ -245,20 +229,5 @@ export type DataMiddlewareProps = {
 
 export type dataServiceType = keyof typeof serviceConfig;
 
-export type AsyncStatus = "idle" | "loading" | "success" | "error";
+export type AsyncStatus = 'idle' | 'loading' | 'success' | 'error';
 
-//Modal
-export interface FullScreenModalProps {
-    open: boolean;
-    onClose: () => void;
-    container?: HTMLElement | null;
-}
-
-export interface JsonTemplateState {
-    data: CreateTemplate;
-}
-
-export interface ModalState {
-    isOpen: boolean;
-    mode: 'create' | 'edit';
-}

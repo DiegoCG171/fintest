@@ -6,7 +6,6 @@ import {
   useAppDispatch,
 } from "../../../store";
 
-
 function DynamicField({
   column,
   value,
@@ -15,24 +14,27 @@ function DynamicField({
   tabId,
   isEditable,
 }: DynamicFieldProps) {
-  
   const dispatch = useAppDispatch();
   const dependsOn = column?.dependsOn;
   const dependsValue = dependsOn ? row[dependsOn] : undefined;
   const isChild = path.length > 1;
   const isParent = row.breakingRules ? row.breakingRules.length > 0 : false;
   const getStyles = () => {
-  if (isChild) {
-    return {
-      fontSize: "0.65rem",
-    };
-  } else {
-    return {
-      fontSize: "0.75rem",
-      fontWeight: "600",
-    };
-  }
-};
+    if (isChild) {
+      return {
+        fontSize: "0.65rem",
+      };
+    } else if (!isParent) {
+      return {
+        fontSize: "0.75rem",
+      };
+    } else {
+      return {
+        fontSize: "0.75rem",
+        fontWeight: "600",
+      };
+    }
+  };
 
   const handleChange = (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -70,14 +72,23 @@ function DynamicField({
     return !dependsValue;
   }
 
-  if(isParent && column.id === "value" || isParent && column.id === "function" ) {
-    return null
+  if (
+    (isParent && column.id === "value") ||
+    (isParent && column.id === "function")
+  ) {
+    return null;
   }
 
-  if (!isEditable && column.id === "value" || !isEditable && column.id === "function") {
-  return <Typography sx={getStyles()}>{typeof value === "string" ? value : ""}</Typography>;
+  if (
+    (!isEditable && column.id === "value") ||
+    (!isEditable && column.id === "function")
+  ) {
+    return (
+      <Typography sx={getStyles()}>
+        {typeof value === "string" ? value : ""}
+      </Typography>
+    );
   }
-
 
   if (column.dynamicRender && dependsValue !== undefined) {
     const dynamic = column.dynamicRender[dependsValue as string];
@@ -228,7 +239,7 @@ function DynamicField({
       variant="body2"
       style={{
         ...getStyles(),
-        padding: isChild ? 6 : 0
+        padding: isChild ? 6 : 0,
       }}
     >
       {typeof value === "string" ? value : ""}
