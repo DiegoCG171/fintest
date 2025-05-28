@@ -12,55 +12,49 @@ import { StatusRender } from "../../components/UI/table/StatusRender";
 import TabbedCardContainer from "../../components/UI/Tabs/TabbedCardContainer";
 import { addTab } from "../../store";
 
-const generateStaticTabs = (
-  messagesData: MessagesState
-): StaticTabItem[] => [
-    {
-      label: "Detalles",
-    route: "main",
-      content: (
-        <BasicTable
-          initialRows={messagesData.activeMessage.detail}
-          type="detail"
+const generateStaticTabs = (messagesData: MessagesState): StaticTabItem[] => [
+  {
+    label: "Detalles",
+    content: (
+      <BasicTable
+        initialRows={messagesData.activeMessage.detail}
+        type="detail"
         customRenderers={{ estado: StatusRender }}
-        />
-      ),
-    },
-    {
-      label: "Errores",
-    route: "main",
-      content: (
-        <BasicTable
-          initialRows={messagesData.activeMessage.errors}
-          type="errors"
+      />
+    ),
+  },
+  {
+    label: "Errores",
+    content: (
+      <BasicTable
+        initialRows={messagesData.activeMessage.errors}
+        type="errors"
         customRenderers={{ estado: StatusRender }}
-        />
-      ),
-    },
-  ];
+      />
+    ),
+  },
+];
 
-const generateEventTabs = (
-  messagesData: MessagesState
-): StaticTabItem[] => [
-      {
-        label: "Eventos",
-        content: (
-          <BasicTable
+const generateEventTabs = (messagesData: MessagesState): StaticTabItem[] => [
+  {
+    label: "Eventos",
+    content: (
+      <BasicTable
         customRenderers={{ estado: StatusRender }}
-            initialRows={messagesData.events}
-          />
-        ),
-      },
-    ];
+        initialRows={messagesData.events}
+      />
+    ),
+  },
+];
 
 const generateDynamicTabs = (
   dynamicTabs: { label: string; route: string }[]
 ) => {
   return dynamicTabs.map((tab) => ({
-        label: tab.label,
+    label: tab.label,
     route: tab.route,
     content: tabConfig[tab.route]?.[0]?.content || null,
-      }));
+  }));
 };
 
 function MainPage() {
@@ -95,7 +89,7 @@ function MainPage() {
     (tab) => tab.route === currentRoute
   );
 
-  const currentTabIndex = dynamicIndex !== -1 ? dynamicIndex + 2 : 0;
+  const currentTabIndex = dynamicIndex !== -1 ? dynamicIndex + 2 : undefined;
 
   return (
     <Box

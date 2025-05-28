@@ -151,7 +151,7 @@ export interface TabConfigInterface {
 export interface TabbedCardContainerProps {
   tabs: { label: string; content: ReactNode }[];
   eventTabs: { label: string; content: ReactNode }[];
-  initialTabIndex: number;
+  initialTabIndex: number | undefined;
 }
 
 //Form props
