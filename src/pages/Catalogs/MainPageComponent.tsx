@@ -1,99 +1,73 @@
 import { Box } from "@mui/material";
 import BasicTable from "../../components/UI/table/BasicTableComponent";
 import TitleHeaderComponent from "../../components/UI/TitleHeaderComponent";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { tabConfig } from "../../config/mock";
 import { useMultiSocket } from "../../config/hooks/useMultiSocket";
 import { MessagesState } from "../../config/interfaces/messages.interface";
-import { useAppSelector } from "../../store/hooks";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { StaticTabItem } from "../../config/interfaces";
 import { StatusRender } from "../../components/UI/table/StatusRender";
 import TabbedCardContainer from "../../components/UI/Tabs/TabbedCardContainer";
+import { addTab } from "../../store";
 
-const generateTabs = (
-  type: string,
-  route: string,
+const generateStaticTabs = (
   messagesData: MessagesState
-): StaticTabItem[] => {
-  const baseTabs: StaticTabItem[] = [
+): StaticTabItem[] => [
     {
       label: "Detalles",
+    route: "main",
       content: (
         <BasicTable
-          customRenderers={{
-            estado: StatusRender,
-          }}
           initialRows={messagesData.activeMessage.detail}
           type="detail"
+        customRenderers={{ estado: StatusRender }}
         />
       ),
     },
     {
       label: "Errores",
+    route: "main",
       content: (
         <BasicTable
-          customRenderers={{
-            estado: StatusRender,
-          }}
           initialRows={messagesData.activeMessage.errors}
           type="errors"
+        customRenderers={{ estado: StatusRender }}
         />
       ),
     },
   ];
 
-  if (type === "events") {
-    return [
+const generateEventTabs = (
+  messagesData: MessagesState
+): StaticTabItem[] => [
       {
         label: "Eventos",
         content: (
           <BasicTable
-            customRenderers={{
-              estado: StatusRender,
-            }}
+        customRenderers={{ estado: StatusRender }}
             initialRows={messagesData.events}
           />
         ),
       },
     ];
-  }
 
-  if (route in tabConfig) {
-    const existingTab = baseTabs.find(
-      (tab) => tab.label === tabConfig[route][0].label
-    );
-    if (!existingTab) {
-      const newTabs = tabConfig[route].map((tab) => ({
+const generateDynamicTabs = (
+  dynamicTabs: { label: string; route: string }[]
+) => {
+  return dynamicTabs.map((tab) => ({
         label: tab.label,
-        content: tab.content,
+    route: tab.route,
+    content: tabConfig[tab.route]?.[0]?.content || null,
       }));
-      baseTabs.push(...newTabs);
-    }
-  }
-
-  return baseTabs;
-};
-
-const calculateTabIndex = (
-  route: string,
-  messagesData: MessagesState
-): number => {
-  const tabs = generateTabs("detail", route, messagesData);
-
-  const matchedIndex = tabs.findIndex((tab) =>
-    tab.label
-      .toLowerCase()
-      .includes(route.split("/").pop()?.toLowerCase() || "")
-  );
-
-  return matchedIndex !== -1 ? matchedIndex : tabs.length - 1;
 };
 
 function MainPage() {
   const location = useLocation();
-  const [viewType] = useState("detail");
   const messagesData = useAppSelector((state) => state.messagesReducer);
+  const dynamicTabs = useAppSelector((state) => state.tabs.dynamicTabs);
+  const dispatch = useAppDispatch();
   const { connect, disconnect } = useMultiSocket();
 
   useEffect(() => {
@@ -101,9 +75,27 @@ function MainPage() {
     return () => disconnect();
   }, [connect, disconnect]);
 
+  useEffect(() => {
+    const currentRoute = location.pathname.slice(1);
+
+    const matching = tabConfig[currentRoute]?.[0];
+    if (matching) {
+      dispatch(
+        addTab({
+          label: matching.label,
+          route: currentRoute,
+        })
+      );
+    }
+  }, [location.pathname, dispatch]);
+
   const currentRoute = location.pathname.slice(1);
 
-  const initialTabIndex = calculateTabIndex(currentRoute, messagesData);
+  const dynamicIndex = dynamicTabs.findIndex(
+    (tab) => tab.route === currentRoute
+  );
+
+  const currentTabIndex = dynamicIndex !== -1 ? dynamicIndex + 2 : 0;
 
   return (
     <Box
@@ -118,9 +110,12 @@ function MainPage() {
     >
       <TitleHeaderComponent />
       <TabbedCardContainer
-        tabs={generateTabs(viewType, currentRoute, messagesData)}
-        eventTabs={generateTabs("events", currentRoute, messagesData)}
-        initialTabIndex={initialTabIndex}
+        tabs={[
+          ...generateStaticTabs(messagesData),
+          ...generateDynamicTabs(dynamicTabs),
+        ]}
+        eventTabs={generateEventTabs(messagesData)}
+        initialTabIndex={currentTabIndex}
       />
     </Box>
   );

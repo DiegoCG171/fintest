@@ -17,3 +17,4 @@ export { getRulesThunk } from './slices/rules/rules.thunk'
 //----Loader
 export { setLoading } from './slices/UI/loader/loader.slice'
 export { setConfig, setValuesForTab, updateFieldValue, updateNestedFieldValue, setVisibility } from './slices/UI/formBuilder/formBuilder.slice'
+export { addTab, removeTab  } from './slices/UI/tabs/tabs.slice'

@@ -5,6 +5,7 @@ import { rulesSlice } from "./slices/rules/rules.slice";
 import { loaderSlice } from "./slices/UI/loader/loader.slice"
 import { formBuilderSlice } from "./slices/UI/formBuilder/formBuilder.slice";
 import { messagesSlice } from "./slices/messages/messages.slice";
+import { tabSlice } from "./slices/UI/tabs/tabs.slice";
 
 export const store = configureStore({
     reducer: {
@@ -13,7 +14,8 @@ export const store = configureStore({
         rules: rulesSlice.reducer,
         loader: loaderSlice.reducer,
         formBuilder: formBuilderSlice.reducer,
-        messagesReducer: messagesSlice.reducer
+        messagesReducer: messagesSlice.reducer,
+        tabs: tabSlice.reducer,
     }
 });
 

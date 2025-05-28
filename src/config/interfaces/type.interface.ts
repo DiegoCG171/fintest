@@ -128,6 +128,7 @@ export interface FormTabItem {
 export interface StaticTabItem {
   label: string;
   content: React.ReactNode;
+  route?: string
 }
 
 export interface TabTableComponentProps {
