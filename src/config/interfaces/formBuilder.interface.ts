@@ -15,6 +15,7 @@ export interface FormBuilderRowProps {
     path: number[];
     tabId: string;
     headers: ColumnConfigFormBuilder[];
+    isChild: boolean
 }
 
 /**Dynamic Field */
@@ -52,7 +53,7 @@ export interface TableRowDataFormBuilder {
     idBitmap: string;
     displayName: string;
     isRequired?: boolean;
-    canRequired?: boolean;
+    isActive?: boolean;
     function?: string | undefined;
     value?: string | number | boolean;
     breakingRules?: TableRowDataFormBuilder[] | string;

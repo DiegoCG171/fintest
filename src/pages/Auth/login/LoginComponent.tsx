@@ -7,7 +7,7 @@ import * as Yup from "yup";
 import CustomInputComponent from "../../../components/core/forms/CustomInput";
 import TextBox from "../../../components/UI/TextBox";
 import { useToast } from "../../../config/hooks/useToast";
-import { clearAuthError, loginThunk, useAppDispatch } from "../../../store";
+import { clearAuthError, loginThunk, setLoading, useAppDispatch } from "../../../store";
 
 const validationSchema = Yup.object({
   username: Yup.string().required("El usuario es requerido"),
@@ -34,6 +34,7 @@ const LoginComponent = () => {
           validationSchema={validationSchema}
           onSubmit={async (values, { setSubmitting }) => {
             dispatch(clearAuthError());
+            dispatch(setLoading(true));
             try {
               await dispatch(
                 loginThunk({
@@ -45,6 +46,7 @@ const LoginComponent = () => {
               showToast(error as string, "error");
             } finally {
               setSubmitting(false);
+              dispatch(setLoading(false));
             }
           }}
         >
@@ -77,7 +79,6 @@ const LoginComponent = () => {
                 <Button
                   fullWidth
                   variant="contained"
-                  type="submit"
                   onClick={() => {
                     if (Object.keys(errors).length > 0) {
                       showToast(
