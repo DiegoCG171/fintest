@@ -3,7 +3,13 @@ import { authSlice } from ".";
 import { templateSlice } from "./slices/templates/template.slice";
 import { rulesSlice } from "./slices/rules/rules.slice";
 import { loaderSlice } from "./slices/UI/loader/loader.slice"
-import { formBuilderSlice } from "./slices/UI/formBuilder/formBuilder.slice";
+import { formBuilderSlice } from "./slices/UI/form/formBuilder.slice";
+import { jsonTemplateDraftSlice } from "./slices/UI/form/jsonTemplateDraft.slice";
+import { sidebarMenuSlice } from "./slices/UI/sidebarMenu/sidebarMenu.slice";
+import { modalFormSlice } from "./slices/UI/form/modalForm.slice";
+import { serverSlice } from "./slices/server/server.slice";
+import { recoveryPsswSlice } from "./slices/recoveryPssw/recovery.slice";
+import { userSlice } from "./slices/users/user.slice";
 import { messagesSlice } from "./slices/messages/messages.slice";
 import { tabSlice } from "./slices/UI/tabs/tabs.slice";
 
@@ -16,6 +22,12 @@ export const store = configureStore({
         formBuilder: formBuilderSlice.reducer,
         messagesReducer: messagesSlice.reducer,
         tabs: tabSlice.reducer,
+        jsonTemplate: jsonTemplateDraftSlice.reducer,
+        sidebarMenu: sidebarMenuSlice.reducer,
+        modalForm: modalFormSlice.reducer,
+        server: serverSlice.reducer,
+        recovery: recoveryPsswSlice.reducer,
+        user: userSlice.reducer
     }
 });
 

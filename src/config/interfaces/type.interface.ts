@@ -100,21 +100,6 @@ export type FormRefHandle = {
   submitForm: () => void;
 };
 
-//Menu props
-
-export interface MenuItem {
-  title: string;
-  iconMenu?: React.ReactNode;
-  linkMenu?: string;
-  onClickMenu?: () => void;
-  subItems?: MenuItem[];
-}
-
-export interface RecursiveMenuItemProps {
-  item: MenuItem;
-  depth?: number;
-}
-
 //Tabs props
 // Para tabs dinámicos de formularios
 export interface FormTabItem {
@@ -245,4 +230,5 @@ export type DataMiddlewareProps = {
 
 export type dataServiceType = keyof typeof serviceConfig;
 
-export type AsyncStatus = "idle" | "loading" | "success" | "error";
+export type AsyncStatus = 'idle' | 'loading' | 'success' | 'error';
+

@@ -3,8 +3,10 @@ import TextBox from "../../../components/UI/TextBox";
 import * as Yup from "yup";
 import { Formik } from "formik";
 import { useToast } from "../../../config/hooks/useToast";
-import { Form, Link as RouterLink } from "react-router-dom";
+import { Form, Link as RouterLink, useNavigate } from "react-router-dom";
 import CustomInputComponent from "../../../components/core/forms/CustomInput";
+import { setLoading, useAppDispatch } from "../../../store";
+import { recoveryPsswThunk } from "../../../store/slices/recoveryPssw/recovery.thunk";
 
 const validationSchema = Yup.object({
   email: Yup.string()
@@ -13,7 +15,11 @@ const validationSchema = Yup.object({
 });
 
 function RecoveryPassword() {
+
   const { showToast } = useToast();
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
   return (
     <Box
       sx={{
@@ -50,9 +56,19 @@ function RecoveryPassword() {
               email: "",
             }}
             validationSchema={validationSchema}
-            onSubmit={(_, { setSubmitting }) => {
-              showToast("Formulario enviado correctamente", "success");
-              setSubmitting(false);
+            onSubmit={async (values, { setSubmitting }) => {
+              dispatch(setLoading(true));
+              try {
+                await dispatch(
+                  recoveryPsswThunk(values.email)
+                ).unwrap();
+                navigate("/reset-pssw");
+              } catch (error) {
+                showToast(error as string, "error");
+              } finally {
+                setSubmitting(false);
+                dispatch(setLoading(false));
+              }
             }}
           >
             {({ errors, touched, getFieldProps, submitForm }) => (
@@ -75,7 +91,6 @@ function RecoveryPassword() {
                     <Button
                       fullWidth
                       variant="contained"
-                      type="submit"
                       onClick={() => {
                         if (Object.keys(errors).length > 0) {
                           showToast(

@@ -9,6 +9,7 @@ import {
   clearTemplateError,
   getRulesThunk,
   getTemplatesThunk,
+  setLoading,
   useAppDispatch,
   useAppSelector,
 } from "../../../store";
@@ -65,19 +66,22 @@ function TabbedTableForm({
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
-
   const handleSave = async () => {
     const tab = tabs[value];
     if (!tab) return;
 
+      dispatch(setLoading(true));
     const payload = preparePayload(valuesToSend, tab.formType);
-    const id = tab.templateId;
+      const id = tab.templateId;
 
     try {
-      await dispatch(updateTemplateThunk({ id, payload }));
+      await dispatch(updateTemplateThunk({ id, payload })).unwrap();
+      dispatch(getTemplatesThunk());
       showToast("Plantilla actualizada correctamente", "success");
     } catch (error) {
       showToast(error as string, "error");
+    } finally {
+      dispatch(setLoading(false));
     }
   };
 
@@ -142,12 +146,10 @@ function TabbedTableForm({
             value={value}
             index={index}
           >
-            {template.templateId && template.formType ? (
-              <CatalogsDataMiddleware
-                tabId={`${template.templateId}-${template.formType}`}
-                template={template}
-              />
-            ) : null}
+            <CatalogsDataMiddleware
+              tabId={currentTabId}
+              template={template}
+            />
           </CustomTabPanel>
         ))}
       </Box>

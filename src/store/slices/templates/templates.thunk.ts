@@ -1,7 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
-import { getTemplate, updateTemplate } from "../../../services"
-import { PatchGenerationTemplate, TemplateRoot } from "../../../config/interfaces"
-import { setLoading } from "../UI/loader/loader.slice";
+import { createTemplate, getTemplate, getTemplateById, updateTemplate } from "../../../services"
+import { CreateTemplate, PatchGenerationTemplate, TemplateContextType, TemplateRoot } from "../../../config/interfaces"
 
 export const getTemplatesThunk = createAsyncThunk<
     TemplateRoot,
@@ -9,33 +8,67 @@ export const getTemplatesThunk = createAsyncThunk<
     { rejectValue: string }
 >(
     'templates/getAll',
-    async (_, { dispatch, rejectWithValue }) => {
+    async (_, { rejectWithValue }) => {
         try {
-            dispatch(setLoading(true));
             const template = await getTemplate();
             return template
         } catch (error: unknown) {
             return rejectWithValue(error as string)
-        } finally {
-            dispatch(setLoading(false));
         }
     }
 )
 
 export const updateTemplateThunk = createAsyncThunk<
-    void, // lo que retorna
-    { id: string; payload: PatchGenerationTemplate }, // lo que recibe
+    void,
+    { id: string; payload: PatchGenerationTemplate },
     { rejectValue: string }
 >(
-    'templates/updateById',
-    async ({ id, payload }, { dispatch, rejectWithValue }) => {
+    'templates/update',
+    async ({ id, payload }, { rejectWithValue }) => {
         try {
-            dispatch(setLoading(true));
             await updateTemplate(id, payload);
-        } catch (error: unknown) {
+            return;
+        } catch (error) {
+            return rejectWithValue(error as string);
+        }
+    }
+);
+
+
+export const createTemplateThunk = createAsyncThunk<
+    TemplateContextType,
+    { template: CreateTemplate },
+    { rejectValue: string }
+>(
+    'templates/create',
+    async ({ template }, { rejectWithValue }) => {
+        try {
+            const response = await createTemplate(template);
+            return response;
+        } catch (error) {
             return rejectWithValue(error as string)
-        } finally {
-            dispatch(setLoading(false));
+        }
+    }
+);
+
+export const getTemplateByIdThunk = createAsyncThunk<
+    TemplateContextType,
+    string,
+    { rejectValue: string }
+>(
+    'templates/getById',
+    async (id, { rejectWithValue }) => {
+        try {
+            const templateList = await getTemplateById(id);
+            const filteredTemplate = templateList.find(item => item._id === id);
+
+            if (!filteredTemplate) {
+                return rejectWithValue(`No se encontró el template con ID ${id}`);
+            }
+
+            return filteredTemplate;
+        } catch (error) {
+            return rejectWithValue(error as string);
         }
     }
 );

@@ -1,5 +1,7 @@
 //Authentication
 export * from './auth/login.service'
+export * from './auth/recoveryPassword.service'
+export * from './auth/resetPssw.service'
 
 //Catalogs 
 export * from './catalogs/clients.service'
