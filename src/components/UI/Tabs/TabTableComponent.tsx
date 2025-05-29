@@ -32,16 +32,39 @@ function TabTableComponent({
   };
 
   const closeTab = (index: number) => {
-    if (index === 1 || index === 0) return null;
-    const dynamicTab = dynamicTabs[index - 2];
-    if (dynamicTab) {
-      dispatch(removeTab(dynamicTab.route));
-    }
-    if (selectedTab === index) {
+  if (index === 0 || index === 1) return;
+
+  const dynamicTab = dynamicTabs[index - 2];
+  if (dynamicTab) {
+    dispatch(removeTab(dynamicTab.route));
+  }
+  if (selectedTab === index) {
+    const newIndex = index > 2 ? index - 1 : 0;
+    setSelectedTab(newIndex);
+    const navigateToTab = tabs[newIndex];
+    if (navigateToTab?.route) {
+      navigate(`/${navigateToTab.route}`);
+    } else {
       navigate("/main");
-      setSelectedTab(0);
     }
-  };
+  } else if (selectedTab > index) {
+    setSelectedTab((prev) => prev - 1);
+  }
+};
+
+
+  const iconAction = (index: number) => {
+    if(index === 1 || index === 0) return undefined;
+    return (
+      <CloseIcon
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    closeTab(index);
+                  }}
+                  fontSize="small"
+                />
+    )
+  }
 
   return (
     <Box
@@ -74,15 +97,7 @@ function TabTableComponent({
         >
           {tabs.map((tab, index) => (
             <Tab
-              icon={
-                <CloseIcon
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    closeTab(index);
-                  }}
-                  fontSize="small"
-                />
-              }
+              icon={iconAction(index)}
               iconPosition="end"
               key={`tab-${index}`}
               label={tab.label}
