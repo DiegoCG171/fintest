@@ -30,6 +30,8 @@ const mainPageRoutes = [
   "moto/ventas-ds", 
   "moto/ventas-visa", 
   "moto/ventas-mastercard", 
+  "connection/logon/logon-template",
+  "pos/tarjeta-presente/dukpt/retail/venta/venta-template"
 ];
 
 const router = createBrowserRouter([

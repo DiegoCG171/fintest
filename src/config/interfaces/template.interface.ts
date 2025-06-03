@@ -22,7 +22,9 @@ export interface TemplateContextType {
 
 export type CreateTemplate = Omit<TemplateContextType, "_id" | "uuid" | "__v" | "createdAt" | "updatedAt">;
 
-
+export interface JsonTemplateState {
+    data: CreateTemplate,
+};
 
 export interface ValidationTransaction {
     idBitmap: string

@@ -6,7 +6,8 @@ import { FormTabItem } from ".";
 /**Form Builder */
 export interface FormBuilderProps {
     tabId: string;
-    template?: FormTabItem
+    template?: FormTabItem;
+    canEdit: boolean
 }
 
 /**Form Row Builder */
@@ -16,6 +17,7 @@ export interface FormBuilderRowProps {
     tabId: string;
     headers: ColumnConfigFormBuilder[];
     isChild: boolean
+    canEdit: boolean
 }
 
 /**Dynamic Field */
@@ -26,6 +28,7 @@ export interface DynamicFieldProps {
     path: number[];
     tabId: string;
     isEditable: boolean
+    onlyRead: boolean
 }
 
 //Slice's interfaces
@@ -55,7 +58,7 @@ export interface TableRowDataFormBuilder {
     isRequired?: boolean;
     isActive?: boolean;
     function?: string | undefined;
-    value?: string | number | boolean;
+    value: string | number | boolean | null | undefined;
     breakingRules?: TableRowDataFormBuilder[] | string;
     _id?: string;
     [key: string]: unknown | undefined;

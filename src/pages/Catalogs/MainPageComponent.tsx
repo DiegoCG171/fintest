@@ -1,6 +1,5 @@
 import { Box } from "@mui/material";
 import BasicTable from "../../components/UI/table/BasicTableComponent";
-import TitleHeaderComponent from "../../components/UI/TitleHeaderComponent";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { tabConfig } from "../../config/mock";
@@ -22,6 +21,7 @@ const generateStaticTabs = (messagesData: MessagesState): StaticTabItem[] => [
         customRenderers={{ estado: StatusRender }}
       />
     ),
+    canEdit: true
   },
   {
     label: "Errores",
@@ -32,6 +32,7 @@ const generateStaticTabs = (messagesData: MessagesState): StaticTabItem[] => [
         customRenderers={{ estado: StatusRender }}
       />
     ),
+    canEdit: true
   },
 ];
 
@@ -44,17 +45,23 @@ const generateEventTabs = (messagesData: MessagesState): StaticTabItem[] => [
         initialRows={messagesData.events}
       />
     ),
+    canEdit: true
   },
 ];
 
 const generateDynamicTabs = (
   dynamicTabs: { label: string; route: string }[]
 ) => {
-  return dynamicTabs.map((tab) => ({
-    label: tab.label,
-    route: tab.route,
-    content: tabConfig[tab.route]?.[0]?.content || null,
-  }));
+  const tab = dynamicTabs.map((tab) => {
+    return {
+      label: tab.label,
+      route: tab.route,
+      content: tabConfig[tab.route]?.[0]?.content || null,
+      canEdit: tabConfig[tab.route]?.[0]?.canEdit || false
+    };
+  });
+
+  return tab;
 };
 
 function MainPage() {
@@ -78,6 +85,7 @@ function MainPage() {
         addTab({
           label: matching.label,
           route: currentRoute,
+          canEdit: matching.canEdit,
         })
       );
     }
@@ -94,7 +102,7 @@ function MainPage() {
   return (
     <Box
       sx={{
-        height: "vh95",
+        height: "95vh",
         display: "flex",
         flexDirection: "column",
         gap: 1,
@@ -102,7 +110,6 @@ function MainPage() {
         backgroundColor: "#f7f7f7",
       }}
     >
-      <TitleHeaderComponent />
       <TabbedCardContainer
         tabs={[
           ...generateStaticTabs(messagesData),

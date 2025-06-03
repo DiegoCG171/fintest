@@ -1,16 +1,37 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Box, Drawer } from "@mui/material";
 import { MenuItem } from "../../../config/interfaces";
 import { staticMenuItems } from "../../../config/mock";
 import HeaderSidebarMenu from "./HeaderSidebarMenu";
 import SidebarBlock from "./SidebarBlock";
 import MediaPlayer from "../MediaPlayer";
+import { getAllCategoriesThunk, useAppDispatch, useAppSelector } from "../../../store";
 
 export const drawerWidth = 240;
 
 function SideNavComponent() {
+  const dispatch = useAppDispatch();
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [hideMenu, setHideMenu] = useState(false);
+  const categories = useAppSelector(state => state.categories);
+
+  useEffect(() => {
+  const fetchCategories = async () => {
+    try {
+      await dispatch(getAllCategoriesThunk()).unwrap(); 
+    } catch (err) {
+      console.error("Error cargando categorías:", err);
+    }
+  };
+
+  if (!categories.categories) {
+    if(categories.status !== 'success') {
+      fetchCategories();
+    } else console.error('No hay categorías disponibles')
+  }
+
+}, [dispatch, categories]);
+
 
   const toggleMenu = useCallback(() => {
     setHideMenu((prev) => !prev);

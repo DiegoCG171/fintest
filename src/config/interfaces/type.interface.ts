@@ -107,6 +107,7 @@ export interface FormTabItem {
   templateId: string;
   formType: string;
   ref?: React.Ref<FormRefHandle>;
+  canEdit: boolean
 }
 
 // Para tabs que pintan JSX directamente
@@ -114,6 +115,7 @@ export interface StaticTabItem {
   label: string;
   content: React.ReactNode;
   route?: string
+  canEdit: boolean
 }
 
 export interface TabTableComponentProps {
@@ -122,7 +124,7 @@ export interface TabTableComponentProps {
 }
 
 export interface TabTableFormComponentProps {
-  tabs: FormTabItem[];
+  tabs: FormTabItem[];  
   initialTabIndex?: number;
 }
 
@@ -130,12 +132,13 @@ export interface TabConfigInterface {
   [key: string]: Array<{
     label: string;
     content: ReactNode;
+    canEdit: boolean
   }>;
 }
 
 export interface TabbedCardContainerProps {
-  tabs: { label: string; content: ReactNode }[];
-  eventTabs: { label: string; content: ReactNode }[];
+  tabs: { label: string; content: ReactNode , canEdit: boolean}[];
+  eventTabs: { label: string; content: ReactNode, canEdit: boolean }[];
   initialTabIndex: number | undefined;
 }
 

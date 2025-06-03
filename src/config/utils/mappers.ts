@@ -9,7 +9,7 @@ export const mapFieldRulesToFormStructure = (fields: Field[]): TableRowDataFormB
                 isActive: false,
                 function: '',
                 value: '',
-                breakingRules: '',
+                breakingRules: '' as string,
                 _id: spec._id,
             })) ?? [];
 
@@ -42,22 +42,22 @@ export const mapValidationTemplate = (validation: ValidationTransaction[]): Tabl
     validation.map((v: ValidationTransaction) => {
         const level3Children = (children: FieldValidation) =>
             children.fields?.map((field: FieldValidation) => ({
-                idBitmap: field.idBitmap,
+                idBitmap: field.idBitmap ?? '',
                 displayName: '',
                 isActive: Boolean(field),
-                function: field.value,
+                function: field.value ?? '',
                 value: '',
-                breakingRules: '',
+                breakingRules: '' as string,
                 _id: field._id,
             })) ?? [];
 
         const level2Children = Array.isArray(v.fields)
             ? v.fields.map((field: FieldValidation) => ({
-                idBitmap: field.idBitmap,
+                idBitmap: field.idBitmap ?? '',
                 displayName: '',
                 isActive: Boolean(field),
-                function: field.function,
-                value: field.value,
+                function: field.function ?? '',
+                value: field.value ?? '',
                 breakingRules: level3Children(field),
                 _id: field._id,
             }))
@@ -68,21 +68,26 @@ export const mapValidationTemplate = (validation: ValidationTransaction[]): Tabl
             displayName: '',
             isRequired: Boolean(v.isRequired),
             isActive: Boolean(v),
-            function: v.function,
-            value: v.value,
+            function: v.function ?? '',
+            value: v.value ?? '',
             breakingRules: level2Children,
             _id: v._id,
         };
     });
 
 
-export const combineTemplateData = (data: ValidationTransaction[], mappedRules: TableRowDataFormBuilder[]): TableRowDataFormBuilder[] => {
+export const combineTemplateData = (data: ValidationTransaction[] | null , mappedRules: TableRowDataFormBuilder[]): TableRowDataFormBuilder[] => {
+
+    if (!data?.length) return [];
     const mapData = mapValidationTemplate(data);
 
     const updateRules = (rules: TableRowDataFormBuilder[], data: TableRowDataFormBuilder[], level = 0): TableRowDataFormBuilder[] => {
         return rules.map(rule => {
-            const matched = data.find(d => d.idBitmap === rule.idBitmap);
-
+            const matched = data.find(d => {
+                const match =
+                    d.idBitmap?.trim().toLowerCase() === rule.idBitmap?.trim().toLowerCase();
+                return match;
+            });
             const updatedRule: TableRowDataFormBuilder = {
                 ...rule,
                 isRequired: level === 0 ? Boolean(matched?.isRequired ?? rule.isRequired) : undefined,
@@ -94,7 +99,6 @@ export const combineTemplateData = (data: ValidationTransaction[], mappedRules: 
                     : rule.breakingRules,
             };
 
-
             if (level > 0) {
                 delete updatedRule.isRequired;
             }
@@ -104,7 +108,6 @@ export const combineTemplateData = (data: ValidationTransaction[], mappedRules: 
     };
 
     return updateRules(mappedRules, mapData);
-    //return mappedRules
 };
 
 

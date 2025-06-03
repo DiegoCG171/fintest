@@ -34,4 +34,7 @@ export const ENDPOINTS = {
     //Users
     user: getEndpoint('users'),
 
+    //Categorias
+    category: getEndpoint('category'),
+
 }

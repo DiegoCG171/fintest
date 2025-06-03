@@ -12,6 +12,7 @@ import { recoveryPsswSlice } from "./slices/recoveryPssw/recovery.slice";
 import { userSlice } from "./slices/users/user.slice";
 import { messagesSlice } from "./slices/messages/messages.slice";
 import { tabSlice } from "./slices/UI/tabs/tabs.slice";
+import { categoriesSlice } from "./slices/categories/categories.slice";
 
 export const store = configureStore({
     reducer: {
@@ -27,7 +28,8 @@ export const store = configureStore({
         modalForm: modalFormSlice.reducer,
         server: serverSlice.reducer,
         recovery: recoveryPsswSlice.reducer,
-        user: userSlice.reducer
+        user: userSlice.reducer,
+        categories: categoriesSlice.reducer
     }
 });
 

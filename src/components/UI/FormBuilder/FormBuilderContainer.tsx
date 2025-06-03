@@ -11,7 +11,7 @@ import { useAppSelector } from "../../../store";
 import { FormBuilderProps } from "../../../config/interfaces";
 import FormBuilderRow from "./FormBuilderRow";
 
-function FormBuilderContainer({ tabId }: FormBuilderProps) {
+function FormBuilderContainer({ tabId, canEdit }: FormBuilderProps) {
   const headers = useAppSelector((state) => state.formBuilder.config);
   const tabForm = useAppSelector((state) => state.formBuilder.tabForms[tabId]);
   const rows = tabForm?.values || [];
@@ -57,6 +57,7 @@ function FormBuilderContainer({ tabId }: FormBuilderProps) {
                 tabId={tabId}
                 headers={headers}
                 isChild= {false}
+                canEdit={canEdit}
               />
             ))}
           </TableBody>

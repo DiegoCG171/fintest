@@ -22,6 +22,9 @@ export { startServerThunk, stopServerThunk} from './slices/server/server.thunk'
 //User
 export * from './slices/users/user.thunk'
 
+//Categories
+export * from './slices/categories/categories.thunk'
+
 //UI
 //----Loader
 export { setLoading } from './slices/UI/loader/loader.slice'

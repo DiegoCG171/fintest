@@ -9,6 +9,7 @@ const TabbedCardContainer = ({
     eventTabs,
     initialTabIndex,
     }: TabbedCardContainerProps) => {
+
     return (
         <Box
         sx={{
@@ -27,7 +28,7 @@ const TabbedCardContainer = ({
             overflow: "auto",
             display: "flex",
             flexDirection: "column",
-            maxWidth: "85dvw",
+            maxWidth: "85vw",
             }}
         >
             <TabTableComponent
