@@ -32,3 +32,12 @@ export interface AuthState {
     error: string | null;
     isAuthenticated: boolean;
 }
+
+export interface ResetPassword {
+    newPassword: string;
+    token: string;
+}
+
+export interface RecoveryTokenResponse {
+  message: string;
+}

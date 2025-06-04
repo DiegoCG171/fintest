@@ -8,7 +8,7 @@ export function mapSocketMessageToTableRowData(msg: IncomingSocketMessage) {
     "Tipo de Mensaje": msg.typeMsg,
     "Tipo de Transacción": msg.typeTx,
     Fecha: msg.date,
-    estado: msg.errorAt,
+    estado:  msg.errorAt,
     fields: msg.fields,
   };
 }

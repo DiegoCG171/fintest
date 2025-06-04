@@ -101,6 +101,7 @@ export const NestedTable = ({
                         verticalAlign: "center",
                          width: key === "fields" ? "40px" : "20%",
                         transition: "background-color 0.2s ease-in-out",
+                         fontWeight: (hasFields) ? 600 : 400
                       }}
                     >
                       <Box

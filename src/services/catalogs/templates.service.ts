@@ -12,6 +12,7 @@ export const getTemplate = async (): Promise<TemplateRoot> => {
         throw errorMessage;
     }
 }
+
 export const updateTemplate = async (id: string, payload: PatchGenerationTemplate ): Promise<unknown> => {
     try{
         const response = await api.patch(`${ENDPOINTS.template}/${id}`, payload);

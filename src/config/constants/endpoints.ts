@@ -4,6 +4,8 @@ import { API_VERSION } from "./apiVersion"
 export const ENDPOINTS = {
     //Autenticación
     login: getEndpoint('auth/login', API_VERSION.v1),
+    recoveryToken: getEndpoint('auth/recovery-token', API_VERSION.v1),
+    resetPassword: getEndpoint('auth/reset-password', API_VERSION.v1),
 
     //Breaker
     getIso: getEndpoint('interpreter/iso'),
@@ -31,5 +33,8 @@ export const ENDPOINTS = {
 
     //Users
     user: getEndpoint('users'),
+    
+    //Collections
+    collections: getEndpoint('collection'),
 
 }

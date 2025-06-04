@@ -1,6 +1,11 @@
 import { Check, PriorityHigh } from "@mui/icons-material";
 import { Box } from "@mui/material";
 
+const typeLabels: Record<string, string> = {
+  validation: 'validación',
+  extraction: 'extracción'
+};
+
 export const StatusRender = (value: string | number | null | undefined) => {
   const val = String(value).toLowerCase();
   if (["ok"].includes(val)) {
@@ -35,7 +40,7 @@ export const StatusRender = (value: string | number | null | undefined) => {
         >
           <PriorityHigh sx={{ width: 16, color: "#ff7f7f" }} />
         </Box>
-        {["validation", "extraction"].includes(val) && val.toUpperCase()}
+        {["validation", "extraction"].includes(val) && `Error en ${typeLabels[val]}`}
       </Box>
     );
   }
