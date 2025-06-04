@@ -1,5 +1,3 @@
-export type MenuServiceRoot = MenuServiceInterface[]
-
 export interface MenuServiceInterface {
     id: string
     name: string
@@ -14,13 +12,14 @@ export interface ItemsServiceMenu {
     linkMenu?: string
 }
 
-export interface MenuSidebarState{
-    data: MenuServiceRoot,
+export interface MenuSidebarState {
+    categoriesMenu: MenuServiceInterface[],
+    collectionsMenu: MenuServiceInterface[],
+    isCollapsed: boolean
 }
 
 
 //Menu props
-
 export interface MenuItem {
     id: string
     name: string
@@ -28,13 +27,15 @@ export interface MenuItem {
     linkMenu?: string;
     items?: ItemsServiceMenu[] | []
     onClickMenu?: () => void;
-    children?: MenuItem[] | MenuServiceRoot;
+    children?: MenuItem[] | MenuServiceInterface[];
 }
 
 export interface RecursiveMenuItemProps {
     item: MenuServiceInterface;
     depth?: number;
+    optionsActive: boolean
     onSelectItem?: (item: MenuServiceInterface | ItemsServiceMenu) => void;
+    buildOptions?: (item: ItemsServiceMenu) => ContextMenuOption[];
 }
 
 export interface HeaderSidebarMenuProps {
@@ -45,4 +46,22 @@ export interface HeaderSidebarMenuProps {
 export interface SeparatorMenuProps {
     onAction?: () => void;
     label: string;
+}
+
+//Menu context
+export interface PopMenuContextProps {
+    openMenu: (event: React.MouseEvent<HTMLElement>, data: ContextMenuOption[]) => void;
+    closeMenu: () => void;
+}
+
+export interface ContextMenuOption {
+    item: {
+        label: string;
+        id: string;
+        link?: string;
+        icon?: React.ReactNode;
+    };
+    action: () => void;
+    disabled?: boolean;
+    danger?: boolean;
 }

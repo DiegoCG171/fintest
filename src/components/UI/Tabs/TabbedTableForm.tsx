@@ -16,6 +16,7 @@ import {
 import { useToast } from "../../../config/hooks/useToast";
 import { prepareUpdatePayload as preparePayload } from "../../../config/utils";
 import { updateTemplateThunk } from "../../../store/slices/templates/templates.thunk";
+import TitleHeaderComponent from "../TitleHeaderComponent";
 
 function TabbedTableForm({
   tabs,
@@ -30,14 +31,15 @@ function TabbedTableForm({
   const { error: rulesError, status: statusRules } = useAppSelector(
     (state) => state.rules
   );
+  const canEdit = tabs[0].canEdit
 
-  const { getError: templatesError, getStatus: statusTemplates } =
+  const { getError: templatesError, getStatus: statusTemplates} =
     useAppSelector((state) => state.templates);
 
-  const currentTabId = useMemo(
-    () => `${tabs[value].templateId}-${tabs[value].formType}`,
-    [tabs, value]
-  );
+  const currentTabId = useMemo(() => {
+    if (!tabs[value]) return "";
+    return `${tabs[value].templateId}-${tabs[value].formType}`;
+  }, [tabs, value]);
 
   const tabForm = useAppSelector(
     (state) => state.formBuilder.tabForms[currentTabId]
@@ -46,7 +48,7 @@ function TabbedTableForm({
   const valuesToSend = tabForm?.values ?? [];
 
   useEffect(() => {
-    const fetchRules = async () => await dispatch(getRulesThunk());
+    const fetchRules = async () => await getRulesThunk();
     if (statusRules === "idle") fetchRules();
     if (statusRules === "error") {
       showToast(rulesError as string, "error");
@@ -67,9 +69,12 @@ function TabbedTableForm({
     setValue(newValue);
   };
   const handleSave = async () => {
+    const tab = tabs[value];
+    if (!tab) return;
+
     dispatch(setLoading(true));
-    const payload = preparePayload(valuesToSend, tabs[value].formType);
-    const id = tabs[value].templateId;
+    const payload = preparePayload(valuesToSend, tab.formType);
+    const id = tab.templateId;
 
     try {
       await dispatch(updateTemplateThunk({ id, payload })).unwrap();
@@ -87,7 +92,6 @@ function TabbedTableForm({
       sx={{
         height: "100%",
         flexDirection: "column",
-        mt: -2,
       }}
     >
       <Stack
@@ -97,47 +101,51 @@ function TabbedTableForm({
           alignItems: "center",
         }}
       >
-        <Tabs
-          value={value}
-          variant="standard"
-          textColor="inherit"
-          indicatorColor="primary"
-          onChange={handleChange}
-          sx={{
-            maxHeight: "16px",
-            padding: 0,
-          }}
-        >
-          {tabs.map((tab, index) => (
-            <Tab
-              key={index + "-tab-chip"}
-              label={tab.label}
-              value={index}
-              sx={{
-                minHeight: "66px",
-                padding: "4px 12px",
-                fontSize: "12px",
-                "&.Mui-selected": {
-                  color: "primary.main",
-                  fontWeight: "bold",
-                },
-              }}
-            />
-          ))}
-        </Tabs>
-        <Button
-          startIcon={<SaveOutlinedIcon />}
-          sx={{ paddingX: 2, fontSize: "12px" }}
-          onClick={() => {
-            handleSave();
-          }}
-        >
-          Guardar
-        </Button>
+        <TitleHeaderComponent />
+        {canEdit && (
+          <Button
+            startIcon={<SaveOutlinedIcon />}
+            sx={{ paddingX: 2, fontSize: "12px" }}
+            onClick={handleSave}
+          >
+            Guardar
+          </Button>
+        )}
       </Stack>
 
+      <Tabs
+        value={value}
+        variant="standard"
+        textColor="inherit"
+        indicatorColor="primary"
+        onChange={handleChange}
+        sx={{
+          maxHeight: "16px",
+          padding: 0,
+          mt: -1,
+        }}
+      >
+        {tabs.map((tab, index) => (
+          <Tab
+            key={index + "-tab-chip"}
+            label={tab.label}
+            value={index}
+            sx={{
+              minHeight: "66px",
+              padding: "4px 12px",
+              fontSize: "12px",
+              "&.Mui-selected": {
+                color: "primary.main",
+                fontWeight: "bold",
+              },
+            }}
+          />
+        ))}
+      </Tabs>
+
       <Box sx={{ flexGrow: 1, overflow: "auto", mt: -2 }}>
-        {tabs.map((template, index) => (
+        {tabs.map((template, index) => {
+          return (
           <CustomTabPanel
             key={index + "-tab-form-content"}
             value={value}
@@ -148,7 +156,7 @@ function TabbedTableForm({
               template={template}
             />
           </CustomTabPanel>
-        ))}
+        )})}
       </Box>
     </Box>
   );

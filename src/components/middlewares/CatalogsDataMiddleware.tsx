@@ -5,21 +5,17 @@ import {
   setValuesForTab,
   useAppDispatch,
   useAppSelector,
+  getRulesThunk,
 } from "../../store";
 import FormBuilderContainer from "../UI/FormBuilder/FormBuilderContainer";
 import {
   combineTemplateData,
   mapFieldRulesToFormStructure,
 } from "../../config/utils/mappers";
-import { ColumnConfigFormBuilder, FormTabItem } from "../../config/interfaces";
+import { CatalogsDataMiddlewareProps, ColumnConfigFormBuilder } from "../../config/interfaces";
 import { getTransactionByType } from "../../config/utils";
 
-interface FormBuilderProps {
-  tabId: string;
-  template: FormTabItem;
-}
-
-function CatalogsDataMiddleware({ tabId, template }: FormBuilderProps) {
+function CatalogsDataMiddleware({ tabId, template }: CatalogsDataMiddlewareProps) {
   const dispatch = useAppDispatch();
   const { formType, templateId } = template;
 
@@ -30,14 +26,24 @@ function CatalogsDataMiddleware({ tabId, template }: FormBuilderProps) {
   );
 
   const alreadyInitialized = useRef(false);
+  useEffect(() => {
+    if (!rawRules?.length) {
+      dispatch(getRulesThunk());
+    }
+  }, [dispatch, rawRules]);
 
   const mappedRules = useMemo(() => {
-    return mapFieldRulesToFormStructure(rawRules || []);
+    if (!rawRules?.length) return [];
+    const result = mapFieldRulesToFormStructure(rawRules);
+    return result;
   }, [rawRules]);
 
   const transactionData = useMemo(() => {
-    return getTransactionByType(templates, templateId, formType);
+    const result = getTransactionByType(templates, templateId, formType);
+    return result;
   }, [templates, templateId, formType]);
+
+  
 
   useEffect(() => {
     dispatch(
@@ -59,7 +65,7 @@ function CatalogsDataMiddleware({ tabId, template }: FormBuilderProps) {
     alreadyInitialized.current = true;
   }, [dispatch, tabId, rawRules, transactionData, mappedRules, formState]);
 
-  return <FormBuilderContainer tabId={tabId} />;
+  return <FormBuilderContainer tabId={tabId} canEdit={template.canEdit} />;
 }
 
 export default CatalogsDataMiddleware;

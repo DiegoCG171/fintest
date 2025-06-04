@@ -15,11 +15,15 @@ function TitleHeaderComponent() {
     const resolvedTitle = TITLE_HEADER[pathnames[0]] || "";
 
     return (
-        <Stack sx={{mt: -1}}>
+        <Stack sx={{mt: -1, pl: 1}}>
             {resolvedTitle && (
                 <Typography
                     variant="h6"
-                    sx={{ fontWeight: "bold", textTransform: "capitalize" }}
+                    sx={{ 
+                        fontWeight: "bold", 
+                        textTransform: "capitalize",
+                        fontSize: 16
+                    }}
                 >
                     {resolvedTitle}
                 </Typography>

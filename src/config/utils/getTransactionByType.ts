@@ -1,22 +1,25 @@
-import { ValidationTransaction } from "../interfaces";
+import { TemplateContextType, ValidationTransaction } from "../interfaces";
 
 export function getTransactionByType(
-    templates: any[],
-    templateId: string,
-    formType: string
-): ValidationTransaction[] {
-    const template = templates.find((t) => t._id === templateId);
+  templates: TemplateContextType[],
+  templateId: string,
+  formType: string
+): ValidationTransaction[] | null {
+  const template = templates.find(
+    (t) => t._id?.toString() === templateId.toString() || t.uuid?.toString() === templateId.toString()
+  );
 
-    if (!template) return [];
+  if (!template) {
+    return null;
+  }
 
-    switch (formType) {
-        case "validationTransaction":
-            return template.validationTransaction ?? [];
-
-        case "generationTransaction":
-            return template.generationTransaction ?? [];
-
-        default:
-            return [];
-    }
+  switch (formType) {
+    case "validationTransaction":
+      return template.validationTransaction ?? [];
+    case "generationTransaction":
+      return template.generationTransaction ?? [];
+    default:
+      return null;
+  }
 }
+

@@ -1,90 +1,159 @@
-import { Box, Stack, Tab, Tabs } from "@mui/material";
+import { Box, Icon, Tab, Tabs, Typography } from "@mui/material";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import CustomTabPanel from "../../core/CustomTabPanel";
 import { TabTableComponentProps } from "../../../config/interfaces";
+import { removeTab, useAppDispatch, useAppSelector } from "../../../store";
+import CloseIcon from "@mui/icons-material/Close";
+import DeveloperBoardIcon from "@mui/icons-material/DeveloperBoard";
 
 function TabTableComponent({
   tabs = [],
   initialTabIndex = 0,
 }: TabTableComponentProps) {
-  const [value, setValue] = useState(initialTabIndex);
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const dynamicTabs = useAppSelector((state) => state.tabs.dynamicTabs);
+  const realInitialIndex = initialTabIndex ?? 0;
+  const [selectedTab, setSelectedTab] = useState(realInitialIndex);
 
-  const variants = tabs.length >= 3 ? "fullWidth" : "standard";
-  const display = tabs.length >= 3 ? "block" : "inline-flex";
   useEffect(() => {
-    setValue(initialTabIndex);
-  }, [initialTabIndex]);
+    setSelectedTab(initialTabIndex);
+  }, [initialTabIndex, dynamicTabs]);
 
-  const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue);
+  const handleChange = (_event: React.SyntheticEvent, newIndex: number) => {
+    const selectedTabItem = tabs[newIndex];
+    setSelectedTab(newIndex);
+
+    if (selectedTabItem?.route) {
+      navigate(`/${selectedTabItem.route}`);
+    }
+  };
+
+  const closeTab = (index: number) => {
+    if (index === 0 || index === 1) return;
+
+    const dynamicTab = dynamicTabs[index - 2];
+    if (dynamicTab) {
+      dispatch(removeTab(dynamicTab.route));
+    }
+    if (selectedTab === index) {
+      const newIndex = index > 2 ? index - 1 : 0;
+      setSelectedTab(newIndex);
+      const navigateToTab = tabs[newIndex];
+      if (navigateToTab?.route) {
+        navigate(`/${navigateToTab.route}`);
+      } else {
+        navigate("/main");
+      }
+    } else if (selectedTab > index) {
+      setSelectedTab((prev) => prev - 1);
+    }
+  };
+
+  const iconAction = (index: number) => {
+    if (index === 1 || index === 0) return undefined;
+    return (
+      <CloseIcon
+        onClick={(e) => {
+          e.stopPropagation();
+          closeTab(index);
+        }}
+        sx={{
+          position: "relative",
+          top: -12,
+          fontSize: 12,
+          right: -4,
+        }}
+      />
+    );
   };
 
   return (
     <Box
       sx={{
         height: "100%",
-        display: "block",
+        display: "flex",
         flexDirection: "column",
+        overflow: "hidden",
       }}
     >
-        <Stack>
-            
-        </Stack>
-      <Tabs
-        value={value}
-        variant={variants}
-        textColor="inherit"
-        onChange={handleChange}
+      {/* Header de Tabs */}
+      <Box
         sx={{
-          border: "1px solid #D1D1D1",
-          borderRadius: 2,
-          margin: 0,
-          fontSize: '10px',
-          minHeight: 4,
-          display: { display },
-          "& .MuiTabs-indicator": {
-            display: "none",
-          },
-          ...(tabs.length > 2 && {
-            '& .MuiTabs-scroller': {
-                marginBottom: '-6px !important',
-            },
-            '& .MuiTabs-root': {
-                marginBottom: '-6px !important',
-            },
-        }),
+          overflowX: "auto",
+          borderBottom: 1,
+          borderColor: "divider",
+          overflowY: "hidden",
         }}
       >
-        {tabs?.map((tab, index) => (
-          <Tab
-            key={index + "-tab-table"}
-            label={tab.label}
-            value={index}
-            sx={{
-              minWidth: "20vw",
-              padding: "0 64px",
-              minHeight: "24px",
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              fontSize: '12px',
-              margin: 1,
-              textTransform: "capitalize",
-              textOverflow: "ellipsis",
-              "&.Mui-selected": {
-                color: "primary.main",
-                fontWeight: "bold",
-                backgroundColor: "primary.light",
-              },
-            }}
-          />
-        ))}
-      </Tabs>
+        <Tabs
+          value={selectedTab}
+          onChange={handleChange}
+          variant="scrollable"
+          scrollButtons="auto"
+          allowScrollButtonsMobile
+          textColor="inherit"
+          sx={{
+            minHeight: "40px",
+            "& .MuiTabs-scroller": { overflowX: "auto", overflowY: "hidden" },
+            "& .MuiTab-root": { minHeight: "40px" },
+            "& .Mui-selected": {
+              color: "primary.main",
+              fontWeight: "bold",
+              backgroundColor: "primary.light",
+            },
+          }}
+        >
+          {tabs.map((tab, index) => { 
+            return (
+            <Tab
+              key={`tab-${index}`}
+              label={
+                <Box
+                  display="flex"
+                  alignItems="flex-end"
+                  gap={2}
+                >
+                  <Icon
+                    fontSize="small"
+                    sx={{ color: tab.canEdit ? "transparent" : "inherit" }}
+                  >
+                    <DeveloperBoardIcon />
+                  </Icon>
 
+                  <Typography
+                    variant="body2"
+                    noWrap
+                  >
+                    {tab.label}
+                  </Typography>
+                  <Icon>{iconAction(index)}</Icon>
+                </Box>
+              }
+              value={index}
+              sx={{
+                minWidth: "160px",
+                padding: "6px 12px",
+                fontSize: "12px",
+                whiteSpace: "nowrap",
+                textTransform: "capitalize",
+                textOverflow: "ellipsis",
+                borderTopRightRadius: 12,
+                borderTopLeftRadius: 12,
+              }}
+            />
+          )}
+          )}
+        </Tabs>
+      </Box>
+
+      {/* Contenido de la Tab */}
       <Box sx={{ flexGrow: 1, overflow: "auto" }}>
-        {tabs?.map((tab, index) => (
+        {tabs.map((tab, index) => (
           <CustomTabPanel
-            key={index + "-tab-content"}
-            value={value}
+            key={`tabpanel-${index}`}
+            value={selectedTab}
             index={index}
           >
             {tab.content}

@@ -13,6 +13,7 @@ function DynamicField({
   path,
   tabId,
   isEditable,
+  onlyRead
 }: DynamicFieldProps) {
   const dispatch = useAppDispatch();
   const dependsOn = column?.dependsOn;
@@ -70,6 +71,19 @@ function DynamicField({
   ): boolean {
     if (isChild) return false;
     return !dependsValue;
+  }
+
+  if(onlyRead && column.type === "checkbox") {
+    return (
+        <input
+          disabled={true}
+          type="checkbox"
+          checked={Boolean(value)}
+          onChange={(e) =>
+            handleChange({ target: { value: e.target.checked } })
+          }
+        />
+      );
   }
 
   if (

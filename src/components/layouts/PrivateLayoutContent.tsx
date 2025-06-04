@@ -4,6 +4,7 @@ import { Box } from "@mui/material";
 import SideNavComponent from "../UI/SidebarMenu/SideNavComponent";
 import FullScreenModal from "../core/FullScreenModal";
 import { closeModal, useAppDispatch, useAppSelector } from "../../store";
+import { PopMenuProvider } from "../../config/context/PopMenuProvider";
 
 function PrivateLayoutContent() {
   const modalContainer = document.getElementById("modal-root");
@@ -13,7 +14,9 @@ function PrivateLayoutContent() {
   return (
     <>
       <Box sx={{ display: "flex", height: "100vh" }}>
-        <SideNavComponent />
+        <PopMenuProvider>
+          <SideNavComponent />
+        </PopMenuProvider>
         <Box
           sx={{
             flex: 1,
