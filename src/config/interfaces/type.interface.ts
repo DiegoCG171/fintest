@@ -100,48 +100,6 @@ export type FormRefHandle = {
   submitForm: () => void;
 };
 
-//Tabs props
-// Para tabs dinámicos de formularios
-export interface FormTabItem {
-  label: string;
-  templateId: string;
-  formType: string;
-  ref?: React.Ref<FormRefHandle>;
-  canEdit: boolean
-}
-
-// Para tabs que pintan JSX directamente
-export interface StaticTabItem {
-  label: string;
-  content: React.ReactNode;
-  route?: string
-  canEdit: boolean
-}
-
-export interface TabTableComponentProps {
-  tabs: StaticTabItem[];
-  initialTabIndex?: number;
-}
-
-export interface TabTableFormComponentProps {
-  tabs: FormTabItem[];  
-  initialTabIndex?: number;
-}
-
-export interface TabConfigInterface {
-  [key: string]: Array<{
-    label: string;
-    content: ReactNode;
-    canEdit: boolean
-  }>;
-}
-
-export interface TabbedCardContainerProps {
-  tabs: { label: string; content: ReactNode , canEdit: boolean}[];
-  eventTabs: { label: string; content: ReactNode, canEdit: boolean }[];
-  initialTabIndex: number | undefined;
-}
-
 //Form props
 export type CustomCheckboxProps = {
   id?: string;

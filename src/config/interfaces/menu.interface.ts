@@ -1,5 +1,3 @@
-export type MenuServiceRoot = MenuServiceInterface[]
-
 export interface MenuServiceInterface {
     id: string
     name: string
@@ -15,12 +13,13 @@ export interface ItemsServiceMenu {
 }
 
 export interface MenuSidebarState {
-    data: MenuServiceRoot,
+    categoriesMenu: MenuServiceInterface[],
+    collectionsMenu: MenuServiceInterface[],
+    isCollapsed: boolean
 }
 
 
 //Menu props
-
 export interface MenuItem {
     id: string
     name: string
@@ -28,7 +27,7 @@ export interface MenuItem {
     linkMenu?: string;
     items?: ItemsServiceMenu[] | []
     onClickMenu?: () => void;
-    children?: MenuItem[] | MenuServiceRoot;
+    children?: MenuItem[] | MenuServiceInterface[];
 }
 
 export interface RecursiveMenuItemProps {

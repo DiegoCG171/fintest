@@ -1,8 +1,8 @@
 import { Box } from "@mui/material";
 import BasicTable from "../../components/UI/table/BasicTableComponent";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
-import { tabConfig } from "../../config/mock";
+//import { tabConfig } from "../../config/mock";
 import { useMultiSocket } from "../../config/hooks/useMultiSocket";
 import { MessagesState } from "../../config/interfaces/messages.interface";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
@@ -10,6 +10,7 @@ import { StaticTabItem } from "../../config/interfaces";
 import { StatusRender } from "../../components/UI/table/StatusRender";
 import TabbedCardContainer from "../../components/UI/Tabs/TabbedCardContainer";
 import { addTab } from "../../store";
+import { getConfigTab } from "../../config/utils/tabsContent";
 
 const generateStaticTabs = (messagesData: MessagesState): StaticTabItem[] => [
   {
@@ -21,7 +22,7 @@ const generateStaticTabs = (messagesData: MessagesState): StaticTabItem[] => [
         customRenderers={{ estado: StatusRender }}
       />
     ),
-    canEdit: true
+    canEdit: true,
   },
   {
     label: "Errores",
@@ -32,7 +33,7 @@ const generateStaticTabs = (messagesData: MessagesState): StaticTabItem[] => [
         customRenderers={{ estado: StatusRender }}
       />
     ),
-    canEdit: true
+    canEdit: true,
   },
 ];
 
@@ -45,31 +46,45 @@ const generateEventTabs = (messagesData: MessagesState): StaticTabItem[] => [
         initialRows={messagesData.events}
       />
     ),
-    canEdit: true
+    canEdit: true,
   },
 ];
-
-const generateDynamicTabs = (
-  dynamicTabs: { label: string; route: string }[]
-) => {
-  const tab = dynamicTabs.map((tab) => {
-    return {
-      label: tab.label,
-      route: tab.route,
-      content: tabConfig[tab.route]?.[0]?.content || null,
-      canEdit: tabConfig[tab.route]?.[0]?.canEdit || false
-    };
-  });
-
-  return tab;
-};
 
 function MainPage() {
   const location = useLocation();
   const messagesData = useAppSelector((state) => state.messagesReducer);
   const dynamicTabs = useAppSelector((state) => state.tabs.dynamicTabs);
+  const categories = useAppSelector(
+    (state) => state.sidebarMenu.categoriesMenu
+  );
+  const collections = useAppSelector(
+    (state) => state.sidebarMenu.collectionsMenu
+  );
   const dispatch = useAppDispatch();
   const { connect, disconnect } = useMultiSocket();
+  const tabConfig = useMemo(() => {
+    const categoriesTabs = getConfigTab(categories, "categories", false);
+    const collectionsTabs = getConfigTab(collections, "collections", true);
+    return {
+      ...categoriesTabs,
+      ...collectionsTabs,
+    };
+  }, [categories, collections]);
+
+  const generateDynamicTabs = (
+    dynamicTabs: { label: string; route: string }[]
+  ) => {
+    const tab = dynamicTabs.map((tab) => {
+      return {
+        label: tab.label,
+        route: tab.route,
+        content: tabConfig[tab.route]?.[0]?.content || null,
+        canEdit: tabConfig[tab.route]?.[0]?.canEdit || false,
+      };
+    });
+
+    return tab;
+  };
 
   useEffect(() => {
     connect();
@@ -89,7 +104,7 @@ function MainPage() {
         })
       );
     }
-  }, [location.pathname, dispatch]);
+  }, [location.pathname, dispatch, tabConfig]);
 
   const currentRoute = location.pathname.slice(1);
 

@@ -1,4 +1,4 @@
-import { CategoryesInterface } from "../interfaces"; // ajusta tu path si es necesario
+import { CategoryesInterface, MenuServiceInterface } from "../interfaces"; // ajusta tu path si es necesario
 
 const normalize = (str: string): string => {
     return str
@@ -14,7 +14,7 @@ export const addLinkMenu = (
     categories: CategoryesInterface[],
     parentPath: string[] = []
 ): CategoryesInterface[] => {
-    if(!categories) return []
+    if (!categories) return []
     return categories.map((category) => {
         const currentPath = [...parentPath, normalize(category.name)];
 
@@ -32,3 +32,33 @@ export const addLinkMenu = (
         };
     });
 };
+
+export const getLinksArray = (data: MenuServiceInterface[]): string[] => {
+    const result: string[] = [];
+
+    const getLink = (node: MenuServiceInterface) => {
+        if (node.linkMenu) {
+            result.push(node.linkMenu);
+        }
+
+        if (Array.isArray(node.items)) {
+            for (const item of node.items) {
+                if (item.linkMenu) {
+                    result.push(item.linkMenu);
+                }
+            }
+        }
+
+        if (Array.isArray(node.children)) {
+            for (const child of node.children) {
+                getLink(child);
+            }
+        }
+    };
+
+    for (const node of data) {
+        getLink(node);
+    }
+
+    return result;
+}

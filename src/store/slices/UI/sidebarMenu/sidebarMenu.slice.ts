@@ -1,22 +1,29 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { MenuServiceRoot, MenuSidebarState } from "../../../../config/interfaces/menu.interface";
-import { mockCategories } from "../../../../config/mock";
+import { MenuServiceInterface, MenuSidebarState } from "../../../../config/interfaces/menu.interface";
 
-const initialState: MenuSidebarState = {
-    data: mockCategories
+export const initialState: MenuSidebarState = {
+    isCollapsed: false,
+    categoriesMenu: [],
+    collectionsMenu: [],
 }
 
 export const sidebarMenuSlice = createSlice({
     name: 'menuSidebar',
     initialState,
     reducers: {
-        setMenuData(state, action: PayloadAction<MenuServiceRoot>) {
-            state.data = action.payload;
+        setCategoriesData(state, action: PayloadAction<MenuServiceInterface[]>) {
+            state.categoriesMenu = action.payload;
         },
-        resetMenuData(state) {
-            state.data = []
-        }
+        resetCategoriesMenuData(state) {
+            state.categoriesMenu = []
+        },
+        setCollectionsData(state, action: PayloadAction<MenuServiceInterface[]>) {
+            state.collectionsMenu = action.payload;
+        },
+        resetCollectionsMenuData(state) {
+            state.collectionsMenu = []
+        },
     }
 })
 
-export const { setMenuData, resetMenuData } = sidebarMenuSlice.actions;
+export const { setCategoriesData, resetCategoriesMenuData, setCollectionsData, resetCollectionsMenuData } = sidebarMenuSlice.actions;

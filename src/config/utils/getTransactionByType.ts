@@ -6,7 +6,7 @@ export function getTransactionByType(
   formType: string
 ): ValidationTransaction[] | null {
   const template = templates.find(
-    (t) => t._id?.toString() === templateId.toString()
+    (t) => t._id?.toString() === templateId.toString() || t.uuid?.toString() === templateId.toString()
   );
 
   if (!template) {

@@ -40,7 +40,8 @@ export const mapFieldRulesToFormStructure = (fields: Field[]): TableRowDataFormB
 
 export const mapValidationTemplate = (validation: ValidationTransaction[]): TableRowDataFormBuilder[] =>
     validation.map((v: ValidationTransaction) => {
-        const level3Children = (children: FieldValidation) =>
+        
+        const level4Children = (children: FieldValidation) =>
             children.fields?.map((field: FieldValidation) => ({
                 idBitmap: field.idBitmap ?? '',
                 displayName: '',
@@ -48,6 +49,17 @@ export const mapValidationTemplate = (validation: ValidationTransaction[]): Tabl
                 function: field.value ?? '',
                 value: '',
                 breakingRules: '' as string,
+                _id: field._id,
+            })) ?? [];
+
+        const level3Children = (children: FieldValidation) =>
+            children.fields?.map((field: FieldValidation) => ({
+                idBitmap: field.idBitmap ?? '',
+                displayName: '',
+                isActive: Boolean(field),
+                function: field.value ?? '',
+                value: '',
+                breakingRules: level4Children(field),
                 _id: field._id,
             })) ?? [];
 
@@ -91,7 +103,7 @@ export const combineTemplateData = (data: ValidationTransaction[] | null , mappe
             const updatedRule: TableRowDataFormBuilder = {
                 ...rule,
                 isRequired: level === 0 ? Boolean(matched?.isRequired ?? rule.isRequired) : undefined,
-                isActive: matched?.isActive ?? rule.isActive, // 👈 aquí
+                isActive: matched?.isActive ?? rule.isActive,
                 function: matched?.function ?? rule.function,
                 value: matched?.value ?? rule.value,
                 breakingRules: Array.isArray(rule.breakingRules) && rule.breakingRules.length > 0

@@ -1,7 +1,52 @@
 
-//Component's interface
+//Tabs props
+import { ReactNode } from "react";
 
-import { FormTabItem } from ".";
+// Para tabs dinámicos de formularios
+export interface FormTabItem {
+    label: string;
+    templateId: string;
+    formType: string;
+    canEdit: boolean;
+    origin: 'collections' | 'categories';
+}
+
+// Para tabs que pintan JSX directamente
+export interface StaticTabItem {
+    label: string;
+    content: React.ReactNode;
+    route?: string
+    canEdit: boolean
+}
+
+export interface TabTableComponentProps {
+    tabs: StaticTabItem[];
+    initialTabIndex?: number;
+}
+
+export interface TabTableFormComponentProps {
+    tabs: FormTabItem[];
+    initialTabIndex?: number;
+}
+
+export interface CatalogsDataMiddlewareProps {
+    tabId: string;
+    template: FormTabItem;
+}
+
+export interface TabConfigInterface {
+    [key: string]: Array<{
+        label: string;
+        content: ReactNode;
+        canEdit: boolean
+    }>;
+}
+
+export interface TabbedCardContainerProps {
+    tabs: { label: string; content: ReactNode, canEdit: boolean }[];
+    eventTabs: { label: string; content: ReactNode, canEdit: boolean }[];
+    initialTabIndex: number | undefined;
+}
 
 /**Form Builder */
 export interface FormBuilderProps {

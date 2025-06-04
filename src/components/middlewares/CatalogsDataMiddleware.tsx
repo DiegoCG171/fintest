@@ -12,15 +12,10 @@ import {
   combineTemplateData,
   mapFieldRulesToFormStructure,
 } from "../../config/utils/mappers";
-import { ColumnConfigFormBuilder, FormTabItem } from "../../config/interfaces";
+import { CatalogsDataMiddlewareProps, ColumnConfigFormBuilder } from "../../config/interfaces";
 import { getTransactionByType } from "../../config/utils";
 
-interface FormBuilderProps {
-  tabId: string;
-  template: FormTabItem;
-}
-
-function CatalogsDataMiddleware({ tabId, template }: FormBuilderProps) {
+function CatalogsDataMiddleware({ tabId, template }: CatalogsDataMiddlewareProps) {
   const dispatch = useAppDispatch();
   const { formType, templateId } = template;
 
@@ -47,6 +42,8 @@ function CatalogsDataMiddleware({ tabId, template }: FormBuilderProps) {
     const result = getTransactionByType(templates, templateId, formType);
     return result;
   }, [templates, templateId, formType]);
+
+  
 
   useEffect(() => {
     dispatch(

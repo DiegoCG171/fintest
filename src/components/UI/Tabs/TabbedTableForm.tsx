@@ -33,7 +33,7 @@ function TabbedTableForm({
   );
   const canEdit = tabs[0].canEdit
 
-  const { getError: templatesError, getStatus: statusTemplates } =
+  const { getError: templatesError, getStatus: statusTemplates} =
     useAppSelector((state) => state.templates);
 
   const currentTabId = useMemo(() => {
