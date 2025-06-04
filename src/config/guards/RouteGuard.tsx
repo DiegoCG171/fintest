@@ -20,7 +20,8 @@ const RouteGuard = ({ children }: { children: React.ReactNode }) => {
     fromCollections.includes(currentPath);
 
   if (!isValid) {
-    return <Navigate to="/not-found" />;
+    return null;
+    //return <Navigate to="/not-found" />;
   }
 
   return <>{children}</>;
