@@ -18,6 +18,7 @@ function RecoveryPassword() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { showToast } = useToast();
+
   return (
     <Box
       sx={{
@@ -81,7 +82,6 @@ function RecoveryPassword() {
                     <Button
                       fullWidth
                       variant="contained"
-                      type="submit"
                       onClick={() => {
                         if (Object.keys(errors).length > 0) {
                           showToast(

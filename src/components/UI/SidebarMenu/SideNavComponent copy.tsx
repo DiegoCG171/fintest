@@ -1,15 +1,19 @@
 import { useState } from "react";
-import { Box, InputAdornment, TextField, IconButton } from "@mui/material";
+import { Box, InputAdornment, TextField, IconButton, Button } from "@mui/material";
 import logo from "../../assets/logo.svg";
 import MenuOpenOutlinedIcon from "@mui/icons-material/MenuOpenOutlined";
 import SearchIcon from "@mui/icons-material/Search";
-import RecursiveMenuItem from "../navigation/RecursiveMenuItem";
-import { MenuItem } from "../../config/interfaces";
-import { staticMenuItems } from "../../config/mock";
+//import RecursiveMenuItem from "../../navigation/RecursiveMenuItem";
+import { MenuItem } from "../../../config/interfaces";
+import { staticMenuItems } from "../../../config/mock";
 
 export const drawerWidth = 240;
 
-function SideNavComponent() {
+interface SidebarProps {
+  onOpenModal: () => void;
+}
+
+function SideNavComponent({ onOpenModal }: SidebarProps) {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
 
   
@@ -80,16 +84,18 @@ function SideNavComponent() {
         />
       </Box>
 
+        <Button variant="text" onClick={onOpenModal}>Crear Template</Button>
+
       {/* Menú desplegable */}
-      <Box sx={{ px: 1, overflowY: "auto", flexGrow: 1, my: 4 }}>
+      {/* <Box sx={{ px: 1, overflowY: "auto", flexGrow: 1, my: 4 }}>
         {menuItems.map((item, index) => (
           <RecursiveMenuItem
             key={index}
-            item={item}
+            item={[item]}
             depth={0}
           />
         ))}
-      </Box>
+      </Box> */}
     </Box>
   );
 }

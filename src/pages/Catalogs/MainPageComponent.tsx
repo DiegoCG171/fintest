@@ -108,7 +108,7 @@ function MainPage() {
   return (
     <Box
       sx={{
-        // height: "95%",
+        height: "vh95",
         display: "flex",
         flexDirection: "column",
         gap: 1,

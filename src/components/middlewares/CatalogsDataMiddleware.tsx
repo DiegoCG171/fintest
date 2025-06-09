@@ -7,18 +7,17 @@ import {
   useAppSelector,
 } from "../../store";
 import FormBuilderContainer from "../UI/FormBuilder/FormBuilderContainer";
-import { combineTemplateData, mapFieldRulesToFormStructure } from "../../config/utils/mappers";
 import {
-  ColumnConfigFormBuilder,
-  FormTabItem,
-} from "../../config/interfaces";
+  combineTemplateData,
+  mapFieldRulesToFormStructure,
+} from "../../config/utils/mappers";
+import { ColumnConfigFormBuilder, FormTabItem } from "../../config/interfaces";
 import { getTransactionByType } from "../../config/utils";
 
 interface FormBuilderProps {
-    tabId: string;
-    template: FormTabItem
+  tabId: string;
+  template: FormTabItem;
 }
-
 
 function CatalogsDataMiddleware({ tabId, template }: FormBuilderProps) {
   const dispatch = useAppDispatch();
@@ -26,10 +25,11 @@ function CatalogsDataMiddleware({ tabId, template }: FormBuilderProps) {
 
   const rawRules = useAppSelector((state) => state.rules.rules);
   const templates = useAppSelector((state) => state.templates.templates);
-  const formState = useAppSelector((state) => state.formBuilder.tabForms[tabId]);
+  const formState = useAppSelector(
+    (state) => state.formBuilder.tabForms[tabId]
+  );
 
   const alreadyInitialized = useRef(false);
-
 
   const mappedRules = useMemo(() => {
     return mapFieldRulesToFormStructure(rawRules || []);
@@ -40,12 +40,19 @@ function CatalogsDataMiddleware({ tabId, template }: FormBuilderProps) {
   }, [templates, templateId, formType]);
 
   useEffect(() => {
-    dispatch(setConfig(serviceConfig.rules.columns as ColumnConfigFormBuilder[]));
+    dispatch(
+      setConfig(serviceConfig.rules.columns as ColumnConfigFormBuilder[])
+    );
   }, [dispatch]);
 
   useEffect(() => {
+    alreadyInitialized.current = false;
+  }, [templateId]);
+
+  useEffect(() => {
     if (alreadyInitialized.current) return;
-    if (!rawRules?.length || !transactionData?.length || formState?.values?.length) return;
+    if (!rawRules?.length || !transactionData?.length) return;
+    if (alreadyInitialized.current || formState) return;
 
     const values = combineTemplateData(transactionData, mappedRules);
     dispatch(setValuesForTab({ tabId, values }));

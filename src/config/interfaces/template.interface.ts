@@ -20,26 +20,35 @@ export interface TemplateContextType {
     updatedAt: string
 }
 
+export type CreateTemplate = Omit<TemplateContextType, "_id" | "uuid" | "__v" | "createdAt" | "updatedAt">;
+
+
+
 export interface ValidationTransaction {
     idBitmap: string
     isRequired?: boolean
-    function: string
-    value: string
-    fields: FieldValidation[]
-    _id: string
+    function?: string
+    value?: string | null
+    fields?: FieldValidation[]
+    _id?: string
 }
 
 export interface FieldValidation {
-    idBitmap: string
-    function: string
-    value: string
-    fields: FieldValidation[]
-    _id: string
+    idBitmap?: string
+    function?: string
+    isRequired?: boolean
+    value?: string | null
+    fields?: FieldValidation[]
+    _id?: string
 }
 
 // PATCH
 
 export interface PatchGenerationTemplate {
+    name?: string
+    description?: string
+    category?:string
+    type?: string
     generationTransaction?: GenerationTransaction[]
     validationTransaction?: GenerationTransaction[]
 }
@@ -76,4 +85,10 @@ export interface TemplateState {
     getError: null | string,
     updateStatus: AsyncStatus,
     updateError: null | string,
+    createStatus: AsyncStatus,
+    createError: null | string
+    getStatusById: AsyncStatus,
+    getErrorById: null | string,
+    templateById: TemplateContextType | null,
+
 }

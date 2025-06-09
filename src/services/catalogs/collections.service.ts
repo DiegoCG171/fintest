@@ -32,9 +32,9 @@ export const createCollection = async (body: CreateCollection) => {
         throw errorMessage;
     }
 }
-export const updateCollection = async (body: CreateCollection) => {
+export const updateCollection = async (id: string, body: CreateCollection) => {
     try {
-        const {data} = await api.patch(ENDPOINTS.collections, body);
+        const {data} = await api.patch(`${ENDPOINTS.collections}/${id}`, body);
         return data;
     } catch (error) {
         const errorMessage = handleAxiosError(error);

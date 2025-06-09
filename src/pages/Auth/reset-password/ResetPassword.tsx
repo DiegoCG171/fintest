@@ -108,7 +108,6 @@ function ResetPassword() {
                     <Button
                       fullWidth
                       variant="contained"
-                      type="submit"
                       onClick={() => {
                         if (Object.keys(errors).length > 0) {
                           showToast(
