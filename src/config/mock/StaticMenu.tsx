@@ -7,12 +7,12 @@ export const staticMenuItems: MenuItem[] = [
             items: [
             {
                 name: "Venta",
-                id: "",
+                id: "6835dbfdc9433ace61787028",
                 linkMenu: "ecommerce/ventas",
             },
             {
                 name: "Reverso",
-                id: "",
+                id: "6835dbfdc9433ace61787086",
                 linkMenu: "ecommerce/reverso",
             },
             {
@@ -22,7 +22,7 @@ export const staticMenuItems: MenuItem[] = [
             },
             {
                 name: "Venta con #DS",
-                id: "",
+                id: "6835dbfdc9433ace61787086",
                 linkMenu: "ecommerce/ventas-ds",
             },
             {

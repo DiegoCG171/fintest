@@ -60,7 +60,7 @@ export const getTemplateByIdThunk = createAsyncThunk<
     async (id, { rejectWithValue }) => {
         try {
             const templateList = await getTemplateById(id);
-            const filteredTemplate = templateList.find(item => item._id === id);
+            const filteredTemplate = templateList.find(item => item.uuid === id);
 
             if (!filteredTemplate) {
                 return rejectWithValue(`No se encontró el template con ID ${id}`);

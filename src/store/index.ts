@@ -22,9 +22,15 @@ export { startServerThunk, stopServerThunk} from './slices/server/server.thunk'
 //User
 export * from './slices/users/user.thunk'
 
+//Categories
+export * from './slices/categories/categories.thunk'
+
+//Toutes
+export * from './slices/routes/validRoutesSlice.slice'
+
 //UI
 //----Loader
 export { setLoading } from './slices/UI/loader/loader.slice'
 export { setConfig, setValuesForTab, updateFieldValue, updateNestedFieldValue, setVisibility } from './slices/UI/form/formBuilder.slice'
-export { setMenuData, resetMenuData }  from './slices/UI/sidebarMenu/sidebarMenu.slice'
 export { openModal, closeModal } from './slices/UI/form/modalForm.slice'
+export { addTab, removeTab  } from './slices/UI/tabs/tabs.slice'

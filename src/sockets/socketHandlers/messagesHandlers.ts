@@ -10,4 +10,3 @@ export const registerMessagesHandlers = (
     dispatch(setMessage( msg));
   });
 };
- 

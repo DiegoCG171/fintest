@@ -40,4 +40,7 @@ export const ENDPOINTS = {
     //Collections
     testCases: getEndpoint('test-case'),
 
+    //Categorias
+    category: getEndpoint('category'),
+
 }

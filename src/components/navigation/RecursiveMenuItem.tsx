@@ -7,39 +7,39 @@ import {
 import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
 import KeyboardArrowRightOutlinedIcon from "@mui/icons-material/KeyboardArrowRightOutlined";
 import KeyboardArrowDownOutlinedIcon from "@mui/icons-material/KeyboardArrowDownOutlined";
-import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
-import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
-import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { setLoading, useAppDispatch } from "../../store";
+import RecursiveMenuSubItem from "./RecursiveMenuSubItem";
+import { useState } from "react";
 
 const RecursiveMenuItem = ({
   item,
   depth = 0,
+  optionsActive,
   onSelectItem,
+  buildOptions
 }: RecursiveMenuItemProps) => {
   const [expanded, setExpanded] = useState(false);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const location = useLocation();
-  const isActive = (link?: string) => {
-    return link && location.pathname === `/${link}`;
+
+  const onDecisionHandler = async (
+    item: MenuServiceInterface | ItemsServiceMenu
+  ) => {
+    if (item.linkMenu) {
+      dispatch(setLoading(true));
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      dispatch(setLoading(false));
+      navigate(`/${item.linkMenu}`);
+      return;
+    }
+
+    if (onSelectItem) {
+      onSelectItem(item);
+    }
   };
 
-  const onDecisionHandler = async (item: MenuServiceInterface | ItemsServiceMenu) => {
-  if (item.linkMenu) {
-    dispatch(setLoading(true));
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    dispatch(setLoading(false));
-    navigate(`/${item.linkMenu}`);
-    return; 
-  }
-
-  if (onSelectItem) {
-    onSelectItem(item);
-  }
-};
-
+  
 
   return (
     <Box sx={{ width: "100%", pl: depth * 0.25, my: 0.5 }}>
@@ -91,10 +91,12 @@ const RecursiveMenuItem = ({
           <Box>
             {item.children?.map((child) => (
               <RecursiveMenuItem
+                optionsActive={optionsActive}
                 key={child.id}
                 item={child}
                 depth={depth + 1}
                 onSelectItem={onDecisionHandler}
+                buildOptions={buildOptions}
               />
             ))}
           </Box>
@@ -108,42 +110,13 @@ const RecursiveMenuItem = ({
           }}
         >
           {item.items?.map((subItem, index) => (
-            <Box
-              key={`box-${index}-${subItem.id}`}
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                cursor: "pointer",
-                borderRadius: 2,
-                p: 1,
-                backgroundColor: isActive(subItem.linkMenu)
-                  ? (theme) => theme.palette.action.selected
-                  : "transparent",
-                transition: "background-color 0.2s ease",
-                "&:hover": {
-                  backgroundColor: (theme) => theme.palette.action.hover,
-                },
-              }}
-              onClick={() => onDecisionHandler?.(subItem)}
-            >
-              <Stack
-                key={subItem.id}
-                direction="row"
-                spacing={1}
-                alignItems="center"
-              >
-                <DescriptionOutlinedIcon
-                  sx={{ fontSize: 16, color: "text.disabled" }}
-                />
-                <Typography sx={{ fontSize: 12, color: "text.disabled" }}>
-                  {subItem.name}
-                </Typography>
-              </Stack>
-              <MoreHorizOutlinedIcon
-                sx={{ fontSize: 16, color: "text.disabled" }}
-              />
-            </Box>
+            <RecursiveMenuSubItem
+                    key={`box-${index}-${subItem.id}`}
+                    item={subItem}
+                    optionsActive={optionsActive}
+                    onClick={onDecisionHandler}
+                    buildOptions={buildOptions}
+                  />
           ))}
         </Box>
       )}

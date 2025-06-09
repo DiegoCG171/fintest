@@ -1,24 +1,51 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Box, Drawer } from "@mui/material";
-import { MenuItem } from "../../../config/interfaces";
-import { staticMenuItems } from "../../../config/mock";
 import HeaderSidebarMenu from "./HeaderSidebarMenu";
 import SidebarBlock from "./SidebarBlock";
 import MediaPlayer from "../MediaPlayer";
+import {
+  getAllCategoriesThunk,
+  setCategoriesRoutes,
+  setCollectionsRoutes,
+  useAppDispatch,
+  useAppSelector,
+} from "../../../store";
+import { addLinkMenu, getLinksArray } from "../../../config/utils";
+import { setCategoriesData, setCollectionsData } from "../../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
+import { staticMenuItems } from "../../../config/mock";
 
 export const drawerWidth = 240;
 
 function SideNavComponent() {
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const dispatch = useAppDispatch();
   const [hideMenu, setHideMenu] = useState(false);
+  const categories = useAppSelector((state) => state.categories);
+
+  useEffect(() => {
+    if (categories.status !== "success" && categories.status !== "loading") {
+      dispatch(getAllCategoriesThunk())
+        .unwrap()
+        .catch((err) => console.error("Error cargando categorías:", err));
+    }
+  }, [dispatch, categories.status]);
+
+  useEffect(() => {
+    if (categories.status === "success" && categories.categories) {
+      const menuCategories = addLinkMenu(categories.categories);
+      dispatch(setCategoriesData(menuCategories));
+      dispatch(setCollectionsData(staticMenuItems))
+
+      //TODO: pasar a useEffect de su propio servicio
+      dispatch(setCategoriesRoutes(getLinksArray(menuCategories)))
+      dispatch(setCollectionsRoutes(getLinksArray(staticMenuItems)))
+    }
+  }, [dispatch, categories.status, categories.categories]);
 
   const toggleMenu = useCallback(() => {
     setHideMenu((prev) => !prev);
   }, []);
 
-  if (menuItems.length === 0) {
-    setMenuItems(staticMenuItems);
-  }
+  
 
   return (
     <Box sx={{ display: "flex" }}>

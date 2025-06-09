@@ -22,7 +22,7 @@ export const mockCategories = [
                                         "items": [
                                             {
                                                 "name": "Venta Template",
-                                                "id": "c9d034be-5f36-42f5-b421-3ad0c7e5b0cc"
+                                                "id": "dedfe3f9-3c33-417c-b0d8-3ec180df3321"
                                             }
                                         ]
                                     },
@@ -852,28 +852,7 @@ export const mockCategories = [
                 "items": []
             }
         ],
-        "items": [
-            {
-                "id": "682f865672a39eae1f5974c0",
-                "name": "Venta Template Pruebaaa",
-            },
-            {
-                "id": "67bce37437eeb9b499cc6e22",
-                "name": "Logon Template",
-            },
-            {
-                "id": "682f865772a39eae1f597746",
-                "name": "Venta Template",
-            },
-            {
-                "id": "6823cc839c06815d4f491991",
-                "name": "Venta Template Prueba",
-            },
-            {
-                "id": "6831394309f8bae2bb8bfe9b",
-                "name": "Plantilla de una venta con su respuesta",
-            },
-        ]
+        "items": []
     },
     {
         "id": "28e69a70-d521-47f5-857c-ea7c296018b3",
@@ -923,8 +902,9 @@ export const mockCategories = [
                 "children": [],
                 "items": [
                     {
-                        "name": "Logon Template",
-                        "id": "60f7d61b-c460-48ce-9c3c-6b91574b2879"
+                        name: "Logon Template",
+                        id: "aad61655-9dfd-4748-9c7d-0e5e5a38f2be",
+                        linkMenu: "connection/logon/logon-template",
                     }
                 ]
             }

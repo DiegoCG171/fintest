@@ -13,6 +13,7 @@ function FormBuilderRow({
   tabId,
   headers,
   isChild,
+  canEdit,
 }: FormBuilderRowProps) {
   const [expanded, setExpanded] = useState(false);
   const [edited, setEdited] = useState(false);
@@ -21,10 +22,7 @@ function FormBuilderRow({
     <>
       <TableRow
         sx={{
-          backgroundColor:
-            isChild
-              ? "#fafbfd"
-              : null,
+          backgroundColor: isChild ? "#fafbfd" : null,
           "&:hover": {
             backgroundColor: "#eaeaea",
           },
@@ -44,8 +42,26 @@ function FormBuilderRow({
                   )}
                 </IconButton>
               ) : (
-                <IconButton onClick={() => setEdited(!edited)}>
-                  {edited ? <CheckOutlinedIcon /> : <EditNoteOutlinedIcon />}
+                <IconButton
+                  onClick={canEdit ? () => setEdited(!edited) : () => {}}
+                  sx={{
+                    cursor: canEdit ? "pointer" : "default",
+                    "&:hover": {
+                      backgroundColor: canEdit
+                        ? "rgba(0, 0, 0, 0.04)"
+                        : "transparent",
+                    },
+                  }}
+                >
+                  {edited ? (
+                    <CheckOutlinedIcon
+                      sx={{ color: canEdit ? "inherit" : "transparent" }}
+                    />
+                  ) : (
+                    <EditNoteOutlinedIcon
+                      sx={{ color: canEdit ? "inherit" : "transparent" }}
+                    />
+                  )}
                 </IconButton>
               )
             ) : (
@@ -56,6 +72,7 @@ function FormBuilderRow({
                 path={path}
                 tabId={tabId}
                 isEditable={edited}
+                onlyRead={!canEdit}
               />
             )}
           </TableCell>
@@ -72,6 +89,7 @@ function FormBuilderRow({
             path={[...path, childIndex]}
             tabId={tabId}
             headers={headers}
+            canEdit={canEdit}
           />
         ))}
     </>
