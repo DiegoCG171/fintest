@@ -5,21 +5,21 @@ import SidebarBlock from "./SidebarBlock";
 import MediaPlayer from "../MediaPlayer";
 import {
   getAllCategoriesThunk,
-  setCategoriesRoutes,
-  setCollectionsRoutes,
   useAppDispatch,
   useAppSelector,
 } from "../../../store";
 import { addLinkMenu, getLinksArray } from "../../../config/utils";
-import { setCategoriesData, setCollectionsData } from "../../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
+import { setCategoriesData, setCollapsedState, setCollectionsData } from "../../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
 import { staticMenuItems } from "../../../config/mock";
+import { setCategoriesRoutesThunk, setCollectionsRoutesThunk } from "../../../store/slices/routes/validRoutes.thunk";
+import SearchBar from "./SearchBar";
 
 export const drawerWidth = 240;
 
 function SideNavComponent() {
   const dispatch = useAppDispatch();
-  const [hideMenu, setHideMenu] = useState(false);
   const categories = useAppSelector((state) => state.categories);
+  const hideMenu = useAppSelector((state) => state.sidebarMenu.isCollapsed)
 
   useEffect(() => {
     if (categories.status !== "success" && categories.status !== "loading") {
@@ -31,21 +31,26 @@ function SideNavComponent() {
 
   useEffect(() => {
     if (categories.status === "success" && categories.categories) {
-      const menuCategories = addLinkMenu(categories.categories);
+      const menuCategories = addLinkMenu(categories.categories, ['categories']);
       dispatch(setCategoriesData(menuCategories));
       dispatch(setCollectionsData(staticMenuItems))
 
       //TODO: pasar a useEffect de su propio servicio
-      dispatch(setCategoriesRoutes(getLinksArray(menuCategories)))
-      dispatch(setCollectionsRoutes(getLinksArray(staticMenuItems)))
+      dispatch(setCategoriesRoutesThunk(getLinksArray(menuCategories)))
+      dispatch(setCollectionsRoutesThunk(getLinksArray(staticMenuItems)))
     }
   }, [dispatch, categories.status, categories.categories]);
 
   const toggleMenu = useCallback(() => {
-    setHideMenu((prev) => !prev);
-  }, []);
+    //setHideMenu((prev) => !prev);
+    dispatch(setCollapsedState())
+  }, [dispatch]);
 
-  
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const handleSearch = useCallback((value: string) => {
+    setSearchTerm(value);
+  }, []);
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -69,8 +74,9 @@ function SideNavComponent() {
         />
         {!hideMenu && (
           <Box sx={{ px: 2, overflowY: "auto", flexGrow: 1, my: 4 }}>
+            <SearchBar onSearch={handleSearch}></SearchBar>
             {/* Menú desplegable */}
-            <SidebarBlock />
+            <SidebarBlock searchTerm={searchTerm} />
             <Box>
               <MediaPlayer></MediaPlayer>
             </Box>

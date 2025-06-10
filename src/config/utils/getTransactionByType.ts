@@ -1,10 +1,10 @@
-import { TemplateContextType, ValidationTransaction } from "../interfaces";
+import { TemplateContextType, FieldValidation } from "../interfaces";
 
 export function getTransactionByType(
   templates: TemplateContextType[],
   templateId: string,
   formType: string
-): ValidationTransaction[] | null {
+): FieldValidation[] | null {
   const template = templates.find(
     (t) => t._id?.toString() === templateId.toString() || t.uuid?.toString() === templateId.toString()
   );

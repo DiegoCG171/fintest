@@ -68,6 +68,7 @@ function TabbedTableForm({
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
+  
   const handleSave = async () => {
     const tab = tabs[value];
     if (!tab) return;

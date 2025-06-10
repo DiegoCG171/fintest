@@ -1,21 +1,28 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import { ModalState } from "../../../../config/interfaces";
 
 const initialState: ModalState = {
     isOpen: false,
-    mode: 'create',
+    componentKey: null,
+    componentProps: undefined
 };
 
 export const modalFormSlice = createSlice({
     name: 'modal',
     initialState,
     reducers: {
-        openModal: (state, action: PayloadAction<{ mode: 'create' | 'edit'}>) => {
+        openModal: (
+            state,
+            action
+        ) => {
             state.isOpen = true;
-            state.mode = action.payload.mode;
+            state.componentKey = action.payload.componentKey;
+            state.componentProps = action.payload.componentProps;
         },
         closeModal: (state) => {
             state.isOpen = false;
+            state.componentKey = null;
+            state.componentProps = undefined;
         },
     },
 });

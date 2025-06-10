@@ -14,7 +14,7 @@ import { sidebarMenuSlice } from "./slices/UI/sidebarMenu/sidebarMenu.slice";
 import { tabSlice } from "./slices/UI/tabs/tabs.slice";
 import { templateSlice } from "./slices/templates/template.slice";
 import { userSlice } from "./slices/users/user.slice";
-import { validRoutesSlice } from "./slices/routes/validRoutesSlice.slice";
+import { validRoutesSlice } from "./slices/routes/validRoutes.slice.slice";
 
 export const store = configureStore({
     reducer: {

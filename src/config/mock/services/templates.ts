@@ -2,9 +2,8 @@ import { CreateTemplate } from "../../interfaces";
 
 export const saleTemplate: CreateTemplate = {
     "name": "Venta Template",
+    categoryId: "",
     "description": "Plantilla de una venta con su respuesta",
-    "category": "Venta",
-    "type": "pos",
     "validationTransaction": [
         {
             "idBitmap": "HD-1",

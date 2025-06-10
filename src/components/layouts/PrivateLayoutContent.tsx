@@ -3,13 +3,9 @@ import HeaderComponent from "../UI/HeaderComponent";
 import { Box } from "@mui/material";
 import SideNavComponent from "../UI/SidebarMenu/SideNavComponent";
 import FullScreenModal from "../core/FullScreenModal";
-import { closeModal, useAppDispatch, useAppSelector } from "../../store";
 import { PopMenuProvider } from "../../config/context/PopMenuProvider";
 
 function PrivateLayoutContent() {
-  const modalContainer = document.getElementById("modal-root");
-  const dispatch = useAppDispatch();
-  const { isOpen } = useAppSelector((state) => state.modalForm);
 
   return (
     <>
@@ -35,9 +31,6 @@ function PrivateLayoutContent() {
         </Box>
       </Box>
       <FullScreenModal
-        open={isOpen}
-        onClose={() => dispatch(closeModal())}
-        container={modalContainer}
       />
     </>
   );

@@ -1,103 +1,32 @@
-import { Box, Button, Modal, Portal, Stack, Typography } from "@mui/material";
-import {
-    FullScreenModalProps,
-    PatchGenerationTemplate,
-} from "../../config/interfaces";
-import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
-import FormJSON from "../UI/FormBuilder/FormJSON";
-import {
-    closeModal,
-    createTemplateThunk,
-    updateTemplateThunk,
-    useAppDispatch,
-    useAppSelector,
-} from "../../store";
-import {
-    resetJsonTemplate,
-    setJsonTemplate,
-} from "../../store/slices/UI/form/jsonTemplateDraft.slice";
-import { saleTemplate } from "../../config/mock";
-import { useEffect } from "react";
-import { deepClean } from "../../config/utils/deepClean";
-import { useToast } from "../../config/hooks/useToast";
+import ModalFormJson from "../../components/UI/FormBuilder/ModalFormJson";
+import { ModalComponentPropsMap } from "../../config/interfaces";
 
-function FullScreenModal({ open, onClose, container }: FullScreenModalProps) {
+import { useAppSelector, useAppDispatch, closeModal } from "../../store";
+import { Modal, Box, Portal } from "@mui/material";
+
+const modalComponentMap: {
+    [K in keyof ModalComponentPropsMap]: React.ComponentType<ModalComponentPropsMap[K]>;
+} = {
+    ModalFormJson,
+};
+
+export default function FullScreenModal() {
     const dispatch = useAppDispatch();
-    const { showToast } = useToast();
-    const modalStateMode = useAppSelector((state) => state.modalForm.mode);
-    const templateData = useAppSelector((state) => state.templates.templateById);
-    const templateId = useAppSelector((state) => state.templates.templateById?._id);
+    
+    const { isOpen, componentKey, componentProps } = useAppSelector(
+        (state) => state.modalForm
+    );
+    if (!isOpen || !componentKey) return null;
+    
+    const DynamicComponent = modalComponentMap[componentKey as keyof ModalComponentPropsMap];
 
-    const isEditMode = modalStateMode === "edit";
-    const title = isEditMode ? "Actualizar template" : "Crear nuevo template";
-    const description = isEditMode
-        ? "Edita el contenido del templete en formato JSON. Asegúrate de que los cambios cumplan con el formato y la estructura requerida antes de guardar."
-        : "Completa los campos necesarios para crear un nuevo template que podrás utilizar más adelante. Asegúrate de que toda la información esté correcta antes de guardar.";
-
-    useEffect(() => {
-        if (modalStateMode === "create") {
-        dispatch(setJsonTemplate(saleTemplate));
-        } else if (
-        modalStateMode === "edit" &&
-        templateData &&
-        !Array.isArray(templateData)
-        ) {
-        const cleanTemplate = deepClean(templateData, [
-            "_id",
-            "__v",
-            "createdAt",
-            "updatedAt",
-            "uuid",
-        ]);
-        dispatch(setJsonTemplate(cleanTemplate));
-        }
-    }, [modalStateMode, templateData, dispatch]);
-
-    const jsonData = useAppSelector((state) => state.jsonTemplate.data);
-
-    const handleSubmit = () => {
-        if(modalStateMode === "create") {
-            createTemplate()
-        } else {
-            editTemplate()
-        }
+    if (!DynamicComponent) {
+        return <div>Error: componente no encontrado</div>;
     }
 
-    const createTemplate = async() => {
-        try {
-            await dispatch(createTemplateThunk({ template: jsonData })).unwrap();
-            dispatch(closeModal())
-            showToast('Template creado correctamente', 'success')
-            dispatch(resetJsonTemplate())
-        } catch (error) {
-            showToast(error as string, 'error');
-        }
-    }
-
-    const editTemplate = async() => {
-        if(!templateId) return null;
-        try {
-            await dispatch(
-            updateTemplateThunk({
-            id: templateId,
-            payload: jsonData as PatchGenerationTemplate,
-            })
-        ).unwrap();
-            dispatch(closeModal())
-            showToast('Template creado correctamente.', 'success')
-            dispatch(resetJsonTemplate())
-        } catch (error) {
-            showToast(error as string, 'error');
-        }
-    }
-
-    if (!open) return null;
     return (
-        <Portal container={container}>
-        <Modal
-            open={open}
-            onClose={onClose}
-        >
+        <Portal>
+        <Modal open={isOpen} onClose={() => dispatch(closeModal())}>
             <Box
             sx={{
                 position: "absolute",
@@ -106,56 +35,17 @@ function FullScreenModal({ open, onClose, container }: FullScreenModalProps) {
                 transform: "translate(-50%, -50%)",
                 width: "50%",
                 bgcolor: "background.paper",
-                border: 0,
                 borderRadius: 2,
                 boxShadow: 24,
-                pt: 2,
-                px: 4,
-                pb: 3,
+                p: 3,
                 outline: "none",
-                "&:focus": {
-                outline: "none",
-                },
             }}
             >
-            <Stack spacing={2}>
-                <Box>
-                <Typography
-                    variant="body1"
-                    gutterBottom
-                    sx={{
-                    fontWeight: "bold",
-                    }}
-                >
-                    {title}
-                </Typography>
-                <Typography
-                    variant="body2"
-                    gutterBottom
-                >
-                    {description}
-                </Typography>
-                <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-                    <Button
-                    startIcon={<SaveOutlinedIcon />}
-                    sx={{
-                        paddingX: 2,
-                        fontSize: "12px",
-                        flexShrink: 0,
-                    }}
-                    onClick={handleSubmit}
-                    >
-                    Guardar
-                    </Button>
-                </Box>
-                </Box>
-                <Box>
-                <FormJSON></FormJSON>
-                </Box>
-            </Stack>
+                <DynamicComponent
+                    {...(componentProps as unknown as ModalComponentPropsMap[typeof componentKey])}
+                />
             </Box>
         </Modal>
         </Portal>
     );
 }
-export default FullScreenModal;
