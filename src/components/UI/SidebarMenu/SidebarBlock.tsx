@@ -13,42 +13,55 @@ import {
   ItemsServiceMenu,
   MenuServiceInterface,
 } from "../../../config/interfaces";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useToast } from "../../../config/hooks/useToast";
 
-function SidebarBlock() {
-  const onEdit = (item: ItemsServiceMenu) => {
+function SidebarBlock({ searchTerm }: { searchTerm: string }) {
+  const dispatch = useAppDispatch();
+  const { showToast } = useToast();
+
+  const categoriesMenu = useAppSelector(
+    (state) => state.sidebarMenu.categoriesMenu
+  );
+  const collectionsMenu = useAppSelector(
+    (state) => state.sidebarMenu.collectionsMenu
+  );
+
+  const addToCollections = (item: ItemsServiceMenu) => {
     console.log("Editando", item);
   };
 
   const buildedOptions = (item: ItemsServiceMenu): ContextMenuOption[] => [
     {
       item: { label: "Agregar a Colecciones", id: item.id },
-      action: () => onEdit(item),
+      action: () => addToCollections(item),
     },
     {
       item: { label: "Editar template", id: item.id },
       action: () => handleSelectItem(item),
     },
   ];
-  const dispatch = useAppDispatch();
-  const categoriesMenu = useAppSelector((state) => state.sidebarMenu.categoriesMenu)
-  const collectionsMenu = useAppSelector((state) => state.sidebarMenu.collectionsMenu)
-  const { showToast } = useToast();
 
-  const handleModal = useCallback(
-    (mode: "create" | "edit") => {
-      dispatch(openModal({ mode }));
-    },
-    [dispatch]
-  );
+  const handleModal = useCallback(() => {
+    dispatch(
+      openModal({
+        componentKey: "ModalFormJson",
+        componentProps: { mode: "create" },
+      })
+    );
+  }, [dispatch]);
 
   const handleSelectItem = useCallback(
     async (item: MenuServiceInterface | ItemsServiceMenu) => {
       dispatch(setLoading(true));
       try {
         await dispatch(getTemplateByIdThunk(item.id)).unwrap();
-        dispatch(openModal({ mode: "edit" }));
+        dispatch(
+          openModal({
+            componentKey: "ModalFormJson",
+            componentProps: { mode: "edit" },
+          })
+        );
       } catch (error) {
         showToast(error as string, "error");
         console.error(error);
@@ -59,6 +72,62 @@ function SidebarBlock() {
     [dispatch, showToast]
   );
 
+  const filterRecursive = useCallback(
+  (node: MenuServiceInterface, term: string): MenuServiceInterface | null => {
+    const normalized = term.toLowerCase();
+
+    // Verifica si el nombre del nodo coincide
+    const isNodeMatch = node.name?.toLowerCase().includes(normalized);
+
+    // Filtra los items del nodo actual
+    const matchedItems = node.items?.filter((item: ItemsServiceMenu) =>
+      item.name.toLowerCase().includes(normalized)
+    ) ?? [];
+
+    // Filtra los hijos recursivamente
+    const matchedChildren = (node.children ?? [])
+      .map((child: MenuServiceInterface) => filterRecursive(child, term))
+      .filter((child): child is MenuServiceInterface => child !== null);
+
+    // Si hay coincidencias en el nodo, en los items o en los hijos, devolvemos el nodo
+    if (isNodeMatch || matchedItems.length > 0 || matchedChildren.length > 0) {
+      return {
+        ...node,
+        items: matchedItems,
+        children: matchedChildren,
+      };
+    }
+
+    // Si no hay coincidencia, no se incluye
+    return null;
+  },
+  []
+);
+
+
+  const { filteredCategories, filteredCollections } = useMemo(() => {
+    const normalized = searchTerm.trim().toLowerCase();
+
+    if (!normalized) {
+      return {
+        filteredCategories: categoriesMenu,
+        filteredCollections: collectionsMenu,
+      };
+    }
+
+    const filteredCategories =
+      categoriesMenu
+        ?.map((category) => filterRecursive(category, normalized))
+        .filter((item): item is MenuServiceInterface => item !== null) ?? [];
+
+    const filteredCollections =
+      collectionsMenu
+        ?.map((category) => filterRecursive(category, normalized))
+        .filter((item): item is MenuServiceInterface => item !== null) ?? [];
+
+    return { filteredCategories, filteredCollections };
+  }, [searchTerm, categoriesMenu, collectionsMenu, filterRecursive]);
+
   return (
     <Box>
       <Box
@@ -67,10 +136,10 @@ function SidebarBlock() {
       >
         <SeparatorMenu
           label="Catálogo"
-          onAction={() => handleModal("create")}
-        ></SeparatorMenu>
-        {Array.isArray(categoriesMenu) &&
-          categoriesMenu.map((rootItem, index) => (
+          onAction={handleModal}
+        />
+        {filteredCategories.length > 0 ? (
+          filteredCategories.map((rootItem, index) => (
             <RecursiveMenuItem
               key={`${index}-${rootItem.id}`}
               item={rootItem}
@@ -78,23 +147,35 @@ function SidebarBlock() {
               onSelectItem={handleSelectItem}
               buildOptions={buildedOptions}
             />
-          ))}
+          ))
+        ) : (
+          <Box sx={{ px: 2, py: 1, fontSize: 14, color: "gray" }}>
+            Sin resultados
+          </Box>
+        )}
       </Box>
       <Divider />
       <Box
         sx={{ px: 1, overflowY: "auto", flexGrow: 1, my: 4, marginRight: 1 }}
         key={"box-colecciones"}
       >
-        <SeparatorMenu label="Colecciones"></SeparatorMenu>
-        {collectionsMenu.map((rootItem, index) => (
-          <RecursiveMenuItem
-            key={`${index}-${rootItem?.id ?? rootItem.name}`}
-            item={rootItem}
-            optionsActive={false}
-          />
-        ))}
+        <SeparatorMenu label="Colecciones" />
+        {filteredCollections.length > 0 ? (
+          filteredCollections.map((rootItem, index) => (
+            <RecursiveMenuItem
+              key={`${index}-${rootItem?.id ?? rootItem.name}`}
+              item={rootItem}
+              optionsActive={false}
+            />
+          ))
+        ) : (
+          <Box sx={{ px: 2, py: 1, fontSize: 14, color: "gray" }}>
+            Sin resultados
+          </Box>
+        )}
       </Box>
     </Box>
   );
 }
+
 export default SidebarBlock;

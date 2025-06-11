@@ -23,7 +23,10 @@ export const sidebarMenuSlice = createSlice({
         resetCollectionsMenuData(state) {
             state.collectionsMenu = []
         },
+        setCollapsedState(state) {
+            state.isCollapsed =!state.isCollapsed
+        }
     }
 })
 
-export const { setCategoriesData, resetCategoriesMenuData, setCollectionsData, resetCollectionsMenuData } = sidebarMenuSlice.actions;
+export const { setCategoriesData, resetCategoriesMenuData, setCollectionsData, resetCollectionsMenuData, setCollapsedState } = sidebarMenuSlice.actions;

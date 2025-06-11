@@ -5,23 +5,27 @@ import {
   RecursiveMenuItemProps,
 } from "../../config/interfaces";
 import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
+import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
 import KeyboardArrowRightOutlinedIcon from "@mui/icons-material/KeyboardArrowRightOutlined";
 import KeyboardArrowDownOutlinedIcon from "@mui/icons-material/KeyboardArrowDownOutlined";
 import { useNavigate } from "react-router-dom";
 import { setLoading, useAppDispatch } from "../../store";
 import RecursiveMenuSubItem from "./RecursiveMenuSubItem";
 import { useState } from "react";
+import { usePopMenu } from "../../config/hooks/usePopMenu";
 
 const RecursiveMenuItem = ({
   item,
   depth = 0,
   optionsActive,
   onSelectItem,
-  buildOptions
+  buildOptions,
 }: RecursiveMenuItemProps) => {
   const [expanded, setExpanded] = useState(false);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const [hovered, setHovered] = useState(false);
+  const { openMenu } = usePopMenu();
 
   const onDecisionHandler = async (
     item: MenuServiceInterface | ItemsServiceMenu
@@ -38,8 +42,6 @@ const RecursiveMenuItem = ({
       onSelectItem(item);
     }
   };
-
-  
 
   return (
     <Box sx={{ width: "100%", pl: depth * 0.25, my: 0.5 }}>
@@ -68,13 +70,39 @@ const RecursiveMenuItem = ({
       >
         <Stack
           direction="row"
-          spacing={1}
           alignItems="center"
+          justifyContent={"space-between"}
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
+          sx={{
+            width: "100%"
+          }}
         >
-          <FolderOutlinedIcon sx={{ fontSize: 16, color: "text.disabled" }} />
-          <Typography sx={{ fontSize: 12, color: "text.disabled" }}>
-            {item.name}
-          </Typography>
+          <Stack
+            direction="row"
+            spacing={1}
+            sx={{
+              width: "80%"
+            }}
+          >
+            <FolderOutlinedIcon sx={{ fontSize: 16, color: "text.disabled" }} />
+            <Typography sx={{ fontSize: 12, color: "text.disabled" }}>
+              {item.name}
+            </Typography>
+          </Stack>
+          {optionsActive && buildOptions && hovered && (
+            <Box
+              onClick={(e) => {
+                e.stopPropagation();
+                openMenu(e, buildOptions(item));
+              }}
+              sx={{ cursor: "pointer", width:"15%" }}
+            >
+              <MoreHorizOutlinedIcon
+                sx={{ fontSize: 16, color: "text.disabled" }}
+              />
+            </Box>
+          )}
         </Stack>
 
         {expanded ? (
@@ -111,12 +139,12 @@ const RecursiveMenuItem = ({
         >
           {item.items?.map((subItem, index) => (
             <RecursiveMenuSubItem
-                    key={`box-${index}-${subItem.id}`}
-                    item={subItem}
-                    optionsActive={optionsActive}
-                    onClick={onDecisionHandler}
-                    buildOptions={buildOptions}
-                  />
+              key={`box-${index}-${subItem.id}`}
+              item={subItem}
+              optionsActive={optionsActive}
+              onClick={onDecisionHandler}
+              buildOptions={buildOptions}
+            />
           ))}
         </Box>
       )}

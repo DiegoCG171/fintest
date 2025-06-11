@@ -11,9 +11,11 @@ export const loginThunk = createAsyncThunk<
     async (credentials: LoginCredentials, { rejectWithValue }) => {
         try {
             const userData = await loginService(credentials);
-            localStorage.setItem('token', userData.token);
-            localStorage.setItem('user', JSON.stringify(userData));
-            return userData;
+            if(!userData.token) {return rejectWithValue('Error en inicio de sesión')} else {
+                localStorage.setItem('token', userData.token);
+                localStorage.setItem('user', JSON.stringify(userData));
+                return userData;
+            }
         } catch (error: unknown) {
             return rejectWithValue(error as string);
         } 

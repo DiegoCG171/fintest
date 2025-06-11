@@ -12,18 +12,25 @@ const normalize = (str: string): string => {
 
 export const addLinkMenu = (
     categories: CategoryesInterface[],
-    parentPath: string[] = []
+    parentPath: string[] = [],
+    parentOriginalPath: string[] = []
 ): CategoryesInterface[] => {
-    if (!categories) return []
+    if (!categories || !Array.isArray(categories)) return [];
     return categories.map((category) => {
         const currentPath = [...parentPath, normalize(category.name)];
+        const normalPath = [...parentOriginalPath, category.name];
 
         const itemsWithLink = category.items.map((item) => ({
             ...item,
-            linkMenu: [...currentPath, normalize(item.name)].join("/"),
+            linkMenu: [...currentPath, normalize(item.name), item.id].join("/"),
+            pathMenu: [...normalPath, item.name].join("/"),
         }));
 
-        const childrenWithLink = addLinkMenu(category.children, currentPath);
+        const childrenWithLink = addLinkMenu(
+            category.children,
+            currentPath,
+            normalPath
+        );
 
         return {
             ...category,

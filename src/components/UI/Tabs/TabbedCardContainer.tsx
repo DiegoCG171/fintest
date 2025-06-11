@@ -3,12 +3,19 @@ import TabTableComponent from "./TabTableComponent";
 import {
   TabbedCardContainerProps,
 } from "../../../config/interfaces";
+import { useAppSelector } from "../../../store";
 
 const TabbedCardContainer = ({
     tabs,
     eventTabs,
     initialTabIndex,
     }: TabbedCardContainerProps) => {
+    
+        const hideMenu = useAppSelector((state) => state.sidebarMenu.isCollapsed)
+        const responsiveWidth = () => {
+            if(hideMenu) return "calc(100vw - 100px)";
+            return "calc(100vw - 300px)"
+        }
 
     return (
         <Box
@@ -18,17 +25,18 @@ const TabbedCardContainer = ({
             flexDirection: "column",
             gap: 2,
             overflow: "hidden",
+            maxHeight: "calc(100% - 90px)"
         }}
         >
         {/* Card para Detalles y Errores */}
         <Card
             sx={{
-            flex: 2,
+            flex: 3,
             minHeight: 0,
             overflow: "auto",
             display: "flex",
             flexDirection: "column",
-            maxWidth: "85vw",
+            maxWidth: responsiveWidth(),
             }}
         >
             <TabTableComponent
@@ -45,6 +53,7 @@ const TabbedCardContainer = ({
             overflow: "auto",
             display: "flex",
             flexDirection: "column",
+            maxWidth: responsiveWidth(),
             }}
         >
             <TabTableComponent
