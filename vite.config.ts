@@ -9,15 +9,15 @@ const __dirname = path.dirname(__filename)
 export default defineConfig({
   plugins: [react()],
   build: {
-    outDir: 'release',
+    outDir: 'dist',
+    emptyOutDir: true,
     minify: 'esbuild',
     sourcemap: false,
-    emptyOutDir: true,
     rollupOptions: {
       output: {
-        manualChunks: undefined
-      }
-    }
+        manualChunks: undefined,
+      },
+    },
   },
   resolve: {
     alias: {

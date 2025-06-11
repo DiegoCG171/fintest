@@ -15,8 +15,7 @@ export const addLinkMenu = (
     parentPath: string[] = [],
     parentOriginalPath: string[] = []
 ): CategoryesInterface[] => {
-    if (!categories) return [];
-
+    if (!categories || !Array.isArray(categories)) return [];
     return categories.map((category) => {
         const currentPath = [...parentPath, normalize(category.name)];
         const normalPath = [...parentOriginalPath, category.name];
