@@ -15,9 +15,31 @@ import {
 } from "../../../config/interfaces";
 import { useCallback, useEffect } from "react";
 import { useToast } from "../../../config/hooks/useToast";
-import { getCollectionsThunk } from "../../../store/slices/collections/collections.thunk";
+import { deleteTestCaseThunk, getCollectionsThunk } from "../../../store/slices/collections/collections.thunk";
+
+import { toggleCreateCollectionMenu, updateTestCase } from "../../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
+import { SidebarCreateCollection } from "./SidebarCreateCollection";
 
 function SidebarBlock() {
+  const dispatch = useAppDispatch();
+  const categoriesMenu = useAppSelector(
+    (state) => state.sidebarMenu.categoriesMenu
+  );
+  const collectionsMenu = useAppSelector(
+    (state) => state.sidebarMenu.collectionsMenu
+  );
+  const createCollectionMenu = useAppSelector(
+    (state) => state.sidebarMenu.createCollectionMenu
+  );
+  const { showToast } = useToast();
+
+  const handleModal = useCallback(
+    (mode: "create" | "edit") => {
+      dispatch(openModal({ mode }));
+    },
+    [dispatch]
+  );
+
   const onEdit = (item: ItemsServiceMenu) => {
     console.log("Editando", item);
   };
@@ -32,20 +54,23 @@ function SidebarBlock() {
       action: () => handleSelectItem(item),
     },
   ];
-  const dispatch = useAppDispatch();
-  const categoriesMenu = useAppSelector((state) => state.sidebarMenu.categoriesMenu)
-  const collectionsMenu = useAppSelector((state) => state.sidebarMenu.collectionsMenu)
-  const { showToast } = useToast();
 
-  const handleModal = useCallback(
-    (mode: "create" | "edit") => {
-      dispatch(openModal({ mode }));
+  const buildedCollectionOptions = (item: ItemsServiceMenu): ContextMenuOption[] => [
+    {
+      item: { label: "Editar caso de prueba", id: item.id },
+      action: () => dispatch(updateTestCase(item)),
     },
-    [dispatch]
-  );
+    {
+      item: { label: "Eliminar caso de prueba", id: item.id },
+      action: () => dispatch(deleteTestCaseThunk(item.id)),
+    },
+  ];
+  const handleOpenCreateCollection = () => {
+    dispatch(toggleCreateCollectionMenu(true));
+  };
 
   useEffect(() => {
-    dispatch(getCollectionsThunk())
+    dispatch(getCollectionsThunk());
   }, [dispatch]);
 
   const handleSelectItem = useCallback(
@@ -90,14 +115,20 @@ function SidebarBlock() {
         sx={{ px: 1, overflowY: "auto", flexGrow: 1, my: 4, marginRight: 1 }}
         key={"box-colecciones"}
       >
-        <SeparatorMenu label="Colecciones"></SeparatorMenu>
+        <SeparatorMenu
+          onAction={handleOpenCreateCollection}
+          label="Colecciones"
+        ></SeparatorMenu>
         {collectionsMenu.map((rootItem, index) => (
           <RecursiveMenuItem
             key={`${index}-${rootItem?.id ?? rootItem.name}`}
             item={rootItem}
-            optionsActive={false}
+            optionsActive={true}
+            onSelectItem={handleSelectItem}
+            buildOptions={buildedCollectionOptions}
           />
         ))}
+        {createCollectionMenu && <SidebarCreateCollection />}
       </Box>
     </Box>
   );

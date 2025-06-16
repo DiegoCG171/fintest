@@ -11,8 +11,9 @@ import {
   useAppSelector,
 } from "../../../store";
 import { addLinkMenu, getLinksArray } from "../../../config/utils";
-import { setCategoriesData, setCollectionsData } from "../../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
-import { staticMenuItems } from "../../../config/mock";
+import { setCategoriesData } from "../../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
+import { getCollectionsThunk } from "../../../store/slices/collections/collections.thunk";
+import { MenuServiceInterface } from "../../../config/interfaces";
 
 export const drawerWidth = 240;
 
@@ -20,6 +21,7 @@ function SideNavComponent() {
   const dispatch = useAppDispatch();
   const [hideMenu, setHideMenu] = useState(false);
   const categories = useAppSelector((state) => state.categories);
+  const {collectionsMenu} = useAppSelector((state) => state.sidebarMenu);
 
   useEffect(() => {
     if (categories.status !== "success" && categories.status !== "loading") {
@@ -33,15 +35,18 @@ function SideNavComponent() {
     if (categories.status === "success" && categories.categories) {
       const menuCategories = addLinkMenu(categories.categories);
       dispatch(setCategoriesData(menuCategories));
-      dispatch(setCollectionsData(staticMenuItems))
+      dispatch(getCollectionsThunk())
 
       //TODO: pasar a useEffect de su propio servicio
       dispatch(setCategoriesRoutes(getLinksArray(menuCategories)))
-      dispatch(setCollectionsRoutes(getLinksArray(staticMenuItems)))
     }
   }, [dispatch, categories.status, categories.categories]);
 
-  const toggleMenu = useCallback(() => {
+  useEffect(() => {
+    dispatch(setCollectionsRoutes(getLinksArray(collectionsMenu as MenuServiceInterface[])))
+  }, [ dispatch, collectionsMenu]);  
+
+  const toggleMenu = useCallback(() => { 
     setHideMenu((prev) => !prev);
   }, []);
 
@@ -69,7 +74,6 @@ function SideNavComponent() {
         />
         {!hideMenu && (
           <Box sx={{ px: 2, overflowY: "auto", flexGrow: 1, my: 4 }}>
-            {/* Menú desplegable */}
             <SidebarBlock />
             <Box>
               <MediaPlayer></MediaPlayer>

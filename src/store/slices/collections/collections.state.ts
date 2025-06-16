@@ -3,5 +3,6 @@ import { CollectionsState } from "../../../config/interfaces/collections.interfa
 
 export const collectionsInitialState: CollectionsState = {
     collections: [],
-    collectionsMenu: []
+    collectionsMenu: [],
+    
 }

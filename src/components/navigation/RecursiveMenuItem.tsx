@@ -17,7 +17,7 @@ const RecursiveMenuItem = ({
   depth = 0,
   optionsActive,
   onSelectItem,
-  buildOptions
+  buildOptions,
 }: RecursiveMenuItemProps) => {
   const [expanded, setExpanded] = useState(false);
   const dispatch = useAppDispatch();

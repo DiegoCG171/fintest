@@ -1,4 +1,4 @@
-import { ItemsServiceMenu, MenuItem } from "./menu.interface";
+import { MenuItem } from "./menu.interface";
 
 export interface CreateCollection {
     name: string
@@ -13,6 +13,12 @@ export interface CollectionsState {
 export interface CollectionResponse {
     _id: string;
     name: string;
-    cases: ItemsServiceMenu[];
+    cases: CollectionCase[];
+    uuid: string;
+}
+
+
+interface CollectionCase {
+    name: string;
     uuid: string;
 }

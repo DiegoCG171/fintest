@@ -15,7 +15,11 @@ export interface ItemsServiceMenu {
 export interface MenuSidebarState {
     categoriesMenu: MenuServiceInterface[],
     collectionsMenu: MenuServiceInterface[],
-    isCollapsed: boolean
+    isCollapsed: boolean,
+    createCollectionMenu: boolean;
+    updateTestCase: MenuServiceInterface | null;
+    loading: boolean;
+    idTestCase: string;
 }
 
 
