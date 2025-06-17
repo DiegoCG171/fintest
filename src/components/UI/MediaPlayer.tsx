@@ -11,7 +11,7 @@ import {
   useAppDispatch,
   useAppSelector,
 } from "../../store";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 function MediaPlayer() {
   const dispatch = useAppDispatch();
@@ -20,10 +20,9 @@ function MediaPlayer() {
   const stopStatus = useAppSelector((state) => state.server.stopServerStatus);
   const serverId = useAppSelector((state) => state.server.server?.id);
   const serverIP = useAppSelector((state) => state.server.server?.ip);
+  const serverPort = useAppSelector((state) => state.server.server?.portNumber);
   const playError = useAppSelector((state) => state.server.error);
   const stopError = useAppSelector((state) => state.server.stopServererror);
-
-  const hasStarted = useRef(false);
 
   const [playerMessage, setPlayerMessage] = useState("");
 
@@ -40,13 +39,6 @@ function MediaPlayer() {
       console.error("Error al iniciar el servidor:", error);
     }
   }, [dispatch, clearErrors]);
-
-  useEffect(() => {
-    if (!hasStarted.current && playStatus !== "success") {
-      hasStarted.current = true;
-      startServer();
-    }
-  }, [playStatus, startServer]);
 
   const stopServer = () => {
     clearErrors();
@@ -66,7 +58,7 @@ function MediaPlayer() {
       setPlayerMessage("Conectando...");
     }
     if (playStatus === "success" && serverIP) {
-      setPlayerMessage(`Escuchando ${serverIP}`);
+      setPlayerMessage(`Escuchando ${serverIP} \n Puerto ${serverPort}`);
     }
     if (playStatus === "error") {
       setPlayerMessage(playError ?? "Ocurrió un error");
@@ -80,7 +72,7 @@ function MediaPlayer() {
     if (stopStatus === "error") {
       setPlayerMessage(stopError ?? "Ocurrió un error");
     }
-  }, [playStatus, serverIP, playError, stopStatus, stopError]);
+  }, [playStatus, serverIP, playError, stopStatus, stopError, serverPort]);
 
   return (
     <Box
@@ -95,8 +87,9 @@ function MediaPlayer() {
     >
       <Box
         sx={{
-          overflow: "hidden",
-          whiteSpace: "nowrap",
+          overflow: "visible",
+          whiteSpace: "normal",
+          wordBreak: "break-word",
         }}
       >
         <Typography
@@ -104,18 +97,14 @@ function MediaPlayer() {
             display: "inline-block",
             color: (theme) => theme.palette.text.disabled,
             fontSize: 12,
-            animation: "slideLoop 10s linear infinite",
-            "@keyframes slideLoop": {
-              "0%": {
-                transform: "translateX(100%)",
-              },
-              "100%": {
-                transform: "translateX(-100%)",
-              },
-            },
           }}
         >
-          {playerMessage}
+          {playerMessage.split("\n").map((line, i) => (
+            <span key={i}>
+              {line}
+              <br />
+            </span>
+          ))}
         </Typography>
       </Box>
 
@@ -128,16 +117,52 @@ function MediaPlayer() {
           mt: 1,
         }}
       >
-        <PauseIcon sx={{ cursor: "pointer" }} />
+        <PauseIcon
+          sx={{
+            opacity: 0.5,
+            pointerEvents: "none",
+          }}
+        />
         <PlayCircleFilledWhiteIcon
           sx={{
             fontSize: 36,
-            cursor: "pointer",
+            cursor: playStatus === "success" ? "not-allowed" : "pointer",
+            opacity: playStatus === "success" ? 0.5 : 1,
+            pointerEvents: playStatus === "success" ? "none" : "auto",
+            transition: "color 0.2s, transform 0.2s",
+            "&:hover":
+              playStatus === "success"
+                ? {}
+                : {
+                    transform: "scale(1.1)",
+                  },
+            "&:active":
+              playStatus === "success"
+                ? {}
+                : {
+                    transform: "scale(0.95)"
+                  },
           }}
-          onClick={startServer}
+          onClick={playStatus !== "success" ? startServer : undefined}
         />
         <StopIcon
-          sx={{ cursor: "pointer" }}
+          sx={{
+            cursor: stopStatus === "success" ? "not-allowed" : "pointer",
+            opacity: stopStatus === "success" ? 0.5 : 1,
+            transition: "color 0.2s, transform 0.2s",
+            "&:hover":
+              stopStatus === "success"
+                ? {}
+                : {
+                    transform: "scale(1.1)",
+                  },
+            "&:active":
+              stopStatus === "success"
+                ? {}
+                : {
+                    transform: "scale(0.95)"
+                  },
+          }}
           onClick={stopServer}
         />
       </Stack>
