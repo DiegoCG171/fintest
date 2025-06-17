@@ -41,6 +41,9 @@ export const sidebarMenuSlice = createSlice({
     toggleCreateCollectionMenu(state, action) {
       state.createCollectionMenu = action.payload;
     },
+    setCollapsedState(state) {
+            state.isCollapsed =!state.isCollapsed
+        },
     updateTestCase(state, action) {
       state.updateTestCase = action.payload;
     },
@@ -124,6 +127,7 @@ export const {
   resetCategoriesMenuData,
   setCollectionsData,
   resetCollectionsMenuData,
+  setCollapsedState,
   toggleCreateCollectionMenu,
   updateTestCase,
   removeUpdateTestCase,

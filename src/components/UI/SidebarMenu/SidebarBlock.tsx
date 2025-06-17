@@ -13,15 +13,16 @@ import {
   ItemsServiceMenu,
   MenuServiceInterface,
 } from "../../../config/interfaces";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useToast } from "../../../config/hooks/useToast";
 import { deleteTestCaseThunk, getCollectionsThunk } from "../../../store/slices/collections/collections.thunk";
 
 import { toggleCreateCollectionMenu, updateTestCase } from "../../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
 import { SidebarCreateCollection } from "./SidebarCreateCollection";
 
-function SidebarBlock() {
+function SidebarBlock({ searchTerm }: { searchTerm: string }) {
   const dispatch = useAppDispatch();
+
   const categoriesMenu = useAppSelector(
     (state) => state.sidebarMenu.categoriesMenu
   );
@@ -33,21 +34,35 @@ function SidebarBlock() {
   );
   const { showToast } = useToast();
 
-  const handleModal = useCallback(
-    (mode: "create" | "edit") => {
-      dispatch(openModal({ mode }));
-    },
-    [dispatch]
-  );
-
-  const onEdit = (item: ItemsServiceMenu) => {
+  const addToCollections = (item: ItemsServiceMenu) => {
     console.log("Editando", item);
   };
+
+  const handleSelectItem = useCallback(
+    async (item: MenuServiceInterface | ItemsServiceMenu) => {
+      dispatch(setLoading(true));
+      try {
+        await dispatch(getTemplateByIdThunk(item.id)).unwrap();
+        dispatch(
+          openModal({
+            componentKey: "ModalFormJson",
+            componentProps: { mode: "edit" },
+          })
+        );
+      } catch (error) {
+        showToast(error as string, "error");
+        console.error(error);
+      } finally {
+        dispatch(setLoading(false));
+      }
+    },
+    [dispatch, showToast]
+  );
 
   const buildedOptions = (item: ItemsServiceMenu): ContextMenuOption[] => [
     {
       item: { label: "Agregar a Colecciones", id: item.id },
-      action: () => onEdit(item),
+      action: () => addToCollections(item),
     },
     {
       item: { label: "Editar template", id: item.id },
@@ -72,22 +87,71 @@ function SidebarBlock() {
   useEffect(() => {
     dispatch(getCollectionsThunk());
   }, [dispatch]);
+  
+  const handleModal = useCallback(() => {
+    dispatch(
+      openModal({
+        componentKey: "ModalFormJson",
+        componentProps: { mode: "create" },
+      })
+    );
+  }, [dispatch]);
 
-  const handleSelectItem = useCallback(
-    async (item: MenuServiceInterface | ItemsServiceMenu) => {
-      dispatch(setLoading(true));
-      try {
-        await dispatch(getTemplateByIdThunk(item.id)).unwrap();
-        dispatch(openModal({ mode: "edit" }));
-      } catch (error) {
-        showToast(error as string, "error");
-        console.error(error);
-      } finally {
-        dispatch(setLoading(false));
-      }
-    },
-    [dispatch, showToast]
-  );
+  const filterRecursive = useCallback(
+  (node: MenuServiceInterface, term: string): MenuServiceInterface | null => {
+    const normalized = term.toLowerCase();
+
+    // Verifica si el nombre del nodo coincide
+    const isNodeMatch = node.name?.toLowerCase().includes(normalized);
+
+    // Filtra los items del nodo actual
+    const matchedItems = node.items?.filter((item: ItemsServiceMenu) =>
+      item.name.toLowerCase().includes(normalized)
+    ) ?? [];
+
+    // Filtra los hijos recursivamente
+    const matchedChildren = (node.children ?? [])
+      .map((child: MenuServiceInterface) => filterRecursive(child, term))
+      .filter((child): child is MenuServiceInterface => child !== null);
+
+    // Si hay coincidencias en el nodo, en los items o en los hijos, devolvemos el nodo
+    if (isNodeMatch || matchedItems.length > 0 || matchedChildren.length > 0) {
+      return {
+        ...node,
+        items: matchedItems,
+        children: matchedChildren,
+      };
+    }
+
+    // Si no hay coincidencia, no se incluye
+    return null;
+  },
+  []
+);
+
+
+  const { filteredCategories, filteredCollections } = useMemo(() => {
+    const normalized = searchTerm.trim().toLowerCase();
+
+    if (!normalized) {
+      return {
+        filteredCategories: categoriesMenu,
+        filteredCollections: collectionsMenu,
+      };
+    }
+
+    const filteredCategories =
+      categoriesMenu
+        ?.map((category) => filterRecursive(category, normalized))
+        .filter((item): item is MenuServiceInterface => item !== null) ?? [];
+
+    const filteredCollections =
+      collectionsMenu
+        ?.map((category) => filterRecursive(category, normalized))
+        .filter((item): item is MenuServiceInterface => item !== null) ?? [];
+
+    return { filteredCategories, filteredCollections };
+  }, [searchTerm, categoriesMenu, collectionsMenu, filterRecursive]);
 
   return (
     <Box>
@@ -97,10 +161,10 @@ function SidebarBlock() {
       >
         <SeparatorMenu
           label="Catálogo"
-          onAction={() => handleModal("create")}
-        ></SeparatorMenu>
-        {Array.isArray(categoriesMenu) &&
-          categoriesMenu.map((rootItem, index) => (
+          onAction={handleModal}
+        />
+        {filteredCategories.length > 0 ? (
+          filteredCategories.map((rootItem, index) => (
             <RecursiveMenuItem
               key={`${index}-${rootItem.id}`}
               item={rootItem}
@@ -108,7 +172,12 @@ function SidebarBlock() {
               onSelectItem={handleSelectItem}
               buildOptions={buildedOptions}
             />
-          ))}
+          ))
+        ) : (
+          <Box sx={{ px: 2, py: 1, fontSize: 14, color: "gray" }}>
+            Sin resultados
+          </Box>
+        )}
       </Box>
       <Divider />
       <Box
@@ -118,7 +187,7 @@ function SidebarBlock() {
         <SeparatorMenu
           onAction={handleOpenCreateCollection}
           label="Colecciones"
-        ></SeparatorMenu>
+          ></SeparatorMenu>
         {collectionsMenu.map((rootItem, index) => (
           <RecursiveMenuItem
             key={`${index}-${rootItem?.id ?? rootItem.name}`}
@@ -126,11 +195,28 @@ function SidebarBlock() {
             optionsActive={true}
             onSelectItem={handleSelectItem}
             buildOptions={buildedCollectionOptions}
-          />
-        ))}
+            />
+          ))}
         {createCollectionMenu && <SidebarCreateCollection />}
+        <SeparatorMenu label="Colecciones" onAction={handleOpenCreateCollection} />
+        {filteredCollections.length > 0 ? (
+          filteredCollections.map((rootItem, index) => (
+            <RecursiveMenuItem
+            key={`${index}-${rootItem?.id ?? rootItem.name}`}
+            item={rootItem}
+            optionsActive={false}
+            onSelectItem={handleSelectItem}
+            buildOptions={buildedCollectionOptions}
+            />
+          ))
+        ) : (
+          <Box sx={{ px: 2, py: 1, fontSize: 14, color: "gray" }}>
+            Sin resultados
+          </Box>
+        )}
       </Box>
     </Box>
   );
 }
+
 export default SidebarBlock;

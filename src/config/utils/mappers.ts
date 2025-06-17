@@ -1,11 +1,4 @@
-import {
-  BreakingRule,
-  Field,
-  FieldValidation,
-  Specification,
-  TableRowDataFormBuilder,
-  ValidationTransaction,
-} from "../interfaces";
+import { BreakingRule, Field, FieldValidation, Specification, TableRowDataFormBuilder } from "../interfaces";
 
 export const mapFieldRulesToFormStructure = (fields: Field[]): TableRowDataFormBuilder[] =>
     fields.map((rule: Field) => {
@@ -45,8 +38,8 @@ export const mapFieldRulesToFormStructure = (fields: Field[]): TableRowDataFormB
     });
 
 
-export const mapValidationTemplate = (validation: ValidationTransaction[]): TableRowDataFormBuilder[] =>
-    validation.map((v: ValidationTransaction) => {
+export const mapValidationTemplate = (validation: FieldValidation[]): TableRowDataFormBuilder[] =>
+    validation.map((v: FieldValidation) => {
         
         const level4Children = (children: FieldValidation) =>
             children.fields?.map((field: FieldValidation) => ({
@@ -83,7 +76,7 @@ export const mapValidationTemplate = (validation: ValidationTransaction[]): Tabl
             : [];
 
         return {
-            idBitmap: v.idBitmap,
+            idBitmap: v.idBitmap ?? '',
             displayName: '',
             isRequired: Boolean(v.isRequired),
             isActive: Boolean(v),
@@ -95,7 +88,7 @@ export const mapValidationTemplate = (validation: ValidationTransaction[]): Tabl
     });
 
 
-export const combineTemplateData = (data: ValidationTransaction[] | null , mappedRules: TableRowDataFormBuilder[]): TableRowDataFormBuilder[] => {
+export const combineTemplateData = (data: FieldValidation[] | null , mappedRules: TableRowDataFormBuilder[]): TableRowDataFormBuilder[] => {
 
     if (!data?.length) return [];
     const mapData = mapValidationTemplate(data);

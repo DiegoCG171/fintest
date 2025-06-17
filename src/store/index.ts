@@ -26,7 +26,7 @@ export * from './slices/users/user.thunk'
 export * from './slices/categories/categories.thunk'
 
 //Toutes
-export * from './slices/routes/validRoutesSlice.slice'
+export * from './slices/routes/validRoutes.slice.slice'
 
 //UI
 //----Loader

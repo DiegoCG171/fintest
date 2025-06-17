@@ -1,6 +1,7 @@
 export interface MenuServiceInterface {
     id: string
     name: string
+    pathMenu?: string
     linkMenu?: string
     children?: MenuServiceInterface[] | []
     items?: ItemsServiceMenu[] | []
@@ -10,6 +11,7 @@ export interface ItemsServiceMenu {
     name: string
     id: string
     linkMenu?: string
+    pathMenu?: string
 }
 
 export interface MenuSidebarState {
@@ -21,7 +23,6 @@ export interface MenuSidebarState {
     loading: boolean;
     idTestCase: string;
 }
-
 
 //Menu props
 export interface MenuItem {

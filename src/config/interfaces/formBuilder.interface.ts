@@ -107,7 +107,6 @@ export interface TableRowDataFormBuilder {
     breakingRules?: TableRowDataFormBuilder[] | string;
     _id?: string;
     [key: string]: unknown | undefined;
-
 }
 
 export interface TabFormState {
