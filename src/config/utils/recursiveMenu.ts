@@ -20,17 +20,17 @@ export const addLinkMenu = (
         const currentPath = [...parentPath, normalize(category.name)];
         const normalPath = [...parentOriginalPath, category.name];
 
-        const itemsWithLink = category.items.map((item) => ({
-            ...item,
-            linkMenu: [...currentPath, normalize(item.name), item.id].join("/"),
-            pathMenu: [...normalPath, item.name].join("/"),
-        }));
+        const itemsWithLink = Array.isArray(category.items)
+            ? category.items.map((item) => ({
+                    ...item,
+                    linkMenu: [...currentPath, normalize(item.name), item.id].join("/"),
+                    pathMenu: [...normalPath, item.name].join("/"),
+              }))
+            : [];
 
-        const childrenWithLink = addLinkMenu(
-            category.children,
-            currentPath,
-            normalPath
-        );
+        const childrenWithLink = Array.isArray(category.children)
+            ? addLinkMenu(category.children, currentPath, normalPath)
+            : [];
 
         return {
             ...category,
@@ -39,6 +39,7 @@ export const addLinkMenu = (
         };
     });
 };
+
 
 export const getLinksArray = (data: MenuServiceInterface[]): string[] => {
     const result: string[] = [];
