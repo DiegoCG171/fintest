@@ -17,6 +17,7 @@ export interface StaticTabItem {
     content: React.ReactNode;
     route?: string
     canEdit: boolean
+    origin?: 'collections' | 'categories';
 }
 
 export interface TabTableComponentProps {
@@ -38,7 +39,8 @@ export interface TabConfigInterface {
     [key: string]: Array<{
         label: string;
         content: ReactNode;
-        canEdit: boolean
+        canEdit: boolean;
+        origin: 'collections' | 'categories';
     }>;
 }
 

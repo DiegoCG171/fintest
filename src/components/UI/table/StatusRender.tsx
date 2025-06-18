@@ -2,7 +2,7 @@ import { Check, PriorityHigh } from "@mui/icons-material";
 import { Box } from "@mui/material";
 
 export const StatusRender = (value: string | number | null | undefined) => {
-  const val = String(value).toLowerCase();
+  const val = String(value ?? "ok").toLowerCase();
   if (["ok"].includes(val)) {
     return (
       <Box

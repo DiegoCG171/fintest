@@ -23,3 +23,19 @@ export function getTransactionByType(
   }
 }
 
+export function getTemplateID(
+  templates: TemplateContextType[],
+  templateId: string,
+) {
+  const template = templates.find(
+    (t) => t._id?.toString() === templateId.toString() || t.uuid?.toString() === templateId.toString()
+  );
+
+  if (!template) {
+    return null;
+  }
+
+  return template._id
+}
+
+
