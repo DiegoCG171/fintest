@@ -24,7 +24,7 @@ function MediaPlayer() {
   const playError = useAppSelector((state) => state.server.error);
   const stopError = useAppSelector((state) => state.server.stopServererror);
 
-  const [playerMessage, setPlayerMessage] = useState("");
+  const [playerMessage, setPlayerMessage] = useState("Detenido...");
 
   const clearErrors = useCallback(() => {
     dispatch(clearServerError());
@@ -58,7 +58,7 @@ function MediaPlayer() {
       setPlayerMessage("Conectando...");
     }
     if (playStatus === "success" && serverIP) {
-      setPlayerMessage(`Escuchando ${serverIP} \n Puerto ${serverPort}`);
+      setPlayerMessage(`Escuchando ${serverIP}:${serverPort}`);
     }
     if (playStatus === "error") {
       setPlayerMessage(playError ?? "Ocurrió un error");
@@ -97,14 +97,10 @@ function MediaPlayer() {
             display: "inline-block",
             color: (theme) => theme.palette.text.disabled,
             fontSize: 12,
+            fontWeight: 600
           }}
         >
-          {playerMessage.split("\n").map((line, i) => (
-            <span key={i}>
-              {line}
-              <br />
-            </span>
-          ))}
+          {playerMessage}
         </Typography>
       </Box>
 
