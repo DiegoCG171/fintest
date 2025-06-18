@@ -43,8 +43,6 @@ function CatalogsDataMiddleware({ tabId, template }: CatalogsDataMiddlewareProps
     return result;
   }, [templates, templateId, formType]);
 
-  
-
   useEffect(() => {
     dispatch(
       setConfig(serviceConfig.rules.columns as ColumnConfigFormBuilder[])

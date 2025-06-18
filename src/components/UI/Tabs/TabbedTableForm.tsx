@@ -14,7 +14,7 @@ import {
   useAppSelector,
 } from "../../../store";
 import { useToast } from "../../../config/hooks/useToast";
-import { prepareUpdatePayload as preparePayload } from "../../../config/utils";
+import { getTemplateID, prepareUpdatePayload as preparePayload } from "../../../config/utils";
 import { updateTemplateThunk } from "../../../store/slices/templates/templates.thunk";
 import TitleHeaderComponent from "../TitleHeaderComponent";
 
@@ -68,6 +68,8 @@ function TabbedTableForm({
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
+
+  const templates = useAppSelector((state) => state.templates.templates);
   
   const handleSave = async () => {
     const tab = tabs[value];
@@ -75,8 +77,8 @@ function TabbedTableForm({
 
     dispatch(setLoading(true));
     const payload = preparePayload(valuesToSend, tab.formType);
-    const id = tab.templateId;
-
+    const id = getTemplateID(templates, tab.templateId);
+    if (!id) return;
     try {
       await dispatch(updateTemplateThunk({ id, payload })).unwrap();
       dispatch(getTemplatesThunk());
