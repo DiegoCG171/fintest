@@ -106,6 +106,7 @@ function TabTableComponent({
           }}
         >
           {tabs.map((tab, index) => { 
+            const isTemplate = tab.origin === "categories" ? true : false;
             return (
             <Tab
               key={`tab-${index}`}
@@ -117,7 +118,7 @@ function TabTableComponent({
                 >
                   <Icon
                     fontSize="small"
-                    sx={{ color: tab.canEdit ? "transparent" : "inherit" }}
+                    sx={{ color: isTemplate ? "inherit" : "transparent" }}
                   >
                     <DeveloperBoardIcon />
                   </Icon>
