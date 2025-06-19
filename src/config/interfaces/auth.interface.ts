@@ -1,5 +1,3 @@
-import { AsyncStatus } from ".";
-
 export interface AuthContextType {
     user: LoginResponse | null;
     loading: boolean;
@@ -35,35 +33,11 @@ export interface AuthState {
     isAuthenticated: boolean;
 }
 
-export interface RootRecoveryPssw {
-    id: string
-    token: string
-    createdAt: string
-    user: UserRecoveryPssw
+export interface ResetPassword {
+    newPassword: string;
+    token: string;
 }
 
-export interface UserRecoveryPssw {
-    id: string
-    username: string
-    password: string
-    email: string
-    names: string
-    surnames: string
-    status: string
-    isOnline: boolean
-    attemps: number
-    portNumber: unknown
-    createdAt: string
-    updatedAt: string
-    deletedAt: unknown
+export interface RecoveryTokenResponse {
+  message: string;
 }
-
-export interface PassRecoveryState {
-    user: RootRecoveryPssw | null;
-    status: AsyncStatus;
-    error: string | null;
-}  
-export interface PassResetState {
-    status: AsyncStatus;
-    error: string | null;
-}  

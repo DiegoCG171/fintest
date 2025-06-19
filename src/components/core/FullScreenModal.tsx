@@ -3,11 +3,13 @@ import { ModalComponentPropsMap } from "../../config/interfaces";
 
 import { useAppSelector, useAppDispatch, closeModal } from "../../store";
 import { Modal, Box, Portal } from "@mui/material";
+import { ModalAddToCollection } from "../UI/FormBuilder/ModalAddToCollection";
 
 const modalComponentMap: {
     [K in keyof ModalComponentPropsMap]: React.ComponentType<ModalComponentPropsMap[K]>;
 } = {
     ModalFormJson,
+    ModalAddToCollection
 };
 
 export default function FullScreenModal() {

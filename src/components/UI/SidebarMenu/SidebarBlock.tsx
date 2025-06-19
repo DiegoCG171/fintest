@@ -13,12 +13,21 @@ import {
   ItemsServiceMenu,
   MenuServiceInterface,
 } from "../../../config/interfaces";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useToast } from "../../../config/hooks/useToast";
+import {
+  deleteTestCaseThunk,
+  getCollectionsThunk,
+} from "../../../store/slices/collections/collections.thunk";
+
+import {
+  toggleCreateCollectionMenu,
+  updateTestCase,
+} from "../../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
+import { SidebarCreateCollection } from "./SidebarCreateCollection";
 
 function SidebarBlock({ searchTerm }: { searchTerm: string }) {
   const dispatch = useAppDispatch();
-  const { showToast } = useToast();
 
   const categoriesMenu = useAppSelector(
     (state) => state.sidebarMenu.categoriesMenu
@@ -26,30 +35,19 @@ function SidebarBlock({ searchTerm }: { searchTerm: string }) {
   const collectionsMenu = useAppSelector(
     (state) => state.sidebarMenu.collectionsMenu
   );
+  const createCollectionMenu = useAppSelector(
+    (state) => state.sidebarMenu.createCollectionMenu
+  );
+  const { showToast } = useToast();
 
   const addToCollections = (item: ItemsServiceMenu) => {
-    console.log("Editando", item);
-  };
-
-  const buildedOptions = (item: ItemsServiceMenu): ContextMenuOption[] => [
-    {
-      item: { label: "Agregar a Colecciones", id: item.id },
-      action: () => addToCollections(item),
-    },
-    {
-      item: { label: "Editar template", id: item.id },
-      action: () => handleSelectItem(item),
-    },
-  ];
-
-  const handleModal = useCallback(() => {
     dispatch(
       openModal({
-        componentKey: "ModalFormJson",
-        componentProps: { mode: "create" },
+        componentKey: "ModalAddToCollection",
+        componentProps: { templateId: item.id },
       })
     );
-  }, [dispatch]);
+  };
 
   const handleSelectItem = useCallback(
     async (item: MenuServiceInterface | ItemsServiceMenu) => {
@@ -72,38 +70,84 @@ function SidebarBlock({ searchTerm }: { searchTerm: string }) {
     [dispatch, showToast]
   );
 
+  const buildedOptions = (item: ItemsServiceMenu): ContextMenuOption[] => [
+    {
+      item: { label: "Agregar a Colecciones", id: item.id },
+      action: () => addToCollections(item),
+    },
+    {
+      item: { label: "Editar template", id: item.id },
+      action: () => handleSelectItem(item),
+    },
+  ];
+
+  const buildedCollectionOptions = (
+    item: ItemsServiceMenu
+  ): ContextMenuOption[] => [
+    {
+      item: { label: "Renombrar", id: item.id },
+      action: () => dispatch(updateTestCase(item)),
+    },
+    {
+      item: { label: "Eliminar", id: item.id },
+      action: () => {
+        dispatch(deleteTestCaseThunk(item.id))
+      },
+    },
+  ];
+  const handleOpenCreateCollection = () => {
+    dispatch(toggleCreateCollectionMenu(true));
+  };
+
+  useEffect(() => {
+    dispatch(getCollectionsThunk());
+  }, [dispatch]);
+
+  const handleModal = useCallback(() => {
+    dispatch(
+      openModal({
+        componentKey: "ModalFormJson",
+        componentProps: { mode: "create" },
+      })
+    );
+  }, [dispatch]);
+
   const filterRecursive = useCallback(
-  (node: MenuServiceInterface, term: string): MenuServiceInterface | null => {
-    const normalized = term.toLowerCase();
+    (node: MenuServiceInterface, term: string): MenuServiceInterface | null => {
+      const normalized = term.toLowerCase();
 
-    // Verifica si el nombre del nodo coincide
-    const isNodeMatch = node.name?.toLowerCase().includes(normalized);
+      // Verifica si el nombre del nodo coincide
+      const isNodeMatch = node.name?.toLowerCase().includes(normalized);
 
-    // Filtra los items del nodo actual
-    const matchedItems = node.items?.filter((item: ItemsServiceMenu) =>
-      item.name.toLowerCase().includes(normalized)
-    ) ?? [];
+      // Filtra los items del nodo actual
+      const matchedItems =
+        node.items?.filter((item: ItemsServiceMenu) =>
+          item.name.toLowerCase().includes(normalized)
+        ) ?? [];
 
-    // Filtra los hijos recursivamente
-    const matchedChildren = (node.children ?? [])
-      .map((child: MenuServiceInterface) => filterRecursive(child, term))
-      .filter((child): child is MenuServiceInterface => child !== null);
+      // Filtra los hijos recursivamente
+      const matchedChildren = (node.children ?? [])
+        .map((child: MenuServiceInterface) => filterRecursive(child, term))
+        .filter((child): child is MenuServiceInterface => child !== null);
 
-    // Si hay coincidencias en el nodo, en los items o en los hijos, devolvemos el nodo
-    if (isNodeMatch || matchedItems.length > 0 || matchedChildren.length > 0) {
-      return {
-        ...node,
-        items: matchedItems,
-        children: matchedChildren,
-      };
-    }
+      // Si hay coincidencias en el nodo, en los items o en los hijos, devolvemos el nodo
+      if (
+        isNodeMatch ||
+        matchedItems.length > 0 ||
+        matchedChildren.length > 0
+      ) {
+        return {
+          ...node,
+          items: matchedItems,
+          children: matchedChildren,
+        };
+      }
 
-    // Si no hay coincidencia, no se incluye
-    return null;
-  },
-  []
-);
-
+      // Si no hay coincidencia, no se incluye
+      return null;
+    },
+    []
+  );
 
   const { filteredCategories, filteredCollections } = useMemo(() => {
     const normalized = searchTerm.trim().toLowerCase();
@@ -134,10 +178,7 @@ function SidebarBlock({ searchTerm }: { searchTerm: string }) {
         sx={{ px: 1, overflowY: "auto", flexGrow: 1, my: 4, marginRight: 1 }}
         key={"box-catalogo"}
       >
-        <SeparatorMenu
-          label="Catálogo"
-          onAction={handleModal}
-        />
+        <SeparatorMenu label="Catálogo" onAction={handleModal} />
         {filteredCategories.length > 0 ? (
           filteredCategories.map((rootItem, index) => (
             <RecursiveMenuItem
@@ -159,13 +200,19 @@ function SidebarBlock({ searchTerm }: { searchTerm: string }) {
         sx={{ px: 1, overflowY: "auto", flexGrow: 1, my: 4, marginRight: 1 }}
         key={"box-colecciones"}
       >
-        <SeparatorMenu label="Colecciones" />
+        {createCollectionMenu && <SidebarCreateCollection />}
+        <SeparatorMenu
+          label="Colecciones"
+          onAction={handleOpenCreateCollection}
+        />
         {filteredCollections.length > 0 ? (
           filteredCollections.map((rootItem, index) => (
             <RecursiveMenuItem
               key={`${index}-${rootItem?.id ?? rootItem.name}`}
               item={rootItem}
-              optionsActive={false}
+              optionsActive={true}
+              onSelectItem={handleSelectItem}
+              buildOptions={buildedCollectionOptions}
             />
           ))
         ) : (
