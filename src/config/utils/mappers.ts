@@ -13,17 +13,17 @@ export const mapFieldRulesToFormStructure = (fields: Field[]): TableRowDataFormB
                 _id: spec._id,
             })) ?? [];
 
-        const level2Children = Array.isArray(rule.breakingRules)
-            ? rule.breakingRules.map((br: BreakingRule) => ({
-                idBitmap: br.id,
-                displayName: br.displayName,
-                isActive: false,
-                function: '',
-                value: '',
-                breakingRules: level3Children(br),
-                _id: br._id,
-            }))
-            : [];
+    const level2Children = Array.isArray(rule.breakingRules)
+      ? rule.breakingRules.map((br: BreakingRule) => ({
+          idBitmap: br.id,
+          displayName: br.displayName,
+          isActive: false,
+          function: "",
+          value: "",
+          breakingRules: level3Children(br),
+          _id: br._id,
+        }))
+      : [];
 
         return {
             idBitmap: rule.idBitmap,
@@ -121,7 +121,3 @@ export const combineTemplateData = (data: FieldValidation[] | null , mappedRules
 
     return updateRules(mappedRules, mapData);
 };
-
-
-
-

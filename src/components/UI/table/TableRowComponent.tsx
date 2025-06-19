@@ -20,7 +20,7 @@ export const TableRowComponent = ({
   rowIndex: number;
   keys: string[];
   customRenderers: CustomRenders;
-  type: string;
+  type?: string;
   activeMessageId: number | string | undefined;
   onSetActiveMessage: (
     id: number | string | undefined,
@@ -56,6 +56,7 @@ export const TableRowComponent = ({
               overflow: "hidden",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
+              fontWeight: (hasFields && type !== 'events') ? 600 : 400  
             }}
           >
             <TableCellRenderer

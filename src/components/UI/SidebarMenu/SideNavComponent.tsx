@@ -9,8 +9,9 @@ import {
   useAppSelector,
 } from "../../../store";
 import { addLinkMenu, getLinksArray } from "../../../config/utils";
-import { setCategoriesData, setCollapsedState, setCollectionsData } from "../../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
-import { staticMenuItems } from "../../../config/mock";
+import { setCategoriesData, setCollapsedState } from "../../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
+import { getCollectionsThunk } from "../../../store/slices/collections/collections.thunk";
+import { MenuServiceInterface } from "../../../config/interfaces";
 import { setCategoriesRoutesThunk, setCollectionsRoutesThunk } from "../../../store/slices/routes/validRoutes.thunk";
 import SearchBar from "./SearchBar";
 
@@ -19,6 +20,7 @@ export const drawerWidth = 240;
 function SideNavComponent() {
   const dispatch = useAppDispatch();
   const categories = useAppSelector((state) => state.categories);
+  const {collectionsMenu} = useAppSelector((state) => state.sidebarMenu);
   const hideMenu = useAppSelector((state) => state.sidebarMenu.isCollapsed)
 
   useEffect(() => {
@@ -33,13 +35,15 @@ function SideNavComponent() {
     if (categories.status === "success" && categories.categories) {
       const menuCategories = addLinkMenu(categories.categories, ['categories']);
       dispatch(setCategoriesData(menuCategories));
-      dispatch(setCollectionsData(staticMenuItems))
-
-      //TODO: pasar a useEffect de su propio servicio
+      dispatch(getCollectionsThunk())
       dispatch(setCategoriesRoutesThunk(getLinksArray(menuCategories)))
-      dispatch(setCollectionsRoutesThunk(getLinksArray(staticMenuItems)))
     }
   }, [dispatch, categories.status, categories.categories]);
+
+  useEffect(() => {
+    dispatch(setCollectionsRoutesThunk(getLinksArray(collectionsMenu as MenuServiceInterface[])))
+  }, [ dispatch, collectionsMenu]);  
+
 
   const toggleMenu = useCallback(() => {
     //setHideMenu((prev) => !prev);

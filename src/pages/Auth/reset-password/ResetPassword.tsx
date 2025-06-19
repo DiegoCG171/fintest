@@ -1,12 +1,12 @@
-import { Form, Link as RouterLink, useNavigate } from "react-router-dom";
+import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 import CustomInputComponent from "../../../components/core/forms/CustomInput";
 import { Box, Button, Stack, Typography, Link } from "@mui/material";
-import { Formik } from "formik";
+import { Form, Formik } from "formik";
 import { useToast } from "../../../config/hooks/useToast";
 import * as Yup from "yup";
 import TextBox from "../../../components/UI/TextBox";
-import { setLoading, useAppDispatch, useAppSelector } from "../../../store";
-import { resetPsswThunk } from "../../../store/slices/resetPssw/resetPssw.thunk";
+import { useAppDispatch } from "../../../store";
+import { resetPasswordThunk } from "../../../store/slices/auth/resetPassword.thunk";
 
 const validationSchema = Yup.object({
   password: Yup.string()
@@ -24,10 +24,13 @@ const validationSchema = Yup.object({
 });
 
 function ResetPassword() {
-  const { showToast } = useToast();
   const dispatch = useAppDispatch();
+  const { showToast } = useToast();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
   const navigate = useNavigate();
-  const _token = useAppSelector((state) => state.recovery.user?.token);
+
+  const token = queryParams.get("token") || "";
   return (
     <Box
       sx={{
@@ -65,37 +68,19 @@ function ResetPassword() {
               retryPassword: "",
             }}
             validationSchema={validationSchema}
-            onSubmit={async (values, { setSubmitting }) => {
-              dispatch(setLoading(true));
-              if(_token) {
-                try {
-                  await dispatch(
-                    resetPsswThunk({
-                      pssw: values.password,
-                      token: _token,
-                    })
-                  );
-                  navigate("/login");
-                  showToast('Contraseña restablecida correctamente', 'success')
-                } catch (error) {
-                  showToast(error as string, 'error')
-                } finally {
-                  setSubmitting(false);
-                  dispatch(setLoading(false));
-                }
-              } else {
-                dispatch(setLoading(false));
-                showToast('Ha ocurrido un error, vuelva a intentarlo.', 'error')
-              }
+            onSubmit={ async (_values, { setSubmitting }) => {
+              setSubmitting(false);
+              const response = await dispatch(
+                resetPasswordThunk({ newPassword: _values.password, token })
+              ).unwrap();
+              showToast(response || "Formulario enviado correctamente", "success");
+              navigate("/login");
             }}
           >
             {({ errors, touched, getFieldProps, submitForm }) => (
               <Form>
                 <Box sx={{ flexGrow: 1 }}>
-                  <Stack
-                    spacing={4}
-                    sx={{ width: "100%" }}
-                  >
+                  <Stack spacing={4} sx={{ width: "100%" }}>
                     <CustomInputComponent
                       label="Nueva contraseña"
                       id="password"
@@ -147,11 +132,7 @@ function ResetPassword() {
                       }}
                     >
                       <Typography>¿Ya tienes cuenta?</Typography>
-                      <Link
-                        variant="body2"
-                        component={RouterLink}
-                        to="/login"
-                      >
+                      <Link variant="body2" component={RouterLink} to="/login">
                         Ingresa aquí
                       </Link>
                     </Stack>

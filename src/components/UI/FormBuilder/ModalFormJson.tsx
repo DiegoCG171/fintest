@@ -24,7 +24,7 @@ import { deepClean } from "../../../config/utils/deepClean";
 import { useEffect, useState } from "react";
 import CategoriesFormJSON from "./CategoriesFormJSON";
 
-function ModalFormJson({ mode }: ModalFormProps) {
+function ModalFormJson({ mode = "create" }: ModalFormProps) {
     const [step, setStep] = useState<1 | 2>(1);
     const [categoryError, setCategoryError] = useState<boolean>(false);
     const dispatch = useAppDispatch();

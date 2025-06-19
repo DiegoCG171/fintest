@@ -33,6 +33,12 @@ export const ENDPOINTS = {
 
     //Users
     user: getEndpoint('users'),
+    
+    //Collections
+    collections: getEndpoint('collection'),
+
+    //Collections
+    testCases: getEndpoint('test-case'),
 
     //Categorias
     category: getEndpoint('category'),

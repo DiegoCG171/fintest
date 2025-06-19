@@ -27,7 +27,7 @@ function SearchBar({ onSearch }: { onSearch: (value: string) => void }) {
         />
         <IconButton
             type="submit"
-            sx={{ p: "10px" }}
+            sx={{ p: "6px" }}
             aria-label="search"
         >
             <SearchIcon />

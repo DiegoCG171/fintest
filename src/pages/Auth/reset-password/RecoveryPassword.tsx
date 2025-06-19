@@ -1,12 +1,12 @@
 import { Box, Button, Stack, Typography, Link } from "@mui/material";
 import TextBox from "../../../components/UI/TextBox";
 import * as Yup from "yup";
-import { Formik } from "formik";
+import { Form, Formik } from "formik";
 import { useToast } from "../../../config/hooks/useToast";
-import { Form, Link as RouterLink, useNavigate } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import CustomInputComponent from "../../../components/core/forms/CustomInput";
-import { setLoading, useAppDispatch } from "../../../store";
-import { recoveryPsswThunk } from "../../../store/slices/recoveryPssw/recovery.thunk";
+import { useAppDispatch } from "../../../store";
+import { recoveryTokenThunk } from "../../../store/slices/auth/recoveryToken.thunk";
 
 const validationSchema = Yup.object({
   email: Yup.string()
@@ -15,10 +15,9 @@ const validationSchema = Yup.object({
 });
 
 function RecoveryPassword() {
-
-  const { showToast } = useToast();
-  const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const { showToast } = useToast();
 
   return (
     <Box
@@ -57,18 +56,10 @@ function RecoveryPassword() {
             }}
             validationSchema={validationSchema}
             onSubmit={async (values, { setSubmitting }) => {
-              dispatch(setLoading(true));
-              try {
-                await dispatch(
-                  recoveryPsswThunk(values.email)
-                ).unwrap();
-                navigate("/reset-pssw");
-              } catch (error) {
-                showToast(error as string, "error");
-              } finally {
-                setSubmitting(false);
-                dispatch(setLoading(false));
-              }
+              setSubmitting(false);
+              const response = await dispatch(recoveryTokenThunk(values.email)).unwrap()
+              showToast(response || "Formulario enviado correctamente", "success");
+              navigate("/login");
             }}
           >
             {({ errors, touched, getFieldProps, submitForm }) => (

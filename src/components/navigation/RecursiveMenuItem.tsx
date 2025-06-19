@@ -1,4 +1,4 @@
-import { Box, Stack, Typography } from "@mui/material";
+import { Box, Stack, Tooltip, Typography } from "@mui/material";
 import {
   ItemsServiceMenu,
   MenuServiceInterface,
@@ -44,7 +44,7 @@ const RecursiveMenuItem = ({
   };
 
   return (
-    <Box sx={{ width: "100%", pl: depth * 0.25, my: 0.5 }}>
+    <Box sx={{ width: "100%", pl: depth * 0.25, my: 1 }}>
       <Box
         sx={{
           display: "flex",
@@ -56,13 +56,12 @@ const RecursiveMenuItem = ({
               : (theme) => theme.palette.background.default
             : "transparent",
           borderRadius: 2,
-          border: "1px solid transparent",
+          border: "2px solid transparent",
           padding: 1,
           margin: 0.5,
           cursor: "pointer",
-          transition: "border 0.2s ease",
+          transition: "border-color 0.2s ease",
           "&:hover": {
-            border: 2,
             borderColor: (theme) => theme.palette.background.default,
           },
         }}
@@ -71,45 +70,75 @@ const RecursiveMenuItem = ({
         <Stack
           direction="row"
           alignItems="center"
-          justifyContent={"space-between"}
           onMouseEnter={() => setHovered(true)}
           onMouseLeave={() => setHovered(false)}
-          sx={{
-            width: "100%"
-          }}
+          sx={{ width: "100%" }}
         >
           <Stack
             direction="row"
             spacing={1}
+            alignItems="center"
             sx={{
-              width: "80%"
+              flexGrow: 1,
+              minWidth: 0,
+              overflow: "hidden",
             }}
           >
             <FolderOutlinedIcon sx={{ fontSize: 16, color: "text.disabled" }} />
-            <Typography sx={{ fontSize: 12, color: "text.disabled" }}>
-              {item.name}
-            </Typography>
+            <Tooltip title={item.name} placement="top">
+              <Typography
+                sx={{
+                  fontSize: 12,
+                  color: "text.disabled",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {item.name}
+              </Typography>
+            </Tooltip>
           </Stack>
-          {optionsActive && buildOptions && hovered && (
+          {optionsActive && buildOptions && (
             <Box
               onClick={(e) => {
                 e.stopPropagation();
                 openMenu(e, buildOptions(item));
               }}
-              sx={{ cursor: "pointer", width:"15%" }}
+              sx={{
+                width: 24,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                cursor: "pointer",
+                ml: 1,
+              }}
             >
               <MoreHorizOutlinedIcon
-                sx={{ fontSize: 16, color: "text.disabled" }}
+                sx={{
+                  fontSize: 16,
+                  color: "text.disabled",
+                  visibility: hovered ? "visible" : "hidden",
+                }}
               />
             </Box>
           )}
-        </Stack>
 
-        {expanded ? (
-          <KeyboardArrowDownOutlinedIcon sx={{ fontSize: 16 }} />
-        ) : (
-          <KeyboardArrowRightOutlinedIcon sx={{ fontSize: 16 }} />
-        )}
+          {/* Flecha expand/collapse */}
+          <Box
+            sx={{
+              ml: 1,
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            {expanded ? (
+              <KeyboardArrowDownOutlinedIcon sx={{ fontSize: 16 }} />
+            ) : (
+              <KeyboardArrowRightOutlinedIcon sx={{ fontSize: 16 }} />
+            )}
+          </Box>
+        </Stack>
       </Box>
 
       {/* Render hijos recursivamente */}
@@ -132,11 +161,7 @@ const RecursiveMenuItem = ({
 
       {/* Render ítems */}
       {expanded && Array.isArray(item.items) && item.items?.length > 0 && (
-        <Box
-          sx={{
-            pl: 1,
-          }}
-        >
+        <Box sx={{ pl: 1 }}>
           {item.items?.map((subItem, index) => (
             <RecursiveMenuSubItem
               key={`box-${index}-${subItem.id}`}
