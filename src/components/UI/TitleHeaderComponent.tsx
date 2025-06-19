@@ -1,12 +1,19 @@
 import { Stack, Typography } from "@mui/material";
 import BreadcrumbComponent from "./BreadcrumbComponent";
 import { useLocation } from "react-router-dom";
+import { useAppSelector } from "../../store";
 
 
 
 function TitleHeaderComponent() {
     const location = useLocation();
     const pathnames = location.pathname.split("/").filter(Boolean);
+    const path = useAppSelector(state => state.templates.templateById?.path)
+    const name = useAppSelector(state => state.templates.templateById?.name)
+    const route = [...(path ?? []), name].filter(Boolean);
+
+
+    console.log(route)
     if (location.pathname === "/") return null;
 
     const resolvedTitle = pathnames[0] || "";

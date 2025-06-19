@@ -15,7 +15,7 @@ import {
 } from "../../../store";
 import { useToast } from "../../../config/hooks/useToast";
 import { getTemplateID, prepareUpdatePayload as preparePayload } from "../../../config/utils";
-import { updateTemplateThunk } from "../../../store/slices/templates/templates.thunk";
+import { getTemplateByIdThunk, updateTemplateThunk } from "../../../store/slices/templates/templates.thunk";
 import TitleHeaderComponent from "../TitleHeaderComponent";
 
 function TabbedTableForm({
@@ -46,6 +46,11 @@ function TabbedTableForm({
   );
 
   const valuesToSend = tabForm?.values ?? [];
+
+  useEffect(() => {
+    const templpateById = async () => await dispatch(getTemplateByIdThunk(tabs[value].templateId));
+    templpateById();
+  }, [currentTabId, tabs, value, dispatch])
 
   useEffect(() => {
     const fetchRules = async () => await getRulesThunk();
