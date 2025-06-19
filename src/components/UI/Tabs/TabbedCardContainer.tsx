@@ -1,21 +1,18 @@
 import { Box, Card } from "@mui/material";
 import TabTableComponent from "./TabTableComponent";
-import {
-  TabbedCardContainerProps,
-} from "../../../config/interfaces";
+import { TabbedCardContainerProps } from "../../../config/interfaces";
 import { useAppSelector } from "../../../store";
 
 const TabbedCardContainer = ({
     tabs,
     eventTabs,
     initialTabIndex,
-    }: TabbedCardContainerProps) => {
-    
-        const hideMenu = useAppSelector((state) => state.sidebarMenu.isCollapsed)
-        const responsiveWidth = () => {
-            if(hideMenu) return "calc(100vw - 100px)";
-            return "calc(100vw - 300px)"
-        }
+}: TabbedCardContainerProps) => {
+    const hideMenu = useAppSelector((state) => state.sidebarMenu.isCollapsed);
+    const responsiveWidth = () => {
+        if (hideMenu) return "calc(100vw - 100px)";
+        return "calc(100vw - 300px)";
+    };
 
     return (
         <Box
@@ -23,43 +20,46 @@ const TabbedCardContainer = ({
             flex: 1,
             display: "flex",
             flexDirection: "column",
-            gap: 2,
+            gap: 3,
             overflow: "hidden",
-            maxHeight: "calc(100% - 90px)"
+            height: "100%",
+            alignItems: "center",
+            justifyContent: "center",
+            my:2
         }}
         >
         {/* Card para Detalles y Errores */}
         <Card
             sx={{
-            flex: 3,
-            minHeight: 0,
-            overflow: "auto",
+            flex: 7,
             display: "flex",
             flexDirection: "column",
+            minWidth: responsiveWidth(),
             maxWidth: responsiveWidth(),
+            overflow: "hidden",
             }}
         >
             <TabTableComponent
-            tabs={tabs}
-            initialTabIndex={initialTabIndex}
-            />
+                tabs={tabs}
+                initialTabIndex={initialTabIndex}
+                />
         </Card>
 
         {/* Card para Eventos */}
         <Card
             sx={{
-            flex: 1,
-            minHeight: 0,
-            overflow: "auto",
+            flex: 3,
             display: "flex",
             flexDirection: "column",
+            minWidth: responsiveWidth(),
             maxWidth: responsiveWidth(),
+            overflow: "hidden",
             }}
         >
             <TabTableComponent
-            tabs={eventTabs}
-            initialTabIndex={0}
-            />
+                tabs={eventTabs}
+                initialTabIndex={0}
+                />
         </Card>
         </Box>
     );

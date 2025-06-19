@@ -80,7 +80,7 @@ function MainPage() {
         route: tab.route,
         content: tabConfig[tab.route]?.[0]?.content || null,
         canEdit: tabConfig[tab.route]?.[0]?.canEdit || false,
-        origin: tabConfig[tab.route]?.[0]?.origin
+        origin: tabConfig[tab.route]?.[0]?.origin,
       };
     });
 
@@ -114,18 +114,18 @@ function MainPage() {
   );
 
   const currentTabIndex = dynamicIndex !== -1 ? dynamicIndex + 2 : undefined;
-  console.log(messagesData, 'Message data')
+  console.log(messagesData, "Message data");
 
   return (
     <Box
       sx={{
-        height: "95vh",
-        display: "flex",
-        flexDirection: "column",
-        gap: 1,
-        overflow: "hidden",
-        backgroundColor: "#f7f7f7",
-      }}
+      height: "100%",
+      width: "100%",
+      display: "flex",
+      flexDirection: "column",
+      overflow: "hidden",
+      backgroundColor: "#f7f7f7",
+  }}
     >
       <TabbedCardContainer
         tabs={[

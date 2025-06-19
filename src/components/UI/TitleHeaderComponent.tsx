@@ -12,7 +12,7 @@ function TitleHeaderComponent() {
     const resolvedTitle = pathnames[0] || "";
 
     return (
-        <Stack sx={{mt: -1, pl: 1}}>
+        <Stack sx={{pl: 1, mt:1}}>
             {resolvedTitle && (
                 <Typography
                     variant="h6"
