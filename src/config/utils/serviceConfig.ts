@@ -14,7 +14,7 @@ export const serviceConfig = {
             {
                 id: "function",
                 label: "Función",
-                options: ["value", "echo", "calculated", "de request"],
+                options: ["value", "echo", "calculated", "de request", "equals", "not_validate", "includes" ],
                 affects: ["value"],
                 width: "20%",
                 type: "select" as const,
@@ -26,7 +26,10 @@ export const serviceConfig = {
                 dependsOn: "function",
                 dynamicRender: {
                     echo: { render: false },
+                    not_validate: { render: false },
                     calculated: { render: false },
+                    includes: { render: true, type: "input" as const },
+                    equals: { render: true, type: "input" as const },
                     value: { render: true, type: "input" as const },
                     "de request": {
                         render: true,

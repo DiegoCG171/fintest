@@ -68,7 +68,8 @@ export const getConfigTab = (
             content: (
                 <TabbedTableForm tabs={tabsContent(item.id, canEdit, origin)} />
             ),
-            canEdit: canEdit,
+            canEdit,
+            origin
             },
         ];
         }

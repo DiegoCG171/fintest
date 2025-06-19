@@ -64,7 +64,7 @@ function MainPage() {
   const dispatch = useAppDispatch();
   const { connect, disconnect } = useMultiSocket();
   const tabConfig = useMemo(() => {
-    const categoriesTabs = getConfigTab(categories, "categories", false);
+    const categoriesTabs = getConfigTab(categories, "categories", true);
     const collectionsTabs = getConfigTab(collections, "collections", true);
     return {
       ...categoriesTabs,
@@ -81,6 +81,7 @@ function MainPage() {
         route: tab.route,
         content: tabConfig[tab.route]?.[0]?.content || null,
         canEdit: tabConfig[tab.route]?.[0]?.canEdit || false,
+        origin: tabConfig[tab.route]?.[0]?.origin
       };
     });
 
@@ -117,6 +118,7 @@ function MainPage() {
   );
 
   const currentTabIndex = dynamicIndex !== -1 ? dynamicIndex + 2 : undefined;
+  console.log(messagesData, 'Message data')
 
   return (
     <Box
