@@ -12,8 +12,7 @@ const eventHandlers: Record<SocketKey, (socket: Socket, dispatch: AppDispatch) =
 export const createSocket = (key: SocketKey, dispatch: AppDispatch) => {
   if (!registry.has(key)) {
     const socket = io(SOCKETS[key], {
-      transports: ["polling", "websocket"],
-      //transports: ["websocket"],
+      transports: ["websocket"],
       query: { token: localStorage.getItem("token") || "" },
     });
 

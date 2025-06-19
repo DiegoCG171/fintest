@@ -21,6 +21,7 @@ function CatalogsDataMiddleware({ tabId, template }: CatalogsDataMiddlewareProps
 
   const rawRules = useAppSelector((state) => state.rules.rules);
   const templates = useAppSelector((state) => state.templates.templates);
+  const testCases = useAppSelector((state) => state.testCases.testCases);
   const formState = useAppSelector(
     (state) => state.formBuilder.tabForms[tabId]
   );
@@ -39,11 +40,14 @@ function CatalogsDataMiddleware({ tabId, template }: CatalogsDataMiddlewareProps
   }, [rawRules]);
 
   const transactionData = useMemo(() => {
-    const result = getTransactionByType(templates, templateId, formType);
-    return result;
-  }, [templates, templateId, formType]);
-
-  
+    if(template.origin === 'categories') {
+      const result = getTransactionByType(templates, templateId, formType);
+      return result;
+    } else {
+      const result = getTransactionByType(testCases, templateId, formType);
+      return result
+    }
+  }, [templates, templateId, formType, template, testCases]);
 
   useEffect(() => {
     dispatch(

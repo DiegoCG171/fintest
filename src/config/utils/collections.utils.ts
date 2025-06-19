@@ -4,7 +4,7 @@ import { generateLinkMenu } from "./generateLinkMenu";
 
 export const mapCollections = (collections: CollectionResponse[]): MenuItem[] => {
   return collections.map((collection): MenuItem => ({
-    id: collection._id,
+    id: collection.uuid,
     name: collection.name,
     items: (collection.cases || []).map((caseCollection): MenuItem => ({
       id: caseCollection.uuid,

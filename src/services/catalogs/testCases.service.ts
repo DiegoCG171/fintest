@@ -1,19 +1,20 @@
 import api from "../../api/api";
 import { ENDPOINTS } from "../../config/constants/endpoints";
+import { PatchGenerationTemplate } from "../../config/interfaces";
 import { handleAxiosError } from "../../config/utils/axiosErrorHandler";
-
-interface CreateCollection {
+ 
+export interface CreateTestCase {
   id_template: string;
-  id_collection_created: string;
+  id_collection: string;
 }
 
 export interface UpdateTestCase {
     name: string;
 }
 
-export const createCollection = async (body: CreateCollection) => {
+export const createTestCase = async (body: CreateTestCase) => {
   try {
-    const { data } = await api.post(ENDPOINTS.collections, body);
+    const { data } = await api.post(ENDPOINTS.testCases, body);
     return data;
   } catch (error) {
     const errorMessage = handleAxiosError(error);
@@ -21,7 +22,7 @@ export const createCollection = async (body: CreateCollection) => {
   }
 };
 
-export const updateTestCase = async (id: string, body: UpdateTestCase) => {
+export const updateTestCase = async (id: string, body: PatchGenerationTemplate) => {
   try {
     const { data } = await api.patch(`${ENDPOINTS.testCases}/${id}`, body);
     return data;
@@ -46,6 +47,16 @@ export const getTestCaseById = async (id: string) => {
         const response = await api.get(`${ENDPOINTS.testCases}`, {
             params: { id }
         });
+        return response.data;
+    } catch (error) {
+        const errorMessage = handleAxiosError(error);
+        throw errorMessage;
+    }
+};
+
+export const getTestCases = async () => {
+    try {
+        const response = await api.get(`${ENDPOINTS.testCases}`);
         return response.data;
     } catch (error) {
         const errorMessage = handleAxiosError(error);

@@ -1,7 +1,7 @@
-import { TemplateContextType, FieldValidation } from "../interfaces";
+import { TemplateContextType, FieldValidation, testCaseInterface } from "../interfaces";
 
 export function getTransactionByType(
-  templates: TemplateContextType[],
+  templates: TemplateContextType[] | testCaseInterface[],
   templateId: string,
   formType: string
 ): FieldValidation[] | null {

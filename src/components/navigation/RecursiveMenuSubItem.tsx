@@ -4,15 +4,16 @@ import {
   IconButton,
   Stack,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
-import { useEffect, useState } from "react";
+import CancelIcon from "@mui/icons-material/Cancel";
+import { useState } from "react";
 import { ItemsServiceMenu, ContextMenuOption } from "../../config/interfaces";
 import { useLocation, useNavigate } from "react-router-dom";
 import { usePopMenu } from "../../config/hooks/usePopMenu";
-import CancelIcon from "@mui/icons-material/Cancel";
 import { useAppDispatch, useAppSelector } from "../../store";
 import { removeUpdateTestCase } from "../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
 import { updateTestCaseThunk } from "../../store/slices/collections/collections.thunk";
@@ -48,18 +49,14 @@ const RecursiveMenuSubItem = ({
     }
   };
 
-  useEffect(() => {
-    console.log(item, idTestCase);
-  }, [item, idTestCase]);
-
   return (
     <Box
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       sx={{
         display: "flex",
-        justifyContent: "space-between",
         alignItems: "center",
+        justifyContent: "space-between",
         cursor: "pointer",
         borderRadius: 2,
         p: 1,
@@ -124,33 +121,61 @@ const RecursiveMenuSubItem = ({
         </Stack>
       ) : (
         <>
-          <Stack direction="row" spacing={1} alignItems="center">
+          <Stack
+            direction="row"
+            alignItems="center"
+            spacing={1}
+            sx={{
+              flexGrow: 1,
+              minWidth: 0,
+              overflow: "hidden",
+            }}
+          >
             <DescriptionOutlinedIcon
               sx={{ fontSize: 16, color: "text.disabled" }}
             />
-            <Typography
-              sx={{ fontSize: 12, color: "text.disabled" }}
-              onClick={() => {
-                if (onClick) onClick(item);
-                else if (item.linkMenu) navigate(`/${item.linkMenu}`);
-              }}
-            >
-              {item.name}
-            </Typography>
+            <Tooltip title={item.name} placement="top">
+              <Typography
+                sx={{
+                  fontSize: 12,
+                  color: "text.disabled",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                  cursor: "pointer",
+                }}
+                onClick={() => {
+                  if (onClick) onClick(item);
+                  else if (item.linkMenu) navigate(`/${item.linkMenu}`);
+                }}
+              >
+                {item.name}
+              </Typography>
+            </Tooltip>
             {loading && idTestCase === item.id && (
               <CircularProgress size="10px" />
             )}
           </Stack>
-          {optionsActive && buildOptions && hovered && !loading && (
+          {optionsActive && buildOptions && !loading && (
             <Box
               onClick={(e) => {
                 e.stopPropagation();
                 openMenu(e, buildOptions(item));
               }}
-              sx={{ cursor: "pointer" }}
+              sx={{
+                width: 24,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                cursor: "pointer",
+              }}
             >
               <MoreHorizOutlinedIcon
-                sx={{ fontSize: 16, color: "text.disabled" }}
+                sx={{
+                  fontSize: 16,
+                  color: "text.disabled",
+                  visibility: hovered ? "visible" : "hidden",
+                }}
               />
             </Box>
           )}

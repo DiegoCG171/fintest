@@ -11,6 +11,7 @@ import { StatusRender } from "../../components/UI/table/StatusRender";
 import TabbedCardContainer from "../../components/UI/Tabs/TabbedCardContainer";
 import { addTab } from "../../store";
 import { getConfigTab } from "../../config/utils/tabsContent";
+import { getTestCasesThunk } from "../../store/slices/testCases/testCases.thunk";
 
 const generateStaticTabs = (messagesData: MessagesState): StaticTabItem[] => [
   {
@@ -88,8 +89,11 @@ function MainPage() {
 
   useEffect(() => {
     connect();
-    return () => disconnect();
   }, [connect, disconnect]);
+
+  useEffect(() => {
+    dispatch(getTestCasesThunk());
+  }, [dispatch]);
 
   useEffect(() => {
     const currentRoute = location.pathname.slice(1);

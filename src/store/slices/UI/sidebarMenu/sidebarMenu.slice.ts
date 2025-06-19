@@ -5,6 +5,7 @@ import {
 } from "../../../../config/interfaces/menu.interface";
 import {
   createCollectionThunk,
+  createTestCaseThunk,
   deleteTestCaseThunk,
   getCollectionsThunk,
   updateTestCaseThunk,
@@ -119,6 +120,44 @@ export const sidebarMenuSlice = createSlice({
         state.loading = false;
       }
     );
+    build.addCase(
+    createTestCaseThunk.fulfilled,
+  (
+    state,
+    action: PayloadAction<{
+      id: string;
+      name: string;
+      collectionId: string;
+    }>
+  ) => {
+    const { id, name, collectionId } = action.payload;
+
+    const slug = name
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/[^\w-]/g, "");
+
+    state.collectionsMenu = state.collectionsMenu.map((group) => {
+      if (group.id === collectionId) {
+        const newItem = {
+          id,
+          name,
+          linkMenu: `${group.id}/${slug}`, // Ajusta el prefijo si lo necesitas distinto
+        };
+
+        return {
+          ...group,
+          items: group.items ? [...group.items, newItem] : [newItem],
+        };
+      }
+      return group;
+    });
+    state.loading = false;
+  }
+);
+
   },
 });
 

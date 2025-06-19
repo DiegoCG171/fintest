@@ -16,6 +16,7 @@ import { tabSlice } from "./slices/UI/tabs/tabs.slice";
 import { templateSlice } from "./slices/templates/template.slice";
 import { userSlice } from "./slices/users/user.slice";
 import { validRoutesSlice } from "./slices/routes/validRoutes.slice.slice";
+import { testCasesSlice } from "./slices/testCases/testCasesSlice";
 
 export const store = configureStore({
     reducer: {
@@ -34,7 +35,8 @@ export const store = configureStore({
         tabs: tabSlice.reducer,
         templates: templateSlice.reducer,
         user: userSlice.reducer,
-        validRoutes: validRoutesSlice.reducer
+        validRoutes: validRoutesSlice.reducer,
+        testCases: testCasesSlice.reducer,
     }
 });
 
