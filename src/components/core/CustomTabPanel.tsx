@@ -14,7 +14,7 @@ function CustomTabPanel({ children, value, index, ...other }: TabPanelProps) {
         flexDirection: "column",
       }}
     >
-      {children}
+      {value === index && <>{children}</>}
     </div>
   );
 }

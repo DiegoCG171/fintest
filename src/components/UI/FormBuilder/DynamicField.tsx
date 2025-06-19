@@ -74,11 +74,12 @@ function DynamicField({
   }
 
   if(onlyRead && column.type === "checkbox") {
+    const realValue = value !== undefined ? value : row.isActive;
     return (
         <input
           disabled={true}
           type="checkbox"
-          checked={Boolean(value)}
+          checked={Boolean(realValue)}
           onChange={(e) =>
             handleChange({ target: { value: e.target.checked } })
           }
@@ -166,11 +167,12 @@ function DynamicField({
   if (column.dependsOn) {
     if (column.type === "checkbox") {
       const isDisabled = shouldDisableCheckbox(isChild, dependsValue);
+      const realValue = value !== undefined ? value : row.isActive;
       return (
         <input
           disabled={Boolean(isDisabled)}
           type="checkbox"
-          checked={Boolean(value)}
+          checked={Boolean(realValue)}
           onChange={(e) =>
             handleChange({ target: { value: e.target.checked } })
           }
@@ -181,10 +183,11 @@ function DynamicField({
 
   if (!column.dependsOn) {
     if (column.type === "checkbox" && path.length === 1) {
+      const realValue = value !== undefined ? value : row.isActive;
       return (
         <input
           type="checkbox"
-          checked={Boolean(value)}
+          checked={Boolean(realValue)}
           onChange={(e) =>
             handleChange({ target: { value: e.target.checked } })
           }
