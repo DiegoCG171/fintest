@@ -6,6 +6,7 @@ export const mapFieldRulesToFormStructure = (fields: Field[]): TableRowDataFormB
             children.specification?.map((spec: Specification) => ({
                 idBitmap: spec.id,
                 displayName: spec.displayName,
+                isRequired: false, // <- AÑADIDO
                 isActive: false,
                 function: '',
                 value: '',
@@ -17,9 +18,10 @@ export const mapFieldRulesToFormStructure = (fields: Field[]): TableRowDataFormB
             ? rule.breakingRules.map((br: BreakingRule) => ({
                 idBitmap: br.id,
                 displayName: br.displayName,
+                isRequired: false, // <- AÑADIDO
                 isActive: false,
-                function: "",
-                value: "",
+                function: '',
+                value: '',
                 breakingRules: level3Children(br),
                 _id: br._id,
             }))
@@ -36,7 +38,6 @@ export const mapFieldRulesToFormStructure = (fields: Field[]): TableRowDataFormB
             _id: rule._id,
         };
     });
-
 
 export const mapValidationTemplate = (validation: FieldValidation[]): TableRowDataFormBuilder[] =>
     validation.map((v: FieldValidation) => {
@@ -91,31 +92,37 @@ export const combineTemplateData = (data: FieldValidation[] | null, mappedRules:
     if (!data?.length) return [];
     const mapData = mapValidationTemplate(data);
 
-    const updateRules = (rules: TableRowDataFormBuilder[], data: TableRowDataFormBuilder[], level = 0): TableRowDataFormBuilder[] => {
-        return rules.map(rule => {
-            const matched = data.find(d => {
-                const match =
-                    d.idBitmap?.trim().toLowerCase() === rule.idBitmap?.trim().toLowerCase();
-                return match;
-            });
+    const updateRules = (
+        rules: TableRowDataFormBuilder[],
+        data: TableRowDataFormBuilder[],
+        level = 0
+    ): TableRowDataFormBuilder[] => {
+        return rules.map((rule) => {
+            const matched = data.find(
+                (d) =>
+                    d.idBitmap?.trim().toLowerCase() === rule.idBitmap?.trim().toLowerCase()
+            );
+
             const updatedRule: TableRowDataFormBuilder = {
                 ...rule,
-                isRequired: level === 0 ? Boolean(matched?.isRequired ?? rule.isRequired) : undefined,
+                isRequired: matched?.isRequired ?? rule.isRequired, // <-- FIXED
                 isActive: matched?.isActive ?? rule.isActive,
                 function: matched?.function ?? rule.function,
                 value: matched?.value ?? rule.value,
-                breakingRules: Array.isArray(rule.breakingRules) && rule.breakingRules.length > 0
-                    ? updateRules(rule.breakingRules as TableRowDataFormBuilder[], matched?.breakingRules as TableRowDataFormBuilder[] ?? [], level + 1)
-                    : rule.breakingRules,
+                breakingRules:
+                    Array.isArray(rule.breakingRules) && rule.breakingRules.length > 0
+                        ? updateRules(
+                            rule.breakingRules as TableRowDataFormBuilder[],
+                            (matched?.breakingRules as TableRowDataFormBuilder[]) ?? [],
+                            level + 1
+                        )
+                        : rule.breakingRules,
             };
-
-            if (level > 0) {
-                delete updatedRule.isRequired;
-            }
 
             return updatedRule;
         });
     };
+
 
     return updateRules(mappedRules, mapData);
 };
