@@ -4,35 +4,56 @@ import {
     TableRowDataFormBuilder,
 } from "../interfaces";
 
-// Recursivo sin filtrar hijos
-function mapNestedRows(rows: TableRowDataFormBuilder[]): FieldUpdateTemplate[] {
+
+function mapAllChildren(rows: TableRowDataFormBuilder[]): FieldUpdateTemplate[] {
     return rows.map((row) => ({
         idBitmap: row.idBitmap ?? '',
         isRequired: Boolean(row.isRequired),
         function: row.function ?? '',
         value: row.value ?? '',
         fields: Array.isArray(row.breakingRules)
-        ? mapNestedRows(row.breakingRules as TableRowDataFormBuilder[])
-        : undefined,
+        ? mapAllChildren(row.breakingRules as TableRowDataFormBuilder[])
+        : [],
     }));
+}
+
+function mapOnlyRequiredChildren(rows: TableRowDataFormBuilder[]): FieldUpdateTemplate[] {
+    return rows
+        .filter((row) => row.isRequired)
+        .map((row) => ({
+        idBitmap: row.idBitmap ?? '',
+        isRequired: true,
+        function: row.function ?? '',
+        value: row.value ?? '',
+        fields: Array.isArray(row.breakingRules)
+            ? mapOnlyRequiredChildren(row.breakingRules as TableRowDataFormBuilder[])
+            : [],
+        }));
 }
 
 export function prepareUpdatePayload(
     rows: TableRowDataFormBuilder[],
     typeForm: string
-    ): PatchGenerationTemplate {
+): PatchGenerationTemplate {
     const formattedRows: FieldUpdateTemplate[] = rows
         .filter((row) => row.isActive)
-        .filter((row) => !(row.idBitmap === "DE-63" && !row.isRequired))
-        .map((row) => ({
-        idBitmap: row.idBitmap ?? '',
-        isRequired: Boolean(row.isRequired),
-        function: row.function ?? '',
-        value: row.value ?? '',
-        fields: Array.isArray(row.breakingRules)
-            ? mapNestedRows(row.breakingRules as TableRowDataFormBuilder[])
-            : undefined,
-        }));
+        .map((row) => {
+        let fields: FieldUpdateTemplate[] = [];
+
+        if (Array.isArray(row.breakingRules)) {
+            fields = row.idBitmap === "DE-63"
+            ? mapOnlyRequiredChildren(row.breakingRules as TableRowDataFormBuilder[])
+            : mapAllChildren(row.breakingRules as TableRowDataFormBuilder[]);
+        }
+
+        return {
+            idBitmap: row.idBitmap ?? '',
+            isRequired: Boolean(row.isRequired),
+            function: row.function ?? '',
+            value: row.value ?? '',
+            fields,
+        };
+        });
 
     return {
         [typeForm]: formattedRows,
