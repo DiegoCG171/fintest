@@ -46,8 +46,8 @@ export const mapValidationTemplate = (validation: FieldValidation[]): TableRowDa
                 idBitmap: field.idBitmap ?? '',
                 displayName: '',
                 isRequired: Boolean(field.isRequired),
-                function: field.value ?? '',
-                value: '',
+                function: field.function ?? '',
+                value: field.value ??'',
                 breakingRules: '' as string,
                 _id: field._id,
             })) ?? [];
@@ -57,8 +57,8 @@ export const mapValidationTemplate = (validation: FieldValidation[]): TableRowDa
                 idBitmap: field.idBitmap ?? '',
                 displayName: '',
                 isRequired: Boolean(field.isRequired),
-                function: field.value ?? '',
-                value: '',
+                function: field.function ?? '',
+                value: field.value ??'',
                 breakingRules: level4Children(field),
                 _id: field._id,
             })) ?? [];
