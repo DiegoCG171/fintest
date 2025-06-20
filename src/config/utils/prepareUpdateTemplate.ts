@@ -22,7 +22,8 @@ export function prepareUpdatePayload(
     typeForm: string
     ): PatchGenerationTemplate {
     const formattedRows: FieldUpdateTemplate[] = rows
-        .filter((row) => row.isActive) // Solo padres activos
+        .filter((row) => row.isActive)
+        .filter((row) => !(row.idBitmap === "DE-63" && !row.isRequired))
         .map((row) => ({
         idBitmap: row.idBitmap ?? '',
         isRequired: Boolean(row.isRequired),
