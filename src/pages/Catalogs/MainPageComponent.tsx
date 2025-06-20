@@ -2,14 +2,13 @@ import { Box } from "@mui/material";
 import BasicTable from "../../components/UI/table/BasicTableComponent";
 import { useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
-//import { tabConfig } from "../../config/mock";
 import { useMultiSocket } from "../../config/hooks/useMultiSocket";
 import { MessagesState } from "../../config/interfaces/messages.interface";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { StaticTabItem } from "../../config/interfaces";
 import { StatusRender } from "../../components/UI/table/StatusRender";
 import TabbedCardContainer from "../../components/UI/Tabs/TabbedCardContainer";
-import { addTab } from "../../store";
+import { addTab, getTemplatesThunk } from "../../store";
 import { getConfigTab } from "../../config/utils/tabsContent";
 import { getTestCasesThunk } from "../../store/slices/testCases/testCases.thunk";
 
@@ -81,7 +80,7 @@ function MainPage() {
         route: tab.route,
         content: tabConfig[tab.route]?.[0]?.content || null,
         canEdit: tabConfig[tab.route]?.[0]?.canEdit || false,
-        origin: tabConfig[tab.route]?.[0]?.origin
+        origin: tabConfig[tab.route]?.[0]?.origin,
       };
     });
 
@@ -94,6 +93,10 @@ function MainPage() {
 
   useEffect(() => {
     dispatch(getTestCasesThunk());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(getTemplatesThunk());
   }, [dispatch]);
 
   useEffect(() => {
@@ -118,18 +121,17 @@ function MainPage() {
   );
 
   const currentTabIndex = dynamicIndex !== -1 ? dynamicIndex + 2 : undefined;
-  console.log(messagesData, 'Message data')
 
   return (
     <Box
       sx={{
-        height: "95vh",
-        display: "flex",
-        flexDirection: "column",
-        gap: 1,
-        overflow: "hidden",
-        backgroundColor: "#f7f7f7",
-      }}
+      height: "100%",
+      width: "100%",
+      display: "flex",
+      flexDirection: "column",
+      overflow: "hidden",
+      backgroundColor: "#f7f7f7",
+  }}
     >
       <TabbedCardContainer
         tabs={[

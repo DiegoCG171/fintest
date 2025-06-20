@@ -105,61 +105,69 @@ function TabTableComponent({
             },
           }}
         >
-          {tabs.map((tab, index) => { 
+          {tabs.map((tab, index) => {
             const isTemplate = tab.origin === "categories" ? true : false;
             return (
-            <Tab
-              key={`tab-${index}`}
-              label={
-                <Box
-                  display="flex"
-                  alignItems="flex-end"
-                  gap={2}
-                >
-                  <Icon
-                    fontSize="small"
-                    sx={{ color: isTemplate ? "inherit" : "transparent" }}
+              <Tab
+                key={`tab-${index}`}
+                label={
+                  <Box
+                    display="flex"
+                    alignItems="flex-end"
+                    gap={2}
                   >
-                    <DeveloperBoardIcon />
-                  </Icon>
+                    <Icon
+                      fontSize="small"
+                      sx={{ color: isTemplate ? "inherit" : "transparent" }}
+                    >
+                      <DeveloperBoardIcon />
+                    </Icon>
 
-                  <Typography
-                    variant="body2"
-                    noWrap
-                  >
-                    {tab.label}
-                  </Typography>
-                  <Icon>{iconAction(index)}</Icon>
-                </Box>
-              }
-              value={index}
-              sx={{
-                minWidth: "160px",
-                padding: "6px 12px",
-                fontSize: "12px",
-                whiteSpace: "nowrap",
-                textTransform: "capitalize",
-                textOverflow: "ellipsis",
-                borderTopRightRadius: 12,
-                borderTopLeftRadius: 12,
-              }}
-            />
-          )}
-          )}
+                    <Typography
+                      variant="body2"
+                      noWrap
+                    >
+                      {tab.label}
+                    </Typography>
+                    <Icon>{iconAction(index)}</Icon>
+                  </Box>
+                }
+                value={index}
+                sx={{
+                  minWidth: "160px",
+                  padding: "6px 12px",
+                  fontSize: "12px",
+                  whiteSpace: "nowrap",
+                  textTransform: "capitalize",
+                  textOverflow: "ellipsis",
+                  borderTopRightRadius: 12,
+                  borderTopLeftRadius: 12,
+                }}
+              />
+            );
+          })}
         </Tabs>
       </Box>
 
       {/* Contenido de la Tab */}
-      <Box sx={{ flexGrow: 1, overflow: "auto" }}>
-        {tabs.map((tab, index) => (
-          <CustomTabPanel
-            key={`tabpanel-${index}`}
-            value={selectedTab}
-            index={index}
-          >
-            {tab.content}
-          </CustomTabPanel>
-        ))}
+      <Box
+        sx={{
+          flexGrow: 1,
+          height: "100%",
+          overflow: "hidden",
+        }}
+      >
+        <Box sx={{ height: "100%", overflow: "auto" }}>
+          {tabs.map((tab, index) => (
+            <CustomTabPanel
+              key={`tabpanel-${index}`}
+              value={selectedTab}
+              index={index}
+            >
+              {tab.content}
+            </CustomTabPanel>
+          ))}
+        </Box>
       </Box>
     </Box>
   );

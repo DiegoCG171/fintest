@@ -18,6 +18,7 @@ export interface TemplateContextType {
     __v: number
     createdAt: string
     updatedAt: string
+    path: string[]
 }
 
 export type CreateTemplate = Omit<TemplateContextType, "_id" | "uuid" | "__v" | "createdAt" | "updatedAt" | "type">;

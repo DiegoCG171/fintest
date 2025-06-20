@@ -1,5 +1,7 @@
 import { MenuItem, Select, TextField, Typography } from "@mui/material";
-import { DynamicFieldProps } from "../../../config/interfaces";
+import {
+  DynamicFieldProps,
+} from "../../../config/interfaces";
 import {
   updateFieldValue,
   updateNestedFieldValue,
@@ -13,7 +15,7 @@ function DynamicField({
   path,
   tabId,
   isEditable,
-  onlyRead
+  onlyRead,
 }: DynamicFieldProps) {
   const dispatch = useAppDispatch();
   const dependsOn = column?.dependsOn;
@@ -36,6 +38,7 @@ function DynamicField({
       };
     }
   };
+
 
   const handleChange = (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -73,17 +76,16 @@ function DynamicField({
     return !dependsValue;
   }
 
-  if(onlyRead && column.type === "checkbox") {
+  if (onlyRead && column.type === "checkbox") {
+    const realValue = value !== undefined ? value : row.isActive;
     return (
-        <input
-          disabled={true}
-          type="checkbox"
-          checked={Boolean(value)}
-          onChange={(e) =>
-            handleChange({ target: { value: e.target.checked } })
-          }
-        />
-      );
+      <input
+        disabled={true}
+        type="checkbox"
+        checked={Boolean(realValue)}
+        onChange={(e) => handleChange({ target: { value: e.target.checked } })}
+      />
+    );
   }
 
   if (
@@ -166,11 +168,12 @@ function DynamicField({
   if (column.dependsOn) {
     if (column.type === "checkbox") {
       const isDisabled = shouldDisableCheckbox(isChild, dependsValue);
+      const realValue = value !== undefined ? value : row.isActive;
       return (
         <input
           disabled={Boolean(isDisabled)}
           type="checkbox"
-          checked={Boolean(value)}
+          checked={Boolean(realValue)}
           onChange={(e) =>
             handleChange({ target: { value: e.target.checked } })
           }
@@ -181,10 +184,11 @@ function DynamicField({
 
   if (!column.dependsOn) {
     if (column.type === "checkbox" && path.length === 1) {
+      const realValue = value !== undefined ? value : row.isActive;
       return (
         <input
           type="checkbox"
-          checked={Boolean(value)}
+          checked={Boolean(realValue)}
           onChange={(e) =>
             handleChange({ target: { value: e.target.checked } })
           }

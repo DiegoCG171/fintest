@@ -69,8 +69,22 @@ function BasicTable({
   }, [initialRows, type]);
 
   return (
-    <Paper sx={{ width: "100%", boxShadow: "none" }}>
-      <TableContainer sx={{ height: type === "events" ? "9vh" : "50vh" }}>
+    <Paper
+      sx={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        boxShadow: "none",
+      }}
+    >
+      <TableContainer
+        sx={{
+          flex: 1,
+          overflow: "auto",
+          mt:2
+        }}
+      >
         <Table stickyHeader>
           <TableHeader keys={keys} />
           <TableBody>

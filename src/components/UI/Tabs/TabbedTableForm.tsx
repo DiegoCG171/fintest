@@ -2,7 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 import { Box, Button, Stack, Tab, Tabs } from "@mui/material";
 import CustomTabPanel from "../../core/CustomTabPanel";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
-import { FormTabItem, TabTableFormComponentProps } from "../../../config/interfaces";
+import {
+  FormTabItem,
+  TabTableFormComponentProps,
+} from "../../../config/interfaces";
 import CatalogsDataMiddleware from "../../middlewares/CatalogsDataMiddleware";
 import {
   clearRulesError,
@@ -14,7 +17,10 @@ import {
   useAppSelector,
 } from "../../../store";
 import { useToast } from "../../../config/hooks/useToast";
-import { getTemplateID, prepareUpdatePayload as preparePayload } from "../../../config/utils";
+import {
+  getTemplateID,
+  prepareUpdatePayload as preparePayload,
+} from "../../../config/utils";
 import { updateTemplateThunk } from "../../../store/slices/templates/templates.thunk";
 import TitleHeaderComponent from "../TitleHeaderComponent";
 import { getTestCasesThunk } from "../../../store/slices/testCases/testCases.thunk";
@@ -33,12 +39,12 @@ function TabbedTableForm({
   const { error: rulesError, status: statusRules } = useAppSelector(
     (state) => state.rules
   );
-  const canEdit = tabs[0].canEdit
+  const canEdit = tabs[0].canEdit;
 
-  const { getError: templatesError, getStatus: statusTemplates} =
+  const { getError: templatesError, getStatus: statusTemplates } =
     useAppSelector((state) => state.templates);
 
-  const { getError: testCasesError, getStatus: statusTestCases} =
+  const { getError: testCasesError, getStatus: statusTestCases } =
     useAppSelector((state) => state.testCases);
 
   const currentTabId = useMemo(() => {
@@ -52,6 +58,11 @@ function TabbedTableForm({
 
   const valuesToSend = tabForm?.values ?? [];
 
+  /* useEffect(() => {
+    const templpateById = async () => await dispatch(getTemplateByIdThunk(tabs[value].templateId));
+    templpateById();
+  }, [currentTabId, tabs, value, dispatch]) */
+
   useEffect(() => {
     const fetchRules = async () => await getRulesThunk();
     if (statusRules === "idle") fetchRules();
@@ -61,9 +72,14 @@ function TabbedTableForm({
     }
   }, [dispatch, rulesError, showToast, statusRules]);
 
+
   useEffect(() => {
-    const fetchTemplates = async () => await dispatch(getTemplatesThunk());
+    const fetchTemplates = async () => {
+      await dispatch(getTemplatesThunk());
+    };
+
     if (statusTemplates === "idle") fetchTemplates();
+
     if (statusTemplates === "error") {
       showToast(templatesError as string, "error");
       dispatch(clearTemplateError());
@@ -84,18 +100,18 @@ function TabbedTableForm({
   };
 
   const templates = useAppSelector((state) => state.templates.templates);
-  
+
   const handleSave = async () => {
     const tab = tabs[value];
     if (!tab) return;
 
-    if(tab.origin === 'categories') {
-      await saveTemplates(tab)
+    if (tab.origin === "categories") {
+      await saveTemplates(tab);
     } else {
-      saveTestCases(tab)
+      saveTestCases(tab);
     }
   };
-  
+
   const saveTemplates = async (tab: FormTabItem) => {
     dispatch(setLoading(true));
     const payload = preparePayload(valuesToSend, tab.formType);
@@ -133,6 +149,7 @@ function TabbedTableForm({
       sx={{
         height: "100%",
         flexDirection: "column",
+        display: "flex",
       }}
     >
       <Stack
@@ -184,20 +201,21 @@ function TabbedTableForm({
         ))}
       </Tabs>
 
-      <Box sx={{ flexGrow: 1, overflow: "auto", mt: -2 }}>
+      <Box sx={{ flex: 1, overflow: "auto" }}>
         {tabs.map((template, index) => {
           return (
-          <CustomTabPanel
-            key={index + "-tab-form-content"}
-            value={value}
-            index={index}
-          >
-            <CatalogsDataMiddleware
-              tabId={currentTabId}
-              template={template}
-            />
-          </CustomTabPanel>
-        )})}
+            <CustomTabPanel
+              key={index + "-tab-form-content"}
+              value={value}
+              index={index}
+            >
+              <CatalogsDataMiddleware
+                tabId={currentTabId}
+                template={template}
+              />
+            </CustomTabPanel>
+          );
+        })}
       </Box>
     </Box>
   );
