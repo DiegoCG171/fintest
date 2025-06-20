@@ -23,8 +23,7 @@ function CategoriesFormJSON({
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
     ) => {
         const name = e.target.value;
-        const trimmed = name.trim();
-        onSetTemplateName(trimmed);
+        onSetTemplateName(name);
     };
 
     return (
