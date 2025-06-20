@@ -2,14 +2,13 @@ import { Box } from "@mui/material";
 import BasicTable from "../../components/UI/table/BasicTableComponent";
 import { useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
-//import { tabConfig } from "../../config/mock";
 import { useMultiSocket } from "../../config/hooks/useMultiSocket";
 import { MessagesState } from "../../config/interfaces/messages.interface";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { StaticTabItem } from "../../config/interfaces";
 import { StatusRender } from "../../components/UI/table/StatusRender";
 import TabbedCardContainer from "../../components/UI/Tabs/TabbedCardContainer";
-import { addTab } from "../../store";
+import { addTab, getTemplatesThunk } from "../../store";
 import { getConfigTab } from "../../config/utils/tabsContent";
 import { getTestCasesThunk } from "../../store/slices/testCases/testCases.thunk";
 
@@ -94,6 +93,10 @@ function MainPage() {
 
   useEffect(() => {
     dispatch(getTestCasesThunk());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(getTemplatesThunk());
   }, [dispatch]);
 
   useEffect(() => {

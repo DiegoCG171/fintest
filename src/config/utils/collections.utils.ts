@@ -9,7 +9,7 @@ export const mapCollections = (collections: CollectionResponse[]): MenuItem[] =>
     items: (collection.cases || []).map((caseCollection): MenuItem => ({
       id: caseCollection.uuid,
       name: caseCollection.name,
-      linkMenu: generateLinkMenu(collection.name, caseCollection.name), 
+      linkMenu: generateLinkMenu('collections', caseCollection.uuid), 
     })),
   }));
 };

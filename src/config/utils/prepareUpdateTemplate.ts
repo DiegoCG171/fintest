@@ -5,7 +5,7 @@ export function prepareUpdatePayload(
     typeForm: string
 ): PatchGenerationTemplate {
     const formattedRows: FieldUpdateTemplate[] = rows
-    .filter(row => row.function)
+    .filter(row => row.isActive)
     .map((row) => ({
         idBitmap: row.idBitmap ?? '',
         isRequired: Boolean(row.isRequired),
@@ -31,8 +31,8 @@ export function prepareUpdatePayload(
             }))
             : undefined,
     }));
-
-    return {
+    const result = {
         [typeForm]: formattedRows,
-    };
+    }
+    return result;
 }

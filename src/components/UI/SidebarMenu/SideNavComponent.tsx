@@ -21,7 +21,7 @@ function SideNavComponent() {
   const dispatch = useAppDispatch();
   const categories = useAppSelector((state) => state.categories);
   const {collectionsMenu} = useAppSelector((state) => state.sidebarMenu);
-  const hideMenu = useAppSelector((state) => state.sidebarMenu.isCollapsed)
+  const hideMenu = useAppSelector((state) => state.sidebarMenu.isCollapsed);
 
   useEffect(() => {
     if (categories.status !== "success" && categories.status !== "loading") {

@@ -58,7 +58,6 @@ export const getTemplateByIdThunk = createAsyncThunk<
 >(
     'templates/getById',
     async (id, { rejectWithValue }) => {
-        console.log(id)
         try {
             const template = await getTemplateById(id)
             return template;
