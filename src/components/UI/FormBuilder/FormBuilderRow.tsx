@@ -12,19 +12,20 @@ function FormBuilderRow({
   path,
   tabId,
   headers,
-  isChild,
   canEdit,
 }: FormBuilderRowProps) {
   const [expanded, setExpanded] = useState(false);
   const [edited, setEdited] = useState(false);
+  const levelColors = ["#ffffff", "#f5f7fa", "#eef3f8", "#e4ecf2", "#d6e0eb"];
+  const backgroundColor = levelColors[path.length - 1] || "#d6e0eb";
 
   return (
     <>
       <TableRow
         sx={{
-          backgroundColor: isChild ? "#fafbfd" : null,
+          backgroundColor,
           "&:hover": {
-            backgroundColor: "#eaeaea",
+            backgroundColor: "#dce3e9",
           },
         }}
       >

@@ -102,7 +102,7 @@ export interface ColumnConfigFormBuilder {
 export interface TableRowDataFormBuilder {
     idBitmap: string;
     displayName: string;
-    isRequired?: boolean;
+    isRequired: boolean;
     isActive?: boolean;
     function?: string | undefined;
     value: string | number | boolean | null | undefined;
