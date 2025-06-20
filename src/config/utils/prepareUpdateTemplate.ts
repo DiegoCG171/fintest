@@ -13,7 +13,6 @@ export function prepareUpdatePayload(
         value: row.value ?? '',
         fields: Array.isArray(row.breakingRules)
             ? row.breakingRules
-            .filter(br => br.function)
             .map((br): FieldUpdateTemplate => ({
                 idBitmap: br.idBitmap ?? '',
                 isRequired: Boolean(br.isRequired),

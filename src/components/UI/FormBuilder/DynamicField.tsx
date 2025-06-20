@@ -1,10 +1,11 @@
 import { MenuItem, Select, TextField, Typography } from "@mui/material";
-import { DynamicFieldProps, TableRowDataFormBuilder } from "../../../config/interfaces";
+import {
+  DynamicFieldProps,
+} from "../../../config/interfaces";
 import {
   updateFieldValue,
   updateNestedFieldValue,
   useAppDispatch,
-  useAppSelector,
 } from "../../../store";
 
 function DynamicField({
@@ -37,30 +38,6 @@ function DynamicField({
       };
     }
   };
-
-  const values = useAppSelector(
-    (state) => state.formBuilder.tabForms[tabId]?.values
-  );
-
-  const getParentRow = (): TableRowDataFormBuilder | null => {
-  if (!values || path.length < 2) return null;
-
-  let current: TableRowDataFormBuilder | undefined = values[path[0]];
-
-  for (let i = 1; i < path.length - 1; i++) {
-    if (Array.isArray(current?.breakingRules)) {
-      current = current.breakingRules[path[i]];
-    } else {
-      return null;
-    }
-  }
-
-  return current ?? null;
-};
-
-
-  const parentRow = getParentRow();
-  const parentValue = parentRow?.isRequired ?? undefined;
 
 
   const handleChange = (
@@ -191,12 +168,7 @@ function DynamicField({
   if (column.dependsOn) {
     if (column.type === "checkbox") {
       const isDisabled = shouldDisableCheckbox(isChild, dependsValue);
-      const realValue =
-  parentValue === true
-    ? true
-    : value !== undefined
-    ? value
-    : row.isActive;
+      const realValue = value !== undefined ? value : row.isActive;
       return (
         <input
           disabled={Boolean(isDisabled)}
