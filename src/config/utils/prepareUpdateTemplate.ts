@@ -22,11 +22,11 @@ function mapOnlyRequiredChildren(rows: TableRowDataFormBuilder[]): FieldUpdateTe
         .filter((row) => row.isRequired)
         .map((row) => ({
         idBitmap: row.idBitmap ?? '',
-        isRequired: true,
+        isRequired: row.isRequired,
         function: row.function ?? '',
         value: row.value ?? '',
         fields: Array.isArray(row.breakingRules)
-            ? mapOnlyRequiredChildren(row.breakingRules as TableRowDataFormBuilder[])
+            ? mapAllChildren(row.breakingRules as TableRowDataFormBuilder[])
             : [],
         }));
 }
