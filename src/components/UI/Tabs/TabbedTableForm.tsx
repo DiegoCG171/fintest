@@ -58,10 +58,13 @@ function TabbedTableForm({
 
   const valuesToSend = tabForm?.values ?? [];
 
-  /* useEffect(() => {
-    const templpateById = async () => await dispatch(getTemplateByIdThunk(tabs[value].templateId));
-    templpateById();
-  }, [currentTabId, tabs, value, dispatch]) */
+  const templateId = useMemo(() => {
+    return tabs[value].templateId
+  }, [tabs, value])
+  
+  const origin = useMemo(() => {
+    return tabs[value].origin
+  }, [tabs, value])
 
   useEffect(() => {
     const fetchRules = async () => await getRulesThunk();
@@ -157,9 +160,10 @@ function TabbedTableForm({
         sx={{
           justifyContent: "space-between",
           alignItems: "center",
+          justifyItems: "center"
         }}
       >
-        <TitleHeaderComponent />
+        <TitleHeaderComponent routeId={templateId} origin={origin} />
         {canEdit && (
           <Button
             startIcon={<SaveOutlinedIcon />}

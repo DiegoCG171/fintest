@@ -8,10 +8,9 @@ import {
   useAppDispatch,
   useAppSelector,
 } from "../../../store";
-import { addLinkMenu, getLinksArray } from "../../../config/utils";
-import { setCategoriesData, setCollapsedState } from "../../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
+import { addLinkMenu, getLinksArray, transformCollectionsToMenu } from "../../../config/utils";
+import { setCategoriesData, setCollapsedState, setCollectionsData } from "../../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
 import { getCollectionsThunk } from "../../../store/slices/collections/collections.thunk";
-import { MenuServiceInterface } from "../../../config/interfaces";
 import { setCategoriesRoutesThunk, setCollectionsRoutesThunk } from "../../../store/slices/routes/validRoutes.thunk";
 import SearchBar from "./SearchBar";
 
@@ -20,7 +19,7 @@ export const drawerWidth = 240;
 function SideNavComponent() {
   const dispatch = useAppDispatch();
   const categories = useAppSelector((state) => state.categories);
-  const {collectionsMenu} = useAppSelector((state) => state.sidebarMenu);
+  const collections= useAppSelector((state) => state.collections);
   const hideMenu = useAppSelector((state) => state.sidebarMenu.isCollapsed);
 
   useEffect(() => {
@@ -32,21 +31,31 @@ function SideNavComponent() {
   }, [dispatch, categories.status]);
 
   useEffect(() => {
+    if (collections.status !== "success" && collections.status !== "loading") {
+      dispatch(getCollectionsThunk())
+        .unwrap()
+        .catch((err) => console.error("Error cargando categorías:", err));
+    }
+  }, [dispatch, collections.status]);
+
+  useEffect(() => {
     if (categories.status === "success" && categories.categories) {
       const menuCategories = addLinkMenu(categories.categories, ['categories']);
       dispatch(setCategoriesData(menuCategories));
-      dispatch(getCollectionsThunk())
       dispatch(setCategoriesRoutesThunk(getLinksArray(menuCategories)))
     }
   }, [dispatch, categories.status, categories.categories]);
 
   useEffect(() => {
-    dispatch(setCollectionsRoutesThunk(getLinksArray(collectionsMenu as MenuServiceInterface[])))
-  }, [ dispatch, collectionsMenu]);  
+    if(collections.status === "success" && collections.collections) {
+      const menuCollections = transformCollectionsToMenu(collections.collections)
+      dispatch(setCollectionsData(menuCollections))
+      dispatch(setCollectionsRoutesThunk(getLinksArray(menuCollections)))
+    }
+  }, [ dispatch, collections]);  
 
 
   const toggleMenu = useCallback(() => {
-    //setHideMenu((prev) => !prev);
     dispatch(setCollapsedState())
   }, [dispatch]);
 

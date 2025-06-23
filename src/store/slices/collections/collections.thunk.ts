@@ -23,7 +23,7 @@ export const getCollectionsThunk = createAsyncThunk(
     try {
       const collections = await getCollections();
       return collections;
-    } catch (error: unknown) {
+    } catch (error) {
       return rejectWithValue(error as string);
     }
   }

@@ -13,11 +13,10 @@ import {
   ItemsServiceMenu,
   MenuServiceInterface,
 } from "../../../config/interfaces";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useToast } from "../../../config/hooks/useToast";
 import {
   deleteTestCaseThunk,
-  getCollectionsThunk,
 } from "../../../store/slices/collections/collections.thunk";
 
 import {
@@ -98,10 +97,6 @@ function SidebarBlock({ searchTerm }: { searchTerm: string }) {
   const handleOpenCreateCollection = () => {
     dispatch(toggleCreateCollectionMenu(true));
   };
-
-  useEffect(() => {
-    dispatch(getCollectionsThunk());
-  }, [dispatch]);
 
   const handleModal = useCallback(() => {
     dispatch(

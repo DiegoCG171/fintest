@@ -7,7 +7,6 @@ import {
   createCollectionThunk,
   createTestCaseThunk,
   deleteTestCaseThunk,
-  getCollectionsThunk,
   updateTestCaseThunk,
 } from "../../collections/collections.thunk";
 import { mapCollections } from "../../../../config/utils/collections.utils";
@@ -53,12 +52,6 @@ export const sidebarMenuSlice = createSlice({
     },
   },
   extraReducers: (build) => {
-    build.addCase(
-      getCollectionsThunk.fulfilled,
-      (state, action: PayloadAction<CollectionResponse[]>) => {
-        state.collectionsMenu = mapCollections(action.payload);
-      }
-    );
     build.addCase(
       createCollectionThunk.fulfilled,
       (state, action: PayloadAction<CollectionResponse>) => {

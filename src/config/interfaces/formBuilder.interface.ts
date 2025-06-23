@@ -1,6 +1,7 @@
 
 //Tabs props
 import { ReactNode } from "react";
+import { originType } from ".";
 
 // Para tabs dinámicos de formularios
 export interface FormTabItem {
@@ -8,7 +9,7 @@ export interface FormTabItem {
     templateId: string;
     formType: string;
     canEdit: boolean;
-    origin: 'collections' | 'categories';
+    origin: originType;
 }
 
 // Para tabs que pintan JSX directamente
@@ -17,7 +18,7 @@ export interface StaticTabItem {
     content: React.ReactNode;
     route?: string
     canEdit: boolean
-    origin?: 'collections' | 'categories';
+    origin?: originType;
 }
 
 export interface TabTableComponentProps {
@@ -40,7 +41,7 @@ export interface TabConfigInterface {
         label: string;
         content: ReactNode;
         canEdit: boolean;
-        origin: 'collections' | 'categories';
+        origin: originType;
     }>;
 }
 

@@ -14,4 +14,5 @@ export interface testCaseInterface {
     createdAt: string
     updatedAt: string
     __v: number
+    path: string[]
 }

@@ -193,3 +193,5 @@ export type dataServiceType = keyof typeof serviceConfig;
 
 export type AsyncStatus = 'idle' | 'loading' | 'success' | 'error';
 
+export type originType = 'collections' | 'categories';
+
