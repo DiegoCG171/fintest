@@ -47,7 +47,7 @@ export default function CategoriesTreeSelector({
     ));
 
   return (
-    <Box sx={{ height: 300, minWidth: 250, overflowY: "auto" }}>
+    <Box sx={{ height: "70%", minWidth: 250, overflowY: "auto", backgroundColor:(theme) => theme.palette.background.paper, borderRadius: 2, border: "1px solid #D1D1D1" }}>
       {root.length > 0 ? (
         <SimpleTreeView>{renderTree(root)}</SimpleTreeView>
       ) : (

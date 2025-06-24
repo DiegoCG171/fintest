@@ -6,7 +6,7 @@ export const getTestCasesThunk = createAsyncThunk<
   testCaseInterface[], 
   void,
   { rejectValue: string }
->("testCases/getAll", async (_, { rejectWithValue }) => {
+>("testCase/getAll", async (_, { rejectWithValue }) => {
   try {
     const testCase = await getTestCases();
     return testCase;

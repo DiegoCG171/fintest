@@ -52,20 +52,17 @@ export const createTemplateThunk = createAsyncThunk<
 });
 
 export const getTemplateByIdThunk = createAsyncThunk<
-  TemplateContextType,
-  string,
-  { rejectValue: string }
->("templates/getById", async (id, { rejectWithValue }) => {
-  try {
-    const templateList = await getTemplateById(id);
-    const filteredTemplate = templateList.find((item) => item.uuid === id);
-
-    if (!filteredTemplate) {
-      return rejectWithValue(`No se encontró el template con ID ${id}`);
+    TemplateContextType,
+    string,
+    { rejectValue: string }
+>(
+    'templates/getById',
+    async (id, { rejectWithValue }) => {
+        try {
+            const template = await getTemplateById(id)
+            return template;
+        } catch (error) {
+            return rejectWithValue(error as string);
+        }
     }
-
-    return filteredTemplate;
-  } catch (error) {
-    return rejectWithValue(error as string);
-  }
-});
+);

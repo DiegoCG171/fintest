@@ -12,7 +12,6 @@ export function getTransactionByType(
   if (!template) {
     return null;
   }
-
   switch (formType) {
     case "validationTransaction":
       return template.validationTransaction ?? [];

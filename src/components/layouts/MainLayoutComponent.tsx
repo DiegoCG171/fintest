@@ -13,7 +13,7 @@ function MainLayoutComponent() {
             height: "100%",
             }}
         >
-            <Box sx={{ flex: 1 }}>
+            <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
             <Outlet />
             </Box>
         </Box>

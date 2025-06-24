@@ -17,8 +17,8 @@ function FormBuilderContainer({ tabId, canEdit }: FormBuilderProps) {
   const rows = tabForm?.values || [];
 
   return (
-    <Paper>
-      <TableContainer sx={{ maxHeight: 360 }}>
+    <Paper sx={{ height: "100%"}}>
+      <TableContainer sx={{ height: "100%"}}>
         <Table stickyHeader>
           <TableHead>
             <TableRow>
@@ -27,8 +27,6 @@ function FormBuilderContainer({ tabId, canEdit }: FormBuilderProps) {
                   key={col.id}
                   sx={{
                     width: col.width,
-                    px: 1,
-                    py: 0.5,
                     fontWeight: "bold",
                   }}
                 >
@@ -40,8 +38,6 @@ function FormBuilderContainer({ tabId, canEdit }: FormBuilderProps) {
           <TableBody
             sx={{
               "& td": {
-                px: 1,
-                py: 0.25,
                 fontSize: "0.75rem",
               },
               "& tr:last-child td": {

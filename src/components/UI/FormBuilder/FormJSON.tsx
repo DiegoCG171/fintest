@@ -36,7 +36,7 @@ function FormJSON() {
         style={{
           borderRadius: "4px",
           fontSize: "0.6rem",
-          maxHeight: "55vh",
+          height: "55vh",
           overflowY: "auto",
           padding: 16,
         }}

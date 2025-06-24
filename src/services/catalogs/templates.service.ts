@@ -32,11 +32,9 @@ export const createTemplate = async (template: CreateTemplate): Promise<Template
     }
 }
 
-export const getTemplateById = async (id: string): Promise<TemplateContextType[]> => {
+export const getTemplateById = async (id: string): Promise<TemplateContextType> => {
     try {
-        const response = await api.get(`${ENDPOINTS.template}`, {
-            params: { id }
-        });
+        const response = await api.get(`${ENDPOINTS.template}/${id}`);
         return response.data;
     } catch (error) {
         const errorMessage = handleAxiosError(error);

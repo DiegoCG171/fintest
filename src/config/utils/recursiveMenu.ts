@@ -1,35 +1,20 @@
-import { CategoryesInterface, MenuServiceInterface } from "../interfaces"; // ajusta tu path si es necesario
-
-const normalize = (str: string): string => {
-    return str
-        .toLowerCase()
-        .normalize("NFD") // separa acentos
-        .replace(/[\u0300-\u036f]/g, "") // elimina acentos
-        .replace(/[^a-z0-9\s-]/g, "") // elimina caracteres especiales
-        .trim()
-        .replace(/\s+/g, "-"); // espacios a guiones
-};
+import { CategoryesInterface, MenuServiceInterface } from "../interfaces"; 
 
 export const addLinkMenu = (
     categories: CategoryesInterface[],
     parentPath: string[] = [],
-    parentOriginalPath: string[] = []
 ): CategoryesInterface[] => {
     if (!categories || !Array.isArray(categories)) return [];
     return categories.map((category) => {
-        const currentPath = [...parentPath, normalize(category.name)];
-        const normalPath = [...parentOriginalPath, category.name];
-
         const itemsWithLink = Array.isArray(category.items)
             ? category.items.map((item) => ({
                     ...item,
-                    linkMenu: [...currentPath, normalize(item.name), item.id].join("/"),
-                    pathMenu: [...normalPath, item.name].join("/"),
-              }))
+                    linkMenu: [parentPath, item.id].join("/"),
+                }))
             : [];
 
         const childrenWithLink = Array.isArray(category.children)
-            ? addLinkMenu(category.children, currentPath, normalPath)
+            ? addLinkMenu(category.children, parentPath)
             : [];
 
         return {
