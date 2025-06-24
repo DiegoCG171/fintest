@@ -25,7 +25,13 @@ import {
 } from "../../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
 import { SidebarCreateCollection } from "./SidebarCreateCollection";
 
-function SidebarBlock({ searchTerm }: { searchTerm: string }) {
+function SidebarBlock({
+  searchTerm,
+  searchOnItem,
+}: {
+  searchTerm: string;
+  searchOnItem: boolean;
+}) {
   const dispatch = useAppDispatch();
 
   const categoriesMenu = useAppSelector(
@@ -108,41 +114,54 @@ function SidebarBlock({ searchTerm }: { searchTerm: string }) {
   }, [dispatch]);
 
   const filterRecursive = useCallback(
-    (node: MenuServiceInterface, term: string): MenuServiceInterface | null => {
-      const normalized = term.toLowerCase();
+  (
+    node: MenuServiceInterface,
+    term: string,
+    searchOnFile: boolean,
+  ): MenuServiceInterface | null => {
+    const normalized = term.toLowerCase();
 
-      // Verifica si el nombre del nodo coincide
-      const isNodeMatch = node.name?.toLowerCase().includes(normalized);
+    const isNodeMatch = node.name?.toLowerCase().includes(normalized);
+    const matchedItems =
+      node.items?.filter((item) =>
+        item.name.toLowerCase().includes(normalized)
+      ) ?? [];
 
-      // Filtra los items del nodo actual
-      const matchedItems =
-        node.items?.filter((item: ItemsServiceMenu) =>
-          item.name.toLowerCase().includes(normalized)
-        ) ?? [];
+    const matchedChildren = (node.children ?? [])
+      .map((child) => filterRecursive(child, term, searchOnFile))
+      .filter((child): child is MenuServiceInterface => child !== null);
 
-      // Filtra los hijos recursivamente
-      const matchedChildren = (node.children ?? [])
-        .map((child: MenuServiceInterface) => filterRecursive(child, term))
-        .filter((child): child is MenuServiceInterface => child !== null);
-
-      // Si hay coincidencias en el nodo, en los items o en los hijos, devolvemos el nodo
-      if (
-        isNodeMatch ||
-        matchedItems.length > 0 ||
-        matchedChildren.length > 0
-      ) {
+    if (searchOnFile) {
+      if (isNodeMatch) {
         return {
           ...node,
           items: matchedItems,
           children: matchedChildren,
         };
       }
-
-      // Si no hay coincidencia, no se incluye
+      if (matchedItems.length > 0 || matchedChildren.length > 0) {
+        return {
+          ...node,
+          items: matchedItems,
+          children: matchedChildren,
+        };
+      }
       return null;
-    },
-    []
-  );
+    }
+
+    if (matchedItems.length > 0 || matchedChildren.length > 0) {
+      return {
+        ...node,
+        items: matchedItems,
+        children: matchedChildren,
+      };
+    }
+
+    return null;
+  },
+  []
+);
+
 
   const { filteredCategories, filteredCollections } = useMemo(() => {
     const normalized = searchTerm.trim().toLowerCase();
@@ -156,16 +175,16 @@ function SidebarBlock({ searchTerm }: { searchTerm: string }) {
 
     const filteredCategories =
       categoriesMenu
-        ?.map((category) => filterRecursive(category, normalized))
+        ?.map((category) => filterRecursive(category, normalized, !searchOnItem))
         .filter((item): item is MenuServiceInterface => item !== null) ?? [];
 
     const filteredCollections =
       collectionsMenu
-        ?.map((category) => filterRecursive(category, normalized))
+        ?.map((category) => filterRecursive(category, normalized, !searchOnItem))
         .filter((item): item is MenuServiceInterface => item !== null) ?? [];
-
     return { filteredCategories, filteredCollections };
-  }, [searchTerm, categoriesMenu, collectionsMenu, filterRecursive]);
+  }, [searchTerm, categoriesMenu, collectionsMenu, filterRecursive, searchOnItem]);
+  
 
   return (
     <Box>

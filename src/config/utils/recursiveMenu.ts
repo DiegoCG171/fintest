@@ -80,7 +80,5 @@ export const getLinksArray = (data: MenuServiceInterface[]): string[] => {
     for (const node of data) {
         getLink(node);
     }
-    console.log(data)
-    console.log(result)
     return result;
 }

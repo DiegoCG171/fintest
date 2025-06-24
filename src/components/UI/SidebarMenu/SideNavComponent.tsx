@@ -8,10 +8,21 @@ import {
   useAppDispatch,
   useAppSelector,
 } from "../../../store";
-import { addLinkMenu, getLinksArray, transformCollectionsToMenu } from "../../../config/utils";
-import { setCategoriesData, setCollapsedState, setCollectionsData } from "../../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
+import {
+  addLinkMenu,
+  getLinksArray,
+  transformCollectionsToMenu,
+} from "../../../config/utils";
+import {
+  setCategoriesData,
+  setCollapsedState,
+  setCollectionsData,
+} from "../../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
 import { getCollectionsThunk } from "../../../store/slices/collections/collections.thunk";
-import { setCategoriesRoutesThunk, setCollectionsRoutesThunk } from "../../../store/slices/routes/validRoutes.thunk";
+import {
+  setCategoriesRoutesThunk,
+  setCollectionsRoutesThunk,
+} from "../../../store/slices/routes/validRoutes.thunk";
 import SearchBar from "./SearchBar";
 
 export const drawerWidth = 240;
@@ -19,8 +30,9 @@ export const drawerWidth = 240;
 function SideNavComponent() {
   const dispatch = useAppDispatch();
   const categories = useAppSelector((state) => state.categories);
-  const collections= useAppSelector((state) => state.collections);
+  const collections = useAppSelector((state) => state.collections);
   const hideMenu = useAppSelector((state) => state.sidebarMenu.isCollapsed);
+  const [searchOnItem, setSearchOnItem] = useState(false);
 
   useEffect(() => {
     if (categories.status !== "success" && categories.status !== "loading") {
@@ -40,29 +52,31 @@ function SideNavComponent() {
 
   useEffect(() => {
     if (categories.status === "success" && categories.categories) {
-      const menuCategories = addLinkMenu(categories.categories, ['categories']);
+      const menuCategories = addLinkMenu(categories.categories, ["categories"]);
       dispatch(setCategoriesData(menuCategories));
-      dispatch(setCategoriesRoutesThunk(getLinksArray(menuCategories)))
+      dispatch(setCategoriesRoutesThunk(getLinksArray(menuCategories)));
     }
   }, [dispatch, categories.status, categories.categories]);
 
   useEffect(() => {
-    if(collections.status === "success" && collections.collections) {
-      const menuCollections = transformCollectionsToMenu(collections.collections)
-      dispatch(setCollectionsData(menuCollections))
-      dispatch(setCollectionsRoutesThunk(getLinksArray(menuCollections)))
+    if (collections.status === "success" && collections.collections) {
+      const menuCollections = transformCollectionsToMenu(
+        collections.collections
+      );
+      dispatch(setCollectionsData(menuCollections));
+      dispatch(setCollectionsRoutesThunk(getLinksArray(menuCollections)));
     }
-  }, [ dispatch, collections]);  
-
+  }, [dispatch, collections]);
 
   const toggleMenu = useCallback(() => {
-    dispatch(setCollapsedState())
+    dispatch(setCollapsedState());
   }, [dispatch]);
 
   const [searchTerm, setSearchTerm] = useState("");
 
-  const handleSearch = useCallback((value: string) => {
+  const handleSearch = useCallback((value: string, isFolderSearch: boolean) => {
     setSearchTerm(value);
+    setSearchOnItem(isFolderSearch);
   }, []);
 
   return (
@@ -89,7 +103,7 @@ function SideNavComponent() {
           <Box sx={{ px: 2, overflowY: "auto", flexGrow: 1, my: 4 }}>
             <SearchBar onSearch={handleSearch}></SearchBar>
             {/* Menú desplegable */}
-            <SidebarBlock searchTerm={searchTerm} />
+            <SidebarBlock searchTerm={searchTerm} searchOnItem={searchOnItem} />
             <Box>
               <MediaPlayer></MediaPlayer>
             </Box>

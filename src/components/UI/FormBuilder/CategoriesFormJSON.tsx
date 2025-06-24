@@ -67,6 +67,7 @@ function CategoriesFormJSON({
         <CategoriesTreeSelector
             root={categoriesMenu}
             onItemSelected={(item) => onSelectCategory(item.id)}
+            preselectedItemId="8d12a4e3-4fbb-4c22-b6fc-9e1b0a21d200"
         />
         </Box>
     );

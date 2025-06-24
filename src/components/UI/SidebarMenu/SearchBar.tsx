@@ -1,10 +1,20 @@
 import { IconButton, InputBase, Paper } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import { ChangeEvent } from "react";
+import FolderOffOutlinedIcon from "@mui/icons-material/FolderOffOutlined";
+import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
+import { ChangeEvent, useState } from "react";
 
-function SearchBar({ onSearch }: { onSearch: (value: string) => void }) {
+function SearchBar({
+    onSearch,
+    }: {
+    onSearch: (value: string, searchOnItem: boolean) => void;
+    }) {
+    const [searchOnItem, setSearchOnItem] = useState(false);
+    const [inputValue, setInputValue] = useState("");
     const searchData = (e: ChangeEvent<HTMLInputElement>) => {
-        onSearch(e.target.value);
+        const value = e.target.value;
+        setInputValue(value);
+        onSearch(value, searchOnItem);
     };
 
     return (
@@ -25,6 +35,30 @@ function SearchBar({ onSearch }: { onSearch: (value: string) => void }) {
             inputProps={{ "aria-label": "barra de búsqueda" }}
             onChange={searchData}
         />
+        <IconButton
+            sx={{
+            p: "6px",
+            backgroundColor: !searchOnItem ? "primary.light" : "transparent",
+            borderRadius: "6px",
+            }}
+            aria-label="search"
+            onClick={() => {
+            const newValue = !searchOnItem;
+            setSearchOnItem(newValue);
+            onSearch(inputValue, newValue);
+            }}
+        >
+            {searchOnItem ? (
+            <FolderOffOutlinedIcon />
+            ) : (
+            <FolderOutlinedIcon
+                sx={{
+                color: "primary.contrastText",
+                backgroundColor: "primary.light",
+                }}
+            />
+            )}
+        </IconButton>
         <IconButton
             type="submit"
             sx={{ p: "6px" }}

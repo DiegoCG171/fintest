@@ -11,7 +11,6 @@ export interface ItemsServiceMenu {
     name: string
     id: string
     linkMenu?: string
-    pathMenu?: string
 }
 
 export interface MenuSidebarState {

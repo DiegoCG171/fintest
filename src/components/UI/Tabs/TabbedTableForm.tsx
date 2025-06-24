@@ -185,6 +185,7 @@ function TabbedTableForm({
           maxHeight: "16px",
           padding: 0,
           mt: -1,
+          mb:2,
         }}
       >
         {tabs.map((tab, index) => (
