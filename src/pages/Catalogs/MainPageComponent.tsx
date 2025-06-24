@@ -118,7 +118,7 @@ function MainPage() {
   );
 
   const currentTabIndex = dynamicIndex !== -1 ? dynamicIndex + 2 : undefined;
-  console.log(messagesData, 'Message data')
+  // console.log(messagesData, 'Message data')
 
   return (
     <Box

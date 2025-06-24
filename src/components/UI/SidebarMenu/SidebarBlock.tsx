@@ -91,7 +91,7 @@ function SidebarBlock({ searchTerm }: { searchTerm: string }) {
     {
       item: { label: "Eliminar", id: item.id },
       action: () => {
-        dispatch(deleteTestCaseThunk(item.id))
+        dispatch(deleteTestCaseThunk(item.id));
       },
     },
   ];
@@ -200,11 +200,11 @@ function SidebarBlock({ searchTerm }: { searchTerm: string }) {
         sx={{ px: 1, overflowY: "auto", flexGrow: 1, my: 4, marginRight: 1 }}
         key={"box-colecciones"}
       >
-        {createCollectionMenu && <SidebarCreateCollection />}
         <SeparatorMenu
           label="Colecciones"
           onAction={handleOpenCreateCollection}
         />
+        {createCollectionMenu && <SidebarCreateCollection />}
         {filteredCollections.length > 0 ? (
           filteredCollections.map((rootItem, index) => (
             <RecursiveMenuItem

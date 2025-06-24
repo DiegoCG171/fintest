@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { AuthState } from "../../../config/interfaces";
 import { loginThunk } from './login.thunk';
-
+import { renewTokenThunk } from './renewTokenThunk.thunk';
 const initialState: AuthState = {
     user: JSON.parse(localStorage.getItem('user') || 'null'),
     token: localStorage.getItem('token'),
@@ -18,6 +18,7 @@ export const authSlice = createSlice({
             state.user = null;
             localStorage.removeItem('token');
             localStorage.removeItem('user');
+            localStorage.removeItem('refreshToken');
             state.isAuthenticated = false; 
         },
         clearAuthError(state) {
@@ -38,7 +39,10 @@ export const authSlice = createSlice({
             .addCase(loginThunk.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload ?? "Error desconocido";
-            });
+            })
+            .addCase(renewTokenThunk.fulfilled, (state, action) => {
+                state.token = action.payload;
+            })
     },
 });
 

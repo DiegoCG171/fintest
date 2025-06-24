@@ -17,6 +17,8 @@ import { templateSlice } from "./slices/templates/template.slice";
 import { userSlice } from "./slices/users/user.slice";
 import { validRoutesSlice } from "./slices/routes/validRoutes.slice.slice";
 import { testCasesSlice } from "./slices/testCases/testCasesSlice";
+import { setupAxiosInterceptors } from "../api/setupAxiosInterceptors";
+import api from "../api/api";
 
 export const store = configureStore({
     reducer: {
@@ -40,5 +42,8 @@ export const store = configureStore({
     }
 });
 
+setupAxiosInterceptors(api, store);
+
+export type AppStore = typeof store;
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
