@@ -33,6 +33,7 @@ function ModalFormJson({ mode = "create" }: ModalFormProps) {
   const templateData = useAppSelector((state) => state.templates.templateById);
   const [category, setCategory] = useState<string | null>(null);
   const templateName = useAppSelector((state) => state.jsonTemplate.data.name);
+  const categoryId = useAppSelector((state) => state.jsonTemplate.data.categoryId);
   const [newTemplateName, setVewTemplateName] = useState<string>(templateName);
   const [showTemplateNameError, setShowTemplateNameError] = useState(false);
 
@@ -186,6 +187,7 @@ function ModalFormJson({ mode = "create" }: ModalFormProps) {
           <CategoriesFormJSON
             showError={showTemplateNameError}
             templateName={newTemplateName ?? ""}
+            preselectedItemId={categoryId ?? ""}
             onSelectCategory={(id) => {
               setCategory(id);
             }}

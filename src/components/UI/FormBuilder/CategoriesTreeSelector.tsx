@@ -77,7 +77,7 @@ export default function CategoriesTreeSelector({
   }, [root, preselectedItemId]);
 
   const handleFolderClick = (node: MenuServiceInterface) => {
-    setSelectedNodeId(node.id);
+    setSelectedNodeId(null);
     setExpanded((prev) => [...new Set([...prev, node.id])]);
 
     if (node.items?.[0]) {
