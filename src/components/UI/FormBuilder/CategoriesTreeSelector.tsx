@@ -114,7 +114,6 @@ export default function CategoriesTreeSelector({
     level = 0
   ): React.ReactNode =>
     nodes.map((node) => {
-      let isSelected = node.id === selectedNodeId;
       return (
         <TreeItem
           key={`${node.id}-${level}`}
@@ -123,11 +122,7 @@ export default function CategoriesTreeSelector({
             <Stack
               direction="row"
               gap={2}
-              sx={{
-                ...(isSelected && {
-                  backgroundColor: "secondary.light",
-                }),
-              }}
+              alignItems="center"
             >
               <FolderOutlinedIcon />
               {node.name}
@@ -137,7 +132,6 @@ export default function CategoriesTreeSelector({
             event.preventDefault();
             event.stopPropagation();
             handleFolderClick(node);
-            isSelected = false;
           }}
         >
           {node.children?.map((child) => renderTree([child], level + 1))}
@@ -160,6 +154,13 @@ export default function CategoriesTreeSelector({
         <SimpleTreeView
           expandedItems={expanded}
           onExpandedItemsChange={(_, ids) => setExpanded(ids)}
+          selectedItems={selectedNodeId ?? ""}
+          onSelectedItemsChange={(_, ids) => {
+            const id = ids ? ids[0] : "";
+            setSelectedNodeId(id);
+            const selected = findNodeById(root, id);
+            if (selected) onItemSelected(selected);
+          }}
         >
           {renderTree(root)}
         </SimpleTreeView>
