@@ -8,7 +8,7 @@ import {
 } from "../../../config/interfaces";
 import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
 import { Stack } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface Props {
   root: MenuServiceInterface[];
@@ -23,46 +23,59 @@ export default function CategoriesTreeSelector({
 }: Props) {
   const [expanded, setExpanded] = useState<string[]>([]);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  console.log(preselectedItemId, "preselect");
+  const preselectedUsed = useRef(false);
 
-  function findFullPathToNode(
-    nodes: MenuServiceInterface[],
-    targetId: string,
-    path: string[] = []
-  ): string[] | null {
-    for (const node of nodes) {
-      const currentPath = [...path, node.id];
-      if (node.id === targetId) return currentPath;
+  const findFullPathToNode = useCallback(
+    (
+      nodes: MenuServiceInterface[],
+      targetId: string,
+      path: string[] = []
+    ): string[] | null => {
+      for (const node of nodes) {
+        const currentPath = [...path, node.id];
+        if (node.id === targetId) return currentPath;
 
-      if (node.children?.length) {
-        const childPath = findFullPathToNode(node.children, targetId, currentPath);
-        if (childPath) return childPath;
+        if (node.children?.length) {
+          const childPath = findFullPathToNode(
+            node.children,
+            targetId,
+            currentPath
+          );
+          if (childPath) return childPath;
+        }
       }
-    }
-    return null;
-  }
+      return null;
+    },
+    []
+  );
 
-  function findNodeById(
-    nodes: MenuServiceInterface[],
-    id: string
-  ): MenuServiceInterface | null {
-    for (const node of nodes) {
-      if (node.id === id) return node;
-      if (node.children?.length) {
-        const result = findNodeById(node.children, id);
-        if (result) return result;
+  const findNodeById = useCallback(
+    (
+      nodes: MenuServiceInterface[],
+      id: string
+    ): MenuServiceInterface | null => {
+      for (const node of nodes) {
+        if (node.id === id) return node;
+        if (node.children?.length) {
+          const result = findNodeById(node.children, id);
+          if (result) return result;
+        }
       }
-    }
-    return null;
-  }
+      return null;
+    },
+    []
+  );
 
   useEffect(() => {
-    if (!preselectedItemId) return;
+    if (!preselectedItemId || preselectedUsed.current) return;
 
     const path = findFullPathToNode(root, preselectedItemId);
 
     if (path) {
-      setExpanded(path);
+      setExpanded((prev) => [...new Set([...prev, ...path])]);
       setSelectedNodeId(preselectedItemId);
+
       let currentNode: MenuServiceInterface | null = null;
       for (const id of path) {
         currentNode = currentNode
@@ -70,19 +83,30 @@ export default function CategoriesTreeSelector({
           : findNodeById(root, id);
       }
 
-      if (currentNode && currentNode.items?.[0]) {
-        onItemSelected(currentNode.items[0]);
+      if (currentNode) {
+        onItemSelected(currentNode);
       }
+
+      preselectedUsed.current = true;
     }
-  }, [root, preselectedItemId]);
+  }, [
+    root,
+    preselectedItemId,
+    findFullPathToNode,
+    findNodeById,
+    onItemSelected,
+  ]);
 
   const handleFolderClick = (node: MenuServiceInterface) => {
     setSelectedNodeId(null);
+
+    setTimeout(() => {
+      setSelectedNodeId(node.id);
+    }, 0);
+
     setExpanded((prev) => [...new Set([...prev, node.id])]);
 
-    if (node.items?.[0]) {
-      onItemSelected(node.items[0]);
-    }
+    onItemSelected(node);
   };
 
   const renderTree = (
@@ -90,13 +114,21 @@ export default function CategoriesTreeSelector({
     level = 0
   ): React.ReactNode =>
     nodes.map((node) => {
-      const isSelected = node.id === selectedNodeId;
+      let isSelected = node.id === selectedNodeId;
       return (
         <TreeItem
           key={`${node.id}-${level}`}
           itemId={node.id}
           label={
-            <Stack direction="row" gap={2}>
+            <Stack
+              direction="row"
+              gap={2}
+              sx={{
+                ...(isSelected && {
+                  backgroundColor: "secondary.light",
+                }),
+              }}
+            >
               <FolderOutlinedIcon />
               {node.name}
             </Stack>
@@ -105,19 +137,10 @@ export default function CategoriesTreeSelector({
             event.preventDefault();
             event.stopPropagation();
             handleFolderClick(node);
-          }}
-          sx={{
-            ...(isSelected && {
-              backgroundColor: "primary.light",
-              borderRadius: 1,
-              border: "1px solid",
-              borderColor: "primary.main",
-            }),
+            isSelected = false;
           }}
         >
-          {node.children?.map((child) =>
-            renderTree([child], level + 1)
-          )}
+          {node.children?.map((child) => renderTree([child], level + 1))}
         </TreeItem>
       );
     });
@@ -141,7 +164,10 @@ export default function CategoriesTreeSelector({
           {renderTree(root)}
         </SimpleTreeView>
       ) : (
-        <Typography variant="body2" color="text.secondary">
+        <Typography
+          variant="body2"
+          color="text.secondary"
+        >
           No hay categorías disponibles.
         </Typography>
       )}

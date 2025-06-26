@@ -1,11 +1,6 @@
 import { AsyncStatus } from "."
 
 /*TODO: Mejorar interfaces*/
-
-// GET
-
-export type TemplateRoot = TemplateContextType[]
-
 export interface TemplateContextType {
     _id: string
     name: string
@@ -58,7 +53,7 @@ export interface FieldUpdateTemplate {
 // Slice
 
 export interface TemplateState {
-    templates: TemplateRoot | [],
+    templates: TemplateContextType[],
     getStatus: AsyncStatus,
     getError: null | string,
     updateStatus: AsyncStatus,

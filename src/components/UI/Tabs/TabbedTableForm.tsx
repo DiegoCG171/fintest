@@ -5,13 +5,13 @@ import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import {
   FormTabItem,
   TabTableFormComponentProps,
+  TemplateContextType,
 } from "../../../config/interfaces";
 import CatalogsDataMiddleware from "../../middlewares/CatalogsDataMiddleware";
 import {
   clearRulesError,
   clearTemplateError,
   getRulesThunk,
-  getTemplatesThunk,
   setLoading,
   useAppDispatch,
   useAppSelector,
@@ -21,10 +21,10 @@ import {
   getTemplateID,
   prepareUpdatePayload as preparePayload,
 } from "../../../config/utils";
-import { updateTemplateThunk } from "../../../store/slices/templates/templates.thunk";
+import { getTemplateByIdThunk, updateTemplateThunk } from "../../../store/slices/templates/templates.thunk";
 import TitleHeaderComponent from "../TitleHeaderComponent";
-import { getTestCasesThunk } from "../../../store/slices/testCases/testCases.thunk";
-import { updateTestCaseThunk } from "../../../store/slices/collections/collections.thunk";
+import { getTestCasesThunk, updateTestCaseThunk } from "../../../store/slices/testCases/testCases.thunk"
+import { addOrUpdateTemplate } from "../../../store/slices/templates/template.slice";
 
 function TabbedTableForm({
   tabs,
@@ -77,17 +77,21 @@ function TabbedTableForm({
 
 
   useEffect(() => {
-    const fetchTemplates = async () => {
-      await dispatch(getTemplatesThunk());
-    };
-
-    if (statusTemplates === "idle") fetchTemplates();
-
-    if (statusTemplates === "error") {
-      showToast(templatesError as string, "error");
-      dispatch(clearTemplateError());
+  const fetchTemplates = async () => {
+    const result = await dispatch(getTemplateByIdThunk(tabs[value].templateId));
+    const template = result.payload;
+    if (template) {
+      dispatch(addOrUpdateTemplate(template as TemplateContextType));
     }
-  }, [dispatch, showToast, statusTemplates, templatesError]);
+  };
+
+  if (statusTemplates === "idle") fetchTemplates();
+
+  if (statusTemplates === "error") {
+    showToast(templatesError as string, "error");
+    dispatch(clearTemplateError());
+  }
+}, [dispatch, showToast, statusTemplates, templatesError, tabs, value]);
 
   useEffect(() => {
     const fetchTestCases = async () => await dispatch(getTestCasesThunk());
@@ -121,8 +125,12 @@ function TabbedTableForm({
     const id = getTemplateID(templates, tab.templateId);
     if (!id) return;
     try {
-      await dispatch(updateTemplateThunk({ id, payload })).unwrap();
-      dispatch(getTemplatesThunk());
+      const result = await dispatch(updateTemplateThunk({ id, payload })).unwrap();
+      const template = result;
+      if (template) {
+      dispatch(addOrUpdateTemplate(template as TemplateContextType));
+    }
+
       showToast("Plantilla actualizada correctamente", "success");
     } catch (error) {
       showToast(error as string, "error");

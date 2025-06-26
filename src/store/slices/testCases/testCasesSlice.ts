@@ -1,24 +1,37 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AsyncStatus, testCaseInterface } from "../../../config/interfaces";
-import { getTestCasesThunk } from "./testCases.thunk";
-import { createTestCaseThunk, updateTestCaseThunk } from "../collections/collections.thunk";
+import { getTestCasesThunk, updateTestCaseThunk } from "./testCases.thunk";
+import { createTestCaseThunk } from "../collections/collections.thunk";
 
 interface InitialStateTestCases {
   testCases: testCaseInterface[];
   getStatus: AsyncStatus;
   getError: null | string;
+  testCase: testCaseInterface | null
 }
 
 const initialState: InitialStateTestCases = {
   testCases: [],
   getStatus: "idle",
   getError: null,
+  testCase: null
 };
 
 export const testCasesSlice = createSlice({
   name: "testCases",
   initialState,
-  reducers: {},
+  reducers: {
+    addOrUpdateTestCases: (state, action: PayloadAction<testCaseInterface>) => {
+            const newTemplate = action.payload;
+            const index = state.testCases.findIndex(t => t.uuid === newTemplate.uuid);
+
+            if (index !== -1) {
+                state.testCases[index] = newTemplate;
+            } else {
+                state.testCases.push(newTemplate);
+            }
+        }
+  },
   extraReducers: (build) => {
     build
       .addCase(getTestCasesThunk.pending, (state) => {
@@ -41,7 +54,7 @@ export const testCasesSlice = createSlice({
         state.getStatus = "success";
       })
       .addCase(updateTestCaseThunk.rejected, (state, action) => {
-        state.getError = action.payload ?? "Error desconocido";
+        state.getError = typeof action.payload === 'string' ? action.payload : 'Error desconocido';
         state.getStatus = "error";
       })
       .addCase(createTestCaseThunk.fulfilled, (state, action) => {

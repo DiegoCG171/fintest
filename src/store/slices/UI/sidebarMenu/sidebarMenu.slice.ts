@@ -7,10 +7,10 @@ import {
   createCollectionThunk,
   createTestCaseThunk,
   deleteTestCaseThunk,
-  updateTestCaseThunk,
 } from "../../collections/collections.thunk";
 import { mapCollections } from "../../../../config/utils/collections.utils";
 import { CollectionResponse } from "../../../../config/interfaces/collections.interface";
+import { updateTestCaseThunk } from "../../testCases/testCases.thunk";
 
 export const initialState: MenuSidebarState = {
   isCollapsed: false,
@@ -42,8 +42,8 @@ export const sidebarMenuSlice = createSlice({
       state.createCollectionMenu = action.payload;
     },
     setCollapsedState(state) {
-            state.isCollapsed =!state.isCollapsed
-        },
+      state.isCollapsed = !state.isCollapsed
+    },
     updateTestCase(state, action) {
       state.updateTestCase = action.payload;
     },
@@ -60,15 +60,16 @@ export const sidebarMenuSlice = createSlice({
         state.createCollectionMenu = false;
       }
     );
-    build.addCase(deleteTestCaseThunk.fulfilled, (state, action) => {
-      state.collectionsMenu = state.collectionsMenu.map((group) => {
-        const filteredItems = group.items?.filter(
-          (item) => item.id !== action.payload
-        );
-        return { ...group, items: filteredItems };
+    build.addCase(deleteTestCaseThunk
+      .fulfilled, (state, action) => {
+        state.collectionsMenu = state.collectionsMenu.map((group) => {
+          const filteredItems = group.items?.filter(
+            (item) => item.id !== action.payload
+          );
+          return { ...group, items: filteredItems };
+        });
+        state.loading = false;
       });
-      state.loading = false;
-    });
     build.addCase(deleteTestCaseThunk.rejected, (state) => {
       state.loading = false;
     });
@@ -76,32 +77,25 @@ export const sidebarMenuSlice = createSlice({
       state.idTestCase = action.meta.arg; // <- Aquí está el ID o datos que enviaste
       state.loading = true;
     });
-    build.addCase(updateTestCaseThunk.pending, (state) => {
-      state.loading = true;
-    });
+    build.addCase(updateTestCaseThunk
+      .pending, (state) => {
+        state.loading = true;
+      });
     build.addCase(updateTestCaseThunk.rejected, (state) => {
       state.loading = false;
     });
     build.addCase(
       updateTestCaseThunk.fulfilled,
-      (state, action: PayloadAction<{ uuid: string; name: string }>) => {
+      (state, action) => {
         const { uuid, name } = action.payload;
-
-        const slug = name
-          .toLowerCase()
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-          .replace(/\s+/g, "-")
-          .replace(/[^\w-]/g, "");
 
         state.collectionsMenu = state.collectionsMenu.map((group) => {
           const updatedItems = group.items?.map((item) => {
             if (item.id === uuid) {
-              const prefix = item.linkMenu?.split("/")[0] ?? "";
               return {
                 ...item,
                 name,
-                linkMenu: `${prefix}/${slug}`,
+                linkMenu: `collections/${uuid}`,
               };
             }
             return item;
@@ -114,43 +108,36 @@ export const sidebarMenuSlice = createSlice({
       }
     );
     build.addCase(
-    createTestCaseThunk.fulfilled,
-  (
-    state,
-    action: PayloadAction<{
-      id: string;
-      name: string;
-      collectionId: string;
-    }>
-  ) => {
-    const { id, name, collectionId } = action.payload;
+      createTestCaseThunk
+        .fulfilled,
+      (
+        state,
+        action: PayloadAction<{
+          id: string;
+          name: string;
+          collectionId: string;
+        }>
+      ) => {
+        const { id, name, collectionId } = action.payload
 
-    const slug = name
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/\s+/g, "-")
-      .replace(/[^\w-]/g, "");
+        state.collectionsMenu = state.collectionsMenu.map((group) => {
+          if (group.id === collectionId) {
+            const newItem = {
+              id,
+              name,
+              linkMenu: `collections/${collectionId}`, // Ajusta el prefijo si lo necesitas distinto
+            };
 
-    state.collectionsMenu = state.collectionsMenu.map((group) => {
-      if (group.id === collectionId) {
-        const newItem = {
-          id,
-          name,
-          linkMenu: `${group.id}/${slug}`, // Ajusta el prefijo si lo necesitas distinto
-        };
-
-        return {
-          ...group,
-          items: group.items ? [...group.items, newItem] : [newItem],
-        };
+            return {
+              ...group,
+              items: group.items ? [...group.items, newItem] : [newItem],
+            };
+          }
+          return group;
+        });
+        state.loading = false;
       }
-      return group;
-    });
-    state.loading = false;
-  }
-);
-
+    );
   },
 });
 

@@ -68,7 +68,10 @@ function CategoriesFormJSON({
         </Typography>
         <CategoriesTreeSelector
             root={categoriesMenu}
-            onItemSelected={(item) => onSelectCategory(item.id)}
+            onItemSelected={(item) => {
+                console.log(item)
+                onSelectCategory(item.id)
+            }}
             preselectedItemId={preselectedItemId ?? ""}
         />
         </Box>

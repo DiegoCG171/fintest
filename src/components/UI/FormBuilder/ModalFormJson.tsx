@@ -5,12 +5,12 @@ import FormJSON from "./FormJSON";
 import {
   ModalFormProps,
   PatchGenerationTemplate,
+  TemplateContextType,
 } from "../../../config/interfaces";
 import {
   closeModal,
   createTemplateThunk,
   getAllCategoriesThunk,
-  getTemplatesThunk,
   updateTemplateThunk,
   useAppDispatch,
   useAppSelector,
@@ -24,6 +24,7 @@ import { saleTemplate } from "../../../config/mock";
 import { deepClean } from "../../../config/utils/deepClean";
 import { useEffect, useState } from "react";
 import CategoriesFormJSON from "./CategoriesFormJSON";
+import { addOrUpdateTemplate } from "../../../store/slices/templates/template.slice";
 
 function ModalFormJson({ mode = "create" }: ModalFormProps) {
   const [step, setStep] = useState<1 | 2>(1);
@@ -33,9 +34,12 @@ function ModalFormJson({ mode = "create" }: ModalFormProps) {
   const templateData = useAppSelector((state) => state.templates.templateById);
   const [category, setCategory] = useState<string | null>(null);
   const templateName = useAppSelector((state) => state.jsonTemplate.data.name);
-  const categoryId = useAppSelector((state) => state.jsonTemplate.data.categoryId);
+  const categoryId = useAppSelector(
+    (state) => state.jsonTemplate.data.categoryId
+  );
   const [newTemplateName, setVewTemplateName] = useState<string>(templateName);
   const [showTemplateNameError, setShowTemplateNameError] = useState(false);
+  const preselectedItemId = category ?? categoryId ?? "";
 
   const templateId = useAppSelector(
     (state) => state.templates.templateById?._id
@@ -75,7 +79,7 @@ function ModalFormJson({ mode = "create" }: ModalFormProps) {
         "createdAt",
         "updatedAt",
         "uuid",
-        "path"
+        "path",
       ]);
       dispatch(setJsonTemplate(cleanTemplate));
     }
@@ -106,7 +110,6 @@ function ModalFormJson({ mode = "create" }: ModalFormProps) {
     } catch (error) {
       showToast(error as string, "error");
     } finally {
-      dispatch(getTemplatesThunk());
       dispatch(getAllCategoriesThunk())
         .unwrap()
         .catch((err) => console.error("Error cargando categorías:", err));
@@ -115,21 +118,26 @@ function ModalFormJson({ mode = "create" }: ModalFormProps) {
 
   const editTemplate = async () => {
     if (!templateId) return null;
+    if (!category) return null
     mutableJsonData.name = newTemplateName;
+    mutableJsonData.categoryId = category
     try {
-      await dispatch(
+      const result = await dispatch(
         updateTemplateThunk({
           id: templateId,
           payload: mutableJsonData as PatchGenerationTemplate,
         })
       ).unwrap();
+      const template = result;
+      if (template) {
+        dispatch(addOrUpdateTemplate(template as TemplateContextType));
+      }
       dispatch(closeModal());
       showToast("Template actualizado correctamente.", "success");
       dispatch(resetJsonTemplate());
     } catch (error) {
       showToast(error as string, "error");
     } finally {
-      dispatch(getTemplatesThunk());
       dispatch(getAllCategoriesThunk())
         .unwrap()
         .catch((err) => console.error("Error cargando categorías:", err));
@@ -187,18 +195,13 @@ function ModalFormJson({ mode = "create" }: ModalFormProps) {
           <CategoriesFormJSON
             showError={showTemplateNameError}
             templateName={newTemplateName ?? ""}
-            preselectedItemId={categoryId ?? ""}
+            preselectedItemId={preselectedItemId}
             onSelectCategory={(id) => {
-              setCategory(id);
+              setCategory(id); 
             }}
             onSetTemplateName={(name: string) => {
               setVewTemplateName(name);
-
-              if (!name) {
-                setShowTemplateNameError(true);
-              } else {
-                setShowTemplateNameError(false);
-              }
+              setShowTemplateNameError(!name);
             }}
           />
         )}

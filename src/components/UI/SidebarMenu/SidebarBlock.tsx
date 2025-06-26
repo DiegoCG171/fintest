@@ -21,7 +21,7 @@ import {
 
 import {
   toggleCreateCollectionMenu,
-  updateTestCase,
+  updateTestCase
 } from "../../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
 import { SidebarCreateCollection } from "./SidebarCreateCollection";
 

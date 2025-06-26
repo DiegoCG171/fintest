@@ -16,7 +16,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { usePopMenu } from "../../config/hooks/usePopMenu";
 import { useAppDispatch, useAppSelector } from "../../store";
 import { removeUpdateTestCase } from "../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
-import { updateTestCaseThunk } from "../../store/slices/collections/collections.thunk";
+import { updateTestCaseThunk } from "../../store/slices/testCases/testCases.thunk";
 
 interface Props {
   item: ItemsServiceMenu;
@@ -36,13 +36,12 @@ const RecursiveMenuSubItem = ({
   const location = useLocation();
   const navigate = useNavigate();
   const { openMenu } = usePopMenu();
-  const dispatch = useAppDispatch();
   const { updateTestCase, loading, idTestCase } = useAppSelector(
     (state) => state.sidebarMenu
   );
 
   const isActive = item.linkMenu && location.pathname === `/${item.linkMenu}`;
-
+  const dispatch = useAppDispatch()
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       dispatch(updateTestCaseThunk({ id: item.id, payload: { name: value } }));

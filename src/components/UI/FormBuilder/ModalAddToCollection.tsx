@@ -21,6 +21,8 @@ export const ModalAddToCollection = ({
   const collectionsMenu = useAppSelector(
     (state) => state.sidebarMenu.collectionsMenu
   );
+
+
   const { loading } = useAppSelector((state) => state.modalForm);
 
   const handleSubmit = () => {
@@ -29,6 +31,7 @@ export const ModalAddToCollection = ({
       return;
     }
     setCollectionError(false);
+    console.log(collection)
     dispatch(
       createTestCaseThunk({
         id_collection: collection,
@@ -78,6 +81,7 @@ export const ModalAddToCollection = ({
         <CategoriesTreeSelector
           root={collectionsMenu}
           onItemSelected={(item) => {
+            console.log(item, item)
             setCollection(item.id);
           }}
         />
