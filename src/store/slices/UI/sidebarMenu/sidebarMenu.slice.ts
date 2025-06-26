@@ -127,6 +127,7 @@ export const sidebarMenuSlice = createSlice({
               name,
               linkMenu: `collections/${id}`, // Ajusta el prefijo si lo necesitas distinto
             };
+            console.log(newItem)
 
             return {
               ...group,
