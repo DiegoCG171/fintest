@@ -69,7 +69,6 @@ function CategoriesFormJSON({
         <CategoriesTreeSelector
             root={categoriesMenu}
             onItemSelected={(item) => {
-                console.log(item)
                 onSelectCategory(item.id)
             }}
             preselectedItemId={preselectedItemId ?? ""}
