@@ -2,26 +2,11 @@ import { Box, Button, Container, Stack, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 import PersonAltOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
-import logo from "../assets/logo.svg";
-import backgroundImage from "../assets/bg-fintest.svg";
+import logo from "../../assets/logo.svg";
 
 function SplashComponent() {
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        width: "100%",
-        height: "calc(100vh - 50px)",
-        backgroundColor: "common.white",
-        backgroundImage: `url(${backgroundImage})`,
-        backgroundRepeat: "repeat",
-        backgroundPosition: "center center",
-      }}
-    >
-      <Container
+    <Container
         sx={{
           width: 560,
           maxHeight: "90vh",
@@ -70,26 +55,23 @@ function SplashComponent() {
             <Button
               variant="contained"
               component={Link}
-              to="/register"
+              to="/main"
               endIcon={<PersonAltOutlineOutlinedIcon />}
             >
               Soy adquirente
             </Button>
             <Button
               variant="contained"
+              disabled={true}
               component={Link}
               to="/register"
               endIcon={<PeopleAltOutlinedIcon />}
-              sx={{
-                backgroundColor: "primary.dark",
-              }}
             >
               Soy emisor
             </Button>
           </Stack>
         </Stack>
       </Container>
-    </Box>
   );
 }
 

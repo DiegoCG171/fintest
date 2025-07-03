@@ -34,6 +34,10 @@ export interface MenuItem {
     children?: MenuItem[] | MenuServiceInterface[];
 }
 
+export interface SidebarProps {
+    onOpenModal: () => void;
+}
+
 export interface RecursiveMenuItemProps {
     item: MenuServiceInterface;
     depth?: number;
@@ -68,4 +72,11 @@ export interface ContextMenuOption {
     action: () => void;
     disabled?: boolean;
     danger?: boolean;
+}
+
+export interface PropsRecursiveMenuSubItem {
+    item: ItemsServiceMenu;
+    optionsActive?: boolean;
+    onClick?: (item: ItemsServiceMenu) => void;
+    buildOptions?: (item: ItemsServiceMenu) => ContextMenuOption[];
 }

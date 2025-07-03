@@ -1,10 +1,7 @@
 import { Breadcrumbs, Typography } from "@mui/material";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import Link from "@mui/material/Link";
-
-type BreadcrumbComponentProps = {
-    pathNames: string[]
-};
+import { BreadcrumbComponentProps } from "../../config/interfaces";
 
 function BreadcrumbComponent({ pathNames }: BreadcrumbComponentProps) {
 

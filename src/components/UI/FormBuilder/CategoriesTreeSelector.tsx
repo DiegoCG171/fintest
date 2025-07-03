@@ -3,24 +3,18 @@ import Typography from "@mui/material/Typography";
 import { SimpleTreeView } from "@mui/x-tree-view/SimpleTreeView";
 import { TreeItem } from "@mui/x-tree-view/TreeItem";
 import {
-  ItemsServiceMenu,
+  CategoriesTreeSelectorProps,
   MenuServiceInterface,
 } from "../../../config/interfaces";
 import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
 import { Stack } from "@mui/material";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-interface Props {
-  root: MenuServiceInterface[];
-  onItemSelected: (item: ItemsServiceMenu) => void;
-  preselectedItemId?: string;
-}
-
 export default function CategoriesTreeSelector({
   root,
   onItemSelected,
   preselectedItemId,
-}: Props) {
+}: CategoriesTreeSelectorProps) {
   const [expanded, setExpanded] = useState<string[]>([]);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const preselectedUsed = useRef(false);

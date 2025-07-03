@@ -1,14 +1,7 @@
 import { Box, FormLabel, TextField, Typography } from "@mui/material";
 import { useAppSelector } from "../../../store";
 import CategoriesTreeSelector from "./CategoriesTreeSelector";
-
-interface CategoriesFormJSONProps {
-    onSelectCategory: (categoryId: string) => void;
-    onSetTemplateName: (name: string) => void;
-    templateName: string;
-    showError: boolean;
-    preselectedItemId?: string;
-}
+import { CategoriesFormJSONProps } from "../../../config/interfaces";
 
 function CategoriesFormJSON({
     preselectedItemId,
