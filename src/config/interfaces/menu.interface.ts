@@ -20,6 +20,7 @@ export interface MenuSidebarState {
     isCollapsed: boolean,
     createCollectionMenu: boolean;
     updateTestCase: MenuServiceInterface | null;
+    updateCollection: MenuServiceInterface | null;
     loading: boolean;
     idTestCase: string;
 }
@@ -41,6 +42,7 @@ export interface RecursiveMenuItemProps {
     optionsActive: boolean
     onSelectItem?: (item: MenuServiceInterface | ItemsServiceMenu) => void;
     buildOptions?: (item: ItemsServiceMenu) => ContextMenuOption[];
+    buildSubItemOptions?: (item: ItemsServiceMenu) => ContextMenuOption[];
 }
 
 export interface HeaderSidebarMenuProps {

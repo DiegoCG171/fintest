@@ -7,6 +7,7 @@ export interface testCaseInterface {
     categoryId: string
     validationTransaction: FieldValidation[]
     generationTransaction: FieldValidation[]
+    selectionTransaction: FieldValidation[]
     templateId: string
     dependOn: string | null
     order: number

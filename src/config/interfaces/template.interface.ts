@@ -14,6 +14,7 @@ export interface TemplateContextType {
     type: string
     validationTransaction: FieldValidation[]
     generationTransaction: FieldValidation[]
+    selectionTransaction: FieldValidation[]
     uuid: string
     __v: number
     createdAt: string

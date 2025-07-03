@@ -44,4 +44,7 @@ export const ENDPOINTS = {
     //Categorias
     category: getEndpoint('category'),
 
+    //Sessions
+    session: getEndpoint('session')
+
 }
