@@ -15,6 +15,10 @@ export const serverSlice = createSlice({
     name: 'server',
     initialState,
     reducers: {
+        setServer: (state, action) => {
+            state.server = action.payload
+            state.status = 'success';
+        },
         clearServer: (state) => {
             state.server = null;
             state.status = 'idle'
@@ -51,6 +55,7 @@ export const serverSlice = createSlice({
                 state.stopServerStatus = 'loading';
             })
             .addCase(stopServerThunk.fulfilled, (state, action) => {
+                state.server = null
                 state.stopServerResponse = action.payload
                 state.stopServerStatus = 'success';
             })
@@ -61,4 +66,4 @@ export const serverSlice = createSlice({
     }
 })
 
-export const {clearServer, clearServerError, clearStopServer, clearStopServerError} = serverSlice.actions
+export const {clearServer, clearServerError, clearStopServer, clearStopServerError, setServer} = serverSlice.actions

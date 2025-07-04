@@ -1,6 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
   createCollection,
+  deleteCollection,
   getCollections,
   updateCollection,
 } from "../../../services/catalogs/collections.service";
@@ -41,15 +42,25 @@ export const createCollectionThunk = createAsyncThunk(
   }
 );
 
-export const updateCollectionThunk = createAsyncThunk(
-  "collections/update",
-  async (
-    { id, payload }: { id: string; payload: CreateCollection },
-    { rejectWithValue }
-  ) => {
+export const updateCollectionThunk = createAsyncThunk<
+  testCaseInterface,
+  { id: string; payload: PatchGenerationTemplate },
+  { rejectValue: string }
+>("collection/update", async ({ id, payload }, { rejectWithValue }) => {
+  try {
+    const testCase = await updateCollection(id, payload);
+    return testCase;
+  } catch (error) {
+    return rejectWithValue(error as string);
+  }
+});
+
+export const deleteTestCaseThunk = createAsyncThunk(
+  "collections/delete/testCase",
+  async (id: string, { rejectWithValue }) => {
     try {
-      await updateCollection(id, payload);
-      return;
+      await deleteTestCase(id);
+      return id;
     } catch (error) {
       return rejectWithValue(error as string);
     }
@@ -76,11 +87,11 @@ export const createTestCaseThunk = createAsyncThunk(
   }
 );
 
-export const deleteTestCaseThunk = createAsyncThunk(
-  "collections/delete/testCase",
+export const deleteCollectionThunk = createAsyncThunk(
+  "collections/delete",
   async (id: string, { rejectWithValue }) => {
     try {
-      await deleteTestCase(id);
+      await deleteCollection(id);
       return id;
     } catch (error) {
       return rejectWithValue(error as string);

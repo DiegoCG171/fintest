@@ -17,6 +17,9 @@ import { templateSlice } from "./slices/templates/template.slice";
 import { userSlice } from "./slices/users/user.slice";
 import { validRoutesSlice } from "./slices/routes/validRoutes.slice.slice";
 import { testCasesSlice } from "./slices/testCases/testCasesSlice";
+import { setupAxiosInterceptors } from "../api/setupAxiosInterceptors";
+import { sessionSlice } from "./slices/sessions/sessionSlice";
+import api from "../api/api";
 
 export const store = configureStore({
     reducer: {
@@ -37,8 +40,12 @@ export const store = configureStore({
         user: userSlice.reducer,
         validRoutes: validRoutesSlice.reducer,
         testCases: testCasesSlice.reducer,
+        session: sessionSlice.reducer
     }
 });
 
+setupAxiosInterceptors(api, store);
+
+export type AppStore = typeof store;
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

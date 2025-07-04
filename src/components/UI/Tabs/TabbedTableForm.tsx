@@ -128,11 +128,11 @@ function TabbedTableForm({
     }
   };
 
+
   const saveTestCases = async (tab: FormTabItem) => {
     dispatch(setLoading(true));
     const payload = preparePayload(valuesToSend, tab.formType);
     const id = tab.templateId;
-
     try {
       await dispatch(updateTestCaseThunk({ id, payload })).unwrap();
       dispatch(getTestCasesThunk());

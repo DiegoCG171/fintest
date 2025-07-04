@@ -16,15 +16,18 @@ import {
 import { useCallback, useEffect, useMemo } from "react";
 import { useToast } from "../../../config/hooks/useToast";
 import {
+  deleteCollectionThunk,
   deleteTestCaseThunk,
   getCollectionsThunk,
 } from "../../../store/slices/collections/collections.thunk";
 
 import {
   toggleCreateCollectionMenu,
+  updateCollection,
   updateTestCase,
 } from "../../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
 import { SidebarCreateCollection } from "./SidebarCreateCollection";
+import { createSessionThunk } from "../../../store/slices/sessions/session.thunk";
 
 function SidebarBlock({ searchTerm }: { searchTerm: string }) {
   const dispatch = useAppDispatch();
@@ -80,10 +83,67 @@ function SidebarBlock({ searchTerm }: { searchTerm: string }) {
       action: () => handleSelectItem(item),
     },
   ];
+  const buildedTemplateOptions = (
+    item: ItemsServiceMenu
+  ): ContextMenuOption[] => [
+    {
+      item: { label: "Agregar a Colecciones", id: item.id },
+      action: () => addToCollections(item),
+    },
+    {
+      item: { label: "Editar template", id: item.id },
+      action: () => handleSelectItem(item),
+    },
+  ];
 
   const buildedCollectionOptions = (
     item: ItemsServiceMenu
   ): ContextMenuOption[] => [
+    {
+      item: { label: "Ejecutar", id: item.id },
+      action: () => {
+        dispatch(
+          createSessionThunk({
+            toExecute: [
+              {
+                runnableId: item.id,
+                runnableType: "collection",
+              },
+            ],
+          })
+        );
+      },
+    },
+    {
+      item: { label: "Renombrar", id: item.id },
+      action: () => dispatch(updateCollection(item)),
+    },
+    {
+      item: { label: "Eliminar", id: item.id },
+      action: () => {
+        dispatch(deleteCollectionThunk(item.id));
+      },
+    },
+  ];
+
+  const buildedTestCaseOptions = (
+    item: ItemsServiceMenu
+  ): ContextMenuOption[] => [
+    {
+      item: { label: "Ejecutar", id: item.id },
+      action: () => {
+        dispatch(
+          createSessionThunk({
+            toExecute: [
+              {
+                runnableId: item.id,
+                runnableType: "testCase",
+              },
+            ],
+          })
+        );
+      },
+    },
     {
       item: { label: "Renombrar", id: item.id },
       action: () => dispatch(updateTestCase(item)),
@@ -91,10 +151,11 @@ function SidebarBlock({ searchTerm }: { searchTerm: string }) {
     {
       item: { label: "Eliminar", id: item.id },
       action: () => {
-        dispatch(deleteTestCaseThunk(item.id))
+        dispatch(deleteTestCaseThunk(item.id));
       },
     },
   ];
+
   const handleOpenCreateCollection = () => {
     dispatch(toggleCreateCollectionMenu(true));
   };
@@ -187,6 +248,7 @@ function SidebarBlock({ searchTerm }: { searchTerm: string }) {
               optionsActive={true}
               onSelectItem={handleSelectItem}
               buildOptions={buildedOptions}
+              buildSubItemOptions={buildedTemplateOptions}
             />
           ))
         ) : (
@@ -200,11 +262,11 @@ function SidebarBlock({ searchTerm }: { searchTerm: string }) {
         sx={{ px: 1, overflowY: "auto", flexGrow: 1, my: 4, marginRight: 1 }}
         key={"box-colecciones"}
       >
-        {createCollectionMenu && <SidebarCreateCollection />}
         <SeparatorMenu
           label="Colecciones"
           onAction={handleOpenCreateCollection}
         />
+        {createCollectionMenu && <SidebarCreateCollection />}
         {filteredCollections.length > 0 ? (
           filteredCollections.map((rootItem, index) => (
             <RecursiveMenuItem
@@ -213,6 +275,7 @@ function SidebarBlock({ searchTerm }: { searchTerm: string }) {
               optionsActive={true}
               onSelectItem={handleSelectItem}
               buildOptions={buildedCollectionOptions}
+              buildSubItemOptions={buildedTestCaseOptions}
             />
           ))
         ) : (
