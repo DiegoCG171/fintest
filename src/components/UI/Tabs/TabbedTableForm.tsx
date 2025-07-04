@@ -116,7 +116,6 @@ function TabbedTableForm({ tabs, initialTabIndex = 0 }: TabTableFormComponentPro
     setValue(newValue);
   };
 
-  const templates = useAppSelector((state) => state.templates.templates);
 
   const handleSave = async () => {
     const tab = tabs[value];
