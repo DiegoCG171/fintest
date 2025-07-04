@@ -9,7 +9,7 @@ const RouteGuard = ({ children }: { children: React.ReactNode }) => {
 
   const currentPath = location.pathname.slice(1);
 
-  const ALWAYS_ALLOWED = ["main"];
+  const ALWAYS_ALLOWED = ["main", "home"];
 
   const isValid =
     ALWAYS_ALLOWED.includes(currentPath) ||

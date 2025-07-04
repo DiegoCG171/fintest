@@ -44,9 +44,7 @@ export const deleteTestCase = async (id: string) => {
 
 export const getTestCaseById = async (id: string) => {
     try {
-        const response = await api.get(`${ENDPOINTS.testCases}`, {
-            params: { id }
-        });
+        const response = await api.get(`${ENDPOINTS.testCases}/${id}`);
         return response.data;
     } catch (error) {
         const errorMessage = handleAxiosError(error);

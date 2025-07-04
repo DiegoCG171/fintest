@@ -8,9 +8,8 @@ import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { StaticTabItem } from "../../config/interfaces";
 import { StatusRender } from "../../components/UI/table/StatusRender";
 import TabbedCardContainer from "../../components/UI/Tabs/TabbedCardContainer";
-import { addTab, getTemplatesThunk } from "../../store";
+import { addTab } from "../../store";
 import { getConfigTab } from "../../config/utils/tabsContent";
-import { getTestCasesThunk } from "../../store/slices/testCases/testCases.thunk";
 
 const generateStaticTabs = (messagesData: MessagesState): StaticTabItem[] => [
   {
@@ -90,14 +89,6 @@ function MainPage() {
   useEffect(() => {
     connect();
   }, [connect, disconnect]);
-
-  useEffect(() => {
-    dispatch(getTestCasesThunk());
-  }, [dispatch]);
-
-  useEffect(() => {
-    dispatch(getTemplatesThunk());
-  }, [dispatch]);
 
   useEffect(() => {
     const currentRoute = location.pathname.slice(1);

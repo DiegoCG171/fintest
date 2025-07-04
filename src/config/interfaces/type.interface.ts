@@ -1,97 +1,24 @@
 import { SelectProps, TextFieldProps } from "@mui/material";
 import { ReactNode } from "react";
-import { Field } from "./rules.interface";
 import { serviceConfig } from "../utils/serviceConfig";
+import { ItemsServiceMenu, MenuServiceInterface } from "./menu.interface";
+import { ColumnDynamicConfig, TableRowDataOld } from "./tables.interface";
 
 //Default Props
 
 export interface WithChildrenProps {
   children: ReactNode;
 }
-
-//Table props
-
-export interface FieldError {
-  code: string;
-  data: {
-    length: number;
-    regex: string;
-    validation: string;
-  };
-}
-export interface TableRowDataOld {
-  [key: string]: ReactNode | TableRowDataOld[];
+export interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
 }
 export interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
   value: number;
 }
-
-export interface TableRowData {
-  ID?: number | string;
-  error?: FieldError;
-  [key: string]: ReactNode | TableRowData[] | FieldError;
-}
-export interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
-
-export interface CustomRenders {
-  [columnKey: string]: (
-    value: string | number | null | undefined
-  ) => React.ReactNode;
-}
-
-export interface BasicTableProps {
-  initialRows: TableRowData[];
-  showPagination?: boolean;
-  customRenderers?: CustomRenders;
-  type?: 'detail' | 'errors' | 'events';
-}
-
-export interface DynamicTableProps {
-  fields: Field[];
-}
-
-export interface ComplexFormTableProps {
-  data: TableRowDataOld[];
-  columns: ColumnDynamicConfig[];
-  parentpath: string;
-}
-
-export interface DynamicRenderConfig {
-  render: boolean;
-  type?: "input" | "select" | "checkbox" | "static";
-  options?: string[];
-}
-
-export interface ColumnDynamicConfig {
-  id: string;
-  label: string;
-  width: number | string;
-  type?: string;
-  dependsOn?: string;
-  affects?: string[];
-  options?: string[];
-  hide?: boolean;
-  dynamicRender?: Record<string, DynamicRenderConfig>;
-}
-
-export interface PropsComplexFormSubTable {
-  data: Record<string, TableRowDataOld>;
-  columns: ColumnConfig[];
-  parentPath: string;
-}
-
-export interface ColumnConfig {
-  id: string;
-  label: string;
-  width: string | number;
-}
-
 export interface FormValues {
   [rootKey: string]: Record<string, Record<string, unknown>>;
 }
@@ -193,3 +120,24 @@ export type dataServiceType = keyof typeof serviceConfig;
 
 export type AsyncStatus = 'idle' | 'loading' | 'success' | 'error';
 
+export type originType = 'collections' | 'categories';
+
+
+//Tree Selector
+export interface CategoriesTreeSelectorProps {
+  root: MenuServiceInterface[];
+  onItemSelected: (item: ItemsServiceMenu) => void;
+  preselectedItemId?: string;
+}
+
+export interface CategoriesFormJSONProps {
+    onSelectCategory: (categoryId: string) => void;
+    onSetTemplateName: (name: string) => void;
+    templateName: string;
+    showError: boolean;
+    preselectedItemId?: string;
+}
+
+export type BreadcrumbComponentProps = {
+    pathNames: string[]
+};

@@ -12,7 +12,7 @@ export const setCollectionsRoutesThunk = createAsyncThunk<
             return fromCollections
         } catch (error: unknown) {
             return rejectWithValue(error as string);
-        } 
+        }
     }
 );
 
@@ -28,9 +28,32 @@ export const setCategoriesRoutesThunk = createAsyncThunk<
             return fromCategories
         } catch (error: unknown) {
             return rejectWithValue(error as string);
-        } 
+        }
     }
 );
+
+export const addCollectionsRouteThunk = createAsyncThunk<
+    string[], 
+    string,
+    { rejectValue: string }
+>(
+    'routes/addCollectionsRoute',
+    async (newRoute, { rejectWithValue }) => {
+        try {
+            const existingRoutes = JSON.parse(localStorage.getItem('fromCollections') || '[]') as string[];
+            const updatedRoutes = existingRoutes.includes(newRoute)
+                ? existingRoutes
+                : [...existingRoutes, newRoute];
+
+            localStorage.setItem('fromCollections', JSON.stringify(updatedRoutes));
+
+            return updatedRoutes;
+        } catch (error: unknown) {
+            return rejectWithValue(error as string);
+        }
+    }
+);
+
 
 export const removeCategoriesRoutesThunk = createAsyncThunk<
     void,

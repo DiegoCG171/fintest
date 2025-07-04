@@ -1,13 +1,13 @@
-import { MenuItem } from "./menu.interface";
+import { AsyncStatus } from ".";
 
 export interface CreateCollection {
     name: string
 }
 
 export interface CollectionsState {
-    collections: CollectionResponse[],
-    collectionsMenu: MenuItem[];
-
+    collections: CollectionResponse[] | null,
+    status: AsyncStatus;
+    error: string | null;
 }
 
 export interface CollectionResponse {

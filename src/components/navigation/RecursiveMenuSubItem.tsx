@@ -11,38 +11,30 @@ import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { useState } from "react";
-import { ItemsServiceMenu, ContextMenuOption } from "../../config/interfaces";
 import { useLocation, useNavigate } from "react-router-dom";
 import { usePopMenu } from "../../config/hooks/usePopMenu";
 import { useAppDispatch, useAppSelector } from "../../store";
 import { removeUpdateTestCase } from "../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
-import { updateTestCaseThunk } from "../../store/slices/collections/collections.thunk";
-
-interface Props {
-  item: ItemsServiceMenu;
-  optionsActive?: boolean;
-  onClick?: (item: ItemsServiceMenu) => void;
-  buildOptions?: (item: ItemsServiceMenu) => ContextMenuOption[];
-}
+import { updateTestCaseThunk } from "../../store/slices/testCases/testCases.thunk";
+import { PropsRecursiveMenuSubItem } from "../../config/interfaces";
 
 const RecursiveMenuSubItem = ({
   item,
   optionsActive,
   onClick,
   buildOptions,
-}: Props) => {
+}: PropsRecursiveMenuSubItem) => {
   const [hovered, setHovered] = useState(false);
   const [value, setValue] = useState(item.name);
   const location = useLocation();
   const navigate = useNavigate();
   const { openMenu } = usePopMenu();
-  const dispatch = useAppDispatch();
   const { updateTestCase, loading, idTestCase } = useAppSelector(
     (state) => state.sidebarMenu
   );
 
   const isActive = item.linkMenu && location.pathname === `/${item.linkMenu}`;
-
+  const dispatch = useAppDispatch()
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       dispatch(updateTestCaseThunk({ id: item.id, payload: { name: value } }));
