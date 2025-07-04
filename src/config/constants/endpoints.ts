@@ -6,6 +6,7 @@ export const ENDPOINTS = {
     login: getEndpoint('auth/login', API_VERSION.v1),
     recoveryPssw:getEndpoint('auth/recovery-token'),
     resetPssw:getEndpoint('auth/reset-password'),
+    renewToken:getEndpoint('auth/renew-token'),
 
     //Breaker
     getIso: getEndpoint('interpreter/iso'),
@@ -42,5 +43,8 @@ export const ENDPOINTS = {
 
     //Categorias
     category: getEndpoint('category'),
+
+    //Sessions
+    session: getEndpoint('session')
 
 }

@@ -17,6 +17,8 @@ export function getTransactionByType(
       return template.validationTransaction ?? [];
     case "generationTransaction":
       return template.generationTransaction ?? [];
+    case "selectionTransaction":
+      return template.selectionTransaction ?? [];
     default:
       return null;
   }

@@ -1,3 +1,4 @@
+import { FieldError, TableRowData } from "."
 import { FieldValidation } from "./template.interface"
 
 export interface testCaseInterface {
@@ -7,6 +8,7 @@ export interface testCaseInterface {
     categoryId: string
     validationTransaction: FieldValidation[]
     generationTransaction: FieldValidation[]
+    selectionTransaction: FieldValidation[]
     templateId: string
     dependOn: string | null
     order: number
@@ -14,5 +16,12 @@ export interface testCaseInterface {
     createdAt: string
     updatedAt: string
     __v: number
-    path: string[]
+}
+
+import { ReactNode } from "react";
+
+export interface TestCaseDetails {
+  status: string;
+  name: string;
+  message: TableRowData | FieldError | ReactNode;
 }

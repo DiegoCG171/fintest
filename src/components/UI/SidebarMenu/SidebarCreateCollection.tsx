@@ -21,7 +21,7 @@ export const SidebarCreateCollection = () => {
       direction="row"
       spacing={1}
       alignItems="center"
-      sx={{ width: "90%", pl: 1.5, my: 0.5 }}
+      sx={{ width: "90%", pl: 1.5, my: 1 }}
     >
       <FolderOutlinedIcon sx={{ fontSize: 16, color: "text.disabled" }} />
       <TextField
