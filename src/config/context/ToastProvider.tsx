@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Alert, AlertTitle, Snackbar } from "@mui/material";
 import { ToastContext } from "./ToastContext";
 import { WithChildrenProps, ToastState } from "../interfaces";
-import { subscribeToast } from "../utils/toastEmitter";
 
 export const ToastProvider = ( { children }: WithChildrenProps ) => {
   const [toast, setToast] = useState<ToastState>({
@@ -21,13 +20,6 @@ export const ToastProvider = ( { children }: WithChildrenProps ) => {
   const showToast = (message: string, type: "success" | "error" | "warning" | "info" = "success") => {
     setToast({ open: true, message, type });
   };
-
-  useEffect(() => {
-    const unsubscribe = subscribeToast((message, type) => {
-      showToast(message, type);
-    });
-    return unsubscribe;
-  }, []);
 
   const handleClose = () => {
     setToast((prev) => ({ ...prev, open: false }));
