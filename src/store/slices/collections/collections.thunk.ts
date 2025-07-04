@@ -11,6 +11,7 @@ import {
   createTestCase,
   deleteTestCase
 } from "../../../services/catalogs/testCases.service";
+import { PatchGenerationTemplate, testCaseInterface } from "../../../config/interfaces";
 
 export const getCollectionsThunk = createAsyncThunk(
   "collections/getAll",

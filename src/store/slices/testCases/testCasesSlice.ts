@@ -63,3 +63,5 @@ export const testCasesSlice = createSlice({
       })
   },
 });
+
+export const { addOrUpdateTestCases } = testCasesSlice.actions
