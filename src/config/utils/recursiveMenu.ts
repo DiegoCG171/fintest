@@ -1,4 +1,5 @@
-import { CategoryesInterface, MenuServiceInterface } from "../interfaces"; 
+import { CategoryesInterface, ItemsServiceMenu, MenuServiceInterface } from "../interfaces";
+import { CollectionResponse } from "../interfaces/collections.interface";
 
 export const addLinkMenu = (
     categories: CategoryesInterface[],
@@ -8,9 +9,9 @@ export const addLinkMenu = (
     return categories.map((category) => {
         const itemsWithLink = Array.isArray(category.items)
             ? category.items.map((item) => ({
-                    ...item,
-                    linkMenu: [parentPath, item.id].join("/"),
-                }))
+                ...item,
+                linkMenu: [parentPath, item.id].join("/"),
+            }))
             : [];
 
         const childrenWithLink = Array.isArray(category.children)
@@ -24,6 +25,33 @@ export const addLinkMenu = (
         };
     });
 };
+
+export const transformCollectionsToMenu = (
+    collections: CollectionResponse[],
+    parentPath: string[] = ["collections"]
+    ): MenuServiceInterface[] => {
+    if (!Array.isArray(collections)) return [];
+
+    return collections.map((collection) => {
+
+        const items: ItemsServiceMenu[] = Array.isArray(collection.cases)
+        ? collection.cases.map((c) => ({
+            id: c.uuid,
+            name: c.name,
+            linkMenu: [...parentPath, c.uuid].join("/"),
+            }))
+        : [];
+
+        return {
+        id: collection.uuid,
+        name: collection.name,
+        children: [],
+        items,
+        };
+    });
+};
+
+
 
 
 export const getLinksArray = (data: MenuServiceInterface[]): string[] => {
@@ -52,6 +80,5 @@ export const getLinksArray = (data: MenuServiceInterface[]): string[] => {
     for (const node of data) {
         getLink(node);
     }
-
     return result;
 }

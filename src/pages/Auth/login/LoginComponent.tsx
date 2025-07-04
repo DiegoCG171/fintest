@@ -41,7 +41,7 @@ const LoginComponent = () => {
                 username: values.username,
                 password: values.password,
               })).unwrap();
-              navigate("/");
+              navigate("/home");
             } catch (error) {
               showToast(error as string, "error");
             } finally {

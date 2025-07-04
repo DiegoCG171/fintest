@@ -1,19 +1,32 @@
 import { Stack, Typography } from "@mui/material";
 import BreadcrumbComponent from "./BreadcrumbComponent";
-import { useLocation } from "react-router-dom";
+import { useAppSelector } from "../../store";
+import { originType } from "../../config/interfaces";
 
 
+type TitleHeaderComponentProps = {
+    routeId: string;
+    origin: originType
+};
 
-function TitleHeaderComponent() {
-    const location = useLocation();
-    const pathnames = location.pathname.split("/").filter(Boolean);
-    /* const path = useAppSelector(state => state.templates.templateById?.path)
-    const name = useAppSelector(state => state.templates.templateById?.name)
-    const route = [...(path ?? []), name].filter(Boolean); */
+function TitleHeaderComponent({ routeId, origin }: TitleHeaderComponentProps) {
+    const templates = useAppSelector(state => state.templates.templates)
+    const testCase = useAppSelector(state => state.testCases.testCases)
 
-    if (location.pathname === "/") return null;
+    const objectTemplate = () => {
+        switch (origin) {
+            case 'categories':
+                return templates.find((t) => t.uuid === routeId)
+            case "collections":
+                return testCase.find((t) => t.uuid === routeId)
+            default : return null
+        }
+    }        
 
-    const resolvedTitle = pathnames[0] || "";
+    const routeTemplate = objectTemplate();
+    const resolvedTitle = routeTemplate?.name || "";
+    const basePath = Array.isArray(routeTemplate?.path) ? [...routeTemplate.path] : [];
+    const pathNames = [...basePath, resolvedTitle];
 
     return (
         <Stack sx={{pl: 1, mt:3}}>
@@ -29,7 +42,7 @@ function TitleHeaderComponent() {
                     {resolvedTitle}
                 </Typography>
             )}
-            {resolvedTitle && <BreadcrumbComponent />}
+            {resolvedTitle && <BreadcrumbComponent pathNames={pathNames}/>}
         </Stack>
     );
 }
