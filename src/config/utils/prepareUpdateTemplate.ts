@@ -45,6 +45,14 @@ export function prepareUpdatePayload(
             ? mapOnlyRequiredChildren(row.breakingRules as TableRowDataFormBuilder[])
             : mapAllChildren(row.breakingRules as TableRowDataFormBuilder[]);
         }
+        
+        if (typeForm === 'selectionTransaction') {
+            return {
+                idBitmap: row.idBitmap ?? '',
+                function: row.function ?? '',
+                value: row.value ?? '',
+            };
+        }
 
         return {
             idBitmap: row.idBitmap ?? '',

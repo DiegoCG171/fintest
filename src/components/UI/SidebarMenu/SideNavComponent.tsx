@@ -24,6 +24,7 @@ import {
   setCollectionsRoutesThunk,
 } from "../../../store/slices/routes/validRoutes.thunk";
 import SearchBar from "./SearchBar";
+import { RunnerSideBar } from "../Runner/RunnerSideBar";
 
 export const drawerWidth = 240;
 
@@ -69,7 +70,7 @@ function SideNavComponent() {
   }, [dispatch, collections]);
 
   const toggleMenu = useCallback(() => {
-    dispatch(setCollapsedState());
+    dispatch(setCollapsedState())
   }, [dispatch]);
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -102,7 +103,6 @@ function SideNavComponent() {
         {!hideMenu && (
           <Box sx={{ px: 2, overflowY: "auto", flexGrow: 1, my: 4 }}>
             <SearchBar onSearch={handleSearch}></SearchBar>
-            {/* Menú desplegable */}
             <SidebarBlock searchTerm={searchTerm} searchOnItem={searchOnItem} />
             <Box>
               <MediaPlayer></MediaPlayer>
@@ -110,6 +110,7 @@ function SideNavComponent() {
           </Box>
         )}
       </Drawer>
+      <RunnerSideBar />
     </Box>
   );
 }

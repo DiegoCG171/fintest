@@ -20,6 +20,13 @@ export const tabsContent = (
         canEdit,
         origin,
     },
+    {
+        label: "Selección",
+        templateId,
+        formType: "selectionTransaction",
+        canEdit,
+        origin,
+    },
 ];
 
 export const extractLinkMenus = (data: MenuServiceInterface[]) => {

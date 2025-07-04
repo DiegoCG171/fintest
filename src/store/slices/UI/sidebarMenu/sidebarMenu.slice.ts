@@ -6,7 +6,9 @@ import {
 import {
   createCollectionThunk,
   createTestCaseThunk,
+  deleteCollectionThunk,
   deleteTestCaseThunk,
+  updateCollectionThunk,
 } from "../../collections/collections.thunk";
 import { mapCollections } from "../../../../config/utils/collections.utils";
 import { CollectionResponse } from "../../../../config/interfaces/collections.interface";
@@ -18,6 +20,7 @@ export const initialState: MenuSidebarState = {
   collectionsMenu: [],
   createCollectionMenu: false,
   updateTestCase: null,
+  updateCollection: null,
   loading: false,
   idTestCase: "",
 };
@@ -42,13 +45,19 @@ export const sidebarMenuSlice = createSlice({
       state.createCollectionMenu = action.payload;
     },
     setCollapsedState(state) {
-      state.isCollapsed = !state.isCollapsed
+      state.isCollapsed = !state.isCollapsed;
     },
     updateTestCase(state, action) {
       state.updateTestCase = action.payload;
     },
     removeUpdateTestCase(state) {
       state.updateTestCase = null;
+    },
+    updateCollection(state, action) {
+      state.updateCollection = action.payload;
+    },
+    removeUpdateCollection(state) {
+      state.updateCollection = null;
     },
   },
   extraReducers: (build) => {
@@ -60,16 +69,53 @@ export const sidebarMenuSlice = createSlice({
         state.createCollectionMenu = false;
       }
     );
-    build.addCase(deleteTestCaseThunk
-      .fulfilled, (state, action) => {
-        state.collectionsMenu = state.collectionsMenu.map((group) => {
-          const filteredItems = group.items?.filter(
-            (item) => item.id !== action.payload
-          );
-          return { ...group, items: filteredItems };
+    build.addCase(
+      updateCollectionThunk.fulfilled,
+      (state, action: PayloadAction<{ uuid: string; name: string }>) => {
+        const { uuid, name } = action.payload;
+
+        const slug = name
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/\s+/g, "-")
+          .replace(/[^\w-]/g, "");
+
+        state.collectionsMenu = state.collectionsMenu.map((collection) => {
+          if (collection.id === uuid) {
+            const prefix = collection.linkMenu?.split("/")[0] ?? "";
+            return {
+              ...collection,
+              name,
+              linkMenu: `${prefix}/${slug}`,
+            };
+          }
+          return collection;
         });
+
+        state.updateCollection = null;
         state.loading = false;
+      }
+    );
+
+    build.addCase(
+      deleteCollectionThunk.fulfilled,
+      (state, action: PayloadAction<string>) => {
+        const idToDelete = action.payload;
+        state.collectionsMenu = state.collectionsMenu.filter(
+          (collection) => collection.id !== idToDelete
+        );
+      }
+    );
+    build.addCase(deleteTestCaseThunk.fulfilled, (state, action) => {
+      state.collectionsMenu = state.collectionsMenu.map((group) => {
+        const filteredItems = group.items?.filter(
+          (item) => item.id !== action.payload
+        );
+        return { ...group, items: filteredItems };
       });
+      state.loading = false;
+    });
     build.addCase(deleteTestCaseThunk.rejected, (state) => {
       state.loading = false;
     });
@@ -108,8 +154,7 @@ export const sidebarMenuSlice = createSlice({
       }
     );
     build.addCase(
-      createTestCaseThunk
-        .fulfilled,
+      createTestCaseThunk.fulfilled,
       (
         state,
         action: PayloadAction<{
@@ -118,16 +163,22 @@ export const sidebarMenuSlice = createSlice({
           collectionId: string;
         }>
       ) => {
-        const { id, name, collectionId } = action.payload
+        const { id, name, collectionId } = action.payload;
+
+        const slug = name
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/\s+/g, "-")
+          .replace(/[^\w-]/g, "");
 
         state.collectionsMenu = state.collectionsMenu.map((group) => {
           if (group.id === collectionId) {
             const newItem = {
               id,
               name,
-              linkMenu: `collections/${id}`, // Ajusta el prefijo si lo necesitas distinto
+              linkMenu: `${group.id}/${slug}`,
             };
-            console.log(newItem)
 
             return {
               ...group,
@@ -151,4 +202,6 @@ export const {
   toggleCreateCollectionMenu,
   updateTestCase,
   removeUpdateTestCase,
+  updateCollection,
+  removeUpdateCollection
 } = sidebarMenuSlice.actions;

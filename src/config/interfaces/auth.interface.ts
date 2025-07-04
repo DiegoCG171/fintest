@@ -22,7 +22,7 @@ export interface LoginResponse {
     createdAt: string
     updatedAt: string
     deletedAt?: unknown
-    token: string
+    token: string;
 }
 
 export interface AuthState {

@@ -1,5 +1,6 @@
 import api from "../../api/api";
 import { ENDPOINTS } from "../../config/constants/endpoints";
+import { PatchGenerationTemplate } from "../../config/interfaces";
 import { CreateCollection } from "../../config/interfaces/collections.interface";
 import { handleAxiosError } from "../../config/utils/axiosErrorHandler";
 
@@ -32,7 +33,7 @@ export const createCollection = async (body: CreateCollection) => {
         throw errorMessage;
     }
 }
-export const updateCollection = async (id: string, body: CreateCollection) => {
+export const updateCollection = async (id: string, body: PatchGenerationTemplate) => {
     try {
         const {data} = await api.patch(`${ENDPOINTS.collections}/${id}`, body);
         return data;
@@ -41,3 +42,13 @@ export const updateCollection = async (id: string, body: CreateCollection) => {
         throw errorMessage;
     }
 }
+
+export const deleteCollection = async (id: string) => {
+  try {
+    const { data } = await api.delete(`${ENDPOINTS.collections}/${id}`);
+    return data;
+  } catch (error) {
+    const errorMessage = handleAxiosError(error);
+    throw errorMessage;
+  }
+};
