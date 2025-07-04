@@ -1,12 +1,61 @@
 
-//Component's interface
+//Tabs props
+import { ReactNode } from "react";
+import { originType } from ".";
 
-import { FormTabItem } from ".";
+// Para tabs dinámicos de formularios
+export interface FormTabItem {
+    label: string;
+    templateId: string;
+    formType: string;
+    canEdit: boolean;
+    origin: originType;
+}
+
+// Para tabs que pintan JSX directamente
+export interface StaticTabItem {
+    label: string;
+    content: React.ReactNode;
+    route?: string
+    canEdit: boolean
+    origin?: originType;
+}
+
+export interface TabTableComponentProps {
+    tabs: StaticTabItem[];
+    initialTabIndex?: number;
+}
+
+export interface TabTableFormComponentProps {
+    tabs: FormTabItem[];
+    initialTabIndex?: number;
+}
+
+export interface CatalogsDataMiddlewareProps {
+    tabId: string;
+    template: FormTabItem;
+}
+
+export interface TabConfigInterface {
+    [key: string]: Array<{
+        label: string;
+        content: ReactNode;
+        canEdit: boolean;
+        origin: originType;
+    }>;
+}
+
+export interface TabbedCardContainerProps {
+    tabs: { label: string; content: ReactNode, canEdit: boolean }[];
+    eventTabs: { label: string; content: ReactNode, canEdit: boolean }[];
+    initialTabIndex: number | undefined;
+}
 
 /**Form Builder */
 export interface FormBuilderProps {
     tabId: string;
-    template?: FormTabItem
+    template?: FormTabItem;
+    canEdit: boolean
 }
 
 /**Form Row Builder */
@@ -15,6 +64,8 @@ export interface FormBuilderRowProps {
     path: number[];
     tabId: string;
     headers: ColumnConfigFormBuilder[];
+    isChild: boolean
+    canEdit: boolean
 }
 
 /**Dynamic Field */
@@ -25,6 +76,7 @@ export interface DynamicFieldProps {
     path: number[];
     tabId: string;
     isEditable: boolean
+    onlyRead: boolean
 }
 
 //Slice's interfaces
@@ -51,14 +103,13 @@ export interface ColumnConfigFormBuilder {
 export interface TableRowDataFormBuilder {
     idBitmap: string;
     displayName: string;
-    isRequired?: boolean;
-    canRequired?: boolean;
+    isRequired: boolean;
+    isActive?: boolean;
     function?: string | undefined;
-    value?: string | number | boolean;
+    value: string | number | boolean | null | undefined;
     breakingRules?: TableRowDataFormBuilder[] | string;
     _id?: string;
     [key: string]: unknown | undefined;
-
 }
 
 export interface TabFormState {

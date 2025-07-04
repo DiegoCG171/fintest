@@ -1,69 +1,52 @@
 import { AsyncStatus } from "."
 
 /*TODO: Mejorar interfaces*/
-
-// GET
-
-export type TemplateRoot = TemplateContextType[]
-
 export interface TemplateContextType {
     _id: string
     name: string
     description: string
-    category: string
+    categoryId: string
     type: string
-    validationTransaction: ValidationTransaction[]
-    generationTransaction: ValidationTransaction[]
+    validationTransaction: FieldValidation[]
+    generationTransaction: FieldValidation[]
+    selectionTransaction: FieldValidation[]
     uuid: string
     __v: number
     createdAt: string
     updatedAt: string
+    path: string[]
 }
 
-export interface ValidationTransaction {
-    idBitmap: string
-    isRequired?: boolean
-    function: string
-    value: string
-    fields: FieldValidation[]
-    _id: string
-}
+export type CreateTemplate = Omit<TemplateContextType, "_id" | "uuid" | "__v" | "createdAt" | "updatedAt" | "type">;
+
+export interface JsonTemplateState {
+    data: CreateTemplate,
+};
 
 export interface FieldValidation {
-    idBitmap: string
-    function: string
-    value: string
-    fields: FieldValidation[]
-    _id: string
+    idBitmap?: string
+    function?: string
+    isRequired?: boolean
+    value?: string | null
+    fields?: FieldValidation[]
+    _id?: string
 }
 
 // PATCH
 
 export interface PatchGenerationTemplate {
-    generationTransaction?: GenerationTransaction[]
-    validationTransaction?: GenerationTransaction[]
+    name?: string
+    description?: string
+    category?:string
+    type?: string
+    generationTransaction?: FieldUpdateTemplate[]
+    validationTransaction?: FieldUpdateTemplate[]
 }
-
-export interface GenerationTransaction {
-    idBitmap: string
-    function: string | undefined
-    value?: string | number | boolean | undefined
-    fields?: FieldUpdateTemplate[]
-    isRequired?: boolean
-}
-
 export interface FieldUpdateTemplate {
     idBitmap: string
-    function?: string | undefined,
-    value?: string | number | boolean | undefined,
-    fields?: Field2[]
-    isRequired?: boolean
-}
-
-export interface Field2 {
-    idBitmap: string
-    function: string
-    value?: string | number | boolean | undefined,
+    function?: string,
+    value?: string | number | boolean,
+    fields?: FieldUpdateTemplate[]
     isRequired?: boolean
 }
 
@@ -71,9 +54,15 @@ export interface Field2 {
 // Slice
 
 export interface TemplateState {
-    templates: TemplateRoot | [],
+    templates: TemplateContextType[],
     getStatus: AsyncStatus,
     getError: null | string,
     updateStatus: AsyncStatus,
     updateError: null | string,
+    createStatus: AsyncStatus,
+    createError: null | string
+    getStatusById: AsyncStatus,
+    getErrorById: null | string,
+    templateById: TemplateContextType | null,
+
 }

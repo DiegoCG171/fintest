@@ -1,125 +1,76 @@
-import { MenuItem } from "../../config/interfaces"; // Asegúrate de que la interfaz esté actualizada
-import CreateNewFolderOutlinedIcon from "@mui/icons-material/CreateNewFolderOutlined";
-import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
-import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
-import ArrowRightAltOutlinedIcon from "@mui/icons-material/ArrowRightAltOutlined";
+import { MenuItem } from "../../config/interfaces"; 
 
 export const staticMenuItems: MenuItem[] = [
     {
-        title: "Catálogo",
-        iconMenu: <CreateNewFolderOutlinedIcon />,
-        subItems: [
-        {
-            title: "Pos",
-            iconMenu: <FolderOutlinedIcon />,
-            subItems: [
+            name: "Ecommerce",
+            id: "",
+            items: [
             {
-                title: "Venta",
-                iconMenu: <DescriptionOutlinedIcon />,
-                subItems: [
-                {
-                    title: "Venta",
-                    iconMenu: <DescriptionOutlinedIcon />,
-                    onClickMenu: () => console.log("Venta desde ecommerce"),
-                },
-                {
-                    title: "Venta",
-                    iconMenu: <DescriptionOutlinedIcon />,
-                    onClickMenu: () => console.log("Venta desde ecommerce"),
-                },
-                ],
+                name: "Venta",
+                id: "6835dbfdc9433ace61787028",
+                linkMenu: "collections/ecommerce/ventas",
+            },
+            {
+                name: "Reverso",
+                id: "6835dbfdc9433ace61787086",
+                linkMenu: "collections/ecommerce/reverso",
+            },
+            {
+                name: "Cancelación",
+                id: "",
+                linkMenu: "collections/ecommerce/cancelacion",
+            },
+            {
+                name: "Venta con #DS",
+                id: "6835dbfdc9433ace61787086",
+                linkMenu: "collections/ecommerce/ventas-ds",
+            },
+            {
+                name: "Venta Visa",
+                id: "",
+                linkMenu: "collections/ecommerce/ventas-visa",
+            },
+            {
+                name: "Centa con 3DS mastercard",
+                id: "",
+                linkMenu: "collections/ecommerce/ventas-mastercard",
             },
             ],
         },
         {
-            title: "ATM",
-            iconMenu: <FolderOutlinedIcon />,
-            subItems: [
+            name: "Moto",
+            id: "",
+            items: [
             {
-                title: "Venta",
-                iconMenu: <DescriptionOutlinedIcon />,
-                onClickMenu: () => console.log("Venta desde moto"),
+                name: "Venta",
+                id: "",
+                linkMenu: "collections/moto/ventas",
+            },
+            {
+                name: "Reverso",
+                id: "",
+                linkMenu: "collections/moto/reverso",
+            },
+            {
+                name: "Cancelación",
+                id: "",
+                linkMenu: "collections/moto/cancelacion",
+            },
+            {
+                name: "Venta con #DS",
+                id: "",
+                linkMenu: "collections/moto/ventas-ds",
+            },
+            {
+                name: "Venta Visa",
+                id: "",
+                linkMenu: "collections/moto/ventas-visa",
+            },
+            {
+                name: "Centa con 3DS mastercard",
+                id: "",
+                linkMenu: "collections/moto/ventas-mastercard",
             },
             ],
         },
-        ],
-    },
-    {
-        title: "Colecciones",
-        iconMenu: <CreateNewFolderOutlinedIcon />,
-        subItems: [
-        {
-            title: "Ecommerce",
-            iconMenu: <FolderOutlinedIcon />,
-            subItems: [
-            {
-                title: "Venta",
-                iconMenu: <ArrowRightAltOutlinedIcon />,
-                linkMenu: "ecommerce/ventas",
-            },
-            {
-                title: "Reverso",
-                iconMenu: <ArrowRightAltOutlinedIcon />,
-                linkMenu: "ecommerce/reverso",
-            },
-            {
-                title: "Cancelación",
-                iconMenu: <ArrowRightAltOutlinedIcon />,
-                linkMenu: "ecommerce/cancelacion",
-            },
-            {
-                title: "Venta con #DS",
-                iconMenu: <ArrowRightAltOutlinedIcon />,
-                linkMenu: "ecommerce/ventas-ds",
-            },
-            {
-                title: "Venta Visa",
-                iconMenu: <ArrowRightAltOutlinedIcon />,
-                linkMenu: "ecommerce/ventas-visa",
-            },
-            {
-                title: "Centa con 3DS mastercard",
-                iconMenu: <ArrowRightAltOutlinedIcon />,
-                linkMenu: "ecommerce/ventas-mastercard",
-            },
-            ],
-        },
-        {
-            title: "Moto",
-            iconMenu: <FolderOutlinedIcon />,
-            subItems: [
-            {
-                title: "Venta",
-                iconMenu: <ArrowRightAltOutlinedIcon />,
-                linkMenu: "moto/ventas",
-            },
-            {
-                title: "Reverso",
-                iconMenu: <ArrowRightAltOutlinedIcon />,
-                linkMenu: "moto/reverso",
-            },
-            {
-                title: "Cancelación",
-                iconMenu: <ArrowRightAltOutlinedIcon />,
-                linkMenu: "moto/cancelacion",
-            },
-            {
-                title: "Venta con #DS",
-                iconMenu: <ArrowRightAltOutlinedIcon />,
-                linkMenu: "moto/ventas-ds",
-            },
-            {
-                title: "Venta Visa",
-                iconMenu: <ArrowRightAltOutlinedIcon />,
-                linkMenu: "moto/ventas-visa",
-            },
-            {
-                title: "Centa con 3DS mastercard",
-                iconMenu: <ArrowRightAltOutlinedIcon />,
-                linkMenu: "moto/ventas-mastercard",
-            },
-            ],
-        },
-        ],
-    },
 ];

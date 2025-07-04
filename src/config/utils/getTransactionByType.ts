@@ -1,22 +1,42 @@
-import { ValidationTransaction } from "../interfaces";
+import { TemplateContextType, FieldValidation, testCaseInterface } from "../interfaces";
 
 export function getTransactionByType(
-    templates: any[],
-    templateId: string,
-    formType: string
-): ValidationTransaction[] {
-    const template = templates.find((t) => t._id === templateId);
+  templates: TemplateContextType[] | testCaseInterface[],
+  templateId: string,
+  formType: string
+): FieldValidation[] | null {
+  const template = templates.find(
+    (t) => t._id?.toString() === templateId.toString() || t.uuid?.toString() === templateId.toString()
+  );
 
-    if (!template) return [];
-
-    switch (formType) {
-        case "validationTransaction":
-            return template.validationTransaction ?? [];
-
-        case "generationTransaction":
-            return template.generationTransaction ?? [];
-
-        default:
-            return [];
-    }
+  if (!template) {
+    return null;
+  }
+  switch (formType) {
+    case "validationTransaction":
+      return template.validationTransaction ?? [];
+    case "generationTransaction":
+      return template.generationTransaction ?? [];
+    case "selectionTransaction":
+      return template.selectionTransaction ?? [];
+    default:
+      return null;
+  }
 }
+
+export function getTemplateID(
+  templates: TemplateContextType[],
+  templateId: string,
+) {
+  const template = templates.find(
+    (t) => t._id?.toString() === templateId.toString() || t.uuid?.toString() === templateId.toString()
+  );
+
+  if (!template) {
+    return null;
+  }
+
+  return template._id
+}
+
+

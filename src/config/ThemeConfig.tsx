@@ -11,6 +11,7 @@ const theme = createTheme({
     },
     secondary: {
       main: "#00B0FF",
+      light: "#D9EDFF",
     },
     success: {
       main: "#4CAF50",
@@ -51,7 +52,7 @@ const theme = createTheme({
         fontSize: "0.8rem",
       },
     },
-  },  
+  },
   components: {
     MuiButtonBase: {
       defaultProps: {
@@ -102,6 +103,17 @@ const theme = createTheme({
           color: "#fff",
           boxShadow: "none",
           backgroundColor: "#184190",
+          "&.Mui-disabled": {
+            backgroundColor: "#D1D1D1",
+            color: "#737373",
+            opacity: 1,
+            cursor: "not-allowed"
+          },
+          "&:hover": {
+            backgroundColor: "#048ABF",
+            color: "#FFF",
+            boxShadow: "none",
+          },
         },
       },
     },
@@ -139,7 +151,7 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           fontSize: "10px",
-          height: "100%"
+          height: "100%",
         },
       },
     },
@@ -166,7 +178,7 @@ const theme = createTheme({
       defaultProps: {
         disableRipple: true,
       },
-    },    
+    },
     MuiBreadcrumbs: {
       styleOverrides: {
         root: {

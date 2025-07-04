@@ -3,3 +3,16 @@ input:-webkit-autofill {
     -webkit-text-fill-color: inherit;
     transition: background-color 5000s ease-in-out 0s;
 }
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #737373a2;
+  border-radius: 4px;
+}

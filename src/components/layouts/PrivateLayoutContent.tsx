@@ -1,30 +1,42 @@
 import { Outlet } from "react-router-dom";
 import HeaderComponent from "../UI/HeaderComponent";
 import { Box } from "@mui/material";
-import SideNavComponent, { drawerWidth } from "../UI/SideNavComponent";
+import SideNavComponent from "../UI/SidebarMenu/SideNavComponent";
+import FullScreenModal from "../core/FullScreenModal";
+import { PopMenuProvider } from "../../config/context/PopMenuProvider";
 
 function PrivateLayoutContent() {
-    return (
-        <Box sx={{ display: "flex", height: "100vh" }}>
-        <SideNavComponent />
+  const FOOTER_HEIGHT = 40;
+
+  return (
+    <>
+      <Box sx={{ display: "flex", height: "100%" }}>
+        <PopMenuProvider>
+          <SideNavComponent />
+        </PopMenuProvider>
         <Box
-            sx={{
+          sx={{
             flex: 1,
+            height: `calc(100% - ${FOOTER_HEIGHT}px)`,
             overflow: "hidden",
             display: "flex",
             flexDirection: "column",
-            }}
+            
+          }}
         >
-            <Box sx={{ position: "sticky", top: 0, zIndex: 800 }}>
+          <Box sx={{ position: "sticky", top: 0, zIndex: 800 }}>
             <HeaderComponent alerts={9} />
-            </Box>
+          </Box>
 
-            <Box sx={{ marginLeft: `${drawerWidth}px`, flexGrow: 1, p: 3 }}>
-                <Outlet />
-            </Box>
+          <Box sx={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
+            <Outlet />
+          </Box>
         </Box>
-        </Box>
-    );
+      </Box>
+      <FullScreenModal
+      />
+    </>
+  );
 }
 
 export default PrivateLayoutContent;

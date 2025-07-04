@@ -1,30 +1,48 @@
 import { Stack, Typography } from "@mui/material";
 import BreadcrumbComponent from "./BreadcrumbComponent";
-import { useLocation } from "react-router-dom";
+import { useAppSelector } from "../../store";
+import { originType } from "../../config/interfaces";
 
-const TITLE_HEADER: Record<string, string> = {
-    ecommerce: "Pruebas Eccomerce",
-    moto: "Pruebas Moto",
+
+type TitleHeaderComponentProps = {
+    routeId: string;
+    origin: originType
 };
 
-function TitleHeaderComponent() {
-    const location = useLocation();
-    const pathnames = location.pathname.split("/").filter(Boolean);
-    if (location.pathname === "/") return null;
+function TitleHeaderComponent({ routeId, origin }: TitleHeaderComponentProps) {
+    const templates = useAppSelector(state => state.templates.templates)
+    const testCase = useAppSelector(state => state.testCases.testCases)
 
-    const resolvedTitle = TITLE_HEADER[pathnames[0]] || "";
+    const objectTemplate = () => {
+        switch (origin) {
+            case 'categories':
+                return templates.find((t) => t.uuid === routeId)
+            case "collections":
+                return testCase.find((t) => t.uuid === routeId)
+            default : return null
+        }
+    }        
+
+    const routeTemplate = objectTemplate();
+    const resolvedTitle = routeTemplate?.name || "";
+    const basePath = Array.isArray(routeTemplate?.path) ? [...routeTemplate.path] : [];
+    const pathNames = [...basePath, resolvedTitle];
 
     return (
-        <Stack sx={{mt: -1}}>
+        <Stack sx={{pl: 1, mt:3}}>
             {resolvedTitle && (
                 <Typography
                     variant="h6"
-                    sx={{ fontWeight: "bold", textTransform: "capitalize" }}
+                    sx={{ 
+                        fontWeight: "bold", 
+                        textTransform: "capitalize",
+                        fontSize: 16
+                    }}
                 >
                     {resolvedTitle}
                 </Typography>
             )}
-            {resolvedTitle && <BreadcrumbComponent />}
+            {resolvedTitle && <BreadcrumbComponent pathNames={pathNames}/>}
         </Stack>
     );
 }
