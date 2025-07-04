@@ -1,12 +1,12 @@
 import { MenuItem, Select, TextField, Typography } from "@mui/material";
-import {
-  DynamicFieldProps,
-} from "../../../config/interfaces";
+import { DynamicFieldProps } from "../../../config/interfaces";
 import {
   updateFieldValue,
   updateNestedFieldValue,
   useAppDispatch,
 } from "../../../store";
+
+const fontSize = "0.75rem";
 
 function DynamicField({
   column,
@@ -15,30 +15,13 @@ function DynamicField({
   path,
   tabId,
   isEditable,
-  onlyRead,
 }: DynamicFieldProps) {
+
   const dispatch = useAppDispatch();
   const dependsOn = column?.dependsOn;
   const dependsValue = dependsOn ? row[dependsOn] : undefined;
   const isChild = path.length > 1;
   const isParent = row.breakingRules ? row.breakingRules.length > 0 : false;
-  const getStyles = () => {
-    if (isChild) {
-      return {
-        fontSize: "0.65rem",
-      };
-    } else if (!isParent) {
-      return {
-        fontSize: "0.75rem",
-      };
-    } else {
-      return {
-        fontSize: "0.75rem",
-        fontWeight: "600",
-      };
-    }
-  };
-
 
   const handleChange = (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -76,35 +59,10 @@ function DynamicField({
     return !dependsValue;
   }
 
-  if (onlyRead && column.type === "checkbox") {
-    const realValue = value !== undefined ? value : row.isRequired;
-    return (
-      <input
-        disabled={true}
-        type="checkbox"
-        checked={Boolean(realValue)}
-        onChange={(e) => handleChange({ target: { value: e.target.checked } })}
-      />
-    );
-  }
+  if (!isEditable && column.id === "value" || !isEditable && column.id === "function") {
+  return <Typography sx={{fontSize}}>{typeof value === "string" ? value : ""}</Typography>;
+}
 
-  if (
-    (isParent && column.id === "value") ||
-    (isParent && column.id === "function")
-  ) {
-    return null;
-  }
-
-  if (
-    (!isEditable && column.id === "value") ||
-    (!isEditable && column.id === "function")
-  ) {
-    return (
-      <Typography sx={getStyles()}>
-        {typeof value === "string" ? value : ""}
-      </Typography>
-    );
-  }
 
   if (column.dynamicRender && dependsValue !== undefined) {
     const dynamic = column.dynamicRender[dependsValue as string];
@@ -121,7 +79,7 @@ function DynamicField({
           fullWidth
           sx={{
             height: "24px",
-            ...getStyles(),
+            fontSize,
             borderRadius: 2,
             "& .MuiSelect-select": {
               padding: "4px 8px",
@@ -132,7 +90,7 @@ function DynamicField({
             <MenuItem
               key={opt}
               value={opt}
-              sx={getStyles()}
+              sx={{ fontSize }}
             >
               {opt}
             </MenuItem>
@@ -152,12 +110,12 @@ function DynamicField({
           sx={{
             "& .MuiInputBase-root": {
               height: "24px",
-              ...getStyles(),
+              fontSize,
               borderRadius: 2,
             },
             "& input": {
               padding: "4px 8px",
-              ...getStyles(),
+              fontSize,
             },
           }}
         />
@@ -168,12 +126,11 @@ function DynamicField({
   if (column.dependsOn) {
     if (column.type === "checkbox") {
       const isDisabled = shouldDisableCheckbox(isChild, dependsValue);
-      const realValue = value !== undefined ? value : row.isRequired;
       return (
         <input
           disabled={Boolean(isDisabled)}
           type="checkbox"
-          checked={Boolean(realValue)}
+          checked={Boolean(value)}
           onChange={(e) =>
             handleChange({ target: { value: e.target.checked } })
           }
@@ -184,11 +141,10 @@ function DynamicField({
 
   if (!column.dependsOn) {
     if (column.type === "checkbox" && path.length === 1) {
-      const realValue = value !== undefined ? value : row.isRequired;
       return (
         <input
           type="checkbox"
-          checked={Boolean(realValue)}
+          checked={Boolean(value)}
           onChange={(e) =>
             handleChange({ target: { value: e.target.checked } })
           }
@@ -204,12 +160,12 @@ function DynamicField({
           sx={{
             "& .MuiInputBase-root": {
               height: "24px",
-              ...getStyles(),
+              fontSize,
               borderRadius: 2,
             },
             "& input": {
               padding: "4px 8px",
-              ...getStyles(),
+              fontSize,
             },
           }}
         />
@@ -225,7 +181,7 @@ function DynamicField({
           variant="outlined"
           sx={{
             height: "24px",
-            ...getStyles(),
+            fontSize,
             borderRadius: 2,
             "& .MuiSelect-select": {
               padding: "4px 8px",
@@ -234,7 +190,7 @@ function DynamicField({
         >
           <MenuItem
             value=""
-            sx={getStyles()}
+            sx={{ fontSize }}
           >
             <em>Seleccione una opción</em>
           </MenuItem>
@@ -242,7 +198,7 @@ function DynamicField({
             <MenuItem
               key={opt}
               value={opt}
-              sx={getStyles()}
+              sx={{ fontSize }}
             >
               {opt}
             </MenuItem>
@@ -255,10 +211,7 @@ function DynamicField({
   return (
     <Typography
       variant="body2"
-      style={{
-        ...getStyles(),
-        padding: isChild ? 6 : 0,
-      }}
+      fontSize={fontSize}
     >
       {typeof value === "string" ? value : ""}
     </Typography>

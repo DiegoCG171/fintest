@@ -1,11 +1,9 @@
 import express from 'express';
-import helmet from 'helmet'
 
 const app = express();
 const PORT: number = parseInt(process.env['PORT'] as string, 10) || 5173;
 const path =__dirname + '/app/';
 
-app.use(helmet())
 app.use(express.static(path));
 
 app.all('*', function (req, res) {

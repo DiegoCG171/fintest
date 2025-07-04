@@ -2,29 +2,24 @@ import { Stack, Typography } from "@mui/material";
 import BreadcrumbComponent from "./BreadcrumbComponent";
 import { useLocation } from "react-router-dom";
 
-
+const TITLE_HEADER: Record<string, string> = {
+    ecommerce: "Pruebas Eccomerce",
+    moto: "Pruebas Moto",
+};
 
 function TitleHeaderComponent() {
     const location = useLocation();
     const pathnames = location.pathname.split("/").filter(Boolean);
-    /* const path = useAppSelector(state => state.templates.templateById?.path)
-    const name = useAppSelector(state => state.templates.templateById?.name)
-    const route = [...(path ?? []), name].filter(Boolean); */
-
     if (location.pathname === "/") return null;
 
-    const resolvedTitle = pathnames[0] || "";
+    const resolvedTitle = TITLE_HEADER[pathnames[0]] || "";
 
     return (
-        <Stack sx={{pl: 1, mt:3}}>
+        <Stack sx={{mt: -1}}>
             {resolvedTitle && (
                 <Typography
                     variant="h6"
-                    sx={{ 
-                        fontWeight: "bold", 
-                        textTransform: "capitalize",
-                        fontSize: 16
-                    }}
+                    sx={{ fontWeight: "bold", textTransform: "capitalize" }}
                 >
                     {resolvedTitle}
                 </Typography>

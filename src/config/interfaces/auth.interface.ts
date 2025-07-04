@@ -22,7 +22,7 @@ export interface LoginResponse {
     createdAt: string
     updatedAt: string
     deletedAt?: unknown
-    token: string;
+    token: string
 }
 
 export interface AuthState {
@@ -31,13 +31,4 @@ export interface AuthState {
     loading: boolean;
     error: string | null;
     isAuthenticated: boolean;
-}
-
-export interface ResetPassword {
-    newPassword: string;
-    token: string;
-}
-
-export interface RecoveryTokenResponse {
-  message: string;
 }

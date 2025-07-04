@@ -3,19 +3,22 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import Link from "@mui/material/Link";
 import { useLocation } from "react-router-dom";
 
+const BREADCRUMB_NAMES: Record<string, string> = {
+  "ventas": "Ventas",
+  "reverso": "Reverso",
+  "cancelacion": "Cancelación",
+  "ventas-ds": "Venta con #DS",
+  "ventas-visa": "Venta visa",
+  "ventas-mastercard": "Cuenta con 3DS mastercard",
+};
+
 function BreadcrumbComponent() {
-  const normalizeName = (text: string) => {
-    if(text === 'pos') return 'POS';
-    if(text === 'atm') return 'ATM';
-    return text.replace(/-/g, " ");
-  }
   const location = useLocation();
   const pathnames = location.pathname.split("/").filter(Boolean);
-  pathnames.shift()
-  pathnames.pop()
+
   const crumbs = pathnames.map((segment, index) => {
     const to = `/${pathnames.slice(0, index + 1).join("/")}`;
-    const name = normalizeName(segment);
+    const name = BREADCRUMB_NAMES[segment] || segment;
 
     const isLast = index === pathnames.length - 1;
     return isLast ? (

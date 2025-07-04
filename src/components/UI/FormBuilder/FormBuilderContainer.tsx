@@ -1,5 +1,5 @@
 import {
-  Paper,
+  Box,
   Table,
   TableBody,
   TableCell,
@@ -11,15 +11,15 @@ import { useAppSelector } from "../../../store";
 import { FormBuilderProps } from "../../../config/interfaces";
 import FormBuilderRow from "./FormBuilderRow";
 
-function FormBuilderContainer({ tabId, canEdit }: FormBuilderProps) {
+function FormBuilderContainer({ tabId }: FormBuilderProps) {
   const headers = useAppSelector((state) => state.formBuilder.config);
   const tabForm = useAppSelector((state) => state.formBuilder.tabForms[tabId]);
   const rows = tabForm?.values || [];
 
   return (
-    <Paper sx={{ height: "100%"}}>
-      <TableContainer sx={{ height: "100%"}}>
-        <Table stickyHeader>
+    <Box>
+      <TableContainer>
+        <Table>
           <TableHead>
             <TableRow>
               {headers.map((col) => (
@@ -27,7 +27,8 @@ function FormBuilderContainer({ tabId, canEdit }: FormBuilderProps) {
                   key={col.id}
                   sx={{
                     width: col.width,
-                    fontWeight: "bold",
+                    px: 1,
+                    py: 0.5,
                   }}
                 >
                   {col.label}
@@ -38,6 +39,8 @@ function FormBuilderContainer({ tabId, canEdit }: FormBuilderProps) {
           <TableBody
             sx={{
               "& td": {
+                px: 1,
+                py: 0.25,
                 fontSize: "0.75rem",
               },
               "& tr:last-child td": {
@@ -52,14 +55,12 @@ function FormBuilderContainer({ tabId, canEdit }: FormBuilderProps) {
                 path={[index]}
                 tabId={tabId}
                 headers={headers}
-                isChild= {false}
-                canEdit={canEdit}
               />
             ))}
           </TableBody>
         </Table>
       </TableContainer>
-    </Paper>
+    </Box>
   );
 }
 export default FormBuilderContainer;

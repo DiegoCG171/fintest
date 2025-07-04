@@ -13,9 +13,8 @@ import NotFoundComponent from "./pages/Generic/NotFoundComponent";
 import MainPage from "./pages/Catalogs/MainPageComponent";
 import ResetPassword from "./pages/Auth/reset-password/ResetPassword";
 import RecoveryPassword from "./pages/Auth/reset-password/RecoveryPassword";
-import RouteGuard from "./config/guards/RouteGuard";
 
-/* const mainPageRoutes = [
+const mainPageRoutes = [
   "main", 
   "ecommerce", 
   "ecommerce/ventas", 
@@ -31,9 +30,7 @@ import RouteGuard from "./config/guards/RouteGuard";
   "moto/ventas-ds", 
   "moto/ventas-visa", 
   "moto/ventas-mastercard", 
-  "connection/logon/logon-template",
-  "pos/tarjeta-presente/dukpt/retail/venta/venta-template"
-]; */
+];
 
 const router = createBrowserRouter([
   {
@@ -48,7 +45,7 @@ const router = createBrowserRouter([
         element: <RootRedirect />,
       },
       {
-        path: "not-found",
+        path: "*",
         element: <NotFoundComponent />,
       },
       {
@@ -87,14 +84,10 @@ const router = createBrowserRouter([
           {
             element: <PrivateLayoutContent />,
             children: [
-              {
-                path: "*",
-                element: (
-                  <RouteGuard>
-                    <MainPage />
-                  </RouteGuard>
-                ),
-              },
+              ...mainPageRoutes.map((route) => ({
+                path: route,
+                element: <MainPage />,
+              })),
             ],
           },
         ],
