@@ -107,6 +107,4 @@ const CustomInputComponent: React.FC<CustomTextFieldProps> = ({
     );
 };
 
-//#template-name
-
 export default CustomInputComponent;

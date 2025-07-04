@@ -1,20 +1,20 @@
 export const serviceConfig = {
     rules: {
         columns: [
-            { id: "isActive", label: "", affects: ["isRequired"], width: "5%", type: "checkbox" as const },
+            { id: "isRequired", label: "", affects: ["canRequired"], width: "5%", type: "checkbox" as const },
             { id: "idBitmap", label: "Campo", width: "10%", type: "static" as const },
             { id: "displayName", label: "Nombre", width: "35%", type: "static" as const },
             {
-                id: "isRequired",
+                id: "canRequired",
                 label: "Requerido",
-                dependsOn: "isActive",
+                dependsOn: "isRequired",
                 width: "10%",
                 type: "checkbox" as const
             },
             {
                 id: "function",
                 label: "Función",
-                options: ["value", "echo", "calculated", "de request", "equals", "not_validate", "includes" ],
+                options: ["Value", "Echo", "Calculated", "De request"],
                 affects: ["value"],
                 width: "20%",
                 type: "select" as const,
@@ -25,13 +25,10 @@ export const serviceConfig = {
                 label: "Parámetro",
                 dependsOn: "function",
                 dynamicRender: {
-                    echo: { render: false },
-                    not_validate: { render: false },
-                    calculated: { render: false },
-                    includes: { render: true, type: "input" as const },
-                    equals: { render: true, type: "input" as const },
-                    value: { render: true, type: "input" as const },
-                    "de request": {
+                    Echo: { render: false },
+                    Calculated: { render: false },
+                    Value: { render: true, type: "input" as const },
+                    "De request": {
                         render: true,
                         type: "select" as const,
                         options: ["Opción 1", "Opción 2", "Opción 3"],

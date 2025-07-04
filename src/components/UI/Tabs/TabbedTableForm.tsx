@@ -2,206 +2,146 @@ import { useEffect, useMemo, useState } from "react";
 import { Box, Button, Stack, Tab, Tabs } from "@mui/material";
 import CustomTabPanel from "../../core/CustomTabPanel";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
-import {
-  FormTabItem,
-  TabTableFormComponentProps,
-  TemplateContextType,
-} from "../../../config/interfaces";
+import { TabTableFormComponentProps } from "../../../config/interfaces";
 import CatalogsDataMiddleware from "../../middlewares/CatalogsDataMiddleware";
 import {
-  addOrUpdateTestCases,
   clearRulesError,
   clearTemplateError,
   getRulesThunk,
-  setLoading,
+  getTemplatesThunk,
   useAppDispatch,
   useAppSelector,
 } from "../../../store";
 import { useToast } from "../../../config/hooks/useToast";
-import {
-  getTemplateID,
-  prepareUpdatePayload as preparePayload,
-} from "../../../config/utils";
-import {
-  getTemplateByIdThunk,
-  updateTemplateThunk,
-} from "../../../store/slices/templates/templates.thunk";
-import TitleHeaderComponent from "../TitleHeaderComponent";
-import {
-  getTestCaseByIdThunk,
-  updateTestCaseThunk,
-} from "../../../store/slices/testCases/testCases.thunk";
-import { addOrUpdateTemplate } from "../../../store/slices/templates/template.slice";
-import { getCollectionsThunk } from "../../../store/slices/collections/collections.thunk";
+import { prepareUpdatePayload as preparePayload} from "../../../config/utils";
+import { updateTemplateThunk } from "../../../store/slices/templates/templates.thunk";
 
-function TabbedTableForm({ tabs, initialTabIndex = 0 }: TabTableFormComponentProps) {
-
+function TabbedTableForm({
+  tabs,
+  initialTabIndex = 0,
+}: TabTableFormComponentProps) {
   const [value, setValue] = useState(initialTabIndex);
   useEffect(() => {
     setValue(initialTabIndex);
   }, [initialTabIndex]);
-
-  const dispatch = useAppDispatch();
   const { showToast } = useToast();
+  const dispatch = useAppDispatch();
+  const { error: rulesError, status: statusRules } = useAppSelector(
+    (state) => state.rules
+  );
 
-  const { error: rulesError, status: statusRules } = useAppSelector((state) => state.rules);
-  const { getError: templatesError, getStatus: statusTemplates } = useAppSelector((state) => state.templates);
-  const { getError: testCasesError, getStatus: statusTestCases } = useAppSelector((state) => state.testCases);
-  const templates = useAppSelector((state) => state.templates.templates);
+  const { getError: templatesError, getStatus: statusTemplates } = useAppSelector(
+    (state) => state.templates
+  );
 
-  const canEdit = tabs[0].canEdit;
-  const currentTabId = useMemo(() => {
-    return tabs[value] ? `${tabs[value].templateId}-${tabs[value].formType}` : "";
-  }, [tabs, value]);
+  const currentTabId = useMemo(
+    () => `${tabs[value].templateId}-${tabs[value].formType}`,
+    [tabs, value]
+  );
 
-  const tabForm = useAppSelector((state) => state.formBuilder.tabForms[currentTabId]);
+  const tabForm = useAppSelector(
+    (state) => state.formBuilder.tabForms[currentTabId]
+  );
+
   const valuesToSend = tabForm?.values ?? [];
 
-  const templateId = useMemo(() => tabs[value].templateId, [tabs, value]);
-  const origin = useMemo(() => tabs[value].origin, [tabs, value]);
-
-
-  //Reglas
   useEffect(() => {
-    if (statusRules === "idle") {
-      dispatch(getRulesThunk());
-    }
+    const fetchRules = async () => await dispatch(getRulesThunk());
+    if (statusRules === "idle") fetchRules();
     if (statusRules === "error") {
       showToast(rulesError as string, "error");
       dispatch(clearRulesError());
     }
   }, [dispatch, rulesError, showToast, statusRules]);
 
-  //Plantillas
   useEffect(() => {
-    if (tabs[value].origin !== "categories") return;
-
-    const fetchTemplates = async () => {
-      const result = await dispatch(getTemplateByIdThunk(tabs[value].templateId));
-      const template = result.payload;
-      if (template) {
-        dispatch(addOrUpdateTemplate(template as TemplateContextType));
-      }
-    };
-
+    const fetchTemplates = async () => await dispatch(getTemplatesThunk());
     if (statusTemplates === "idle") fetchTemplates();
     if (statusTemplates === "error") {
       showToast(templatesError as string, "error");
       dispatch(clearTemplateError());
     }
-  }, [dispatch, showToast, statusTemplates, templatesError, tabs, value]);
+  }, [dispatch, showToast, statusTemplates, templatesError]);
 
-  //Casos de prueba
-  useEffect(() => {
-    if (tabs[value].origin !== "collections") return;
 
-    const fetchTestCases = async () => {
-      const result = await dispatch(getTestCaseByIdThunk(tabs[value].templateId));
-      const testCase = result.payload;
-      if (testCase) {
-        dispatch(addOrUpdateTestCases(testCase))
-      }
-    };
-
-    if (statusTestCases === "idle") fetchTestCases();
-    if (statusTestCases === "error") {
-      showToast(testCasesError as string, "error");
-      dispatch(clearTemplateError());
-    }
-  }, [dispatch, showToast, statusTestCases, testCasesError, tabs, value]);
-
-  //Handlers
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
 
   const handleSave = async () => {
-    const tab = tabs[value];
-    if (!tab) return;
+  const payload = preparePayload(valuesToSend, tabs[value].formType);
+  const id = tabs[value].templateId;
 
-    if (tab.origin === "categories") {
-      await saveTemplates(tab);
-    } else {
-      saveTestCases(tab);
-    }
-  };
+  try {
+    await dispatch(updateTemplateThunk({ id, payload }));
+    showToast("Plantilla actualizada correctamente", "success");
+  } catch (error) {
+    showToast(error as string, "error");
+  }
+};
 
-  //Guardar plantilla
-  const saveTemplates = async (tab: FormTabItem) => {
-    dispatch(setLoading(true));
-    const payload = preparePayload(valuesToSend, tab.formType);
-    const id = getTemplateID(templates, tab.templateId);
-    if (!id) return;
-
-    try {
-      const result = await dispatch(updateTemplateThunk({ id, payload })).unwrap();
-      if (result) {
-        dispatch(addOrUpdateTemplate(result as TemplateContextType));
-      }
-      showToast("Plantilla actualizada correctamente", "success");
-    } catch (error) {
-      showToast(error as string, "error");
-    } finally {
-      dispatch(setLoading(false));
-    }
-  };
-
-  //Guardar caso de prueba
-  const saveTestCases = async (tab: FormTabItem) => {
-    dispatch(setLoading(true));
-    const payload = preparePayload(valuesToSend, tab.formType);
-    const id = tab.templateId;
-    try {
-      await dispatch(updateTestCaseThunk({ id, payload })).unwrap();
-      dispatch(getCollectionsThunk());
-      showToast("Caso de prueba actualizado correctamente", "success");
-    } catch (error) {
-      showToast(error as string, "error");
-    } finally {
-      dispatch(setLoading(false));
-    }
-  };
 
   return (
-    <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
-      <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "center" }}>
-        <TitleHeaderComponent routeId={templateId} origin={origin} />
-        {canEdit && (
-          <Button startIcon={<SaveOutlinedIcon />} sx={{ px: 2, fontSize: "12px" }} onClick={handleSave}>
-            Guardar
-          </Button>
-        )}
+    <Box
+      sx={{
+        height: "100%",
+        flexDirection: "column",
+        mt: -2,
+      }}
+    >
+      <Stack
+        direction="row"
+        sx={{
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <Tabs
+          value={value}
+          variant="standard"
+          textColor="inherit"
+          indicatorColor="primary"
+          onChange={handleChange}
+          sx={{
+            maxHeight: "16px",
+            padding: 0,
+          }}
+        >
+          {tabs.map((tab, index) => (
+            <Tab
+              key={index + "-tab-chip"}
+              label={tab.label}
+              value={index}
+              sx={{
+                minHeight: "66px",
+                padding: "4px 12px",
+                fontSize: "12px",
+                "&.Mui-selected": {
+                  color: "primary.main",
+                  fontWeight: "bold",
+                },
+              }}
+            />
+          ))}
+        </Tabs>
+        <Button
+          startIcon={<SaveOutlinedIcon />}
+          sx={{ paddingX: 2, fontSize: "12px" }}
+          onClick={() => {
+            handleSave();
+          }}
+        >
+          Guardar
+        </Button>
       </Stack>
 
-      <Tabs
-        value={value}
-        onChange={handleChange}
-        variant="standard"
-        textColor="inherit"
-        indicatorColor="primary"
-        sx={{ maxHeight: "16px", padding: 0, mt: -1, mb: 2 }}
-      >
-        {tabs.map((tab, index) => (
-          <Tab
-            key={`${index}-tab-chip`}
-            label={tab.label}
-            value={index}
-            sx={{
-              minHeight: "66px",
-              padding: "4px 12px",
-              fontSize: "12px",
-              "&.Mui-selected": {
-                color: "primary.main",
-                fontWeight: "bold",
-              },
-            }}
-          />
-        ))}
-      </Tabs>
-
-      <Box sx={{ flex: 1, overflow: "auto" }}>
-        {tabs.map((template, index) => (
-          <CustomTabPanel key={`${index}-tab-form-content`} value={value} index={index}>
+      <Box sx={{ flexGrow: 1, overflow: "auto", mt: -2 }}>
+        {tabs.map((template,index) => (
+          <CustomTabPanel
+            key={index + "-tab-form-content"}
+            value={value}
+            index={index}
+          >
             <CatalogsDataMiddleware tabId={currentTabId} template={template} />
           </CustomTabPanel>
         ))}
@@ -209,5 +149,4 @@ function TabbedTableForm({ tabs, initialTabIndex = 0 }: TabTableFormComponentPro
     </Box>
   );
 }
-
 export default TabbedTableForm;

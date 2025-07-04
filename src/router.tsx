@@ -1,6 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import ThemeConfig from "./config/ThemeConfig";
 import MainLayoutComponent from "./components/layouts/MainLayoutComponent";
+import SplashComponent from "./pages/SplashComponent";
 import AuthLayout from "./components/layouts/AuthLayoutComponent";
 import LoginComponent from "./pages/Auth/login/LoginComponent";
 import RegisterComponent from "./pages/Auth/register/RegisterComponent";
@@ -12,9 +13,24 @@ import NotFoundComponent from "./pages/Generic/NotFoundComponent";
 import MainPage from "./pages/Catalogs/MainPageComponent";
 import ResetPassword from "./pages/Auth/reset-password/ResetPassword";
 import RecoveryPassword from "./pages/Auth/reset-password/RecoveryPassword";
-import RouteGuard from "./config/guards/RouteGuard";
-import DecisionComponent from "./pages/DecisionComponent";
 
+const mainPageRoutes = [
+  "main", 
+  "ecommerce", 
+  "ecommerce/ventas", 
+  "ecommerce/reverso", 
+  "ecommerce/cancelacion", 
+  "ecommerce/ventas-ds", 
+  "ecommerce/ventas-visa", 
+  "ecommerce/ventas-mastercard", 
+  "moto",
+  "moto/ventas", 
+  "moto/reverso", 
+  "moto/cancelacion", 
+  "moto/ventas-ds", 
+  "moto/ventas-visa", 
+  "moto/ventas-mastercard", 
+];
 
 const router = createBrowserRouter([
   {
@@ -29,12 +45,16 @@ const router = createBrowserRouter([
         element: <RootRedirect />,
       },
       {
-        path: "not-found",
+        path: "*",
         element: <NotFoundComponent />,
       },
       {
         element: <PublicGuard />,
         children: [
+          {
+            path: "home",
+            element: <SplashComponent />,
+          },
           {
             path: "reset-pssw",
             element: <ResetPassword />,
@@ -64,19 +84,11 @@ const router = createBrowserRouter([
           {
             element: <PrivateLayoutContent />,
             children: [
-              {
-                path: "*",
-                element: (
-                  <RouteGuard>
-                    <MainPage />
-                  </RouteGuard>
-                ),
-              },
+              ...mainPageRoutes.map((route) => ({
+                path: route,
+                element: <MainPage />,
+              })),
             ],
-          },
-          {
-            path: "home",
-            element: <DecisionComponent />,
           },
         ],
       },

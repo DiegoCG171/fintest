@@ -52,7 +52,7 @@ function createFolder() {
 
   function buildCodeTask(cb) {
     log('building code into the directory')
-    return exec('cd .. && vite build', function (err, stdout, stderr) {
+    return exec('cd .. && npm run build', function (err, stdout, stderr) {
       log(stdout);
       log(stderr);
       cb(err);

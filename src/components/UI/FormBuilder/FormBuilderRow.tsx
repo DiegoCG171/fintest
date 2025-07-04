@@ -1,34 +1,22 @@
 import { IconButton, TableCell, TableRow } from "@mui/material";
 import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
 import ExpandLessRoundedIcon from "@mui/icons-material/ExpandLessRounded";
-import EditNoteOutlinedIcon from "@mui/icons-material/EditNoteOutlined";
-import CheckOutlinedIcon from "@mui/icons-material/CheckOutlined";
-import { FormBuilderRowProps } from "../../../config/interfaces";
+import EditNoteOutlinedIcon from '@mui/icons-material/EditNoteOutlined';
+import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
+import {
+  FormBuilderRowProps,
+} from "../../../config/interfaces";
 import DynamicField from "./DynamicField";
 import { useState } from "react";
 
-function FormBuilderRow({
-  row,
-  path,
-  tabId,
-  headers,
-  canEdit,
-}: FormBuilderRowProps) {
+function FormBuilderRow({ row, path, tabId, headers }: FormBuilderRowProps) {
   const [expanded, setExpanded] = useState(false);
-  const [edited, setEdited] = useState(false);
-  const levelColors = ["#ffffff", "#f5f7fa", "#eef3f8", "#e4ecf2", "#d6e0eb"];
-  const backgroundColor = levelColors[path.length - 1] || "#d6e0eb";
+  const [edited, setEdited] = useState(false)
+
 
   return (
     <>
-      <TableRow
-        sx={{
-          backgroundColor,
-          "&:hover": {
-            backgroundColor: "#dce3e9",
-          },
-        }}
-      >
+      <TableRow>
         {headers.map((col) => (
           <TableCell key={col.id}>
             {col.id === "breakingRules" ? (
@@ -37,31 +25,19 @@ function FormBuilderRow({
               row.breakingRules.length > 0 ? (
                 <IconButton onClick={() => setExpanded(!expanded)}>
                   {expanded ? (
+                    
                     <ExpandLessRoundedIcon />
                   ) : (
                     <ExpandMoreRoundedIcon />
                   )}
                 </IconButton>
               ) : (
-                <IconButton
-                  onClick={canEdit ? () => setEdited(!edited) : () => {}}
-                  sx={{
-                    cursor: canEdit ? "pointer" : "default",
-                    "&:hover": {
-                      backgroundColor: canEdit
-                        ? "rgba(0, 0, 0, 0.04)"
-                        : "transparent",
-                    },
-                  }}
-                >
+                <IconButton onClick={() => setEdited(!edited)}>
                   {edited ? (
-                    <CheckOutlinedIcon
-                      sx={{ color: canEdit ? "inherit" : "transparent" }}
-                    />
+                    <CheckOutlinedIcon />
+                    
                   ) : (
-                    <EditNoteOutlinedIcon
-                      sx={{ color: canEdit ? "inherit" : "transparent" }}
-                    />
+                    <EditNoteOutlinedIcon />
                   )}
                 </IconButton>
               )
@@ -73,24 +49,20 @@ function FormBuilderRow({
                 path={path}
                 tabId={tabId}
                 isEditable={edited}
-                onlyRead={!canEdit}
               />
             )}
           </TableCell>
         ))}
       </TableRow>
 
-      {expanded &&
-        Array.isArray(row.breakingRules) &&
+      {expanded && Array.isArray(row.breakingRules) &&
         row.breakingRules.map((child, childIndex) => (
           <FormBuilderRow
-            isChild
             key={child._id}
             row={child}
             path={[...path, childIndex]}
             tabId={tabId}
             headers={headers}
-            canEdit={canEdit}
           />
         ))}
     </>

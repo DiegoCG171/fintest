@@ -1,12 +1,10 @@
 import { Box, Button, Stack, Typography, Link } from "@mui/material";
 import TextBox from "../../../components/UI/TextBox";
 import * as Yup from "yup";
-import { Form, Formik } from "formik";
+import { Formik } from "formik";
 import { useToast } from "../../../config/hooks/useToast";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { Form, Link as RouterLink } from "react-router-dom";
 import CustomInputComponent from "../../../components/core/forms/CustomInput";
-import { useAppDispatch } from "../../../store";
-import { recoveryTokenThunk } from "../../../store/slices/auth/recoveryToken.thunk";
 
 const validationSchema = Yup.object({
   email: Yup.string()
@@ -15,10 +13,7 @@ const validationSchema = Yup.object({
 });
 
 function RecoveryPassword() {
-  const dispatch = useAppDispatch();
-  const navigate = useNavigate();
   const { showToast } = useToast();
-
   return (
     <Box
       sx={{
@@ -55,11 +50,9 @@ function RecoveryPassword() {
               email: "",
             }}
             validationSchema={validationSchema}
-            onSubmit={async (values, { setSubmitting }) => {
+            onSubmit={(_, { setSubmitting }) => {
+              showToast("Formulario enviado correctamente", "success");
               setSubmitting(false);
-              const response = await dispatch(recoveryTokenThunk(values.email)).unwrap()
-              showToast(response || "Formulario enviado correctamente", "success");
-              navigate("/login");
             }}
           >
             {({ errors, touched, getFieldProps, submitForm }) => (
@@ -82,6 +75,7 @@ function RecoveryPassword() {
                     <Button
                       fullWidth
                       variant="contained"
+                      type="submit"
                       onClick={() => {
                         if (Object.keys(errors).length > 0) {
                           showToast(
