@@ -2,25 +2,29 @@ import {
   Box,
   Button,
   Checkbox,
+  FormControl,
   FormControlLabel,
+  FormHelperText,
   Stack,
   Typography,
 } from "@mui/material";
 import Link from "@mui/material/Link";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import Grid from "@mui/material/Grid2";
 import { Formik, Form } from "formik";
 import CustomInputComponent from "../../../components/core/forms/CustomInput";
 import * as Yup from "yup";
 import TextBox from "../../../components/UI/TextBox";
 import { useToast } from "../../../config/hooks/useToast";
+import { createUserThunk, setLoading, useAppDispatch } from "../../../store";
 
 const validationSchema = Yup.object({
   email: Yup.string()
     .email("Formato de email inválido")
     .required("El email es requerido"),
-  name: Yup.string().required("El nombre es requerido"),
-  user: Yup.string().required("El usuario es requerido"),
+  names: Yup.string().required("El nombre es requerido"),
+  surnames: Yup.string().required("El apellido es requerido"),
+  username: Yup.string().required("El usuario es requerido"),
   password: Yup.string()
     .min(6, "La contraseña debe tener al menos 6 caracteres")
     .matches(/[A-Z]/, "La contraseña debe contener al menos una mayúscula")
@@ -33,10 +37,16 @@ const validationSchema = Yup.object({
   retryPassword: Yup.string()
     .oneOf([Yup.ref("password")], "Las contraseñas deben coincidir")
     .required("Repetir la contraseña es requerido"),
+  accepted: Yup.boolean().oneOf(
+    [true],
+    "Debes aceptar los términos y condiciones"
+  ),
 });
 
 function RegisterComponent() {
   const { showToast } = useToast();
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   return (
     <Box sx={{ width: "100%" }}>
       <TextBox
@@ -52,27 +62,37 @@ function RegisterComponent() {
       <Box sx={{ flexGrow: 1, my: 4 }}>
         <Formik
           initialValues={{
-            name: "",
+            names: "",
             email: "",
-            user: "",
+            username: "",
             password: "",
             retryPassword: "",
             accepted: false,
+            surnames: ""
           }}
           validationSchema={validationSchema}
-          onSubmit={(_, { setSubmitting }) => {
-            showToast("Formulario enviado correctamente", "success");
-            setSubmitting(false);
+          onSubmit={ async(values, { setSubmitting }) => {
+            dispatch(setLoading(true));
+            try {
+              await dispatch(createUserThunk(values)).unwrap();
+              navigate("/login");
+              showToast("Formulario enviado correctamente", "success");
+            } catch (error) {
+              showToast(error as string, "error");
+            } finally {
+              setSubmitting(false);
+              dispatch(setLoading(false));
+            }
           }}
         >
-          {({ errors, touched, getFieldProps, submitForm }) => (
+          {({ errors, touched, getFieldProps, values, submitForm }) => (
             <Form>
               <Grid
                 container
                 spacing={{ xs: 2 }}
                 columns={{ xs: 4, sm: 8, md: 12 }}
               >
-                <Grid size={{ xs: 2, sm: 4, md: 6 }}>
+                <Grid size={{ xs: 12 }}>
                   <CustomInputComponent
                     label="Email"
                     id="email"
@@ -87,19 +107,28 @@ function RegisterComponent() {
                 <Grid size={{ xs: 2, sm: 4, md: 6 }}>
                   <CustomInputComponent
                     label="Nombre"
-                    id="name"
-                    {...getFieldProps("name")}
-                    error={Boolean(touched.name && errors.name)}
-                    helperText={touched.name && errors.name}
+                    id="names"
+                    {...getFieldProps("names")}
+                    error={Boolean(touched.names && errors.names)}
+                    helperText={touched.names && errors.names}
+                  />
+                </Grid>
+                <Grid size={{ xs: 2, sm: 4, md: 6 }}>
+                  <CustomInputComponent
+                    label="Apellidos"
+                    id="surnames"
+                    {...getFieldProps("surnames")}
+                    error={Boolean(touched.surnames && errors.surnames)}
+                    helperText={touched.surnames && errors.surnames}
                   />
                 </Grid>
                 <Grid size={{ xs: 12 }}>
                   <CustomInputComponent
                     label="Usuario"
-                    id="user"
-                    {...getFieldProps("user")}
-                    error={Boolean(touched.user && errors.user)}
-                    helperText={touched.user && errors.user}
+                    id="username"
+                    {...getFieldProps("username")}
+                    error={Boolean(touched.username && errors.username)}
+                    helperText={touched.username && errors.username}
                   />
                 </Grid>
                 <Grid size={{ xs: 2, sm: 4, md: 6 }}>
@@ -127,32 +156,26 @@ function RegisterComponent() {
                     helperText={touched.retryPassword && errors.retryPassword}
                   />
                 </Grid>
-                <Stack
-                  direction="row"
-                  spacing={1}
-                  sx={{ ml: -1, display: "flex", alignItems: "center" }}
+                <FormControl
+                  error={Boolean(touched.accepted && errors.accepted)}
+                  sx={{ mb: 1 }}
                 >
                   <FormControlLabel
-                    value="accepted"
-                    control={<Checkbox />}
-                    label="Aceptar"
-                    labelPlacement="end"
-                    sx={{ mb: 1, fontSize: 14, fontWeight: "bold" }}
+                    control={
+                      <Checkbox
+                        {...getFieldProps("accepted")}
+                        checked={values.accepted}
+                      />
+                    }
+                    label="Aceptar términos y condiciones"
                   />
-                  <Link
-                    component="button"
-                    variant="body2"
-                    onClick={() => {
-                      console.info("I'm a button.");
-                    }}
-                  >
-                    Términos y condiciones
-                  </Link>
-                </Stack>
+                  {touched.accepted && errors.accepted && (
+                    <FormHelperText>{errors.accepted}</FormHelperText>
+                  )}
+                </FormControl>
                 <Button
                   fullWidth
                   variant="contained"
-                  type="submit"
                   onClick={() => {
                     if (Object.keys(errors).length > 0) {
                       showToast(
