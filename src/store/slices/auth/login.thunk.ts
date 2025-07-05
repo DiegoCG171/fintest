@@ -1,7 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { login as loginService } from "../../../services";
 import { LoginCredentials, LoginResponse } from "../../../config/interfaces";
-import { setLoading } from "../UI/loader/loader.slice";
 
 export const loginThunk = createAsyncThunk<
     LoginResponse,
@@ -9,17 +8,16 @@ export const loginThunk = createAsyncThunk<
     { rejectValue: string }
 >(
     'auth/login',
-    async (credentials: LoginCredentials, { dispatch, rejectWithValue }) => {
+    async (credentials: LoginCredentials, { rejectWithValue }) => {
         try {
-            dispatch(setLoading(true));
             const userData = await loginService(credentials);
-            localStorage.setItem('token', userData.token);
-            localStorage.setItem('user', JSON.stringify(userData));
-            return userData;
+            if(!userData.token) {return rejectWithValue('Error en inicio de sesión')} else {
+                localStorage.setItem('token', userData.token);
+                localStorage.setItem('user', JSON.stringify(userData));
+                return userData;
+            }
         } catch (error: unknown) {
             return rejectWithValue(error as string);
-        } finally {
-            dispatch(setLoading(false));
-        }
+        } 
     }
 );

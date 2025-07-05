@@ -1,92 +1,262 @@
+import {
+  Box,
+  CircularProgress,
+  IconButton,
+  Stack,
+  TextField,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+import {
+  ItemsServiceMenu,
+  MenuServiceInterface,
+  RecursiveMenuItemProps,
+} from "../../config/interfaces";
+import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
+import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
+import KeyboardArrowRightOutlinedIcon from "@mui/icons-material/KeyboardArrowRightOutlined";
+import KeyboardArrowDownOutlinedIcon from "@mui/icons-material/KeyboardArrowDownOutlined";
+import { useNavigate } from "react-router-dom";
+import { setLoading, useAppDispatch, useAppSelector } from "../../store";
+import RecursiveMenuSubItem from "./RecursiveMenuSubItem";
 import { useState } from "react";
-import { Box, Collapse, IconButton, Typography } from "@mui/material";
-import { useLocation, useNavigate } from "react-router-dom";
-import KeyboardArrowRightRoundedIcon from "@mui/icons-material/KeyboardArrowRightRounded";
-import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
-import { RecursiveMenuItemProps } from "../../config/interfaces";
+import { usePopMenu } from "../../config/hooks/usePopMenu";
+import { removeUpdateCollection } from "../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
+import { updateCollectionThunk } from "../../store/slices/collections/collections.thunk";
+import CancelIcon from "@mui/icons-material/Cancel";
 
-
-const RecursiveMenuItem = ({ item, depth = 0 }: RecursiveMenuItemProps) => {
-  const [open, setOpen] = useState(false);
+const RecursiveMenuItem = ({
+  item,
+  depth = 0,
+  optionsActive,
+  onSelectItem,
+  buildOptions,
+  buildSubItemOptions,
+}: RecursiveMenuItemProps) => {
+  const [expanded, setExpanded] = useState(false);
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const location = useLocation();
+  const [hovered, setHovered] = useState(false);
+  const [value, setValue] = useState(item.name);
+  const { openMenu } = usePopMenu();
+  const { loading, updateCollection } = useAppSelector(
+    (state) => state.sidebarMenu
+  );
 
-  const hasChildren = item.subItems && item.subItems.length > 0;
-  const isActive = item.linkMenu && location.pathname === `/${item.linkMenu}`;
+  const onDecisionHandler = async (
+    item: MenuServiceInterface | ItemsServiceMenu
+  ) => {
+    if (item.linkMenu) {
+      dispatch(setLoading(true));
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      dispatch(setLoading(false));
+      navigate(`/${item.linkMenu}`);
+      return;
+    }
 
-  const handleClick = (event: React.MouseEvent) => {
-    event.preventDefault();
-    if (item.onClickMenu) item.onClickMenu();
-    if (item.linkMenu) navigate(`/${item.linkMenu}`);
-    if (hasChildren) setOpen(!open);
+    if (onSelectItem) {
+      onSelectItem(item);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      dispatch(
+        updateCollectionThunk({ id: item.id, payload: { name: value } })
+      );
+    }
   };
 
   return (
-    <Box sx={{ width: "100%", pl: depth * 0.75, my: 0.5 }}>
+    <Box sx={{ width: "100%", pl: depth * 0.25, my: 1 }}>
       <Box
-        onClick={handleClick}
         sx={{
           display: "flex",
-          alignItems: "center",
           justifyContent: "space-between",
+          alignItems: "center",
+          backgroundColor: expanded
+            ? depth === 0
+              ? (theme) => theme.palette.secondary.light
+              : (theme) => theme.palette.background.default
+            : "transparent",
           borderRadius: 2,
-          p: "4px 8px",
+          border: "2px solid transparent",
+          padding: 1,
+          margin: 0.5,
           cursor: "pointer",
-          backgroundColor: isActive ? "primary.light" : "transparent",
+          transition: "border-color 0.2s ease",
           "&:hover": {
-            backgroundColor: "rgba(0, 0, 0, 0.05)",
+            borderColor: (theme) => theme.palette.background.default,
           },
         }}
+        onClick={() => {
+          if (!updateCollection) {
+            setExpanded(!expanded);
+          }
+        }}
       >
-        {/* Icono izquierdo y texto */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <IconButton
-            size="small"
-            sx={{ p: 0 }}
+        {updateCollection && updateCollection.id === item.id ? (
+          <Stack
+            direction="row"
+            spacing={1}
+            alignItems="center"
+            sx={{ width: "100%" }}
           >
-            {item.iconMenu}
-          </IconButton>
-          <Typography
-            variant="body2"
-            sx={{
-              fontSize: "0.875rem",
-              color: isActive ? "primary.main" : "inherit",
-            }}
+            <TextField
+              variant="standard"
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              onKeyDown={handleKeyDown}
+              disabled={loading}
+              sx={{
+                "& .MuiInputBase-input": {
+                  fontSize: "12px",
+                  color: "text.disabled",
+                },
+              }}
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <IconButton
+                      size="small"
+                      disabled={loading}
+                      onClick={() => {
+                        dispatch(removeUpdateCollection());
+                        setValue(item.name);
+                      }}
+                    >
+                      {loading ? (
+                        <CircularProgress size="10px" />
+                      ) : (
+                        <CancelIcon
+                          sx={{
+                            fontSize: 12,
+                            color: "text.disabled",
+                            cursor: "pointer",
+                            "&:hover": {
+                              color: "text.primary",
+                            },
+                          }}
+                        />
+                      )}
+                    </IconButton>
+                  ),
+                },
+              }}
+            />
+          </Stack>
+        ) : (
+          <Stack
+            direction="row"
+            alignItems="center"
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
+            sx={{ width: "100%" }}
           >
-            {item.title}
-          </Typography>
-        </Box>
-
-        {/* Icono de colapso (solo si tiene hijos) */}
-        {hasChildren && (
-          <IconButton
-            size="small"
-            sx={{ p: 0 }}
-          >
-            {open ? (
-              <KeyboardArrowDownRoundedIcon fontSize="small" />
-            ) : (
-              <KeyboardArrowRightRoundedIcon fontSize="small" />
+            <Stack
+              direction="row"
+              spacing={1}
+              alignItems="center"
+              sx={{
+                flexGrow: 1,
+                minWidth: 0,
+                overflow: "hidden",
+              }}
+            >
+              <FolderOutlinedIcon
+                sx={{ fontSize: 16, color: "text.disabled" }}
+              />
+              <Tooltip title={item.name} placement="top">
+                <Typography
+                  sx={{
+                    fontSize: 12,
+                    color: "text.disabled",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {item.name}
+                </Typography>
+              </Tooltip>
+            </Stack>
+            {optionsActive && (
+              <Box
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const options =
+                    buildOptions?.(item) || buildSubItemOptions?.(item);
+                  if (options) openMenu(e, options);
+                }}
+                sx={{
+                  width: 24,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  cursor: "pointer",
+                  ml: 1,
+                }}
+              >
+                <MoreHorizOutlinedIcon
+                  sx={{
+                    fontSize: 16,
+                    color: "text.disabled",
+                    visibility: hovered ? "visible" : "hidden",
+                  }}
+                />
+              </Box>
             )}
-          </IconButton>
+
+            {/* Flecha expand/collapse */}
+            <Box
+              sx={{
+                ml: 1,
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              {expanded ? (
+                <KeyboardArrowDownOutlinedIcon sx={{ fontSize: 16 }} />
+              ) : (
+                <KeyboardArrowRightOutlinedIcon sx={{ fontSize: 16 }} />
+              )}
+            </Box>
+          </Stack>
         )}
       </Box>
 
-      {/* Submenús colapsables */}
-      {hasChildren && (
-        <Collapse
-          in={open}
-          timeout="auto"
-          unmountOnExit
-        >
-          {item.subItems!.map((subItem, index) => (
-            <RecursiveMenuItem
-              key={index}
+      {/* Render hijos recursivamente */}
+      {expanded &&
+        Array.isArray(item.children) &&
+        item.children?.length > 0 && (
+          <Box>
+            {item.children?.map((child) => (
+              <RecursiveMenuItem
+                optionsActive={optionsActive}
+                key={child.id}
+                item={child}
+                depth={depth + 1}
+                onSelectItem={onDecisionHandler}
+                buildOptions={buildOptions}
+                buildSubItemOptions={buildSubItemOptions}
+              />
+            ))}
+          </Box>
+        )}
+
+      {/* Render ítems */}
+      {expanded && Array.isArray(item.items) && item.items?.length > 0 && (
+        <Box sx={{ pl: 1 }}>
+          {item.items?.map((subItem, index) => (
+            <RecursiveMenuSubItem
+              key={`box-${index}-${subItem.id}`}
               item={subItem}
-              depth={depth + 1}
+              optionsActive={optionsActive}
+              onClick={onDecisionHandler}
+              buildOptions={buildSubItemOptions}
             />
           ))}
-        </Collapse>
+        </Box>
       )}
     </Box>
   );
