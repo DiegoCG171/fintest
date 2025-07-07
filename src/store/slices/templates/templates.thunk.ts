@@ -8,12 +8,11 @@ import {
 import {
   CreateTemplate,
   PatchGenerationTemplate,
-  TemplateContextType,
-  TemplateRoot,
+  TemplateContextType
 } from "../../../config/interfaces";
 
 export const getTemplatesThunk = createAsyncThunk<
-  TemplateRoot,
+  TemplateContextType[],
   void,
   { rejectValue: string }
 >("templates/getAll", async (_, { rejectWithValue }) => {
@@ -26,13 +25,13 @@ export const getTemplatesThunk = createAsyncThunk<
 });
 
 export const updateTemplateThunk = createAsyncThunk<
-  void,
+  TemplateContextType,
   { id: string; payload: PatchGenerationTemplate },
   { rejectValue: string }
 >("templates/update", async ({ id, payload }, { rejectWithValue }) => {
   try {
-    await updateTemplate(id, payload);
-    return;
+    const response = await updateTemplate(id, payload);
+    return response;
   } catch (error) {
     return rejectWithValue(error as string);
   }

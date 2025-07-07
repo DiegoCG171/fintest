@@ -11,6 +11,10 @@ export * from './slices/recoveryPssw/recovery.thunk'
 export { clearTemplates, clearTemplateError, clearUpdateError, clearCreateError, clearByIdTemplate, clearByIdTemplateError } from './slices/templates/template.slice'
 export { getTemplatesThunk, updateTemplateThunk, createTemplateThunk, getTemplateByIdThunk } from './slices/templates/templates.thunk'
 
+//TestCases
+export { addOrUpdateTestCases } from './slices/testCases/testCasesSlice'
+export * from './slices/testCases/testCases.thunk'
+
 //Rules
 export { clearRules, clearRulesError } from './slices/rules/rules.slice'
 export { getRulesThunk } from './slices/rules/rules.thunk'

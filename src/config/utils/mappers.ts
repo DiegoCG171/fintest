@@ -6,7 +6,7 @@ export const mapFieldRulesToFormStructure = (fields: Field[]): TableRowDataFormB
             children.specification?.map((spec: Specification) => ({
                 idBitmap: spec.id,
                 displayName: spec.displayName,
-                isRequired: false, // <- AÑADIDO
+                isRequired: false,
                 isActive: false,
                 function: '',
                 value: '',
@@ -18,7 +18,7 @@ export const mapFieldRulesToFormStructure = (fields: Field[]): TableRowDataFormB
             ? rule.breakingRules.map((br: BreakingRule) => ({
                 idBitmap: br.id,
                 displayName: br.displayName,
-                isRequired: false, // <- AÑADIDO
+                isRequired: false,
                 isActive: false,
                 function: '',
                 value: '',
@@ -105,10 +105,10 @@ export const combineTemplateData = (data: FieldValidation[] | null, mappedRules:
 
             const updatedRule: TableRowDataFormBuilder = {
                 ...rule,
-                isRequired: matched?.isRequired ?? rule.isRequired, // <-- FIXED
+                isRequired: matched?.isRequired ?? rule.isRequired,
                 isActive: matched?.isActive ?? rule.isActive,
-                function: matched?.function ?? rule.function,
-                value: matched?.value ?? rule.value,
+                function: matched?.function ??  rule.function,
+                value: matched?.value ??  rule.value,
                 breakingRules:
                     Array.isArray(rule.breakingRules) && rule.breakingRules.length > 0
                         ? updateRules(

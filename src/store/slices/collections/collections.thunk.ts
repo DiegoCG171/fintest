@@ -9,14 +9,9 @@ import { CreateCollection } from "../../../config/interfaces/collections.interfa
 import {
   CreateTestCase,
   createTestCase,
-  deleteTestCase,
-  getTestCaseById,
-  updateTestCase,
+  deleteTestCase
 } from "../../../services/catalogs/testCases.service";
-import {
-  PatchGenerationTemplate,
-  testCaseInterface,
-} from "../../../config/interfaces";
+import { PatchGenerationTemplate, testCaseInterface } from "../../../config/interfaces";
 
 export const getCollectionsThunk = createAsyncThunk(
   "collections/getAll",
@@ -24,7 +19,7 @@ export const getCollectionsThunk = createAsyncThunk(
     try {
       const collections = await getCollections();
       return collections;
-    } catch (error: unknown) {
+    } catch (error) {
       return rejectWithValue(error as string);
     }
   }
@@ -93,32 +88,6 @@ export const deleteCollectionThunk = createAsyncThunk(
     try {
       await deleteCollection(id);
       return id;
-    } catch (error) {
-      return rejectWithValue(error as string);
-    }
-  }
-);
-
-export const updateTestCaseThunk = createAsyncThunk<
-  testCaseInterface,
-  { id: string; payload: PatchGenerationTemplate },
-  { rejectValue: string }
->("test-case/update", async ({ id, payload }, { rejectWithValue }) => {
-  try {
-    const testCase = await updateTestCase(id, payload);
-    return testCase;
-  } catch (error) {
-    return rejectWithValue(error as string);
-  }
-});
-
-export const getTestCaseByIdThunk = createAsyncThunk(
-  "test-case/getById",
-  async (id: string, { rejectWithValue }) => {
-    try {
-      const testCase = await getTestCaseById(id);
-
-      return testCase;
     } catch (error) {
       return rejectWithValue(error as string);
     }

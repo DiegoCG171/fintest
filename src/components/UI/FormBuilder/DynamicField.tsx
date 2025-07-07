@@ -1,12 +1,11 @@
 import { MenuItem, Select, TextField, Typography } from "@mui/material";
-import {
-  DynamicFieldProps,
-} from "../../../config/interfaces";
+import { DynamicFieldProps } from "../../../config/interfaces";
 import {
   updateFieldValue,
   updateNestedFieldValue,
   useAppDispatch,
 } from "../../../store";
+import { useEffect, useRef } from "react";
 
 function DynamicField({
   column,
@@ -16,7 +15,17 @@ function DynamicField({
   tabId,
   isEditable,
   onlyRead,
+  originalValue,
 }: DynamicFieldProps) {
+  const originalRef = useRef(originalValue ?? value);
+  const hasChanged = String(value ?? "") !== String(originalRef.current ?? "");
+
+  useEffect(() => {
+    if (originalValue !== undefined) {
+      originalRef.current = originalValue;
+    }
+  }, [originalValue]);
+
   const dispatch = useAppDispatch();
   const dependsOn = column?.dependsOn;
   const dependsValue = dependsOn ? row[dependsOn] : undefined;
@@ -39,6 +48,56 @@ function DynamicField({
     }
   };
 
+  const getSelectStyles = (hasChanged: boolean, getStyles: () => object) => ({
+    height: "24px",
+    ...getStyles(),
+    borderRadius: 2,
+    transition: "all 0.2s ease",
+
+    "& .MuiOutlinedInput-notchedOutline": {
+      border: hasChanged ? "2px solid #f39c12" : undefined,
+    },
+
+    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+      border: hasChanged ? "2px solid #f39c12" : undefined,
+    },
+
+    "&:hover .MuiOutlinedInput-notchedOutline": {
+      border: hasChanged ? "2px solid #f39c12" : undefined,
+    },
+
+    "& .MuiSelect-select": {
+      padding: "4px 8px",
+    },
+  });
+
+  const getInputStyles = (hasChanged: boolean, getStyles: () => object) => ({
+    "& .MuiOutlinedInput-root": {
+      borderRadius: 2,
+      height: "24px",
+      ...getStyles(),
+
+      "& .MuiOutlinedInput-notchedOutline": {
+        borderColor: hasChanged ? "#f39c12 !important" : undefined,
+        borderWidth: hasChanged ? "2px !important" : undefined,
+      },
+
+      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+        borderColor: hasChanged ? "#f39c12 !important" : undefined,
+        borderWidth: hasChanged ? "2px !important" : undefined,
+      },
+
+      "&:hover .MuiOutlinedInput-notchedOutline": {
+        borderColor: hasChanged ? "#f39c12 !important" : undefined,
+        borderWidth: hasChanged ? "2px !important" : undefined,
+      },
+    },
+
+    "& .MuiOutlinedInput-input": {
+      padding: "4px 8px",
+      ...getStyles(),
+    },
+  });
 
   const handleChange = (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -119,14 +178,7 @@ function DynamicField({
           size="small"
           variant="outlined"
           fullWidth
-          sx={{
-            height: "24px",
-            ...getStyles(),
-            borderRadius: 2,
-            "& .MuiSelect-select": {
-              padding: "4px 8px",
-            },
-          }}
+          sx={getSelectStyles(hasChanged, getStyles)}
         >
           {options.map((opt) => (
             <MenuItem
@@ -149,17 +201,7 @@ function DynamicField({
           fullWidth
           variant="outlined"
           size="small"
-          sx={{
-            "& .MuiInputBase-root": {
-              height: "24px",
-              ...getStyles(),
-              borderRadius: 2,
-            },
-            "& input": {
-              padding: "4px 8px",
-              ...getStyles(),
-            },
-          }}
+          sx={getInputStyles(hasChanged, getStyles)}
         />
       );
     }
@@ -201,17 +243,7 @@ function DynamicField({
           fullWidth
           variant="outlined"
           size="small"
-          sx={{
-            "& .MuiInputBase-root": {
-              height: "24px",
-              ...getStyles(),
-              borderRadius: 2,
-            },
-            "& input": {
-              padding: "4px 8px",
-              ...getStyles(),
-            },
-          }}
+          sx={getInputStyles(hasChanged, getStyles)}
         />
       );
     }
@@ -223,14 +255,7 @@ function DynamicField({
           onChange={handleChange}
           size="small"
           variant="outlined"
-          sx={{
-            height: "24px",
-            ...getStyles(),
-            borderRadius: 2,
-            "& .MuiSelect-select": {
-              padding: "4px 8px",
-            },
-          }}
+          sx={getSelectStyles(hasChanged, getStyles)}
         >
           <MenuItem
             value=""

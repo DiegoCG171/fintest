@@ -10,8 +10,13 @@ export const tabSlice = createSlice({
     initialState,
     reducers: {
         addTab: (state, action: PayloadAction<Tab>) => {
-            const exists = state.dynamicTabs.some(tab => tab.route === action.payload.route);
-            if (!exists) state.dynamicTabs.push(action.payload);
+            const index = state.dynamicTabs.findIndex(tab => tab.route === action.payload.route);
+
+            if (index === -1) {
+                state.dynamicTabs.push(action.payload);
+            } else {
+                state.dynamicTabs[index] = action.payload;
+            }
         },
         removeTab: (state, action: PayloadAction<string>) => {
             state.dynamicTabs = state.dynamicTabs.filter(tab => tab.route !== action.payload);

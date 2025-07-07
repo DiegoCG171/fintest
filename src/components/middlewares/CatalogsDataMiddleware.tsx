@@ -5,7 +5,6 @@ import {
   setValuesForTab,
   useAppDispatch,
   useAppSelector,
-  getRulesThunk,
 } from "../../store";
 import FormBuilderContainer from "../UI/FormBuilder/FormBuilderContainer";
 import {
@@ -27,11 +26,7 @@ function CatalogsDataMiddleware({ tabId, template }: CatalogsDataMiddlewareProps
   );
 
   const alreadyInitialized = useRef(false);
-  useEffect(() => {
-    if (!rawRules?.length) {
-      dispatch(getRulesThunk());
-    }
-  }, [dispatch, rawRules]);
+  
 
   const mappedRules = useMemo(() => {
     if (!rawRules?.length) return [];
@@ -50,10 +45,17 @@ function CatalogsDataMiddleware({ tabId, template }: CatalogsDataMiddlewareProps
   }, [templates, templateId, formType, template, testCases]);
 
   useEffect(() => {
-    dispatch(
+    if(template.formType != "generationTransaction") {
+      dispatch(
       setConfig(serviceConfig.rules.columns as ColumnConfigFormBuilder[])
     );
-  }, [dispatch]);
+    } else {
+      dispatch(
+      setConfig(serviceConfig.rulesGeneration.columns as ColumnConfigFormBuilder[])
+    );
+    }
+    
+  }, [dispatch, template, formType]);
 
   useEffect(() => {
     alreadyInitialized.current = false;

@@ -1,23 +1,15 @@
 import { Breadcrumbs, Typography } from "@mui/material";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import Link from "@mui/material/Link";
-import { useLocation } from "react-router-dom";
+import { BreadcrumbComponentProps } from "../../config/interfaces";
 
-function BreadcrumbComponent() {
-  const normalizeName = (text: string) => {
-    if(text === 'pos') return 'POS';
-    if(text === 'atm') return 'ATM';
-    return text.replace(/-/g, " ");
-  }
-  const location = useLocation();
-  const pathnames = location.pathname.split("/").filter(Boolean);
-  pathnames.shift()
-  pathnames.pop()
-  const crumbs = pathnames.map((segment, index) => {
-    const to = `/${pathnames.slice(0, index + 1).join("/")}`;
-    const name = normalizeName(segment);
+function BreadcrumbComponent({ pathNames }: BreadcrumbComponentProps) {
 
-    const isLast = index === pathnames.length - 1;
+  const crumbs = pathNames.map((segment:string, index: number) => {
+    const to = `/${pathNames.slice(0, index + 1).join("/")}`;
+    const name = segment;
+
+    const isLast = index === pathNames.length - 1;
     return isLast ? (
       <Typography
         key={to}

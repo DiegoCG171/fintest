@@ -5,30 +5,25 @@ import {
 } from "../interfaces";
 
 
-function mapAllChildren(rows: TableRowDataFormBuilder[]): FieldUpdateTemplate[] {
-    return rows.map((row) => ({
-        idBitmap: row.idBitmap ?? '',
-        isRequired: Boolean(row.isRequired),
-        function: row.function ?? '',
-        value: row.value ?? '',
-        fields: Array.isArray(row.breakingRules)
-        ? mapAllChildren(row.breakingRules as TableRowDataFormBuilder[])
-        : [],
-    }));
-}
+function mapAllChildren(rows: TableRowDataFormBuilder[], typeForm: string): FieldUpdateTemplate[] {
+    return rows.map((row) => {
+        const base = {
+            idBitmap: row.idBitmap ?? '',
+            ...(typeForm !== 'generationTransaction' && { isRequired: Boolean(row.isRequired) }),
+            function: row.function ?? '',
+            value: row.value ?? '',
+        };
 
-function mapOnlyRequiredChildren(rows: TableRowDataFormBuilder[]): FieldUpdateTemplate[] {
-    return rows
-        .filter((row) => row.isRequired)
-        .map((row) => ({
-        idBitmap: row.idBitmap ?? '',
-        isRequired: row.isRequired,
-        function: row.function ?? '',
-        value: row.value ?? '',
-        fields: Array.isArray(row.breakingRules)
-            ? mapAllChildren(row.breakingRules as TableRowDataFormBuilder[])
-            : [],
-        }));
+        const children = Array.isArray(row.breakingRules)
+            ? mapAllChildren(row.breakingRules as TableRowDataFormBuilder[], typeForm)
+            : [];
+
+        /* return children.length > 0
+            ? { ...base, fields: children }
+            : base; */
+
+        return { ...base, fields: children }
+    });
 }
 
 export function prepareUpdatePayload(
@@ -38,13 +33,6 @@ export function prepareUpdatePayload(
     const formattedRows: FieldUpdateTemplate[] = rows
         .filter((row) => row.isActive)
         .map((row) => {
-        let fields: FieldUpdateTemplate[] = [];
-
-        if (Array.isArray(row.breakingRules)) {
-            fields = row.idBitmap === "DE-63"
-            ? mapOnlyRequiredChildren(row.breakingRules as TableRowDataFormBuilder[])
-            : mapAllChildren(row.breakingRules as TableRowDataFormBuilder[]);
-        }
         
         if (typeForm === 'selectionTransaction') {
             return {
@@ -54,13 +42,20 @@ export function prepareUpdatePayload(
             };
         }
 
-        return {
+        const base = {
             idBitmap: row.idBitmap ?? '',
-            isRequired: Boolean(row.isRequired),
+            ...(typeForm !== 'generationTransaction' && { isRequired: Boolean(row.isRequired) }),
             function: row.function ?? '',
-            value: row.value ?? '',
-            fields,
+            value: row.value ?? ''
         };
+
+        const children = Array.isArray(row.breakingRules)
+            ? mapAllChildren(row.breakingRules as TableRowDataFormBuilder[], typeForm)
+            : [];
+
+        return children.length > 0
+            ? { ...base, fields: children }
+            : base;
         });
 
     return {

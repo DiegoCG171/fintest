@@ -15,6 +15,12 @@ function FormBuilderRow({
   canEdit,
 }: FormBuilderRowProps) {
   const [expanded, setExpanded] = useState(false);
+  const [originalValues, setOriginalValues] = useState(() =>
+    headers.reduce((acc, col) => {
+      acc[col.id] = row[col.id];
+      return acc;
+    }, {} as Record<string, unknown>)
+  );
   const [edited, setEdited] = useState(false);
   const levelColors = ["#ffffff", "#f5f7fa", "#eef3f8", "#e4ecf2", "#d6e0eb"];
   const backgroundColor = levelColors[path.length - 1] || "#d6e0eb";
@@ -44,7 +50,24 @@ function FormBuilderRow({
                 </IconButton>
               ) : (
                 <IconButton
-                  onClick={canEdit ? () => setEdited(!edited) : () => {}}
+                  onClick={() => {
+                    if (canEdit) {
+                      if (edited) {
+                        const hasChanges = headers.some(
+                          (col) => row[col.id] !== originalValues[col.id]
+                        );
+                        if (hasChanges) {
+                          const newOriginals = headers.reduce((acc, col) => {
+                            acc[col.id] = row[col.id];
+                            return acc;
+                          }, {} as Record<string, unknown>);
+                          setOriginalValues(newOriginals);
+                        }
+                      }
+
+                      setEdited(!edited);
+                    }
+                  }}
                   sx={{
                     cursor: canEdit ? "pointer" : "default",
                     "&:hover": {
@@ -69,6 +92,7 @@ function FormBuilderRow({
               <DynamicField
                 column={col}
                 value={row[col.id]}
+                originalValue={originalValues[col.id]}
                 row={row}
                 path={path}
                 tabId={tabId}
