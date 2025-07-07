@@ -50,10 +50,17 @@ function CatalogsDataMiddleware({ tabId, template }: CatalogsDataMiddlewareProps
   }, [templates, templateId, formType, template, testCases]);
 
   useEffect(() => {
-    dispatch(
+    if(template.formType != "generationTransaction") {
+      dispatch(
       setConfig(serviceConfig.rules.columns as ColumnConfigFormBuilder[])
     );
-  }, [dispatch]);
+    } else {
+      dispatch(
+      setConfig(serviceConfig.rulesGeneration.columns as ColumnConfigFormBuilder[])
+    );
+    }
+    
+  }, [dispatch, template, formType]);
 
   useEffect(() => {
     alreadyInitialized.current = false;

@@ -77,6 +77,7 @@ export interface DynamicFieldProps {
     tabId: string;
     isEditable: boolean
     onlyRead: boolean
+    originalValue: string | number | boolean | undefined | unknown;
 }
 
 //Slice's interfaces

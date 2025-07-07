@@ -107,8 +107,8 @@ export const combineTemplateData = (data: FieldValidation[] | null, mappedRules:
                 ...rule,
                 isRequired: matched?.isRequired ?? rule.isRequired,
                 isActive: matched?.isActive ?? rule.isActive,
-                function: matched?.function ?? rule.function,
-                value: matched?.value ?? rule.value,
+                function: matched?.function ??  rule.function,
+                value: matched?.value ??  rule.value,
                 breakingRules:
                     Array.isArray(rule.breakingRules) && rule.breakingRules.length > 0
                         ? updateRules(
