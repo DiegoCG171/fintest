@@ -10,6 +10,7 @@ export interface TemplateContextType {
     validationTransaction: FieldValidation[]
     generationTransaction: FieldValidation[]
     selectionTransaction: FieldValidation[]
+    processingMethod: string
     uuid: string
     __v: number
     createdAt: string
@@ -17,7 +18,7 @@ export interface TemplateContextType {
     path: string[]
 }
 
-export type CreateTemplate = Omit<TemplateContextType, "_id" | "uuid" | "__v" | "createdAt" | "updatedAt" | "type">;
+export type CreateTemplate = Omit<TemplateContextType, "_id" | "uuid" | "__v" | "createdAt" | "updatedAt" | "type" | "path">;
 
 export interface JsonTemplateState {
     data: CreateTemplate,

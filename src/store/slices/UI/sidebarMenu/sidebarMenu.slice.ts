@@ -133,8 +133,6 @@ export const sidebarMenuSlice = createSlice({
               name,
               linkMenu: `collections/${id}`, // Ajusta el prefijo si lo necesitas distinto
             };
-            console.log(newItem)
-
             return {
               ...group,
               items: group.items ? [...group.items, newItem] : [newItem],

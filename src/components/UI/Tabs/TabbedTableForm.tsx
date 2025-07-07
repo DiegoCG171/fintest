@@ -34,8 +34,10 @@ import {
 import { addOrUpdateTemplate } from "../../../store/slices/templates/template.slice";
 import { getCollectionsThunk } from "../../../store/slices/collections/collections.thunk";
 
-function TabbedTableForm({ tabs, initialTabIndex = 0 }: TabTableFormComponentProps) {
-
+function TabbedTableForm({
+  tabs,
+  initialTabIndex = 0,
+}: TabTableFormComponentProps) {
   const [value, setValue] = useState(initialTabIndex);
   useEffect(() => {
     setValue(initialTabIndex);
@@ -44,17 +46,26 @@ function TabbedTableForm({ tabs, initialTabIndex = 0 }: TabTableFormComponentPro
   const dispatch = useAppDispatch();
   const { showToast } = useToast();
 
-  const { error: rulesError, status: statusRules } = useAppSelector((state) => state.rules);
-  const { getError: templatesError, getStatus: statusTemplates } = useAppSelector((state) => state.templates);
-  const { getError: testCasesError, getStatus: statusTestCases } = useAppSelector((state) => state.testCases);
+  const { error: rulesError, status: statusRules } = useAppSelector(
+    (state) => state.rules
+  );
+  const { getError: templatesError, getStatus: statusTemplates } =
+    useAppSelector((state) => state.templates);
+  const { getError: testCasesError, getStatus: statusTestCases } =
+    useAppSelector((state) => state.testCases);
   const templates = useAppSelector((state) => state.templates.templates);
+  const testCases = useAppSelector((state) => state.testCases.testCases);
 
   const canEdit = tabs[0].canEdit;
   const currentTabId = useMemo(() => {
-    return tabs[value] ? `${tabs[value].templateId}-${tabs[value].formType}` : "";
+    return tabs[value]
+      ? `${tabs[value].templateId}-${tabs[value].formType}`
+      : "";
   }, [tabs, value]);
 
-  const tabForm = useAppSelector((state) => state.formBuilder.tabForms[currentTabId]);
+  const tabForm = useAppSelector(
+    (state) => state.formBuilder.tabForms[currentTabId]
+  );
   const valuesToSend = tabForm?.values ?? [];
 
   const templateId = useMemo(() => tabs[value].templateId, [tabs, value]);
@@ -76,8 +87,16 @@ function TabbedTableForm({ tabs, initialTabIndex = 0 }: TabTableFormComponentPro
   useEffect(() => {
     if (tabs[value].origin !== "categories") return;
 
+    const templateExist = templates.find(
+      (template) => template.uuid === tabs[value].templateId
+    );
+
+    if(templateExist) return;
+
     const fetchTemplates = async () => {
-      const result = await dispatch(getTemplateByIdThunk(tabs[value].templateId));
+      const result = await dispatch(
+        getTemplateByIdThunk(tabs[value].templateId)
+      );
       const template = result.payload;
       if (template) {
         dispatch(addOrUpdateTemplate(template as TemplateContextType));
@@ -90,17 +109,25 @@ function TabbedTableForm({ tabs, initialTabIndex = 0 }: TabTableFormComponentPro
       showToast(templatesError as string, "error");
       dispatch(clearTemplateError());
     }
-  }, [dispatch, showToast, statusTemplates, templatesError, tabs, value]);
+  }, [dispatch, showToast, statusTemplates, templatesError, tabs, value, templates]);
 
   //Casos de prueba
   useEffect(() => {
     if (tabs[value].origin !== "collections") return;
 
+    const testCaseExist = testCases.find(
+      (testCase) => testCase.uuid === tabs[value].templateId
+    );
+
+    if(testCaseExist) return;
+
     const fetchTestCases = async () => {
-      const result = await dispatch(getTestCaseByIdThunk(tabs[value].templateId));
+      const result = await dispatch(
+        getTestCaseByIdThunk(tabs[value].templateId)
+      );
       const testCase = result.payload;
       if (testCase) {
-        dispatch(addOrUpdateTestCases(testCase))
+        dispatch(addOrUpdateTestCases(testCase));
       }
     };
 
@@ -109,7 +136,7 @@ function TabbedTableForm({ tabs, initialTabIndex = 0 }: TabTableFormComponentPro
       showToast(testCasesError as string, "error");
       dispatch(clearTemplateError());
     }
-  }, [dispatch, showToast, statusTestCases, testCasesError, tabs, value]);
+  }, [dispatch, showToast, statusTestCases, testCasesError, tabs, value, testCases]);
 
   //Handlers
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
@@ -135,7 +162,9 @@ function TabbedTableForm({ tabs, initialTabIndex = 0 }: TabTableFormComponentPro
     if (!id) return;
 
     try {
-      const result = await dispatch(updateTemplateThunk({ id, payload })).unwrap();
+      const result = await dispatch(
+        updateTemplateThunk({ id, payload })
+      ).unwrap();
       if (result) {
         dispatch(addOrUpdateTemplate(result as TemplateContextType));
       }
@@ -165,10 +194,20 @@ function TabbedTableForm({ tabs, initialTabIndex = 0 }: TabTableFormComponentPro
 
   return (
     <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
-      <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "center" }}>
-        <TitleHeaderComponent routeId={templateId} origin={origin} />
+      <Stack
+        direction="row"
+        sx={{ justifyContent: "space-between", alignItems: "end" }}
+      >
+        <TitleHeaderComponent
+          routeId={templateId}
+          origin={origin}
+        />
         {canEdit && (
-          <Button startIcon={<SaveOutlinedIcon />} sx={{ px: 2, fontSize: "12px" }} onClick={handleSave}>
+          <Button
+            startIcon={<SaveOutlinedIcon />}
+            sx={{ px: 2, fontSize: "12px" }}
+            onClick={handleSave}
+          >
             Guardar
           </Button>
         )}
@@ -202,8 +241,15 @@ function TabbedTableForm({ tabs, initialTabIndex = 0 }: TabTableFormComponentPro
 
       <Box sx={{ flex: 1, overflow: "auto" }}>
         {tabs.map((template, index) => (
-          <CustomTabPanel key={`${index}-tab-form-content`} value={value} index={index}>
-            <CatalogsDataMiddleware tabId={currentTabId} template={template} />
+          <CustomTabPanel
+            key={`${index}-tab-form-content`}
+            value={value}
+            index={index}
+          >
+            <CatalogsDataMiddleware
+              tabId={currentTabId}
+              template={template}
+            />
           </CustomTabPanel>
         ))}
       </Box>

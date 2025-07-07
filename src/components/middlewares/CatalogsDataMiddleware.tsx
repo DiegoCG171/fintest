@@ -5,7 +5,6 @@ import {
   setValuesForTab,
   useAppDispatch,
   useAppSelector,
-  getRulesThunk,
 } from "../../store";
 import FormBuilderContainer from "../UI/FormBuilder/FormBuilderContainer";
 import {
@@ -27,11 +26,7 @@ function CatalogsDataMiddleware({ tabId, template }: CatalogsDataMiddlewareProps
   );
 
   const alreadyInitialized = useRef(false);
-  useEffect(() => {
-    if (!rawRules?.length) {
-      dispatch(getRulesThunk());
-    }
-  }, [dispatch, rawRules]);
+  
 
   const mappedRules = useMemo(() => {
     if (!rawRules?.length) return [];
