@@ -17,20 +17,6 @@ function mapAllChildren(rows: TableRowDataFormBuilder[]): FieldUpdateTemplate[] 
     }));
 }
 
-function mapOnlyRequiredChildren(rows: TableRowDataFormBuilder[]): FieldUpdateTemplate[] {
-    return rows
-        .filter((row) => row.isRequired)
-        .map((row) => ({
-        idBitmap: row.idBitmap ?? '',
-        isRequired: row.isRequired,
-        function: row.function ?? '',
-        value: row.value ?? '',
-        fields: Array.isArray(row.breakingRules)
-            ? mapAllChildren(row.breakingRules as TableRowDataFormBuilder[])
-            : [],
-        }));
-}
-
 export function prepareUpdatePayload(
     rows: TableRowDataFormBuilder[],
     typeForm: string
@@ -41,9 +27,7 @@ export function prepareUpdatePayload(
         let fields: FieldUpdateTemplate[] = [];
 
         if (Array.isArray(row.breakingRules)) {
-            fields = row.idBitmap === "DE-63"
-            ? mapOnlyRequiredChildren(row.breakingRules as TableRowDataFormBuilder[])
-            : mapAllChildren(row.breakingRules as TableRowDataFormBuilder[]);
+            fields = mapAllChildren(row.breakingRules as TableRowDataFormBuilder[]);
         }
         
         if (typeForm === 'selectionTransaction') {
