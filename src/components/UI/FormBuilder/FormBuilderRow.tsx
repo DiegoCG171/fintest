@@ -15,7 +15,7 @@ function FormBuilderRow({
   canEdit,
 }: FormBuilderRowProps) {
   const [expanded, setExpanded] = useState(false);
-  const [originalValues, setOriginalValues] = useState(() =>
+  const [originalValues] = useState(() =>
     headers.reduce((acc, col) => {
       acc[col.id] = row[col.id];
       return acc;
@@ -24,15 +24,19 @@ function FormBuilderRow({
   const [edited, setEdited] = useState(false);
   const levelColors = ["#ffffff", "#f5f7fa", "#eef3f8", "#e4ecf2", "#d6e0eb"];
   const backgroundColor = levelColors[path.length - 1] || "#d6e0eb";
+  const hasRowChanges = headers.some(
+    (col) => row[col.id] !== originalValues[col.id]
+  );
 
   return (
     <>
       <TableRow
         sx={{
-          backgroundColor,
+          backgroundColor: hasRowChanges ? "#fff7d6" : backgroundColor,
           "&:hover": {
-            backgroundColor: "#dce3e9",
+            backgroundColor: hasRowChanges ? "#ffefbf" : "#dce3e9",
           },
+          transition: "background-color 0.3s ease",
         }}
       >
         {headers.map((col) => (
@@ -52,19 +56,6 @@ function FormBuilderRow({
                 <IconButton
                   onClick={() => {
                     if (canEdit) {
-                      if (edited) {
-                        const hasChanges = headers.some(
-                          (col) => row[col.id] !== originalValues[col.id]
-                        );
-                        if (hasChanges) {
-                          const newOriginals = headers.reduce((acc, col) => {
-                            acc[col.id] = row[col.id];
-                            return acc;
-                          }, {} as Record<string, unknown>);
-                          setOriginalValues(newOriginals);
-                        }
-                      }
-
                       setEdited(!edited);
                     }
                   }}
