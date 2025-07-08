@@ -3,7 +3,7 @@ import { CollectionResponse } from "../interfaces/collections.interface";
 
 export const addLinkMenu = (
     categories: CategoryesInterface[],
-    parentPath: string[] = [],
+    parentPath: string,
 ): CategoryesInterface[] => {
     if (!categories || !Array.isArray(categories)) return [];
     return categories.map((category) => {

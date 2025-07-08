@@ -1,16 +1,16 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { RootCategoryesInterface } from "../../../config/interfaces";
-import { getAllCategories } from "../../../services";
+import { getCategories } from "../../../services";
 
-export const getAllCategoriesThunk = createAsyncThunk<
+export const getCategoriesByMethodThunk = createAsyncThunk<
     RootCategoryesInterface,
-    void,
+    string,
     { rejectValue: string }
 >(
     'categories/getAll',
-    async ( _, {rejectWithValue} ) => {
+    async ( method, {rejectWithValue} ) => {
         try {
-            const categories = await getAllCategories();
+            const categories = await getCategories(method);
             return categories
         } catch (error) {
             return rejectWithValue(error as string);

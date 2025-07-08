@@ -5,18 +5,29 @@ import SplashComponent from "../components/UI/SplashComponent";
 import { useState } from "react";
 import PersonAltOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
-import { useAppSelector } from "../store";
+import {
+  getCategoriesByMethodThunk,
+  useAppDispatch,
+  useAppSelector,
+} from "../store";
 import { Link } from "react-router-dom";
 
 function DecisionComponent() {
   const [flipped, setFlipped] = useState(false);
   const user = useAppSelector((state) => state.auth.user?.names);
   const title = `${user}, te damos la bienvenida a`;
-
+  const dispatch = useAppDispatch();
   const firstCard = () => (
     <Stack spacing={8}>
-      <Stack spacing={4} alignItems="center">
-        <Typography align="center" variant="h6" color="common.white">
+      <Stack
+        spacing={4}
+        alignItems="center"
+      >
+        <Typography
+          align="center"
+          variant="h6"
+          color="common.white"
+        >
           {title}
         </Typography>
         <Box
@@ -60,8 +71,15 @@ function DecisionComponent() {
 
   const secondCard = () => (
     <Stack spacing={8}>
-      <Stack spacing={4} alignItems="center">
-        <Typography align="center" variant="h6" color="common.white">
+      <Stack
+        spacing={4}
+        alignItems="center"
+      >
+        <Typography
+          align="center"
+          variant="h6"
+          color="common.white"
+        >
           {title}
         </Typography>
         <Box
@@ -84,10 +102,30 @@ function DecisionComponent() {
         direction="row"
         sx={{ justifyContent: "center", alignItems: "center" }}
       >
-        <Button variant="contained" component={Link} to="/main" sx={{ minWidth: 160 }}>
+        <Button
+          variant="contained"
+          component={Link}
+          to="/pos/acquirer"
+          sx={{ minWidth: 160 }}
+          onClick={() => {
+            dispatch(getCategoriesByMethodThunk("pos/acquirer"))
+              .unwrap()
+              .catch((err) => console.error("Error cargando categorías:", err));
+          }}
+        >
           POS
         </Button>
-        <Button variant="contained" component={Link} to="/main" sx={{ minWidth: 160 }}>
+        <Button
+          variant="contained"
+          component={Link}
+          to="/atm/acquirer"
+          sx={{ minWidth: 160 }}
+          onClick={() => {
+            dispatch(getCategoriesByMethodThunk("atm/acquirer"))
+              .unwrap()
+              .catch((err) => console.error("Error cargando categorías:", err));
+          }}
+        >
           ATM
         </Button>
       </Stack>

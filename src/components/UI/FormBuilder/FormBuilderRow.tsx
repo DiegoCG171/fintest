@@ -3,9 +3,13 @@ import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
 import ExpandLessRoundedIcon from "@mui/icons-material/ExpandLessRounded";
 import EditNoteOutlinedIcon from "@mui/icons-material/EditNoteOutlined";
 import CheckOutlinedIcon from "@mui/icons-material/CheckOutlined";
-import { FormBuilderRowProps } from "../../../config/interfaces";
+import {
+  FormBuilderRowProps,
+  TableRowDataFormBuilder,
+} from "../../../config/interfaces";
 import DynamicField from "./DynamicField";
 import { useState } from "react";
+import { useAppSelector } from "../../../store";
 
 function FormBuilderRow({
   row,
@@ -14,25 +18,73 @@ function FormBuilderRow({
   headers,
   canEdit,
 }: FormBuilderRowProps) {
+  
   const [expanded, setExpanded] = useState(false);
-  const [originalValues, setOriginalValues] = useState(() =>
-    headers.reduce((acc, col) => {
-      acc[col.id] = row[col.id];
-      return acc;
-    }, {} as Record<string, unknown>)
-  );
   const [edited, setEdited] = useState(false);
   const levelColors = ["#ffffff", "#f5f7fa", "#eef3f8", "#e4ecf2", "#d6e0eb"];
   const backgroundColor = levelColors[path.length - 1] || "#d6e0eb";
+
+  function getNestedRow(
+    rows: TableRowDataFormBuilder[],
+    path: number[]
+  ): TableRowDataFormBuilder | null {
+    let current: TableRowDataFormBuilder | undefined = undefined;
+    let currentLevel: TableRowDataFormBuilder[] = rows;
+
+    for (let i = 0; i < path.length; i++) {
+      const index = path[i];
+      current = currentLevel[index];
+      if (!current) return null;
+      if (i < path.length - 1) {
+        currentLevel = Array.isArray(current.breakingRules)
+          ? current.breakingRules
+          : [];
+      }
+    }
+
+    return current ?? null;
+  }
+
+  const originalRow = useAppSelector((state) => {
+    const originals = state.formBuilder.tabForms[tabId]?.originalValues;
+    return getNestedRow(originals, path);
+  });
+
+  const hasRowChanges = headers.some((col) => {
+    const current = row[col.id];
+    const original = originalRow?.[col.id];
+
+    if (col.id === "breakingRules") {
+      const currentChildren = Array.isArray(current) ? current : [];
+      const originalChildren = Array.isArray(original) ? original : [];
+
+      if (currentChildren.length !== originalChildren.length) return true;
+
+      return currentChildren.some((child, index) => {
+        const originalChild = originalChildren[index];
+        if (!originalChild) return true;
+
+        return (
+          child.idBitmap !== originalChild.idBitmap ||
+          child.displayName !== originalChild.displayName ||
+          child.value !== originalChild.value ||
+          child.function !== originalChild.function ||
+          child.isRequired !== originalChild.isRequired
+        );
+      });
+    }
+    return current !== original;
+  });
 
   return (
     <>
       <TableRow
         sx={{
-          backgroundColor,
+          backgroundColor: hasRowChanges ? "#fff7d6" : backgroundColor,
           "&:hover": {
-            backgroundColor: "#dce3e9",
+            backgroundColor: hasRowChanges ? "#ffefbf" : "#dce3e9",
           },
+          transition: "background-color 0.3s ease",
         }}
       >
         {headers.map((col) => (
@@ -52,19 +104,6 @@ function FormBuilderRow({
                 <IconButton
                   onClick={() => {
                     if (canEdit) {
-                      if (edited) {
-                        const hasChanges = headers.some(
-                          (col) => row[col.id] !== originalValues[col.id]
-                        );
-                        if (hasChanges) {
-                          const newOriginals = headers.reduce((acc, col) => {
-                            acc[col.id] = row[col.id];
-                            return acc;
-                          }, {} as Record<string, unknown>);
-                          setOriginalValues(newOriginals);
-                        }
-                      }
-
                       setEdited(!edited);
                     }
                   }}
@@ -92,7 +131,6 @@ function FormBuilderRow({
               <DynamicField
                 column={col}
                 value={row[col.id]}
-                originalValue={originalValues[col.id]}
                 row={row}
                 path={path}
                 tabId={tabId}

@@ -4,7 +4,7 @@ import HeaderSidebarMenu from "./HeaderSidebarMenu";
 import SidebarBlock from "./SidebarBlock";
 import MediaPlayer from "../MediaPlayer";
 import {
-  getAllCategoriesThunk,
+  getCategoriesByMethodThunk,
   useAppDispatch,
   useAppSelector,
 } from "../../../store";
@@ -25,6 +25,7 @@ import {
 } from "../../../store/slices/routes/validRoutes.thunk";
 import SearchBar from "./SearchBar";
 import { RunnerSideBar } from "../Runner/RunnerSideBar";
+import { useParams } from "react-router-dom";
 
 export const drawerWidth = 240;
 
@@ -34,14 +35,16 @@ function SideNavComponent() {
   const collections = useAppSelector((state) => state.collections);
   const hideMenu = useAppSelector((state) => state.sidebarMenu.isCollapsed);
   const [searchOnItem, setSearchOnItem] = useState(false);
+  const params = useParams();
+  const { method, type } = params;
 
   useEffect(() => {
     if (categories.status !== "success" && categories.status !== "loading") {
-      dispatch(getAllCategoriesThunk())
+      dispatch(getCategoriesByMethodThunk(`${method}/${type}`))
         .unwrap()
         .catch((err) => console.error("Error cargando categorías:", err));
     }
-  }, [dispatch, categories.status]);
+  }, [dispatch, categories.status, method, type ]);
 
   useEffect(() => {
     if (collections.status !== "success" && collections.status !== "loading") {
@@ -53,11 +56,12 @@ function SideNavComponent() {
 
   useEffect(() => {
     if (categories.status === "success" && categories.categories) {
-      const menuCategories = addLinkMenu(categories.categories, ["categories"]);
+      const menuCategories = addLinkMenu(categories.categories, `${method}/${type}/categories`);
+      console.log(menuCategories)
       dispatch(setCategoriesData(menuCategories));
       dispatch(setCategoriesRoutesThunk(getLinksArray(menuCategories)));
     }
-  }, [dispatch, categories.status, categories.categories]);
+  }, [dispatch, categories.status, categories.categories, method, type]);
 
   useEffect(() => {
     if (collections.status === "success" && collections.collections) {

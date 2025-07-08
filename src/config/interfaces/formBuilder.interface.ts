@@ -77,17 +77,21 @@ export interface DynamicFieldProps {
     tabId: string;
     isEditable: boolean
     onlyRead: boolean
-    originalValue: string | number | boolean | undefined | unknown;
 }
 
 //Slice's interfaces
 
 export interface FormBuilderState {
-    config: ColumnConfigFormBuilder[];
     tabForms: {
-        [tabId: string]: TabFormState;
+        [tabId: string]: {
+            values: TableRowDataFormBuilder[];
+            originalValues: TableRowDataFormBuilder[];
+            visibility?: Record<string, boolean>;
+        };
     };
+    config: ColumnConfigFormBuilder[];
 }
+
 
 export interface ColumnConfigFormBuilder {
     id: string;
@@ -110,7 +114,8 @@ export interface TableRowDataFormBuilder {
     value: string | number | boolean | null | undefined;
     breakingRules?: TableRowDataFormBuilder[] | string;
     _id?: string;
-    [key: string]: unknown | undefined;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    [key: string]: any;
 }
 
 export interface TabFormState {
