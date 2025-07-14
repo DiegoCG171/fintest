@@ -11,6 +11,7 @@ import {
   useAppSelector,
 } from "../store";
 import { Link } from "react-router-dom";
+import { getCollectionsThunk } from "../store/slices/collections/collections.thunk";
 
 function DecisionComponent() {
   const [flipped, setFlipped] = useState(false);
@@ -111,6 +112,9 @@ function DecisionComponent() {
             dispatch(getCategoriesByMethodThunk("pos/acquirer"))
               .unwrap()
               .catch((err) => console.error("Error cargando categorías:", err));
+            dispatch(getCollectionsThunk("pos/acquirer"))
+              .unwrap()
+              .catch((err) => console.error("Error cargando categorías:", err));
           }}
         >
           POS
@@ -122,6 +126,9 @@ function DecisionComponent() {
           sx={{ minWidth: 160 }}
           onClick={() => {
             dispatch(getCategoriesByMethodThunk("atm/acquirer"))
+              .unwrap()
+              .catch((err) => console.error("Error cargando categorías:", err));
+            dispatch(getCollectionsThunk("atm/acquirer"))
               .unwrap()
               .catch((err) => console.error("Error cargando categorías:", err));
           }}
