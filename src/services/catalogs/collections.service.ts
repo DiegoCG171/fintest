@@ -4,9 +4,9 @@ import { PatchGenerationTemplate } from "../../config/interfaces";
 import { CreateCollection } from "../../config/interfaces/collections.interface";
 import { handleAxiosError } from "../../config/utils/axiosErrorHandler";
 
-export const getCollections = async () => {
+export const getCollections = async (method: string) => {
     try {
-        const {data} = await api.get(ENDPOINTS.collections);
+        const {data} = await api.get(`${ENDPOINTS.collections}/${method}`);
         return data;
     } catch (error) {
         const errorMessage = handleAxiosError(error);

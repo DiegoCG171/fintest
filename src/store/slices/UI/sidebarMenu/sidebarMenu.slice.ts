@@ -8,8 +8,6 @@ import {
   createTestCaseThunk,
   deleteTestCaseThunk,
 } from "../../collections/collections.thunk";
-import { mapCollections } from "../../../../config/utils/collections.utils";
-import { CollectionResponse } from "../../../../config/interfaces/collections.interface";
 import { updateTestCaseThunk } from "../../testCases/testCases.thunk";
 
 export const initialState: MenuSidebarState = {
@@ -61,20 +59,14 @@ export const sidebarMenuSlice = createSlice({
   extraReducers: (build) => {
     build.addCase(
       createCollectionThunk.fulfilled,
-      (state, action: PayloadAction<CollectionResponse>) => {
-        const newCollectionMapped = mapCollections([action.payload]);
-        state.collectionsMenu.push(newCollectionMapped[0]);
+      (state) => {
+        
         state.createCollectionMenu = false;
       }
     );
     build.addCase(deleteTestCaseThunk
-      .fulfilled, (state, action) => {
-        state.collectionsMenu = state.collectionsMenu.map((group) => {
-          const filteredItems = group.items?.filter(
-            (item) => item.id !== action.payload
-          );
-          return { ...group, items: filteredItems };
-        });
+      .fulfilled, (state) => {
+        
         state.loading = false;
       });
     build.addCase(deleteTestCaseThunk.rejected, (state) => {
@@ -93,23 +85,8 @@ export const sidebarMenuSlice = createSlice({
     });
     build.addCase(
       updateTestCaseThunk.fulfilled,
-      (state, action) => {
-        const { uuid, name } = action.payload;
-
-        state.collectionsMenu = state.collectionsMenu.map((group) => {
-          const updatedItems = group.items?.map((item) => {
-            if (item.id === uuid) {
-              return {
-                ...item,
-                name,
-                linkMenu: `collections/${uuid}`,
-              };
-            }
-            return item;
-          });
-
-          return { ...group, items: updatedItems };
-        });
+      (state) => {
+        
         state.updateTestCase = null;
         state.loading = false;
       }
@@ -117,29 +94,9 @@ export const sidebarMenuSlice = createSlice({
     build.addCase(
       createTestCaseThunk.fulfilled,
       (
-        state,
-        action: PayloadAction<{
-          id: string;
-          name: string;
-          collectionId: string;
-        }>
+        state
       ) => {
-        const { id, name, collectionId } = action.payload
-
-        state.collectionsMenu = state.collectionsMenu.map((group) => {
-          if (group.id === collectionId) {
-            const newItem = {
-              id,
-              name,
-              linkMenu: `collections/${id}`, // Ajusta el prefijo si lo necesitas distinto
-            };
-            return {
-              ...group,
-              items: group.items ? [...group.items, newItem] : [newItem],
-            };
-          }
-          return group;
-        });
+        
         state.loading = false;
       }
     );

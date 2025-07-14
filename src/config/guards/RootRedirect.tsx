@@ -4,7 +4,7 @@ import { useAppSelector } from "../../store";
 const RootRedirect = () => {
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
 
-  return isAuthenticated ? <Navigate to="/main" /> : <Navigate to="/login" />;
+  return isAuthenticated ? <Navigate to="/home" /> : <Navigate to="/login" />;
 };
 
 export default RootRedirect;

@@ -5,7 +5,6 @@ import {
   updateNestedFieldValue,
   useAppDispatch,
 } from "../../../store";
-import { useEffect, useRef } from "react";
 
 function DynamicField({
   column,
@@ -15,17 +14,9 @@ function DynamicField({
   tabId,
   isEditable,
   onlyRead,
-  originalValue,
 }: DynamicFieldProps) {
-  const originalRef = useRef(originalValue ?? value);
-  const hasChanged = String(value ?? "") !== String(originalRef.current ?? "");
 
-  useEffect(() => {
-    if (originalValue !== undefined) {
-      originalRef.current = originalValue;
-    }
-  }, [originalValue]);
-
+  const hasChanged = false;
   const dispatch = useAppDispatch();
   const dependsOn = column?.dependsOn;
   const dependsValue = dependsOn ? row[dependsOn] : undefined;

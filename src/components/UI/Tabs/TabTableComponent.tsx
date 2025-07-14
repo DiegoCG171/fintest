@@ -1,6 +1,6 @@
 import { Box, Icon, Tab, Tabs, Typography } from "@mui/material";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import CustomTabPanel from "../../core/CustomTabPanel";
 import { TabTableComponentProps } from "../../../config/interfaces";
 import { removeTab, useAppDispatch, useAppSelector } from "../../../store";
@@ -16,6 +16,8 @@ function TabTableComponent({
   const dynamicTabs = useAppSelector((state) => state.tabs.dynamicTabs);
   const realInitialIndex = initialTabIndex ?? 0;
   const [selectedTab, setSelectedTab] = useState(realInitialIndex);
+  const params = useParams();
+  const { method, type } = params; 
 
   useEffect(() => {
     setSelectedTab(initialTabIndex);
@@ -44,7 +46,7 @@ function TabTableComponent({
       if (navigateToTab?.route) {
         navigate(`/${navigateToTab.route}`);
       } else {
-        navigate("/main");
+        navigate(`/${method}/${type}`);
       }
     } else if (selectedTab > index) {
       setSelectedTab((prev) => prev - 1);

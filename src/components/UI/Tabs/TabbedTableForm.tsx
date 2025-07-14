@@ -33,6 +33,7 @@ import {
 } from "../../../store/slices/testCases/testCases.thunk";
 import { addOrUpdateTemplate } from "../../../store/slices/templates/template.slice";
 import { getCollectionsThunk } from "../../../store/slices/collections/collections.thunk";
+import { useParams } from "react-router-dom";
 
 function TabbedTableForm({
   tabs,
@@ -70,6 +71,8 @@ function TabbedTableForm({
 
   const templateId = useMemo(() => tabs[value].templateId, [tabs, value]);
   const origin = useMemo(() => tabs[value].origin, [tabs, value]);
+  const params = useParams();
+  const { method, type } = params;
 
 
   //Reglas
@@ -183,7 +186,7 @@ function TabbedTableForm({
     const id = tab.templateId;
     try {
       await dispatch(updateTestCaseThunk({ id, payload })).unwrap();
-      dispatch(getCollectionsThunk());
+      dispatch(getCollectionsThunk(`${method}/${type}`));
       showToast("Caso de prueba actualizado correctamente", "success");
     } catch (error) {
       showToast(error as string, "error");

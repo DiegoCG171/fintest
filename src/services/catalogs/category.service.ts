@@ -12,3 +12,13 @@ export const getAllCategories = async () => {
         throw errorMessage;
     }
 };
+
+export const getCategories = async (method: string) => {
+    try {
+        const response = await api.get<RootCategoryesInterface>(`${ENDPOINTS.category}/${method}`);
+        return response.data;
+    } catch (error) {
+        const errorMessage = handleAxiosError(error);
+        throw errorMessage;
+    }
+};

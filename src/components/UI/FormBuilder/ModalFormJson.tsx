@@ -10,7 +10,7 @@ import {
 import {
   closeModal,
   createTemplateThunk,
-  getAllCategoriesThunk,
+  getCategoriesByMethodThunk,
   updateTemplateThunk,
   useAppDispatch,
   useAppSelector,
@@ -25,6 +25,7 @@ import { deepClean } from "../../../config/utils/deepClean";
 import { useEffect, useState } from "react";
 import CategoriesFormJSON from "./CategoriesFormJSON";
 import { addOrUpdateTemplate } from "../../../store/slices/templates/template.slice";
+import { useParams } from "react-router-dom";
 
 function ModalFormJson({ mode = "create" }: ModalFormProps) {
   const [step, setStep] = useState<1 | 2>(1);
@@ -44,6 +45,9 @@ function ModalFormJson({ mode = "create" }: ModalFormProps) {
   const templateId = useAppSelector(
     (state) => state.templates.templateById?._id
   );
+
+  const params = useParams();
+  const { method, type } = params;
 
   const isEditMode = mode === "edit";
   const title = isEditMode ? "Actualizar template" : "Crear nuevo template";
@@ -110,7 +114,7 @@ function ModalFormJson({ mode = "create" }: ModalFormProps) {
     } catch (error) {
       showToast(error as string, "error");
     } finally {
-      dispatch(getAllCategoriesThunk())
+      dispatch(getCategoriesByMethodThunk(`${method}/${type}`))
         .unwrap()
         .catch((err) => console.error("Error cargando categorías:", err));
     }
@@ -138,7 +142,7 @@ function ModalFormJson({ mode = "create" }: ModalFormProps) {
     } catch (error) {
       showToast(error as string, "error");
     } finally {
-      dispatch(getAllCategoriesThunk())
+      dispatch(getCategoriesByMethodThunk(`${method}/${type}`))
         .unwrap()
         .catch((err) => console.error("Error cargando categorías:", err));
     }

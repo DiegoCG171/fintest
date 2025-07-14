@@ -15,7 +15,6 @@ import RecoveryPassword from "./pages/Auth/reset-password/RecoveryPassword";
 import RouteGuard from "./config/guards/RouteGuard";
 import DecisionComponent from "./pages/DecisionComponent";
 
-
 const router = createBrowserRouter([
   {
     element: (
@@ -65,7 +64,23 @@ const router = createBrowserRouter([
             element: <PrivateLayoutContent />,
             children: [
               {
-                path: "*",
+                path: ":method/:type",
+                element: (
+                  <RouteGuard>
+                    <MainPage />
+                  </RouteGuard>
+                ),
+              },
+              {
+                path: ":method/:type/categories/:categoryId",
+                element: (
+                  <RouteGuard>
+                    <MainPage />
+                  </RouteGuard>
+                ),
+              },
+              {
+                path: ":method/:type/collections/:caseId",
                 element: (
                   <RouteGuard>
                     <MainPage />

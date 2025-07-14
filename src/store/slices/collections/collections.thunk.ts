@@ -15,9 +15,9 @@ import { PatchGenerationTemplate, testCaseInterface } from "../../../config/inte
 
 export const getCollectionsThunk = createAsyncThunk(
   "collections/getAll",
-  async (_, { rejectWithValue }) => {
+  async (method: string, { rejectWithValue }) => {
     try {
-      const collections = await getCollections();
+      const collections = await getCollections(method);
       return collections;
     } catch (error) {
       return rejectWithValue(error as string);
@@ -30,7 +30,7 @@ export const createCollectionThunk = createAsyncThunk(
   async (collections: CreateCollection, { rejectWithValue }) => {
     try {
       const response = await createCollection(collections);
-      return response;
+      return response.data;
     } catch (error) {
       return rejectWithValue(error as string);
     }

@@ -52,11 +52,12 @@ function MediaPlayer() {
         setCanStop(false)
       } catch (error) {
         console.error("Error al detener el servidor:", error);
+        showToast(error as string, "error")
       } finally {
         dispatch(clearServer());
       }
     }
-  }, [dispatch, clearErrors, serverId]);
+  }, [dispatch, clearErrors, serverId, showToast]);
 
   useEffect(() => {
     if (playStatus === "loading") {
