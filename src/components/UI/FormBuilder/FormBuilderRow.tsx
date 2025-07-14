@@ -81,12 +81,9 @@ function FormBuilderRow({
       <TableRow
         sx={{
           backgroundColor: hasRowChanges ? "#fff7d6" : backgroundColor,
-          backgroundColor: hasRowChanges ? "#fff7d6" : backgroundColor,
           "&:hover": {
             backgroundColor: hasRowChanges ? "#ffefbf" : "#dce3e9",
-            backgroundColor: hasRowChanges ? "#ffefbf" : "#dce3e9",
           },
-          transition: "background-color 0.3s ease",
           transition: "background-color 0.3s ease",
         }}
       >
