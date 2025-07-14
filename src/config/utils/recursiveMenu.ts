@@ -28,7 +28,7 @@ export const addLinkMenu = (
 
 export const transformCollectionsToMenu = (
     collections: CollectionResponse[],
-    parentPath: string[] = ["collections"]
+    parentPath: string
     ): MenuServiceInterface[] => {
     if (!Array.isArray(collections)) return [];
 
@@ -38,7 +38,7 @@ export const transformCollectionsToMenu = (
         ? collection.cases.map((c) => ({
             id: c.uuid,
             name: c.name,
-            linkMenu: [...parentPath, c.uuid].join("/"),
+            linkMenu: [parentPath, c.uuid].join("/"),
             }))
         : [];
 

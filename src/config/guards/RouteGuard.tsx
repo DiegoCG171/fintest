@@ -11,7 +11,7 @@ const allowedBasePaths = [
 ];
 
 const RouteGuard = ({ children }: { children: React.ReactNode }) => {
-  const { method, type, origin, collectionId } = useParams();
+  const { method, type } = useParams();
   const location = useLocation();
 
   const pathname = location.pathname.slice(1);

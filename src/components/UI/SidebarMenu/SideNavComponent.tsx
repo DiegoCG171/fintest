@@ -44,20 +44,23 @@ function SideNavComponent() {
         .unwrap()
         .catch((err) => console.error("Error cargando categorías:", err));
     }
-  }, [dispatch, categories.status, method, type ]);
+  }, [dispatch, categories.status, method, type]);
 
   useEffect(() => {
     if (collections.status !== "success" && collections.status !== "loading") {
-      dispatch(getCollectionsThunk())
+      dispatch(getCollectionsThunk(`${method}/${type}`))
         .unwrap()
         .catch((err) => console.error("Error cargando categorías:", err));
     }
-  }, [dispatch, collections.status]);
+  }, [dispatch, collections.status, method, type]);
 
   useEffect(() => {
     if (categories.status === "success" && categories.categories) {
-      const menuCategories = addLinkMenu(categories.categories, `${method}/${type}/categories`);
-      console.log(menuCategories)
+      const menuCategories = addLinkMenu(
+        categories.categories,
+        `${method}/${type}/categories`
+      );
+
       dispatch(setCategoriesData(menuCategories));
       dispatch(setCategoriesRoutesThunk(getLinksArray(menuCategories)));
     }
@@ -65,16 +68,18 @@ function SideNavComponent() {
 
   useEffect(() => {
     if (collections.status === "success" && collections.collections) {
-      const menuCollections = transformCollectionsToMenu(
-        collections.collections
+      const transformCollections = transformCollectionsToMenu(
+        collections.collections,
+        `${method}/${type}/collections`
       );
-      dispatch(setCollectionsData(menuCollections));
-      dispatch(setCollectionsRoutesThunk(getLinksArray(menuCollections)));
+
+      dispatch(setCollectionsData(transformCollections));
+      dispatch(setCollectionsRoutesThunk(getLinksArray(transformCollections)));
     }
-  }, [dispatch, collections]);
+  }, [dispatch, collections, method, type]);
 
   const toggleMenu = useCallback(() => {
-    dispatch(setCollapsedState())
+    dispatch(setCollapsedState());
   }, [dispatch]);
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -107,7 +112,10 @@ function SideNavComponent() {
         {!hideMenu && (
           <Box sx={{ px: 2, overflowY: "auto", flexGrow: 1, my: 4 }}>
             <SearchBar onSearch={handleSearch}></SearchBar>
-            <SidebarBlock searchTerm={searchTerm} searchOnItem={searchOnItem} />
+            <SidebarBlock
+              searchTerm={searchTerm}
+              searchOnItem={searchOnItem}
+            />
             <Box>
               <MediaPlayer></MediaPlayer>
             </Box>

@@ -5,17 +5,26 @@ import { useAppDispatch } from "../../../store";
 import { useState } from "react";
 import { createCollectionThunk } from "../../../store/slices/collections/collections.thunk";
 import { toggleCreateCollectionMenu } from "../../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
+import { useRefreshCollectionsMenu } from "../../../config/hooks/useRefreshCollectionsMenu";
 
 export const SidebarCreateCollection = () => {
   const dispatch = useAppDispatch();
   const [value, setValue] = useState("");
+  const refreshCollectionsMenu = useRefreshCollectionsMenu();
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      dispatch(createCollectionThunk({ name: value }));
+  const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+  if (e.key === "Enter" && value.trim() !== "") {
+    try {
+      await dispatch(createCollectionThunk({ name: value.trim() })).unwrap();
+      await refreshCollectionsMenu();
       setValue("");
+      dispatch(toggleCreateCollectionMenu(false));
+    } catch (error) {
+      console.error("Error al crear la colección:", error);
     }
-  };
+  }
+};
+
   return (
     <Stack
       direction="row"

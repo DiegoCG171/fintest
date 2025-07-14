@@ -10,8 +10,14 @@ import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { ModalAddToCollectionProps } from "../../../config/interfaces";
-import { createTestCaseThunk } from "../../../store/slices/collections/collections.thunk";
-import { addCollectionsRouteThunk } from "../../../store/slices/routes/validRoutes.thunk";
+import {
+  createTestCaseThunk,
+  getCollectionsThunk,
+} from "../../../store/slices/collections/collections.thunk";
+import { setCollectionsRoutesThunk } from "../../../store/slices/routes/validRoutes.thunk";
+import { getLinksArray, transformCollectionsToMenu } from "../../../config/utils";
+import { setCollectionsData } from "../../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
+import { useParams } from "react-router-dom";
 export const ModalAddToCollection = ({
   templateId = "",
 }: ModalAddToCollectionProps) => {
@@ -24,23 +30,36 @@ export const ModalAddToCollection = ({
 
   const { loading } = useAppSelector((state) => state.modalForm);
 
+  const { method = "", type = "" } = useParams();
+
   const handleSubmit = async () => {
     if (!collection) {
       setCollectionError(true);
       return;
     }
+
     setCollectionError(false);
+
     try {
-      const response = await dispatch(
+      dispatch(
         createTestCaseThunk({
           id_collection: collection,
           id_template: templateId,
         })
       ).unwrap();
-      const newUrl = response.id;
-      dispatch(addCollectionsRouteThunk(`collections/${newUrl}`));
+
+      const result = await dispatch(
+        getCollectionsThunk(`${method}/${type}`)
+      ).unwrap();
+
+      const transformed = transformCollectionsToMenu(
+        result,
+        `${method}/${type}/collections`
+      );
+      dispatch(setCollectionsData(transformed));
+      dispatch(setCollectionsRoutesThunk(getLinksArray(transformed)));
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
   };
 
