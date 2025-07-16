@@ -34,6 +34,7 @@ import {
 import { addOrUpdateTemplate } from "../../../store/slices/templates/template.slice";
 import { getCollectionsThunk } from "../../../store/slices/collections/collections.thunk";
 import { useParams } from "react-router-dom";
+import { resetOriginalValues } from "../../../store/slices/UI/form/formBuilder.slice";
 
 function TabbedTableForm({
   tabs,
@@ -170,6 +171,7 @@ function TabbedTableForm({
       ).unwrap();
       if (result) {
         dispatch(addOrUpdateTemplate(result as TemplateContextType));
+        dispatch(resetOriginalValues({ tabId: tab.templateId + '-' + tab.formType }));
       }
       showToast("Plantilla actualizada correctamente", "success");
     } catch (error) {
@@ -188,6 +190,7 @@ function TabbedTableForm({
       await dispatch(updateTestCaseThunk({ id, payload })).unwrap();
       dispatch(getCollectionsThunk(`${method}/${type}`));
       showToast("Caso de prueba actualizado correctamente", "success");
+      dispatch(resetOriginalValues({ tabId: tab.templateId + '-' + tab.formType }));
     } catch (error) {
       showToast(error as string, "error");
     } finally {
