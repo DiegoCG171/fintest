@@ -46,5 +46,4 @@ export const ENDPOINTS = {
 
     //Sessions
     session: getEndpoint('session')
-
 }

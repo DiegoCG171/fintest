@@ -2,7 +2,10 @@ import { Box, Divider } from "@mui/material";
 import SeparatorMenu from "./SeparatorMenu";
 import RecursiveMenuItem from "../../navigation/RecursiveMenuItem";
 import {
+  createTemplateThunk,
+  getAllCategoriesThunk,
   getTemplateByIdThunk,
+  getTemplatesThunk,
   openModal,
   setLoading,
   useAppDispatch,
@@ -28,6 +31,7 @@ import {
 } from "../../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
 import { SidebarCreateCollection } from "./SidebarCreateCollection";
 import { createSessionThunk } from "../../../store/slices/sessions/session.thunk";
+import { cleanObject } from "../../../config/utils/cleandObject";
 
 function SidebarBlock({ searchTerm }: { searchTerm: string }) {
   const dispatch = useAppDispatch();
@@ -41,6 +45,7 @@ function SidebarBlock({ searchTerm }: { searchTerm: string }) {
   const createCollectionMenu = useAppSelector(
     (state) => state.sidebarMenu.createCollectionMenu
   );
+  const { templates } = useAppSelector((state) => state.templates);
   const { showToast } = useToast();
 
   const addToCollections = (item: ItemsServiceMenu) => {
@@ -89,6 +94,41 @@ function SidebarBlock({ searchTerm }: { searchTerm: string }) {
     {
       item: { label: "Agregar a Colecciones", id: item.id },
       action: () => addToCollections(item),
+    },
+    {
+      item: { label: "Duplicar", id: item.id },
+      action: async () => {
+        const originalTemplate = templates.find(
+          (template) => template.uuid === item.id
+        );
+
+        if (!originalTemplate) {
+          showToast("Template no encontrado", "error");
+          return;
+        }
+
+        const copyTemplate = cleanObject(originalTemplate);
+
+        try {
+          await dispatch(
+            createTemplateThunk({
+              template: {
+                ...copyTemplate,
+                name: `${copyTemplate.name} copia`,
+              },
+            })
+          ).unwrap();
+
+          showToast("Copia del template creada correctamente", "success");
+        } catch (error) {
+          showToast(error as string, "error");
+        } finally {
+          dispatch(getTemplatesThunk());
+          dispatch(getAllCategoriesThunk())
+            .unwrap()
+            .catch((err) => console.error("Error cargando categorías:", err));
+        }
+      },
     },
     {
       item: { label: "Editar template", id: item.id },

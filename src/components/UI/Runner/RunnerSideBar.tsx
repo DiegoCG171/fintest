@@ -1,7 +1,6 @@
 import { Box, Drawer, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import {
-  closeSession,
   toggleRunningSession,
   toggleSessionDetails,
 } from "../../../store/slices/sessions/sessionSlice";
@@ -18,6 +17,7 @@ import { RunnerHeader } from "./RunnerHeader";
 import { RunnerDetailsPanel } from "./RunnerDetailsPanel";
 import { RunnerFooter } from "./RunnerFooter";
 import RunnerStepList from "./RunnerStepList";
+import { removeSessionThunk } from "../../../store/slices/sessions/session.thunk";
 
 export const RunnerSideBar = () => {
   const dispatch = useAppDispatch();
@@ -28,6 +28,7 @@ export const RunnerSideBar = () => {
     isOpenDetails,
     completedCount,
     loading,
+    id
   } = useAppSelector((state) => state.session);
   const { server } = useAppSelector((state) => state.server);
 
@@ -59,7 +60,7 @@ export const RunnerSideBar = () => {
   };
 
   const handleCloseSession = () => {
-    dispatch(closeSession());
+    dispatch(removeSessionThunk(id));
   };
 
   const handleStartServer = () => {
@@ -119,11 +120,12 @@ export const RunnerSideBar = () => {
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "space-between",
-                height: "calc(100% - 4rem)",
+                height: "calc(100%)",
                 alignItems: "start",
               }}
             >
               <RunnerStepList
+                isActive={isActive}
                 activeSession={activeSession}
                 completedCount={completedCount}
                 onTestCaseSelect={handleSetTestCaseDetails}
@@ -131,7 +133,7 @@ export const RunnerSideBar = () => {
               />
 
               <Typography
-                sx={{ fontSize: 12, color: "#9e9e9e", alignSelf: "end" }}
+                sx={{ fontSize: 12, color: "#9e9e9e", alignSelf: "end", marginBottom: 1 }}
               >
                 {completedCount} de {activeSession.length} Completados
               </Typography>

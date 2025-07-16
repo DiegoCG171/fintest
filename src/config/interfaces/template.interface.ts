@@ -59,7 +59,7 @@ export interface FieldUpdateTemplate {
 // Slice
 
 export interface TemplateState {
-    templates: TemplateRoot | [],
+    templates: TemplateRoot,
     getStatus: AsyncStatus,
     getError: null | string,
     updateStatus: AsyncStatus,

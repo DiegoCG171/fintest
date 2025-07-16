@@ -23,6 +23,8 @@ export interface LoginResponse {
     updatedAt: string
     deletedAt?: unknown
     token: string;
+    role: string;
+    permissions: string[];
 }
 
 export interface AuthState {

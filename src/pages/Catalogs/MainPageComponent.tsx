@@ -11,6 +11,11 @@ import TabbedCardContainer from "../../components/UI/Tabs/TabbedCardContainer";
 import { addTab, getTemplatesThunk } from "../../store";
 import { getConfigTab } from "../../config/utils/tabsContent";
 import { getTestCasesThunk } from "../../store/slices/testCases/testCases.thunk";
+import {
+  getGenetationFunctionsThunk,
+  getSelectionFunctionsThunk,
+  getValidationFunctionsThunk,
+} from "../../store/slices/functionsSelect/functionsSelect.thunk";
 
 const generateStaticTabs = (messagesData: MessagesState): StaticTabItem[] => [
   {
@@ -100,6 +105,18 @@ function MainPage() {
   }, [dispatch]);
 
   useEffect(() => {
+    dispatch(getGenetationFunctionsThunk());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(getValidationFunctionsThunk());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(getSelectionFunctionsThunk());
+  }, [dispatch]);
+
+  useEffect(() => {
     const currentRoute = location.pathname.slice(1);
 
     const matching = tabConfig[currentRoute]?.[0];
@@ -125,13 +142,13 @@ function MainPage() {
   return (
     <Box
       sx={{
-      height: "100%",
-      width: "100%",
-      display: "flex",
-      flexDirection: "column",
-      overflow: "hidden",
-      backgroundColor: "#f7f7f7",
-  }}
+        height: "100%",
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+        backgroundColor: "#f7f7f7",
+      }}
     >
       <TabbedCardContainer
         tabs={[
