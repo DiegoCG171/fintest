@@ -91,19 +91,42 @@ function DynamicField({
   });
 
   const handleChange = (
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | any
-  ) => {
-    const newValue = e.target.value;
-    const fieldKey = column.id;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | any
+) => {
+  const newValue = e.target.value;
+  const fieldKey = column.id;
+
+  if (path.length > 1) {
+    dispatch(
+      updateNestedFieldValue({
+        tabId,
+        path,
+        fieldKey,
+        value: newValue,
+      })
+    );
+  } else {
+    dispatch(
+      updateFieldValue({
+        tabId,
+        rowIndex: path[0],
+        fieldKey,
+        value: newValue,
+      })
+    );
+  }
+
+  if (fieldKey === "function" && newValue === "not_validate") {
+    const valueFieldKey = "value";
 
     if (path.length > 1) {
       dispatch(
         updateNestedFieldValue({
           tabId,
           path,
-          fieldKey,
-          value: newValue,
+          fieldKey: valueFieldKey,
+          value: "",
         })
       );
     } else {
@@ -111,12 +134,14 @@ function DynamicField({
         updateFieldValue({
           tabId,
           rowIndex: path[0],
-          fieldKey,
-          value: newValue,
+          fieldKey: valueFieldKey,
+          value: "",
         })
       );
     }
-  };
+  }
+};
+
 
   function shouldDisableCheckbox(
     isChild: boolean,
