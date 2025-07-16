@@ -17,7 +17,10 @@ function TabTableComponent({
   const realInitialIndex = initialTabIndex ?? 0;
   const [selectedTab, setSelectedTab] = useState(realInitialIndex);
   const params = useParams();
-  const { method, type } = params; 
+  const { method, type, categoryId, caseId } = params;
+  const baseRoute = categoryId
+    ? `${method}/${type}/categories/${categoryId}`
+    : `${method}/${type}/collections/${caseId}`;
 
   useEffect(() => {
     setSelectedTab(initialTabIndex);
@@ -29,16 +32,19 @@ function TabTableComponent({
 
     if (selectedTabItem?.route) {
       navigate(`/${selectedTabItem.route}`);
+    } else {
+      const suffix = selectedTabItem.label.toLowerCase();
+      navigate(`/${baseRoute}/${suffix}`);
     }
   };
 
   const closeTab = (index: number) => {
-    if (index === 0 || index === 1) return;
+    const tab = tabs[index];
+    if (!tab.origin) return;
+    if (!tab.route) return;
 
-    const dynamicTab = dynamicTabs[index - 2];
-    if (dynamicTab) {
-      dispatch(removeTab(dynamicTab.route));
-    }
+    dispatch(removeTab(tab.route));
+
     if (selectedTab === index) {
       const newIndex = index > 2 ? index - 1 : 0;
       setSelectedTab(newIndex);
@@ -46,7 +52,8 @@ function TabTableComponent({
       if (navigateToTab?.route) {
         navigate(`/${navigateToTab.route}`);
       } else {
-        navigate(`/${method}/${type}`);
+        const suffix = navigateToTab.label.toLowerCase();
+        navigate(`/${baseRoute}/${suffix}`);
       }
     } else if (selectedTab > index) {
       setSelectedTab((prev) => prev - 1);
@@ -54,7 +61,7 @@ function TabTableComponent({
   };
 
   const iconAction = (index: number) => {
-    if (index === 1 || index === 0) return undefined;
+    if (!tabs[index]?.origin) return undefined;
     return (
       <CloseIcon
         onClick={(e) => {

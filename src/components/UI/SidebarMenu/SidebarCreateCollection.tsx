@@ -6,16 +6,24 @@ import { useState } from "react";
 import { createCollectionThunk } from "../../../store/slices/collections/collections.thunk";
 import { toggleCreateCollectionMenu } from "../../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
 import { useRefreshCollectionsMenu } from "../../../config/hooks/useRefreshCollectionsMenu";
+import { useCreateCollections } from "../../../config/hooks/useCreateCollections";
 
 export const SidebarCreateCollection = () => {
   const dispatch = useAppDispatch();
   const [value, setValue] = useState("");
   const refreshCollectionsMenu = useRefreshCollectionsMenu();
+  const params = useCreateCollections()
+  console.log(params)
 
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
   if (e.key === "Enter" && value.trim() !== "") {
     try {
-      await dispatch(createCollectionThunk({ name: value.trim() })).unwrap();
+      const name = value.trim()
+      const body = {
+        ...params,
+        name
+      }
+      await dispatch(createCollectionThunk(body)).unwrap();
       await refreshCollectionsMenu();
       setValue("");
       dispatch(toggleCreateCollectionMenu(false));
