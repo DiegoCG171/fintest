@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { CategoriesState, RootCategoryesInterface } from "../../../config/interfaces";
-import { getAllCategoriesThunk } from "./categories.thunk";
+import { getCategoriesByMethodThunk } from "./categories.thunk";
 
 const initialState: CategoriesState = {
     categories:  null,
@@ -22,15 +22,15 @@ export const categoriesSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            .addCase(getAllCategoriesThunk.pending, (state) => {
+            .addCase(getCategoriesByMethodThunk.pending, (state) => {
                 state.error = null;
                 state.status = 'loading';
             })
-            .addCase(getAllCategoriesThunk.fulfilled, (state, action: PayloadAction<RootCategoryesInterface>) => {
+            .addCase(getCategoriesByMethodThunk.fulfilled, (state, action: PayloadAction<RootCategoryesInterface>) => {
                 state.categories = action.payload
                 state.status = 'success';
             })
-            .addCase(getAllCategoriesThunk.rejected, (state, action) => {
+            .addCase(getCategoriesByMethodThunk.rejected, (state, action) => {
                 state.error = action.payload ?? "Error desconocido";
                 state.status = 'error';
             })

@@ -1,7 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import ThemeConfig from "./config/ThemeConfig";
 import MainLayoutComponent from "./components/layouts/MainLayoutComponent";
-import SplashComponent from "./pages/SplashComponent";
 import AuthLayout from "./components/layouts/AuthLayoutComponent";
 import LoginComponent from "./pages/Auth/login/LoginComponent";
 import RegisterComponent from "./pages/Auth/register/RegisterComponent";
@@ -14,26 +13,7 @@ import MainPage from "./pages/Catalogs/MainPageComponent";
 import ResetPassword from "./pages/Auth/reset-password/ResetPassword";
 import RecoveryPassword from "./pages/Auth/reset-password/RecoveryPassword";
 import RouteGuard from "./config/guards/RouteGuard";
-
-/* const mainPageRoutes = [
-  "main", 
-  "ecommerce", 
-  "ecommerce/ventas", 
-  "ecommerce/reverso", 
-  "ecommerce/cancelacion", 
-  "ecommerce/ventas-ds", 
-  "ecommerce/ventas-visa", 
-  "ecommerce/ventas-mastercard", 
-  "moto",
-  "moto/ventas", 
-  "moto/reverso", 
-  "moto/cancelacion", 
-  "moto/ventas-ds", 
-  "moto/ventas-visa", 
-  "moto/ventas-mastercard", 
-  "connection/logon/logon-template",
-  "pos/tarjeta-presente/dukpt/retail/venta/venta-template"
-]; */
+import DecisionComponent from "./pages/DecisionComponent";
 
 const router = createBrowserRouter([
   {
@@ -54,10 +34,6 @@ const router = createBrowserRouter([
       {
         element: <PublicGuard />,
         children: [
-          {
-            path: "home",
-            element: <SplashComponent />,
-          },
           {
             path: "reset-pssw",
             element: <ResetPassword />,
@@ -88,7 +64,35 @@ const router = createBrowserRouter([
             element: <PrivateLayoutContent />,
             children: [
               {
-                path: "*",
+                path: ":method/:type",
+                element: (
+                  <RouteGuard>
+                    <MainPage />
+                  </RouteGuard>
+                ),
+              },
+              {
+                path: ":method/:type/detalles",
+                element: (
+                  <MainPage />
+                ),
+              },
+              {
+                path: ":method/:type/errores",
+                element: (
+                  <MainPage />
+                ),
+              },
+              {
+                path: ":method/:type/categories/:categoryId",
+                element: (
+                  <RouteGuard>
+                    <MainPage />
+                  </RouteGuard>
+                ),
+              },
+              {
+                path: ":method/:type/collections/:caseId",
                 element: (
                   <RouteGuard>
                     <MainPage />
@@ -96,6 +100,10 @@ const router = createBrowserRouter([
                 ),
               },
             ],
+          },
+          {
+            path: "home",
+            element: <DecisionComponent />,
           },
         ],
       },

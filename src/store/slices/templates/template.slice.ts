@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { createTemplateThunk, getTemplateByIdThunk, getTemplatesThunk, updateTemplateThunk } from './templates.thunk';
 import { TemplateContextType, TemplateState } from '../../../config/interfaces';
 
@@ -14,7 +14,6 @@ const initialState: TemplateState = {
     getErrorById: null,
     templateById: null as TemplateContextType | null,
 };
-
 
 export const templateSlice = createSlice({
     name: 'templates',
@@ -42,6 +41,16 @@ export const templateSlice = createSlice({
         clearByIdTemplateError: (state) => {
             state.getErrorById = null;
             state.getStatusById = 'idle'
+        },
+        addOrUpdateTemplate: (state, action: PayloadAction<TemplateContextType>) => {
+            const newTemplate = action.payload;
+            const index = state.templates.findIndex(t => t.uuid === newTemplate.uuid);
+
+            if (index !== -1) {
+                state.templates[index] = newTemplate;
+            } else {
+                state.templates.push(newTemplate);
+            }
         }
     },
     extraReducers: (builder) => {
@@ -96,4 +105,4 @@ export const templateSlice = createSlice({
     }
 })
 
-export const { clearTemplates, clearTemplateError, clearUpdateError, clearCreateError, clearByIdTemplate, clearByIdTemplateError } = templateSlice.actions
+export const { clearTemplates, clearTemplateError, clearUpdateError, clearCreateError, clearByIdTemplate, clearByIdTemplateError, addOrUpdateTemplate } = templateSlice.actions

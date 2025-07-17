@@ -3,6 +3,7 @@ import { CreateTemplate } from "../../interfaces";
 export const saleTemplate: CreateTemplate = {
     "name": "Venta Template",
     categoryId: "",
+    processingMethod: "Acquirer",
     "description": "Plantilla de una venta con su respuesta",
     "validationTransaction": [
         {
@@ -641,5 +642,6 @@ export const saleTemplate: CreateTemplate = {
             "idBitmap": "DE-126",
             "function": "echo"
         }
-    ]
+    ],
+    "selectionTransaction": []
 }

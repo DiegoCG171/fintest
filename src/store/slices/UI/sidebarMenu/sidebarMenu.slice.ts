@@ -6,14 +6,9 @@ import {
 import {
   createCollectionThunk,
   createTestCaseThunk,
-  deleteCollectionThunk,
   deleteTestCaseThunk,
-  getCollectionsThunk,
-  updateCollectionThunk,
-  updateTestCaseThunk,
 } from "../../collections/collections.thunk";
-import { mapCollections } from "../../../../config/utils/collections.utils";
-import { CollectionResponse } from "../../../../config/interfaces/collections.interface";
+import { updateTestCaseThunk } from "../../testCases/testCases.thunk";
 
 export const initialState: MenuSidebarState = {
   isCollapsed: false,
@@ -63,66 +58,17 @@ export const sidebarMenuSlice = createSlice({
   },
   extraReducers: (build) => {
     build.addCase(
-      getCollectionsThunk.fulfilled,
-      (state, action: PayloadAction<CollectionResponse[]>) => {
-        state.collectionsMenu = mapCollections(action.payload);
-      }
-    );
-    build.addCase(
       createCollectionThunk.fulfilled,
-      (state, action: PayloadAction<CollectionResponse>) => {
-        const newCollectionMapped = mapCollections([action.payload]);
-        state.collectionsMenu.push(newCollectionMapped[0]);
+      (state) => {
+        
         state.createCollectionMenu = false;
       }
     );
-    build.addCase(
-      updateCollectionThunk.fulfilled,
-      (state, action: PayloadAction<{ uuid: string; name: string }>) => {
-        const { uuid, name } = action.payload;
-
-        const slug = name
-          .toLowerCase()
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-          .replace(/\s+/g, "-")
-          .replace(/[^\w-]/g, "");
-
-        state.collectionsMenu = state.collectionsMenu.map((collection) => {
-          if (collection.id === uuid) {
-            const prefix = collection.linkMenu?.split("/")[0] ?? "";
-            return {
-              ...collection,
-              name,
-              linkMenu: `${prefix}/${slug}`,
-            };
-          }
-          return collection;
-        });
-
-        state.updateCollection = null;
+    build.addCase(deleteTestCaseThunk
+      .fulfilled, (state) => {
+        
         state.loading = false;
-      }
-    );
-
-    build.addCase(
-      deleteCollectionThunk.fulfilled,
-      (state, action: PayloadAction<string>) => {
-        const idToDelete = action.payload;
-        state.collectionsMenu = state.collectionsMenu.filter(
-          (collection) => collection.id !== idToDelete
-        );
-      }
-    );
-    build.addCase(deleteTestCaseThunk.fulfilled, (state, action) => {
-      state.collectionsMenu = state.collectionsMenu.map((group) => {
-        const filteredItems = group.items?.filter(
-          (item) => item.id !== action.payload
-        );
-        return { ...group, items: filteredItems };
       });
-      state.loading = false;
-    });
     build.addCase(deleteTestCaseThunk.rejected, (state) => {
       state.loading = false;
     });
@@ -130,39 +76,17 @@ export const sidebarMenuSlice = createSlice({
       state.idTestCase = action.meta.arg; // <- Aquí está el ID o datos que enviaste
       state.loading = true;
     });
-    build.addCase(updateTestCaseThunk.pending, (state) => {
-      state.loading = true;
-    });
+    build.addCase(updateTestCaseThunk
+      .pending, (state) => {
+        state.loading = true;
+      });
     build.addCase(updateTestCaseThunk.rejected, (state) => {
       state.loading = false;
     });
     build.addCase(
       updateTestCaseThunk.fulfilled,
-      (state, action: PayloadAction<{ uuid: string; name: string }>) => {
-        const { uuid, name } = action.payload;
-
-        const slug = name
-          .toLowerCase()
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-          .replace(/\s+/g, "-")
-          .replace(/[^\w-]/g, "");
-
-        state.collectionsMenu = state.collectionsMenu.map((group) => {
-          const updatedItems = group.items?.map((item) => {
-            if (item.id === uuid) {
-              const prefix = item.linkMenu?.split("/")[0] ?? "";
-              return {
-                ...item,
-                name,
-                linkMenu: `${prefix}/${slug}`,
-              };
-            }
-            return item;
-          });
-
-          return { ...group, items: updatedItems };
-        });
+      (state) => {
+        
         state.updateTestCase = null;
         state.loading = false;
       }
@@ -170,37 +94,9 @@ export const sidebarMenuSlice = createSlice({
     build.addCase(
       createTestCaseThunk.fulfilled,
       (
-        state,
-        action: PayloadAction<{
-          id: string;
-          name: string;
-          collectionId: string;
-        }>
+        state
       ) => {
-        const { id, name, collectionId } = action.payload;
-
-        const slug = name
-          .toLowerCase()
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-          .replace(/\s+/g, "-")
-          .replace(/[^\w-]/g, "");
-
-        state.collectionsMenu = state.collectionsMenu.map((group) => {
-          if (group.id === collectionId) {
-            const newItem = {
-              id,
-              name,
-              linkMenu: `${group.id}/${slug}`,
-            };
-
-            return {
-              ...group,
-              items: group.items ? [...group.items, newItem] : [newItem],
-            };
-          }
-          return group;
-        });
+        
         state.loading = false;
       }
     );

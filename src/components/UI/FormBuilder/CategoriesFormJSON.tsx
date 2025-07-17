@@ -1,15 +1,10 @@
 import { Box, FormLabel, TextField, Typography } from "@mui/material";
 import { useAppSelector } from "../../../store";
 import CategoriesTreeSelector from "./CategoriesTreeSelector";
-
-interface CategoriesFormJSONProps {
-    onSelectCategory: (categoryId: string) => void;
-    onSetTemplateName: (name: string) => void;
-    templateName: string;
-    showError: boolean;
-}
+import { CategoriesFormJSONProps } from "../../../config/interfaces";
 
 function CategoriesFormJSON({
+    preselectedItemId,
     onSelectCategory,
     templateName,
     showError,
@@ -25,7 +20,7 @@ function CategoriesFormJSON({
         const name = e.target.value;
         onSetTemplateName(name);
     };
-
+    
     return (
         <Box
         sx={{
@@ -66,7 +61,10 @@ function CategoriesFormJSON({
         </Typography>
         <CategoriesTreeSelector
             root={categoriesMenu}
-            onItemSelected={(item) => onSelectCategory(item.id)}
+            onItemSelected={(item) => {
+                onSelectCategory(item.id)
+            }}
+            preselectedItemId={preselectedItemId ?? ""}
         />
         </Box>
     );

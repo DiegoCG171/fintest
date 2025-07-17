@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 import BasicTable from "../../components/UI/table/BasicTableComponent";
 import { useEffect, useMemo } from "react";
-import { useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useMultiSocket } from "../../config/hooks/useMultiSocket";
 import { MessagesState } from "../../config/interfaces/messages.interface";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
@@ -10,35 +10,35 @@ import { StatusRender } from "../../components/UI/table/StatusRender";
 import TabbedCardContainer from "../../components/UI/Tabs/TabbedCardContainer";
 import { addTab, getTemplatesThunk } from "../../store";
 import { getConfigTab } from "../../config/utils/tabsContent";
-import { getTestCasesThunk } from "../../store/slices/testCases/testCases.thunk";
 import {
   getGenetationFunctionsThunk,
   getSelectionFunctionsThunk,
   getValidationFunctionsThunk,
 } from "../../store/slices/functionsSelect/functionsSelect.thunk";
-
 const generateStaticTabs = (messagesData: MessagesState): StaticTabItem[] => [
   {
     label: "Detalles",
     content: (
       <BasicTable
         initialRows={messagesData.activeMessage.detail}
-        type="detail"
+        typeTable="detail"
         customRenderers={{ estado: StatusRender }}
       />
     ),
     canEdit: true,
+    route: `${messagesData.route}/detalles`,
   },
   {
     label: "Errores",
     content: (
       <BasicTable
         initialRows={messagesData.activeMessage.errors}
-        type="errors"
+        typeTable="errors"
         customRenderers={{ estado: StatusRender }}
       />
     ),
     canEdit: true,
+    route: `${messagesData.route}/errores`,
   },
 ];
 
@@ -56,9 +56,19 @@ const generateEventTabs = (messagesData: MessagesState): StaticTabItem[] => [
 ];
 
 function MainPage() {
-  const location = useLocation();
-  const messagesData = useAppSelector((state) => state.messagesReducer);
+  const { method, type, categoryId, caseId } = useParams();
+  const rawMessagesData = useAppSelector((state) => state.messagesReducer);
+  const messagesData = {
+    ...rawMessagesData,
+    route: `${method}/${type}`
+  }
+
+  const currentRoute = categoryId
+  ? `${method}/${type}/categories/${categoryId}`
+  : `${method}/${type}/collections/${caseId}`;
+
   const dynamicTabs = useAppSelector((state) => state.tabs.dynamicTabs);
+  const dynamicIndex = dynamicTabs.findIndex((tab) => tab.route === currentRoute);
   const categories = useAppSelector(
     (state) => state.sidebarMenu.categoriesMenu
   );
@@ -97,10 +107,6 @@ function MainPage() {
   }, [connect, disconnect]);
 
   useEffect(() => {
-    dispatch(getTestCasesThunk());
-  }, [dispatch]);
-
-  useEffect(() => {
     dispatch(getTemplatesThunk());
   }, [dispatch]);
 
@@ -118,7 +124,7 @@ function MainPage() {
 
   useEffect(() => {
     const currentRoute = location.pathname.slice(1);
-
+    if (!method || !type || (!categoryId && !caseId)) return;
     const matching = tabConfig[currentRoute]?.[0];
     if (matching) {
       dispatch(
@@ -129,13 +135,7 @@ function MainPage() {
         })
       );
     }
-  }, [location.pathname, dispatch, tabConfig]);
-
-  const currentRoute = location.pathname.slice(1);
-
-  const dynamicIndex = dynamicTabs.findIndex(
-    (tab) => tab.route === currentRoute
-  );
+  }, [caseId, categoryId, currentRoute, dispatch, method, tabConfig, type]);
 
   const currentTabIndex = dynamicIndex !== -1 ? dynamicIndex + 2 : undefined;
 

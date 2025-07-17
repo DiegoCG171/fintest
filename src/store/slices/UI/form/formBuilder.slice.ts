@@ -22,34 +22,55 @@ function getNestedRow(
     current = currentLevel[index];
     if (!current) return null;
     if (i < path.length - 1) {
-      if (!Array.isArray(current.breakingRules)) {
-        current.breakingRules = [];
-      }
-      currentLevel = current.breakingRules;
+      currentLevel = Array.isArray(current.breakingRules)
+        ? current.breakingRules
+        : [];
     }
   }
   return current || null;
 }
 
 export const formBuilderSlice = createSlice({
-  name: "formBuilder",
+  name: 'formBuilder',
   initialState,
   reducers: {
     setConfig(state, action: PayloadAction<ColumnConfigFormBuilder[]>) {
       state.config = action.payload;
     },
-    setValuesForTab(
+
+    setValuesForTab: (
       state,
-      action: PayloadAction<{
-        tabId: string;
-        values: TableRowDataFormBuilder[];
-      }>
-    ) {
-      if (!state.tabForms[action.payload.tabId]) {
-        state.tabForms[action.payload.tabId] = { values: [], visibility: {} };
-      }
-      state.tabForms[action.payload.tabId].values = action.payload.values;
+      action: PayloadAction<{ tabId: string; values: TableRowDataFormBuilder[]; originalValues?: TableRowDataFormBuilder[] }>
+    ) => {
+      const { tabId, values, originalValues } = action.payload;
+      console.log(tabId)
+      const currentTab = state.tabForms[tabId];
+      state.tabForms[tabId] = {
+        ...currentTab,
+        values,
+        originalValues: currentTab?.originalValues ?? originalValues ?? values,
+        visibility: currentTab?.visibility ?? {},
+      };
     },
+
+    setOriginalValuesForTab: (
+      state,
+      action: PayloadAction<{ tabId: string; originalValues: TableRowDataFormBuilder[] }>
+    ) => {
+      const { tabId, originalValues } = action.payload;
+      if (state.tabForms[tabId]) {
+        state.tabForms[tabId].originalValues = originalValues;
+      }
+    },
+
+    resetOriginalValues: (state, action: PayloadAction<{ tabId: string }>) => {
+      const { tabId } = action.payload;
+      const tab = state.tabForms[tabId];
+      if (tab) {
+        tab.originalValues = JSON.parse(JSON.stringify(tab.values));
+      }
+    },
+
     updateFieldValue(
       state,
       action: PayloadAction<{
@@ -82,49 +103,28 @@ export const formBuilderSlice = createSlice({
         targetRow[fieldKey] = value;
       }
     },
-    updateMultipleNestedFields(
-      state,
-      action: PayloadAction<{
-        tabId: string;
-        updates: {
-          path: number[];
-          fieldKey: string;
-          value: string | number | boolean;
-        }[];
-      }>
-    ) {
-      const { tabId, updates } = action.payload;
-      const tab = state.tabForms[tabId];
-      if (!tab) return;
 
-      for (const { path, fieldKey, value } of updates) {
-        const targetRow = getNestedRow(tab.values, path);
-        if (targetRow) {
-          targetRow[fieldKey] = value;
-        }
-      }
-    },
     setVisibility(
       state,
-      action: PayloadAction<{
-        tabId: string;
-        visibility: Record<string, boolean>;
-      }>
+      action: PayloadAction<{ tabId: string; visibility: Record<string, boolean> }>
     ) {
       const { tabId, visibility } = action.payload;
       if (!state.tabForms[tabId]) {
-        state.tabForms[tabId] = { values: [], visibility: {} };
+        state.tabForms[tabId] = { values: [], originalValues: [], visibility: {} };
       }
       state.tabForms[tabId].visibility = visibility;
     },
   },
-});
+})
 
 export const {
   setConfig,
   setValuesForTab,
+  setOriginalValuesForTab,
   updateFieldValue,
   updateNestedFieldValue,
-  updateMultipleNestedFields,
   setVisibility,
-} = formBuilderSlice.actions;
+  resetOriginalValues
+} = formBuilderSlice.actions
+
+export default formBuilderSlice

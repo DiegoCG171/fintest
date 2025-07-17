@@ -104,9 +104,15 @@ const theme = createTheme({
           boxShadow: "none",
           backgroundColor: "#184190",
           "&.Mui-disabled": {
-            backgroundColor: "#184090",
-            color: "#ffffff",
+            backgroundColor: "#D1D1D1",
+            color: "#737373",
             opacity: 1,
+            cursor: "not-allowed"
+          },
+          "&:hover": {
+            backgroundColor: "#048ABF",
+            color: "#FFF",
+            boxShadow: "none",
           },
         },
       },

@@ -11,41 +11,63 @@ import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { useState } from "react";
-import { ItemsServiceMenu, ContextMenuOption } from "../../config/interfaces";
 import { useLocation, useNavigate } from "react-router-dom";
 import { usePopMenu } from "../../config/hooks/usePopMenu";
-import { useAppDispatch, useAppSelector } from "../../store";
-import { removeUpdateTestCase } from "../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
-import { updateTestCaseThunk } from "../../store/slices/collections/collections.thunk";
-
-interface Props {
-  item: ItemsServiceMenu;
-  optionsActive?: boolean;
-  onClick?: (item: ItemsServiceMenu) => void;
-  buildOptions?: (item: ItemsServiceMenu) => ContextMenuOption[];
-}
+import {
+  updateTestCaseThunk,
+  useAppDispatch,
+  useAppSelector,
+} from "../../store";
+import {
+  removeUpdateCollection,
+  removeUpdateTestCase,
+} from "../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
+import { PropsRecursiveMenuSubItem } from "../../config/interfaces";
+import { updateCollectionThunk } from "../../store/slices/collections/collections.thunk";
+import { useRefreshCollectionsMenu } from "../../config/hooks/useRefreshCollectionsMenu";
 
 const RecursiveMenuSubItem = ({
   item,
   optionsActive,
   onClick,
   buildOptions,
-}: Props) => {
+}: PropsRecursiveMenuSubItem) => {
   const [hovered, setHovered] = useState(false);
   const [value, setValue] = useState(item.name);
   const location = useLocation();
   const navigate = useNavigate();
   const { openMenu } = usePopMenu();
-  const dispatch = useAppDispatch();
   const { updateTestCase, loading, idTestCase } = useAppSelector(
     (state) => state.sidebarMenu
   );
 
-  const isActive = item.linkMenu && location.pathname === `/${item.linkMenu}`;
+  const refreshCollectionsMenu = useRefreshCollectionsMenu();
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const isActive = item.linkMenu && location.pathname === `/${item.linkMenu}`;
+  const dispatch = useAppDispatch();
+  const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      dispatch(updateTestCaseThunk({ id: item.id, payload: { name: value } }));
+      try {
+        const payload = { name: value };
+
+        const isTestCase = updateTestCase && updateTestCase.id === item.id;
+
+        if (isTestCase) {
+          await dispatch(
+            updateTestCaseThunk({ id: item.id, payload })
+          ).unwrap();
+          dispatch(removeUpdateTestCase());
+        } else {
+          await dispatch(
+            updateCollectionThunk({ id: item.id, payload })
+          ).unwrap();
+          dispatch(removeUpdateCollection());
+        }
+
+        await refreshCollectionsMenu();
+      } catch (error) {
+        console.error("Error actualizando ítem:", error);
+      }
     }
   };
 
@@ -95,7 +117,13 @@ const RecursiveMenuSubItem = ({
                     size="small"
                     disabled={loading}
                     onClick={() => {
-                      dispatch(removeUpdateTestCase());
+                      const isTestCase =
+                        updateTestCase && updateTestCase.id === item.id;
+                      if (isTestCase) {
+                        dispatch(removeUpdateTestCase());
+                      } else {
+                        dispatch(removeUpdateCollection());
+                      }
                       setValue(item.name);
                     }}
                   >
@@ -134,7 +162,10 @@ const RecursiveMenuSubItem = ({
             <DescriptionOutlinedIcon
               sx={{ fontSize: 16, color: "text.disabled" }}
             />
-            <Tooltip title={item.name} placement="top">
+            <Tooltip
+              title={item.name}
+              placement="top"
+            >
               <Typography
                 sx={{
                   fontSize: 12,

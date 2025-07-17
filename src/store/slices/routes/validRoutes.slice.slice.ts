@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { RoutesState } from "../../../config/interfaces";
-import { removeCategoriesRoutesThunk, removeCollectionsRoutesThunk, setCategoriesRoutesThunk, setCollectionsRoutesThunk } from "./validRoutes.thunk";
+import { addCollectionsRouteThunk, removeCategoriesRoutesThunk, removeCollectionsRoutesThunk, setCategoriesRoutesThunk, setCollectionsRoutesThunk } from "./validRoutes.thunk";
 
 const initialState: RoutesState = {
     fromCollections: [],
@@ -32,6 +32,9 @@ export const validRoutesSlice  = createSlice({
         .addCase(removeCollectionsRoutesThunk.fulfilled, (state) => {
             state.fromCategories = []
         })
+        .addCase(addCollectionsRouteThunk.fulfilled, (state, action) => {
+        state.fromCollections = action.payload;
+        });
     }
 });
 

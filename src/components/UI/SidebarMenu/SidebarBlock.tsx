@@ -3,7 +3,7 @@ import SeparatorMenu from "./SeparatorMenu";
 import RecursiveMenuItem from "../../navigation/RecursiveMenuItem";
 import {
   createTemplateThunk,
-  getAllCategoriesThunk,
+  getCategoriesByMethodThunk,
   getTemplateByIdThunk,
   getTemplatesThunk,
   openModal,
@@ -16,7 +16,7 @@ import {
   ItemsServiceMenu,
   MenuServiceInterface,
 } from "../../../config/interfaces";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useToast } from "../../../config/hooks/useToast";
 import {
   deleteCollectionThunk,
@@ -35,10 +35,19 @@ import { cleanObject } from "../../../config/utils/cleandObject";
 import PermissionGuard from "../../../config/guards/PermissionGuard";
 import { hasPermission } from "../../../config/utils/permissions";
 import { useAuth } from "../../../config/hooks/useAuth";
+import { useParams } from "react-router-dom";
 
-function SidebarBlock({ searchTerm }: { searchTerm: string }) {
+function SidebarBlock({
+  searchTerm,
+  searchOnItem,
+}: {
+  searchTerm: string;
+  searchOnItem: boolean;
+}) {
   const dispatch = useAppDispatch();
   const { permissions } = useAuth();
+
+  const { method, type } = useParams();
 
   const categoriesMenu = useAppSelector(
     (state) => state.sidebarMenu.categoriesMenu
@@ -144,9 +153,9 @@ function SidebarBlock({ searchTerm }: { searchTerm: string }) {
             showToast(error as string, "error");
           } finally {
             dispatch(getTemplatesThunk());
-            dispatch(getAllCategoriesThunk())
+            dispatch(getCategoriesByMethodThunk(`${method}`))
               .unwrap()
-              .catch((err) => console.error("Error cargando categorías:", err));
+              .catch((err: string) => console.error("Error cargando categorías:", err));
           }
         },
       });
@@ -188,14 +197,22 @@ function SidebarBlock({ searchTerm }: { searchTerm: string }) {
     if (hasPermission(permissions, "update", "collection")) {
       options.push({
         item: { label: "Renombrar", id: item.id },
-        action: () => dispatch(updateCollection(item)),
+        action: () => {
+        dispatch(updateCollection(item));
+        dispatch(getCollectionsThunk(`${method}/${type}`));
+      },
       });
     }
 
     if (hasPermission(permissions, "delete", "collection")) {
       options.push({
         item: { label: "Eliminar", id: item.id },
-        action: () => dispatch(deleteCollectionThunk(item.id)),
+        action: async () => {
+        await dispatch(deleteCollectionThunk(item.id)).unwrap();
+        if (method && type) {
+          dispatch(getCollectionsThunk(`${method}/${type}`));
+        }
+      },
       });
     }
 
@@ -235,7 +252,12 @@ function SidebarBlock({ searchTerm }: { searchTerm: string }) {
     if (hasPermission(permissions, "delete", "testCase")) {
       options.push({
         item: { label: "Eliminar", id: item.id },
-        action: () => dispatch(deleteTestCaseThunk(item.id)),
+        action: async () => {
+        await dispatch(deleteTestCaseThunk(item.id));
+        if (method && type) {
+          dispatch(getCollectionsThunk(`${method}/${type}`));
+        }
+      },
       });
     }
 
@@ -245,10 +267,6 @@ function SidebarBlock({ searchTerm }: { searchTerm: string }) {
   const handleOpenCreateCollection = () => {
     dispatch(toggleCreateCollectionMenu(true));
   };
-
-  useEffect(() => {
-    dispatch(getCollectionsThunk());
-  }, [dispatch]);
 
   const handleModal = useCallback(() => {
     dispatch(
@@ -260,29 +278,42 @@ function SidebarBlock({ searchTerm }: { searchTerm: string }) {
   }, [dispatch]);
 
   const filterRecursive = useCallback(
-    (node: MenuServiceInterface, term: string): MenuServiceInterface | null => {
+    (
+      node: MenuServiceInterface,
+      term: string,
+      searchOnFile: boolean
+    ): MenuServiceInterface | null => {
       const normalized = term.toLowerCase();
 
-      // Verifica si el nombre del nodo coincide
       const isNodeMatch = node.name?.toLowerCase().includes(normalized);
-
-      // Filtra los items del nodo actual
       const matchedItems =
-        node.items?.filter((item: ItemsServiceMenu) =>
+        node.items?.filter((item) =>
           item.name.toLowerCase().includes(normalized)
         ) ?? [];
 
-      // Filtra los hijos recursivamente
       const matchedChildren = (node.children ?? [])
-        .map((child: MenuServiceInterface) => filterRecursive(child, term))
+        .map((child) => filterRecursive(child, term, searchOnFile))
         .filter((child): child is MenuServiceInterface => child !== null);
 
-      // Si hay coincidencias en el nodo, en los items o en los hijos, devolvemos el nodo
-      if (
-        isNodeMatch ||
-        matchedItems.length > 0 ||
-        matchedChildren.length > 0
-      ) {
+      if (searchOnFile) {
+        if (isNodeMatch) {
+          return {
+            ...node,
+            items: matchedItems,
+            children: matchedChildren,
+          };
+        }
+        if (matchedItems.length > 0 || matchedChildren.length > 0) {
+          return {
+            ...node,
+            items: matchedItems,
+            children: matchedChildren,
+          };
+        }
+        return null;
+      }
+
+      if (matchedItems.length > 0 || matchedChildren.length > 0) {
         return {
           ...node,
           items: matchedItems,
@@ -290,7 +321,6 @@ function SidebarBlock({ searchTerm }: { searchTerm: string }) {
         };
       }
 
-      // Si no hay coincidencia, no se incluye
       return null;
     },
     []
@@ -308,16 +338,25 @@ function SidebarBlock({ searchTerm }: { searchTerm: string }) {
 
     const filteredCategories =
       categoriesMenu
-        ?.map((category) => filterRecursive(category, normalized))
+        ?.map((category) =>
+          filterRecursive(category, normalized, !searchOnItem)
+        )
         .filter((item): item is MenuServiceInterface => item !== null) ?? [];
 
     const filteredCollections =
       collectionsMenu
-        ?.map((category) => filterRecursive(category, normalized))
+        ?.map((category) =>
+          filterRecursive(category, normalized, !searchOnItem)
+        )
         .filter((item): item is MenuServiceInterface => item !== null) ?? [];
-
     return { filteredCategories, filteredCollections };
-  }, [searchTerm, categoriesMenu, collectionsMenu, filterRecursive]);
+  }, [
+    searchTerm,
+    categoriesMenu,
+    collectionsMenu,
+    filterRecursive,
+    searchOnItem,
+  ]);
 
   return (
     <Box>

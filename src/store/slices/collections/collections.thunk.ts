@@ -9,22 +9,17 @@ import { CreateCollection } from "../../../config/interfaces/collections.interfa
 import {
   CreateTestCase,
   createTestCase,
-  deleteTestCase,
-  getTestCaseById,
-  updateTestCase,
+  deleteTestCase
 } from "../../../services/catalogs/testCases.service";
-import {
-  PatchGenerationTemplate,
-  testCaseInterface,
-} from "../../../config/interfaces";
+import { PatchGenerationTemplate, testCaseInterface } from "../../../config/interfaces";
 
 export const getCollectionsThunk = createAsyncThunk(
   "collections/getAll",
-  async (_, { rejectWithValue }) => {
+  async (method: string, { rejectWithValue }) => {
     try {
-      const collections = await getCollections();
+      const collections = await getCollections(method);
       return collections;
-    } catch (error: unknown) {
+    } catch (error) {
       return rejectWithValue(error as string);
     }
   }
@@ -35,7 +30,7 @@ export const createCollectionThunk = createAsyncThunk(
   async (collections: CreateCollection, { rejectWithValue }) => {
     try {
       const response = await createCollection(collections);
-      return response;
+      return response.data;
     } catch (error) {
       return rejectWithValue(error as string);
     }
@@ -93,32 +88,6 @@ export const deleteCollectionThunk = createAsyncThunk(
     try {
       await deleteCollection(id);
       return id;
-    } catch (error) {
-      return rejectWithValue(error as string);
-    }
-  }
-);
-
-export const updateTestCaseThunk = createAsyncThunk<
-  testCaseInterface,
-  { id: string; payload: PatchGenerationTemplate },
-  { rejectValue: string }
->("test-case/update", async ({ id, payload }, { rejectWithValue }) => {
-  try {
-    const testCase = await updateTestCase(id, payload);
-    return testCase;
-  } catch (error) {
-    return rejectWithValue(error as string);
-  }
-});
-
-export const getTestCaseByIdThunk = createAsyncThunk(
-  "test-case/getById",
-  async (id: string, { rejectWithValue }) => {
-    try {
-      const testCase = await getTestCaseById(id);
-
-      return testCase;
     } catch (error) {
       return rejectWithValue(error as string);
     }

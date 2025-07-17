@@ -1,23 +1,51 @@
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate, useLocation, useParams } from "react-router-dom";
+
+const validMethods = ["pos", "atm"];
+const validTypes = ["acquirer", "emmisor"];
+
+const allowedBasePaths = [
+  "pos/acquirer",
+  "pos/emmisor",
+  "atm/acquirer",
+  "atm/emmisor",
+];
 
 const RouteGuard = ({ children }: { children: React.ReactNode }) => {
+  const { method, type } = useParams();
   const location = useLocation();
-  const rawFromCategories = localStorage.getItem('fromCategories');
-  const fromCategories = rawFromCategories ? JSON.parse(rawFromCategories) : null;
-  const rawFromCollections = localStorage.getItem('fromCollections');
-  const fromCollections = rawFromCollections ? JSON.parse(rawFromCollections) : null;
 
-  const currentPath = location.pathname.slice(1);
+  const pathname = location.pathname.slice(1);
 
-  const ALWAYS_ALLOWED = ["main"];
+  const rawFromCategories = localStorage.getItem("fromCategories");
+  const fromCategories: string[] = rawFromCategories
+    ? JSON.parse(rawFromCategories)
+    : [];
 
-  const isValid =
-    ALWAYS_ALLOWED.includes(currentPath) ||
-    fromCategories.includes(currentPath) ||
-    fromCollections.includes(currentPath);
+  const rawFromCollections = localStorage.getItem("fromCollections");
+  const fromCollections: string[] = rawFromCollections
+    ? JSON.parse(rawFromCollections)
+    : [];
+
+  const isValidMethod = validMethods.includes(method ?? "");
+  const isValidType = validTypes.includes(type ?? "");
+
+  let isValid = false;
+
+  if (!isValidMethod || !isValidType) {
+    isValid = false;
+  } else if (pathname === `${method}/${type}`) {
+
+    isValid = allowedBasePaths.includes(pathname);
+  } else if (pathname.includes("categories/")) {
+
+    isValid = fromCategories.includes(pathname);
+  } else if (pathname.includes("collections/")) {
+
+    isValid = fromCollections.includes(pathname);
+  }
 
   if (!isValid) {
-    return <Navigate to="/not-found" />;
+    return <Navigate to="/not-found" replace />;
   }
 
   return <>{children}</>;

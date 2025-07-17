@@ -1,47 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
 import { MenuItem, Select, TextField, Typography } from "@mui/material";
-import {
-  DynamicFieldProps,
-  TableRowDataFormBuilder,
-} from "../../../config/interfaces";
+import { DynamicFieldProps } from "../../../config/interfaces";
 import {
   updateFieldValue,
   updateNestedFieldValue,
   useAppDispatch,
   useAppSelector,
 } from "../../../store";
-import { updateMultipleNestedFields } from "../../../store/slices/UI/form/formBuilder.slice";
 
 type Primitive = string | number | boolean;
 
-function collectConditionalDescendantUpdates(
-  basePath: number[],
-  nodes: unknown,
-  fieldKey: string,
-  value: boolean
-): { path: number[]; fieldKey: string; value: boolean }[] {
-  if (!Array.isArray(nodes)) return [];
 
-  const updates: { path: number[]; fieldKey: string; value: boolean }[] = [];
-
-  (nodes as TableRowDataFormBuilder[]).forEach((node, index) => {
-    const currentPath = [...basePath, index];
-    const hasGrandChildren =
-      Array.isArray(node.breakingRules) && node.breakingRules.length > 0;
-
-    if (value === false) {
-      if (!hasGrandChildren) {
-        updates.push({ path: currentPath, fieldKey, value });
-      }
-    }
-
-    if (value === true && !hasGrandChildren) {
-      updates.push({ path: currentPath, fieldKey, value });
-    }
-  });
-
-  return updates;
-}
 
 function DynamicField({
   column,
@@ -52,6 +21,8 @@ function DynamicField({
   isEditable,
   onlyRead,
 }: DynamicFieldProps) {
+
+  const hasChanged = false;
   const dispatch = useAppDispatch();
   const dependsOn = column?.dependsOn;
   const dependsValue = dependsOn ? row[dependsOn] : undefined;
@@ -109,36 +80,94 @@ function DynamicField({
     fontWeight: isParent ? "600" : undefined,
   });
 
+  const getSelectStyles = (hasChanged: boolean, getStyles: () => object) => ({
+    height: "24px",
+    ...getStyles(),
+    borderRadius: 2,
+    transition: "all 0.2s ease",
+
+    "& .MuiOutlinedInput-notchedOutline": {
+      border: hasChanged ? "2px solid #f39c12" : undefined,
+    },
+
+    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+      border: hasChanged ? "2px solid #f39c12" : undefined,
+    },
+
+    "&:hover .MuiOutlinedInput-notchedOutline": {
+      border: hasChanged ? "2px solid #f39c12" : undefined,
+    },
+
+    "& .MuiSelect-select": {
+      padding: "4px 8px",
+    },
+  });
+
+  const getInputStyles = (hasChanged: boolean, getStyles: () => object) => ({
+    "& .MuiOutlinedInput-root": {
+      borderRadius: 2,
+      height: "24px",
+      ...getStyles(),
+
+      "& .MuiOutlinedInput-notchedOutline": {
+        borderColor: hasChanged ? "#f39c12 !important" : undefined,
+        borderWidth: hasChanged ? "2px !important" : undefined,
+      },
+
+      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+        borderColor: hasChanged ? "#f39c12 !important" : undefined,
+        borderWidth: hasChanged ? "2px !important" : undefined,
+      },
+
+      "&:hover .MuiOutlinedInput-notchedOutline": {
+        borderColor: hasChanged ? "#f39c12 !important" : undefined,
+        borderWidth: hasChanged ? "2px !important" : undefined,
+      },
+    },
+
+    "& .MuiOutlinedInput-input": {
+      padding: "4px 8px",
+      ...getStyles(),
+    },
+  });
+
   const handleChange = (
-    e:
-      | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-      | { target: { value: Primitive } }
-  ) => {
-    let newValue = e.target.value;
-    const fieldKey = column.id;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | any
+) => {
+  const newValue = e.target.value;
+  const fieldKey = column.id;
 
-    if (
-      fieldKey === "function" &&
-      (newValue === "" || newValue === undefined)
-    ) {
-      newValue = "echo";
-    }
+  if (path.length > 1) {
+    dispatch(
+      updateNestedFieldValue({
+        tabId,
+        path,
+        fieldKey,
+        value: newValue,
+      })
+    );
+  } else {
+    dispatch(
+      updateFieldValue({
+        tabId,
+        rowIndex: path[0],
+        fieldKey,
+        value: newValue,
+      })
+    );
+  }
 
-    setLocalValue(newValue);
-
-    const hasChildren =
-      Array.isArray(row.breakingRules) && row.breakingRules.length > 0;
-
-    const valueToDispatch =
-      typeof newValue === "boolean" ? newValue : undefined;
+  if (fieldKey === "function" && newValue === "not_validate") {
+    const valueFieldKey = "value";
 
     if (path.length > 1) {
       dispatch(
         updateNestedFieldValue({
           tabId,
           path,
-          fieldKey,
-          value: newValue,
+          fieldKey: valueFieldKey,
+          value: "",
         })
       );
     } else {
@@ -146,26 +175,14 @@ function DynamicField({
         updateFieldValue({
           tabId,
           rowIndex: path[0],
-          fieldKey,
-          value: newValue,
+          fieldKey: valueFieldKey,
+          value: "",
         })
       );
     }
+  }
+};
 
-    if (
-      fieldKey === "isRequired" &&
-      hasChildren &&
-      typeof valueToDispatch === "boolean"
-    ) {
-      const updates = collectConditionalDescendantUpdates(
-        path,
-        row.breakingRules,
-        "isRequired",
-        valueToDispatch
-      );
-      dispatch(updateMultipleNestedFields({ tabId, updates }));
-    }
-  };
 
   function shouldDisableCheckbox(
     isChild: boolean,
@@ -246,14 +263,7 @@ function DynamicField({
           size="small"
           variant="outlined"
           fullWidth
-          sx={{
-            height: "24px",
-            ...getStyles(),
-            borderRadius: 2,
-            "& .MuiSelect-select": {
-              padding: "4px 8px",
-            },
-          }}
+          sx={getSelectStyles(hasChanged, getStyles)}
         >
           {options.map((opt) => (
             <MenuItem key={opt} value={opt} sx={getStyles()}>
@@ -272,17 +282,7 @@ function DynamicField({
           fullWidth
           variant="outlined"
           size="small"
-          sx={{
-            "& .MuiInputBase-root": {
-              height: "24px",
-              ...getStyles(),
-              borderRadius: 2,
-            },
-            "& input": {
-              padding: "4px 8px",
-              ...getStyles(),
-            },
-          }}
+          sx={getInputStyles(hasChanged, getStyles)}
         />
       );
     }
@@ -322,18 +322,7 @@ function DynamicField({
           fullWidth
           variant="outlined"
           size="small"
-          onChange={handleChange}
-          sx={{
-            "& .MuiInputBase-root": {
-              height: "24px",
-              ...getStyles(),
-              borderRadius: 2,
-            },
-            "& input": {
-              padding: "4px 8px",
-              ...getStyles(),
-            },
-          }}
+          sx={getInputStyles(hasChanged, getStyles)}
         />
       );
     }
@@ -347,14 +336,7 @@ function DynamicField({
           onChange={handleChange}
           size="small"
           variant="outlined"
-          sx={{
-            height: "24px",
-            ...getStyles(),
-            borderRadius: 2,
-            "& .MuiSelect-select": {
-              padding: "4px 8px",
-            },
-          }}
+          sx={getSelectStyles(hasChanged, getStyles)}
         >
           <MenuItem value="" sx={getStyles()}>
             <em>Seleccione una opción</em>

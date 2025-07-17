@@ -17,13 +17,14 @@ import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
 import KeyboardArrowRightOutlinedIcon from "@mui/icons-material/KeyboardArrowRightOutlined";
 import KeyboardArrowDownOutlinedIcon from "@mui/icons-material/KeyboardArrowDownOutlined";
 import { useNavigate } from "react-router-dom";
-import { setLoading, useAppDispatch, useAppSelector } from "../../store";
+import { setLoading, updateTestCaseThunk, useAppDispatch, useAppSelector } from "../../store";
 import RecursiveMenuSubItem from "./RecursiveMenuSubItem";
 import { useState } from "react";
 import { usePopMenu } from "../../config/hooks/usePopMenu";
-import { removeUpdateCollection } from "../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
+import { removeUpdateCollection, removeUpdateTestCase } from "../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
 import { updateCollectionThunk } from "../../store/slices/collections/collections.thunk";
 import CancelIcon from "@mui/icons-material/Cancel";
+import { useRefreshCollectionsMenu } from "../../config/hooks/useRefreshCollectionsMenu";
 
 const RecursiveMenuItem = ({
   item,
@@ -33,6 +34,8 @@ const RecursiveMenuItem = ({
   buildOptions,
   buildSubItemOptions,
 }: RecursiveMenuItemProps) => {
+  const refreshCollectionsMenu = useRefreshCollectionsMenu();
+
   const [expanded, setExpanded] = useState(false);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -59,11 +62,30 @@ const RecursiveMenuItem = ({
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      dispatch(
-        updateCollectionThunk({ id: item.id, payload: { name: value } })
-      );
+  const isEditing = updateCollection?.id === item.id;
+
+  const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const isCollection = Array.isArray(item.items);
+
+    if (e.key === "Enter" && isEditing) {
+      try {
+        if (isCollection) {
+          await dispatch(
+            updateCollectionThunk({ id: item.id, payload: { name: value } })
+          ).unwrap();
+          dispatch(removeUpdateCollection());
+        } else {
+          await dispatch(
+            updateTestCaseThunk({ id: item.id, payload: { name: value } })
+          ).unwrap();
+          dispatch(removeUpdateTestCase());
+        }
+
+        await refreshCollectionsMenu();
+        dispatch(removeUpdateCollection());
+      } catch (error) {
+        console.error("Error actualizando colección:", error);
+      }
     }
   };
 
@@ -121,8 +143,10 @@ const RecursiveMenuItem = ({
                       size="small"
                       disabled={loading}
                       onClick={() => {
-                        dispatch(removeUpdateCollection());
-                        setValue(item.name);
+                        if (isEditing) {
+                          dispatch(removeUpdateCollection());
+                          setValue(item.name);
+                        }
                       }}
                     >
                       {loading ? (
@@ -166,7 +190,10 @@ const RecursiveMenuItem = ({
               <FolderOutlinedIcon
                 sx={{ fontSize: 16, color: "text.disabled" }}
               />
-              <Tooltip title={item.name} placement="top">
+              <Tooltip
+                title={item.name}
+                placement="top"
+              >
                 <Typography
                   sx={{
                     fontSize: 12,

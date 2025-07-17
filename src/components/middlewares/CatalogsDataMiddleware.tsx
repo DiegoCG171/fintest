@@ -5,19 +5,24 @@ import {
   setValuesForTab,
   useAppDispatch,
   useAppSelector,
-  getRulesThunk,
 } from "../../store";
 import FormBuilderContainer from "../UI/FormBuilder/FormBuilderContainer";
 import {
   combineTemplateData,
   mapFieldRulesToFormStructure,
 } from "../../config/utils/mappers";
-import { CatalogsDataMiddlewareProps, ColumnConfigFormBuilder } from "../../config/interfaces";
+import {
+  CatalogsDataMiddlewareProps,
+  ColumnConfigFormBuilder,
+} from "../../config/interfaces";
 import { getTransactionByType } from "../../config/utils";
 import { useAuth } from "../../config/hooks/useAuth";
 import { hasPermission } from "../../config/utils/permissions";
 
-function CatalogsDataMiddleware({ tabId, template }: CatalogsDataMiddlewareProps) {
+function CatalogsDataMiddleware({
+  tabId,
+  template,
+}: CatalogsDataMiddlewareProps) {
   const dispatch = useAppDispatch();
   const { formType, templateId } = template;
   const { permissions } = useAuth();
@@ -31,12 +36,6 @@ function CatalogsDataMiddleware({ tabId, template }: CatalogsDataMiddlewareProps
 
   const alreadyInitialized = useRef(false);
 
-  useEffect(() => {
-    if (!rawRules?.length) {
-      dispatch(getRulesThunk());
-    }
-  }, [dispatch, rawRules]);
-
   const mappedRules = useMemo(() => {
     if (!rawRules?.length) return [];
     return mapFieldRulesToFormStructure(rawRules);
@@ -44,17 +43,27 @@ function CatalogsDataMiddleware({ tabId, template }: CatalogsDataMiddlewareProps
 
   const transactionData = useMemo(() => {
     if (template.origin === "categories") {
-      return getTransactionByType(templates, templateId, formType);
+      const result = getTransactionByType(templates, templateId, formType);
+      return result;
     } else {
-      return getTransactionByType(testCases, templateId, formType);
+      const result = getTransactionByType(testCases, templateId, formType);
+      return result;
     }
   }, [templates, templateId, formType, template, testCases]);
 
   useEffect(() => {
-    dispatch(
-      setConfig(serviceConfig.rules.columns as ColumnConfigFormBuilder[])
-    );
-  }, [dispatch]);
+    if (template.formType != "generationTransaction") {
+      dispatch(
+        setConfig(serviceConfig.rules.columns as ColumnConfigFormBuilder[])
+      );
+    } else {
+      dispatch(
+        setConfig(
+          serviceConfig.rulesGeneration.columns as ColumnConfigFormBuilder[]
+        )
+      );
+    }
+  }, [dispatch, template, formType]);
 
   useEffect(() => {
     alreadyInitialized.current = false;
@@ -65,7 +74,7 @@ function CatalogsDataMiddleware({ tabId, template }: CatalogsDataMiddlewareProps
     if (!rawRules?.length || !transactionData?.length || formState) return;
 
     const values = combineTemplateData(transactionData, mappedRules);
-    dispatch(setValuesForTab({ tabId, values }));
+    dispatch(setValuesForTab({ tabId, values, originalValues: values }));
     alreadyInitialized.current = true;
   }, [dispatch, tabId, rawRules, transactionData, mappedRules, formState]);
 

@@ -1,6 +1,7 @@
 
 //Tabs props
 import { ReactNode } from "react";
+import { originType } from ".";
 
 // Para tabs dinámicos de formularios
 export interface FormTabItem {
@@ -8,7 +9,7 @@ export interface FormTabItem {
     templateId: string;
     formType: string;
     canEdit: boolean;
-    origin: 'collections' | 'categories';
+    origin: originType;
 }
 
 // Para tabs que pintan JSX directamente
@@ -17,7 +18,7 @@ export interface StaticTabItem {
     content: React.ReactNode;
     route?: string
     canEdit: boolean
-    origin?: 'collections' | 'categories';
+    origin?: originType;
 }
 
 export interface TabTableComponentProps {
@@ -81,11 +82,16 @@ export interface DynamicFieldProps {
 //Slice's interfaces
 
 export interface FormBuilderState {
-    config: ColumnConfigFormBuilder[];
     tabForms: {
-        [tabId: string]: TabFormState;
+        [tabId: string]: {
+            values: TableRowDataFormBuilder[];
+            originalValues: TableRowDataFormBuilder[];
+            visibility?: Record<string, boolean>;
+        };
     };
+    config: ColumnConfigFormBuilder[];
 }
+
 
 export interface ColumnConfigFormBuilder {
     id: string;
@@ -108,7 +114,8 @@ export interface TableRowDataFormBuilder {
     value: string | number | boolean | null | undefined;
     breakingRules?: TableRowDataFormBuilder[] | string;
     _id?: string;
-    [key: string]: unknown | undefined;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    [key: string]: any;
 }
 
 export interface TabFormState {

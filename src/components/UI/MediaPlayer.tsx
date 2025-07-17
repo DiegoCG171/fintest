@@ -12,9 +12,11 @@ import {
   useAppSelector,
 } from "../../store";
 import { useCallback, useEffect, useState } from "react";
+import { useToast } from "../../config/hooks/useToast";
 
 function MediaPlayer() {
   const dispatch = useAppDispatch();
+  const { showToast } = useToast();
 
   const playStatus = useAppSelector((state) => state.server.status);
   const stopStatus = useAppSelector((state) => state.server.stopServerStatus);
@@ -23,6 +25,7 @@ function MediaPlayer() {
   const serverPort = useAppSelector((state) => state.server.server?.portNumber);
   const playError = useAppSelector((state) => state.server.error);
   const stopError = useAppSelector((state) => state.server.stopServererror);
+  const [canStop, setCanStop] = useState(false)
 
   const [playerMessage, setPlayerMessage] = useState("Detenido...");
 
@@ -35,23 +38,26 @@ function MediaPlayer() {
     clearErrors();
     try {
       await dispatch(startServerThunk()).unwrap();
+      setCanStop(true)
     } catch (error) {
       console.error("Error al iniciar el servidor:", error);
     }
   }, [dispatch, clearErrors]);
 
-  const stopServer = () => {
+  const stopServer = useCallback(async() => {
     clearErrors();
     if (serverId) {
       try {
-        dispatch(stopServerThunk(serverId)).unwrap();
+        await dispatch(stopServerThunk(serverId)).unwrap();
+        setCanStop(false)
       } catch (error) {
         console.error("Error al detener el servidor:", error);
+        showToast(error as string, "error")
       } finally {
         dispatch(clearServer());
       }
     }
-  };
+  }, [dispatch, clearErrors, serverId, showToast]);
 
   useEffect(() => {
     if (playStatus === "loading") {
@@ -61,7 +67,8 @@ function MediaPlayer() {
       setPlayerMessage(`Escuchando ${serverIP}:${serverPort}`);
     }
     if (playStatus === "error") {
-      setPlayerMessage(playError ?? "Ocurrió un error");
+      setPlayerMessage("Detenido...");
+      showToast("Hubo un error al levantar la sesión", "error");
     }
     if (stopStatus === "loading") {
       setPlayerMessage("Desconectando...");
@@ -70,9 +77,9 @@ function MediaPlayer() {
       setPlayerMessage("Detenido...");
     }
     if (stopStatus === "error") {
-      setPlayerMessage(stopError ?? "Ocurrió un error");
+      setPlayerMessage("Detenido...");
     }
-  }, [playStatus, serverIP, playError, stopStatus, stopError, serverPort]);
+  }, [playStatus, serverIP, playError, stopStatus, stopError, serverPort, showToast]);
 
   return (
     <Box
@@ -143,8 +150,8 @@ function MediaPlayer() {
         />
         <StopIcon
           sx={{
-            cursor: stopStatus === "success" ? "not-allowed" : "pointer",
-            opacity: stopStatus === "success" ? 0.5 : 1,
+            cursor: !canStop ? "not-allowed" : "pointer",
+            opacity: !canStop ? 0.5 : 1,
             transition: "color 0.2s, transform 0.2s",
             "&:hover":
               stopStatus === "success"

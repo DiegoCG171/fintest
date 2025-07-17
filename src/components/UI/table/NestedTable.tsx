@@ -1,19 +1,9 @@
 import { Fragment, useState } from "react";
-import { TableRowData } from "../../../config/interfaces";
+import { NestedTableProps } from "../../../config/interfaces";
 import { Box, Collapse, IconButton, Table, TableBody, TableCell, TableRow } from "@mui/material";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import { insertWordBreaks } from "../../../config/utils/table";
 import { getBackgroundColorForLevel } from "../../../config/utils/getBackgroundColorForLevel";
-
-interface NestedTableProps {
-  data: TableRowData[];
-  customRenderers?: {
-    [columnKey: string]: (
-      value: string | number | null | undefined
-    ) => React.ReactNode;
-  };
-  level?: number;
-}
 
 export const NestedTable = ({
   data,
