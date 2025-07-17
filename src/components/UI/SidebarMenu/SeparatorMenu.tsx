@@ -3,7 +3,7 @@ import CreateNewFolderOutlinedIcon from "@mui/icons-material/CreateNewFolderOutl
 import { SeparatorMenuProps } from "../../../config/interfaces";
 import PermissionGuard from "../../../config/guards/PermissionGuard";
 
-function SeparatorMenu({ label, onAction }: SeparatorMenuProps) {
+function SeparatorMenu({ label, onAction, permissions }: SeparatorMenuProps) {
   return (
     <Box
       sx={{
@@ -20,7 +20,7 @@ function SeparatorMenu({ label, onAction }: SeparatorMenuProps) {
         {label.toUpperCase()}
       </Typography>
       <PermissionGuard
-        permissions={[{ action: "create", resource: "template" }]}
+        permissions={[...permissions]}
       >
         <CreateNewFolderOutlinedIcon
           sx={{ fontSize: 18, color: (theme) => theme.palette.text.disabled }}

@@ -32,9 +32,13 @@ import {
 import { SidebarCreateCollection } from "./SidebarCreateCollection";
 import { createSessionThunk } from "../../../store/slices/sessions/session.thunk";
 import { cleanObject } from "../../../config/utils/cleandObject";
+import PermissionGuard from "../../../config/guards/PermissionGuard";
+import { hasPermission } from "../../../config/utils/permissions";
+import { useAuth } from "../../../config/hooks/useAuth";
 
 function SidebarBlock({ searchTerm }: { searchTerm: string }) {
   const dispatch = useAppDispatch();
+  const { permissions } = useAuth();
 
   const categoriesMenu = useAppSelector(
     (state) => state.sidebarMenu.categoriesMenu
@@ -78,123 +82,165 @@ function SidebarBlock({ searchTerm }: { searchTerm: string }) {
     [dispatch, showToast]
   );
 
-  const buildedOptions = (item: ItemsServiceMenu): ContextMenuOption[] => [
-    {
-      item: { label: "Agregar a Colecciones", id: item.id },
-      action: () => addToCollections(item),
-    },
-    {
-      item: { label: "Editar template", id: item.id },
-      action: () => handleSelectItem(item),
-    },
-  ];
+  const buildedOptions = (item: ItemsServiceMenu): ContextMenuOption[] => {
+    const options: ContextMenuOption[] = [];
+
+    if (hasPermission(permissions, "create", "collection")) {
+      options.push({
+        item: { label: "Agregar a Colecciones", id: item.id },
+        action: () => addToCollections(item),
+      });
+    }
+
+    if (hasPermission(permissions, "update", "template")) {
+      options.push({
+        item: { label: "Editar template", id: item.id },
+        action: () => handleSelectItem(item),
+      });
+    }
+
+    return options;
+  };
+
   const buildedTemplateOptions = (
     item: ItemsServiceMenu
-  ): ContextMenuOption[] => [
-    {
-      item: { label: "Agregar a Colecciones", id: item.id },
-      action: () => addToCollections(item),
-    },
-    {
-      item: { label: "Duplicar", id: item.id },
-      action: async () => {
-        const originalTemplate = templates.find(
-          (template) => template.uuid === item.id
-        );
+  ): ContextMenuOption[] => {
+    const options: ContextMenuOption[] = [];
 
-        if (!originalTemplate) {
-          showToast("Template no encontrado", "error");
-          return;
-        }
+    if (hasPermission(permissions, "create", "collection")) {
+      options.push({
+        item: { label: "Agregar a Colecciones", id: item.id },
+        action: () => addToCollections(item),
+      });
+    }
 
-        const copyTemplate = cleanObject(originalTemplate);
+    if (hasPermission(permissions, "create", "template")) {
+      options.push({
+        item: { label: "Duplicar", id: item.id },
+        action: async () => {
+          const originalTemplate = templates.find(
+            (template) => template.uuid === item.id
+          );
 
-        try {
-          await dispatch(
-            createTemplateThunk({
-              template: {
-                ...copyTemplate,
-                name: `${copyTemplate.name} copia`,
-              },
-            })
-          ).unwrap();
+          if (!originalTemplate) {
+            showToast("Template no encontrado", "error");
+            return;
+          }
 
-          showToast("Copia del template creada correctamente", "success");
-        } catch (error) {
-          showToast(error as string, "error");
-        } finally {
-          dispatch(getTemplatesThunk());
-          dispatch(getAllCategoriesThunk())
-            .unwrap()
-            .catch((err) => console.error("Error cargando categorías:", err));
-        }
-      },
-    },
-    {
-      item: { label: "Editar template", id: item.id },
-      action: () => handleSelectItem(item),
-    },
-  ];
+          const copyTemplate = cleanObject(originalTemplate);
+
+          try {
+            await dispatch(
+              createTemplateThunk({
+                template: {
+                  ...copyTemplate,
+                  name: `${copyTemplate.name} copia`,
+                },
+              })
+            ).unwrap();
+
+            showToast("Copia del template creada correctamente", "success");
+          } catch (error) {
+            showToast(error as string, "error");
+          } finally {
+            dispatch(getTemplatesThunk());
+            dispatch(getAllCategoriesThunk())
+              .unwrap()
+              .catch((err) => console.error("Error cargando categorías:", err));
+          }
+        },
+      });
+    }
+
+    if (hasPermission(permissions, "update", "template")) {
+      options.push({
+        item: { label: "Editar template", id: item.id },
+        action: () => handleSelectItem(item),
+      });
+    }
+
+    return options;
+  };
 
   const buildedCollectionOptions = (
     item: ItemsServiceMenu
-  ): ContextMenuOption[] => [
-    {
-      item: { label: "Ejecutar", id: item.id },
-      action: () => {
-        dispatch(
-          createSessionThunk({
-            toExecute: [
-              {
-                runnableId: item.id,
-                runnableType: "collection",
-              },
-            ],
-          })
-        );
-      },
-    },
-    {
-      item: { label: "Renombrar", id: item.id },
-      action: () => dispatch(updateCollection(item)),
-    },
-    {
-      item: { label: "Eliminar", id: item.id },
-      action: () => {
-        dispatch(deleteCollectionThunk(item.id));
-      },
-    },
-  ];
+  ): ContextMenuOption[] => {
+    const options: ContextMenuOption[] = [];
+
+    if (hasPermission(permissions, "create", "session")) {
+      options.push({
+        item: { label: "Ejecutar", id: item.id },
+        action: () => {
+          dispatch(
+            createSessionThunk({
+              toExecute: [
+                {
+                  runnableId: item.id,
+                  runnableType: "collection",
+                },
+              ],
+            })
+          );
+        },
+      });
+    }
+
+    if (hasPermission(permissions, "update", "collection")) {
+      options.push({
+        item: { label: "Renombrar", id: item.id },
+        action: () => dispatch(updateCollection(item)),
+      });
+    }
+
+    if (hasPermission(permissions, "delete", "collection")) {
+      options.push({
+        item: { label: "Eliminar", id: item.id },
+        action: () => dispatch(deleteCollectionThunk(item.id)),
+      });
+    }
+
+    return options;
+  };
 
   const buildedTestCaseOptions = (
     item: ItemsServiceMenu
-  ): ContextMenuOption[] => [
-    {
-      item: { label: "Ejecutar", id: item.id },
-      action: () => {
-        dispatch(
-          createSessionThunk({
-            toExecute: [
-              {
-                runnableId: item.id,
-                runnableType: "testCase",
-              },
-            ],
-          })
-        );
-      },
-    },
-    {
-      item: { label: "Renombrar", id: item.id },
-      action: () => dispatch(updateTestCase(item)),
-    },
-    {
-      item: { label: "Eliminar", id: item.id },
-      action: () => {
-        dispatch(deleteTestCaseThunk(item.id));
-      },
-    },
-  ];
+  ): ContextMenuOption[] => {
+    const options: ContextMenuOption[] = [];
+
+    if (hasPermission(permissions, "create", "session")) {
+      options.push({
+        item: { label: "Ejecutar", id: item.id },
+        action: () => {
+          dispatch(
+            createSessionThunk({
+              toExecute: [
+                {
+                  runnableId: item.id,
+                  runnableType: "testCase",
+                },
+              ],
+            })
+          );
+        },
+      });
+    }
+
+    if (hasPermission(permissions, "update", "testCase")) {
+      options.push({
+        item: { label: "Renombrar", id: item.id },
+        action: () => dispatch(updateTestCase(item)),
+      });
+    }
+
+    if (hasPermission(permissions, "delete", "testCase")) {
+      options.push({
+        item: { label: "Eliminar", id: item.id },
+        action: () => dispatch(deleteTestCaseThunk(item.id)),
+      });
+    }
+
+    return options;
+  };
 
   const handleOpenCreateCollection = () => {
     dispatch(toggleCreateCollectionMenu(true));
@@ -279,50 +325,64 @@ function SidebarBlock({ searchTerm }: { searchTerm: string }) {
         sx={{ px: 1, overflowY: "auto", flexGrow: 1, my: 4, marginRight: 1 }}
         key={"box-catalogo"}
       >
-        <SeparatorMenu label="Catálogo" onAction={handleModal} />
-        {filteredCategories.length > 0 ? (
-          filteredCategories.map((rootItem, index) => (
-            <RecursiveMenuItem
-              key={`${index}-${rootItem.id}`}
-              item={rootItem}
-              optionsActive={true}
-              onSelectItem={handleSelectItem}
-              buildOptions={buildedOptions}
-              buildSubItemOptions={buildedTemplateOptions}
-            />
-          ))
-        ) : (
-          <Box sx={{ px: 2, py: 1, fontSize: 14, color: "gray" }}>
-            Sin resultados
-          </Box>
-        )}
+        <PermissionGuard
+          permissions={[{ action: "read", resource: "template" }]}
+        >
+          <SeparatorMenu
+            label="Catálogo"
+            onAction={handleModal}
+            permissions={[{ action: "create", resource: "template" }]}
+          />
+
+          {filteredCategories.length > 0 ? (
+            filteredCategories.map((rootItem, index) => (
+              <RecursiveMenuItem
+                key={`${index}-${rootItem.id}`}
+                item={rootItem}
+                optionsActive={true}
+                onSelectItem={handleSelectItem}
+                buildOptions={buildedOptions}
+                buildSubItemOptions={buildedTemplateOptions}
+              />
+            ))
+          ) : (
+            <Box sx={{ px: 2, py: 1, fontSize: 14, color: "gray" }}>
+              Sin resultados
+            </Box>
+          )}
+        </PermissionGuard>
       </Box>
       <Divider />
       <Box
         sx={{ px: 1, overflowY: "auto", flexGrow: 1, my: 4, marginRight: 1 }}
         key={"box-colecciones"}
       >
-        <SeparatorMenu
-          label="Colecciones"
-          onAction={handleOpenCreateCollection}
-        />
-        {createCollectionMenu && <SidebarCreateCollection />}
-        {filteredCollections.length > 0 ? (
-          filteredCollections.map((rootItem, index) => (
-            <RecursiveMenuItem
-              key={`${index}-${rootItem?.id ?? rootItem.name}`}
-              item={rootItem}
-              optionsActive={true}
-              onSelectItem={handleSelectItem}
-              buildOptions={buildedCollectionOptions}
-              buildSubItemOptions={buildedTestCaseOptions}
-            />
-          ))
-        ) : (
-          <Box sx={{ px: 2, py: 1, fontSize: 14, color: "gray" }}>
-            Sin resultados
-          </Box>
-        )}
+        <PermissionGuard
+          permissions={[{ action: "read", resource: "collection" }]}
+        >
+          <SeparatorMenu
+            permissions={[{ action: "create", resource: "collection" }]}
+            label="Colecciones"
+            onAction={handleOpenCreateCollection}
+          />
+          {createCollectionMenu && <SidebarCreateCollection />}
+          {filteredCollections.length > 0 ? (
+            filteredCollections.map((rootItem, index) => (
+              <RecursiveMenuItem
+                key={`${index}-${rootItem?.id ?? rootItem.name}`}
+                item={rootItem}
+                optionsActive={true}
+                onSelectItem={handleSelectItem}
+                buildOptions={buildedCollectionOptions}
+                buildSubItemOptions={buildedTestCaseOptions}
+              />
+            ))
+          ) : (
+            <Box sx={{ px: 2, py: 1, fontSize: 14, color: "gray" }}>
+              Sin resultados
+            </Box>
+          )}
+        </PermissionGuard>
       </Box>
     </Box>
   );

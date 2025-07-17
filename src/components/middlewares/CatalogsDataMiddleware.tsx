@@ -14,10 +14,13 @@ import {
 } from "../../config/utils/mappers";
 import { CatalogsDataMiddlewareProps, ColumnConfigFormBuilder } from "../../config/interfaces";
 import { getTransactionByType } from "../../config/utils";
+import { useAuth } from "../../config/hooks/useAuth";
+import { hasPermission } from "../../config/utils/permissions";
 
 function CatalogsDataMiddleware({ tabId, template }: CatalogsDataMiddlewareProps) {
   const dispatch = useAppDispatch();
   const { formType, templateId } = template;
+  const { permissions } = useAuth();
 
   const rawRules = useAppSelector((state) => state.rules.rules);
   const templates = useAppSelector((state) => state.templates.templates);
@@ -27,6 +30,7 @@ function CatalogsDataMiddleware({ tabId, template }: CatalogsDataMiddlewareProps
   );
 
   const alreadyInitialized = useRef(false);
+
   useEffect(() => {
     if (!rawRules?.length) {
       dispatch(getRulesThunk());
@@ -35,17 +39,14 @@ function CatalogsDataMiddleware({ tabId, template }: CatalogsDataMiddlewareProps
 
   const mappedRules = useMemo(() => {
     if (!rawRules?.length) return [];
-    const result = mapFieldRulesToFormStructure(rawRules);
-    return result;
+    return mapFieldRulesToFormStructure(rawRules);
   }, [rawRules]);
 
   const transactionData = useMemo(() => {
-    if(template.origin === 'categories') {
-      const result = getTransactionByType(templates, templateId, formType);
-      return result;
+    if (template.origin === "categories") {
+      return getTransactionByType(templates, templateId, formType);
     } else {
-      const result = getTransactionByType(testCases, templateId, formType);
-      return result
+      return getTransactionByType(testCases, templateId, formType);
     }
   }, [templates, templateId, formType, template, testCases]);
 
@@ -61,15 +62,26 @@ function CatalogsDataMiddleware({ tabId, template }: CatalogsDataMiddlewareProps
 
   useEffect(() => {
     if (alreadyInitialized.current) return;
-    if (!rawRules?.length || !transactionData?.length) return;
-    if (alreadyInitialized.current || formState) return;
+    if (!rawRules?.length || !transactionData?.length || formState) return;
 
     const values = combineTemplateData(transactionData, mappedRules);
     dispatch(setValuesForTab({ tabId, values }));
     alreadyInitialized.current = true;
   }, [dispatch, tabId, rawRules, transactionData, mappedRules, formState]);
 
-  return <FormBuilderContainer tabId={tabId} canEdit={template.canEdit} />;
+  const canEdit = useMemo(() => {
+    if (!permissions) return false;
+    if (template.origin === "categories") {
+      return hasPermission(permissions, "update", "template");
+    }
+    if (template.origin === "collections") {
+      return hasPermission(permissions, "update", "testCase");
+    }
+    return false;
+  }, [template.origin, permissions]);
+
+  return <FormBuilderContainer tabId={tabId} canEdit={canEdit} />;
 }
+
 
 export default CatalogsDataMiddleware;

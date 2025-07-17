@@ -53,6 +53,10 @@ export interface HeaderSidebarMenuProps {
 export interface SeparatorMenuProps {
     onAction?: () => void;
     label: string;
+    permissions: {
+        action: string;
+        resource: string;
+    }[]
 }
 
 //Menu context

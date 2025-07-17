@@ -101,15 +101,12 @@ export const RunnerSideBar = () => {
             overflow: "hidden",
           }}
         >
-          {/* Header */}
           <RunnerHeader
             isOpenDetails={isOpenDetails}
             onCloseDetails={() => handleToggleSessionDetails(false)}
           />
 
-          {/* Content */}
           <Box sx={{ display: "flex", flex: 1, height: "100%" }}>
-            {/* Step list */}
             <Box
               px={2}
               sx={{
@@ -139,7 +136,6 @@ export const RunnerSideBar = () => {
               </Typography>
             </Box>
 
-            {/* Details panel */}
             <RunnerDetailsPanel
               visible={isOpenDetails}
               testCaseDetails={testCaseDetails}
@@ -147,8 +143,6 @@ export const RunnerSideBar = () => {
               loading={loading}
             />
           </Box>
-
-          {/* Footer */}
           <RunnerFooter
             server={server}
             onStart={handleStartServer}

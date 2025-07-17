@@ -25,12 +25,15 @@ import { updateTemplateThunk } from "../../../store/slices/templates/templates.t
 import TitleHeaderComponent from "../TitleHeaderComponent";
 import { getTestCasesThunk } from "../../../store/slices/testCases/testCases.thunk";
 import { updateTestCaseThunk } from "../../../store/slices/collections/collections.thunk";
+import { useAuth } from "../../../config/hooks/useAuth";
+import { hasPermission } from "../../../config/utils/permissions";
 
 function TabbedTableForm({
   tabs,
   initialTabIndex = 0,
 }: TabTableFormComponentProps) {
   const [value, setValue] = useState(initialTabIndex);
+  const { permissions } = useAuth();
   useEffect(() => {
     setValue(initialTabIndex);
   }, [initialTabIndex]);
@@ -39,7 +42,17 @@ function TabbedTableForm({
   const { error: rulesError, status: statusRules } = useAppSelector(
     (state) => state.rules
   );
-  const canEdit = tabs[0].canEdit;
+  
+  const canEdit = useMemo(() => {
+      if (!permissions) return false;
+      if (tabs[0].origin === "categories") {
+        return hasPermission(permissions, "update", "template");
+      }
+      if (tabs[0].origin === "collections") {
+        return hasPermission(permissions, "update", "testCase");
+      }
+      return false;
+    }, [tabs, permissions]);
 
   const { getError: templatesError, getStatus: statusTemplates } =
     useAppSelector((state) => state.templates);
@@ -58,10 +71,7 @@ function TabbedTableForm({
 
   const valuesToSend = tabForm?.values ?? [];
 
-  /* useEffect(() => {
-    const templpateById = async () => await dispatch(getTemplateByIdThunk(tabs[value].templateId));
-    templpateById();
-  }, [currentTabId, tabs, value, dispatch]) */
+  
 
   useEffect(() => {
     const fetchRules = async () => await getRulesThunk();
