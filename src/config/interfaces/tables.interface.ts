@@ -27,7 +27,7 @@ export interface BasicTableProps {
     initialRows: TableRowData[];
     showPagination?: boolean;
     customRenderers?: CustomRenders;
-    type?: 'detail' | 'errors' | 'events';
+    typeTable?: 'detail' | 'errors' | 'events';
 }
 
 export interface DynamicTableProps {

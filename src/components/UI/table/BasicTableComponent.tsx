@@ -15,15 +15,19 @@ import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { setActiveMessage } from "../../../store/slices/messages/messages.slice";
 import { TableRowComponent } from "./TableRowComponent";
 import { TableHeader } from "./TableHeader";
+import { useNavigate, useParams } from "react-router-dom";
 
 function BasicTable({
   initialRows,
   showPagination = false,
   customRenderers = {},
-  type = "events",
+  typeTable = "events",
 }: BasicTableProps) {
   const dispatch = useAppDispatch();
   const { activeMessage } = useAppSelector((state) => state.messagesReducer);
+  const navigate = useNavigate();
+  const { method, type } = useParams();
+  const urlBase = `/${method}/${type}`;
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [keys, setKeys] = useState<string[]>([]);
@@ -45,12 +49,27 @@ function BasicTable({
     setPage(0);
   };
 
-  const handleSetActiveMessage = (
+  const handleSetActiveMessage = async (
     id: number | string | undefined,
     message: TableRowData[] | ReactNode | FieldError
   ) => {
-    if (type === "events" && Array.isArray(message)) {
+    if (typeTable === "events" && Array.isArray(message)) {
       dispatch(setActiveMessage({ data: message, id }));
+      setTimeout(() => {
+  navigate(`${urlBase}/detalles`);
+}, 300);
+      /* const selectedRow = initialRows.find((row) => row.ID === id);
+
+      if (!selectedRow) {
+        console.warn("No se encontró el row con id:", id);
+        return;
+      } */
+      /* console.log(selectedRow)
+      if (!selectedRow.estado) {
+        navigate(`${urlBase}/detalles`);
+      } else {
+        navigate(`${urlBase}/errores`);
+      } */
     }
   };
 
@@ -61,12 +80,12 @@ function BasicTable({
   useEffect(() => {
     const dynamicKeys = Object.keys(initialRows[0] || {});
     const filteredKeys =
-      type === "events"
+      typeTable === "events"
         ? dynamicKeys.filter((key) => key !== "fields")
         : dynamicKeys;
 
     setKeys(filteredKeys);
-  }, [initialRows, type]);
+  }, [initialRows, typeTable]);
 
   return (
     <Paper
@@ -82,7 +101,7 @@ function BasicTable({
         sx={{
           flex: 1,
           overflow: "auto",
-          mt:2
+          mt: 2,
         }}
       >
         <Table stickyHeader>
@@ -95,7 +114,7 @@ function BasicTable({
                 rowIndex={rowIndex}
                 keys={keys}
                 customRenderers={customRenderers}
-                type={type}
+                type={typeTable}
                 activeMessageId={activeMessage.id}
                 onSetActiveMessage={handleSetActiveMessage}
                 onToggle={handleToggle}

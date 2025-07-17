@@ -72,6 +72,18 @@ const router = createBrowserRouter([
                 ),
               },
               {
+                path: ":method/:type/detalles",
+                element: (
+                  <MainPage />
+                ),
+              },
+              {
+                path: ":method/:type/errores",
+                element: (
+                  <MainPage />
+                ),
+              },
+              {
                 path: ":method/:type/categories/:categoryId",
                 element: (
                   <RouteGuard>

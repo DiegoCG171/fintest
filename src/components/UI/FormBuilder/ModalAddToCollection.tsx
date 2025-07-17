@@ -15,7 +15,10 @@ import {
   getCollectionsThunk,
 } from "../../../store/slices/collections/collections.thunk";
 import { setCollectionsRoutesThunk } from "../../../store/slices/routes/validRoutes.thunk";
-import { getLinksArray, transformCollectionsToMenu } from "../../../config/utils";
+import {
+  getLinksArray,
+  transformCollectionsToMenu,
+} from "../../../config/utils";
 import { setCollectionsData } from "../../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
 import { useParams } from "react-router-dom";
 export const ModalAddToCollection = ({
@@ -30,7 +33,7 @@ export const ModalAddToCollection = ({
 
   const { loading } = useAppSelector((state) => state.modalForm);
 
-  const { method = "", type = "" } = useParams();
+  const { method, type } = useParams();
 
   const handleSubmit = async () => {
     if (!collection) {
@@ -41,7 +44,7 @@ export const ModalAddToCollection = ({
     setCollectionError(false);
 
     try {
-      dispatch(
+      await dispatch(
         createTestCaseThunk({
           id_collection: collection,
           id_template: templateId,

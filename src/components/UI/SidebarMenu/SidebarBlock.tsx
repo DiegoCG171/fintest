@@ -18,6 +18,7 @@ import { useToast } from "../../../config/hooks/useToast";
 import {
   deleteCollectionThunk,
   deleteTestCaseThunk,
+  getCollectionsThunk,
 } from "../../../store/slices/collections/collections.thunk";
 
 import {
@@ -27,6 +28,7 @@ import {
 } from "../../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
 import { SidebarCreateCollection } from "./SidebarCreateCollection";
 import { createSessionThunk } from "../../../store/slices/sessions/session.thunk";
+import { useParams } from "react-router-dom";
 
 function SidebarBlock({
   searchTerm,
@@ -36,6 +38,8 @@ function SidebarBlock({
   searchOnItem: boolean;
 }) {
   const dispatch = useAppDispatch();
+
+  const { method, type } = useParams();
 
   const categoriesMenu = useAppSelector(
     (state) => state.sidebarMenu.categoriesMenu
@@ -121,12 +125,18 @@ function SidebarBlock({
     },
     {
       item: { label: "Renombrar", id: item.id },
-      action: () => dispatch(updateCollection(item)),
+      action: () => {
+        dispatch(updateCollection(item));
+        dispatch(getCollectionsThunk(`${method}/${type}`));
+      },
     },
     {
       item: { label: "Eliminar", id: item.id },
-      action: () => {
-        dispatch(deleteCollectionThunk(item.id));
+      action: async () => {
+        await dispatch(deleteCollectionThunk(item.id)).unwrap();
+        if (method && type) {
+          dispatch(getCollectionsThunk(`${method}/${type}`));
+        }
       },
     },
   ];
@@ -155,8 +165,11 @@ function SidebarBlock({
     },
     {
       item: { label: "Eliminar", id: item.id },
-      action: () => {
-        dispatch(deleteTestCaseThunk(item.id));
+      action: async () => {
+        await dispatch(deleteTestCaseThunk(item.id));
+        if (method && type) {
+          dispatch(getCollectionsThunk(`${method}/${type}`));
+        }
       },
     },
   ];
@@ -175,31 +188,41 @@ function SidebarBlock({
   }, [dispatch]);
 
   const filterRecursive = useCallback(
-  (
-    node: MenuServiceInterface,
-    term: string,
-    searchOnFile: boolean,
-  ): MenuServiceInterface | null => {
-    const normalized = term.toLowerCase();
+    (
+      node: MenuServiceInterface,
+      term: string,
+      searchOnFile: boolean
+    ): MenuServiceInterface | null => {
+      const normalized = term.toLowerCase();
 
-    const isNodeMatch = node.name?.toLowerCase().includes(normalized);
-    const matchedItems =
-      node.items?.filter((item) =>
-        item.name.toLowerCase().includes(normalized)
-      ) ?? [];
+      const isNodeMatch = node.name?.toLowerCase().includes(normalized);
+      const matchedItems =
+        node.items?.filter((item) =>
+          item.name.toLowerCase().includes(normalized)
+        ) ?? [];
 
-    const matchedChildren = (node.children ?? [])
-      .map((child) => filterRecursive(child, term, searchOnFile))
-      .filter((child): child is MenuServiceInterface => child !== null);
+      const matchedChildren = (node.children ?? [])
+        .map((child) => filterRecursive(child, term, searchOnFile))
+        .filter((child): child is MenuServiceInterface => child !== null);
 
-    if (searchOnFile) {
-      if (isNodeMatch) {
-        return {
-          ...node,
-          items: matchedItems,
-          children: matchedChildren,
-        };
+      if (searchOnFile) {
+        if (isNodeMatch) {
+          return {
+            ...node,
+            items: matchedItems,
+            children: matchedChildren,
+          };
+        }
+        if (matchedItems.length > 0 || matchedChildren.length > 0) {
+          return {
+            ...node,
+            items: matchedItems,
+            children: matchedChildren,
+          };
+        }
+        return null;
       }
+
       if (matchedItems.length > 0 || matchedChildren.length > 0) {
         return {
           ...node,
@@ -207,22 +230,11 @@ function SidebarBlock({
           children: matchedChildren,
         };
       }
+
       return null;
-    }
-
-    if (matchedItems.length > 0 || matchedChildren.length > 0) {
-      return {
-        ...node,
-        items: matchedItems,
-        children: matchedChildren,
-      };
-    }
-
-    return null;
-  },
-  []
-);
-
+    },
+    []
+  );
 
   const { filteredCategories, filteredCollections } = useMemo(() => {
     const normalized = searchTerm.trim().toLowerCase();
@@ -236,16 +248,25 @@ function SidebarBlock({
 
     const filteredCategories =
       categoriesMenu
-        ?.map((category) => filterRecursive(category, normalized, !searchOnItem))
+        ?.map((category) =>
+          filterRecursive(category, normalized, !searchOnItem)
+        )
         .filter((item): item is MenuServiceInterface => item !== null) ?? [];
 
     const filteredCollections =
       collectionsMenu
-        ?.map((category) => filterRecursive(category, normalized, !searchOnItem))
+        ?.map((category) =>
+          filterRecursive(category, normalized, !searchOnItem)
+        )
         .filter((item): item is MenuServiceInterface => item !== null) ?? [];
     return { filteredCategories, filteredCollections };
-  }, [searchTerm, categoriesMenu, collectionsMenu, filterRecursive, searchOnItem]);
-  
+  }, [
+    searchTerm,
+    categoriesMenu,
+    collectionsMenu,
+    filterRecursive,
+    searchOnItem,
+  ]);
 
   return (
     <Box>
@@ -253,7 +274,10 @@ function SidebarBlock({
         sx={{ px: 1, overflowY: "auto", flexGrow: 1, my: 4, marginRight: 1 }}
         key={"box-catalogo"}
       >
-        <SeparatorMenu label="Catálogo" onAction={handleModal} />
+        <SeparatorMenu
+          label="Catálogo"
+          onAction={handleModal}
+        />
         {filteredCategories.length > 0 ? (
           filteredCategories.map((rootItem, index) => (
             <RecursiveMenuItem
