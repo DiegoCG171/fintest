@@ -1,6 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { TableRowData } from "../../../config/interfaces";
-import { createSessionThunk } from "./session.thunk";
+import {
+  CreateSessionPayload,
+  createSessionThunk,
+  removeSessionThunk,
+} from "./session.thunk";
 import { mapRunSessionItems } from "../../../config/utils/sessions.utils";
 import { setMessage } from "../messages/messages.slice";
 import { mapSocketMessageToTableRowData } from "../../../config/utils/messages.utils";
@@ -14,6 +18,8 @@ interface sessionInitialState {
   activeSession: SessionItem[];
   completedCount: number;
   processedIncrementals: string[];
+  id: string;
+  prevConfigCreateSession: CreateSessionPayload;
 }
 
 export interface SessionItem {
@@ -25,6 +31,7 @@ export interface SessionItem {
 }
 
 const initialState: sessionInitialState = {
+  id: "",
   isActive: false,
   loading: false,
   isOpenDetails: false,
@@ -32,14 +39,20 @@ const initialState: sessionInitialState = {
   activeSession: [],
   completedCount: 0,
   processedIncrementals: [],
+  prevConfigCreateSession: {
+    toExecute: [],
+  },
 };
 
 export const sessionSlice = createSlice({
   name: "session",
   initialState,
   reducers: {
+    openSession: (state) => {
+      state.isActive = true;
+    },
     closeSession: (state) => {
-      state.isActive = false
+      state.isActive = false;
     },
     toggleRunningSession: (state, action) => {
       state.runningSession = action.payload;
@@ -54,9 +67,25 @@ export const sessionSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(createSessionThunk.fulfilled, (state, action) => {
-        state.isActive = true;
-        state.activeSession = mapRunSessionItems(action.payload.toExecute);
+        state.isActive = action.payload.type === "DEFAULT" ? true : false;
+        state.id = action.payload.data.uuid;
+        state.activeSession = mapRunSessionItems(
+          action.payload.type === "DEFAULT"
+            ? action.payload.data.toExecute
+            : action.payload.data.toExecute
+        );
         state.completedCount = 0;
+        state.prevConfigCreateSession = action.payload.sessionPayload;
+      })
+      .addCase(removeSessionThunk.fulfilled, (state) => {
+        state.isActive = false;
+        state.id = "";
+        state.isOpenDetails = false;
+        state.runningSession = false;
+        state.loading = false;
+        state.activeSession = [];
+        state.completedCount = 0;
+        state.processedIncrementals = [];
       })
       .addCase(setMessage, (state, action) => {
         const socketMsg = action.payload as IncomingSocketMessage;
@@ -93,5 +122,10 @@ export const sessionSlice = createSlice({
   },
 });
 
-export const { closeSession, toggleRunningSession, toggleSessionDetails, setLoading } =
-  sessionSlice.actions;
+export const {
+  openSession,
+  closeSession,
+  toggleRunningSession,
+  toggleSessionDetails,
+  setLoading,
+} = sessionSlice.actions;

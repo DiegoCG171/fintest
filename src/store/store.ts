@@ -20,6 +20,8 @@ import { testCasesSlice } from "./slices/testCases/testCasesSlice";
 import { setupAxiosInterceptors } from "../api/setupAxiosInterceptors";
 import { sessionSlice } from "./slices/sessions/sessionSlice";
 import api from "../api/api";
+import { functionsSelectSlice } from "./slices/functionsSelect/functionsSelect.slice";
+import { modalConfirmSessionSlice } from "./slices/UI/confirmSession/modalCoinfirmSession.slice";
 
 export const store = configureStore({
     reducer: {
@@ -40,7 +42,9 @@ export const store = configureStore({
         user: userSlice.reducer,
         validRoutes: validRoutesSlice.reducer,
         testCases: testCasesSlice.reducer,
-        session: sessionSlice.reducer
+        session: sessionSlice.reducer,
+        functionSelect: functionsSelectSlice.reducer,
+        modalConfirmSession: modalConfirmSessionSlice.reducer
     }
 });
 

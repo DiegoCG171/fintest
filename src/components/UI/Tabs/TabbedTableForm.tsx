@@ -35,12 +35,15 @@ import { addOrUpdateTemplate } from "../../../store/slices/templates/template.sl
 import { getCollectionsThunk } from "../../../store/slices/collections/collections.thunk";
 import { useParams } from "react-router-dom";
 import { resetOriginalValues } from "../../../store/slices/UI/form/formBuilder.slice";
+import { useAuth } from "../../../config/hooks/useAuth";
+import { hasPermission } from "../../../config/utils/permissions";
 
 function TabbedTableForm({
   tabs,
   initialTabIndex = 0,
 }: TabTableFormComponentProps) {
   const [value, setValue] = useState(initialTabIndex);
+  const { permissions } = useAuth();
   useEffect(() => {
     setValue(initialTabIndex);
   }, [initialTabIndex]);
@@ -51,6 +54,18 @@ function TabbedTableForm({
   const { error: rulesError, status: statusRules } = useAppSelector(
     (state) => state.rules
   );
+  
+  const canEdit = useMemo(() => {
+      if (!permissions) return false;
+      if (tabs[0].origin === "categories") {
+        return hasPermission(permissions, "update", "template");
+      }
+      if (tabs[0].origin === "collections") {
+        return hasPermission(permissions, "update", "testCase");
+      }
+      return false;
+    }, [tabs, permissions]);
+
   const { getError: templatesError, getStatus: statusTemplates } =
     useAppSelector((state) => state.templates);
   const { getError: testCasesError, getStatus: statusTestCases } =
@@ -58,7 +73,6 @@ function TabbedTableForm({
   const templates = useAppSelector((state) => state.templates.templates);
   const testCases = useAppSelector((state) => state.testCases.testCases);
 
-  const canEdit = tabs[0].canEdit;
   const currentTabId = useMemo(() => {
     return tabs[value]
       ? `${tabs[value].templateId}-${tabs[value].formType}`

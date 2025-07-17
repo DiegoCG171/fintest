@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { createSession } from "../../../services/catalogs/session.service";
+import { createSession, removeSession } from "../../../services/catalogs/session.service";
+import { toggleConfirmSessionModal } from "../UI/confirmSession/modalCoinfirmSession.slice";
 
 export interface CreateSessionPayload {
     toExecute: RunnableToExecute[]
@@ -14,9 +15,25 @@ type RunnableType = 'collection' | 'testCase';
 
 export const createSessionThunk = createAsyncThunk(
   "auth/createSession",
-  async (createSessionPayload: CreateSessionPayload, { rejectWithValue }) => {
+  async (createSessionPayload: CreateSessionPayload, { rejectWithValue, dispatch }) => {
     try {
-      return await createSession(createSessionPayload);
+      const {type, data} = await createSession(createSessionPayload);
+
+      if(type === 'SESSION_CONFLICT') {
+        dispatch(toggleConfirmSessionModal(true));
+      }
+      return {type, data, sessionPayload: createSessionPayload};
+    } catch (error) {
+      return rejectWithValue(error as string);
+    }
+  }
+);
+
+export const removeSessionThunk = createAsyncThunk(
+  "auth/removeSession",
+  async (id: string, { rejectWithValue }) => {
+    try {
+      return await removeSession(id);
     } catch (error) {
       return rejectWithValue(error as string);
     }

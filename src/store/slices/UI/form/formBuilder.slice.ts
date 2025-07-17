@@ -1,5 +1,9 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit"
-import { ColumnConfigFormBuilder, FormBuilderState, TableRowDataFormBuilder } from "../../../../config/interfaces";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import {
+  ColumnConfigFormBuilder,
+  FormBuilderState,
+  TableRowDataFormBuilder,
+} from "../../../../config/interfaces";
 
 const initialState: FormBuilderState = {
   config: [],
@@ -82,7 +86,6 @@ export const formBuilderSlice = createSlice({
         tab.values[rowIndex][fieldKey] = value;
       }
     },
-
     updateNestedFieldValue(
       state,
       action: PayloadAction<{

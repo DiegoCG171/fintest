@@ -41,7 +41,7 @@ export interface TabConfigInterface {
         label: string;
         content: ReactNode;
         canEdit: boolean;
-        origin: originType;
+        origin?: 'collections' | 'categories';
     }>;
 }
 

@@ -9,10 +9,15 @@ import {
 } from "@mui/material";
 import { CheckCircle, Cancel } from "@mui/icons-material";
 import { TestCaseDetails } from "../../../config/interfaces";
-import { blinkAnimation, getStepColor, getStepIcon } from "../../../config/utils/iconRunner";
+import {
+  blinkAnimation,
+  getStepColor,
+  getStepIcon,
+} from "../../../config/utils/iconRunner";
 import { SessionItem } from "../../../store/slices/sessions/sessionSlice";
 
 interface RunnerStepListProps {
+  isActive: boolean;
   activeSession: SessionItem[];
   completedCount: number;
   onTestCaseSelect: (test: TestCaseDetails) => void;
@@ -20,6 +25,7 @@ interface RunnerStepListProps {
 }
 
 const RunnerStepList = ({
+  isActive,
   activeSession,
   completedCount,
   onTestCaseSelect,
@@ -74,21 +80,21 @@ const RunnerStepList = ({
         ))}
       </Stepper>
       <Box sx={{ display: "flex", justifyContent: "center" }}>
-        <Button
-          onClick={onCloseSession}
-          startIcon={
-            completedCount === activeSession.length ? (
-              <CheckCircle />
-            ) : (
-              <Cancel />
-            )
-          }
-          sx={{ px: 2 }}
-        >
-          {completedCount === activeSession.length
-            ? "Finalizar ejecución"
-            : "Cancelar ejecución"}
-        </Button>
+        {isActive && (
+          <Button
+            onClick={onCloseSession}
+            startIcon={
+              completedCount === activeSession.length ? (
+                <CheckCircle />
+              ) : (
+                <Cancel />
+              )
+            }
+            sx={{ width: "100%" }}
+          >
+            {completedCount === activeSession.length ? "Finalizar" : "Cancelar"}
+          </Button>
+        )}
       </Box>
     </Box>
   );

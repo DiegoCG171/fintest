@@ -20,6 +20,7 @@ export const authSlice = createSlice({
             localStorage.removeItem('user');
             localStorage.removeItem('refreshToken');
             state.isAuthenticated = false; 
+            localStorage.clear();
         },
         clearAuthError(state) {
             state.error = null

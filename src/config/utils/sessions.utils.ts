@@ -6,10 +6,23 @@ interface RunnableItem {
 }
 
 export const mapRunSessionItems = (runnables: RunnableItem[]) => {
-  return runnables.map((runnable, i) => ({
-    runnableId: runnable.runnableId,
-    status: i === 0 ? "En progreso..." : "pendiente...",
-    name: runnable.name,
-    message: {}
-  }));
+  let foundFirstUnrun = false;
+
+  return runnables.map((runnable) => {
+    let status = "pendiente...";
+
+    if (runnable.hasRun) {
+      status = "Terminado";
+    } else if (!foundFirstUnrun) {
+      status = "En progreso...";
+      foundFirstUnrun = true;
+    }
+
+    return {
+      runnableId: runnable.runnableId,
+      status,
+      name: runnable.name,
+      message: {}
+    };
+  });
 };

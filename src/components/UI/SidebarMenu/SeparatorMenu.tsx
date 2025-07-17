@@ -1,16 +1,16 @@
 import { Box, Typography } from "@mui/material";
 import CreateNewFolderOutlinedIcon from "@mui/icons-material/CreateNewFolderOutlined";
 import { SeparatorMenuProps } from "../../../config/interfaces";
+import PermissionGuard from "../../../config/guards/PermissionGuard";
 
-function SeparatorMenu({ label, onAction }: SeparatorMenuProps) {
-
+function SeparatorMenu({ label, onAction, permissions }: SeparatorMenuProps) {
   return (
     <Box
       sx={{
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        cursor: onAction ? "pointer" : '',
+        cursor: onAction ? "pointer" : "",
       }}
       onClick={onAction}
     >
@@ -19,9 +19,13 @@ function SeparatorMenu({ label, onAction }: SeparatorMenuProps) {
       >
         {label.toUpperCase()}
       </Typography>
-      <CreateNewFolderOutlinedIcon
-        sx={{ fontSize: 18, color: (theme) => theme.palette.text.disabled }}
-      />
+      <PermissionGuard
+        permissions={[...permissions]}
+      >
+        <CreateNewFolderOutlinedIcon
+          sx={{ fontSize: 18, color: (theme) => theme.palette.text.disabled }}
+        />
+      </PermissionGuard>
     </Box>
   );
 }

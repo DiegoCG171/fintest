@@ -3,7 +3,7 @@ import { createTemplateThunk, getTemplateByIdThunk, getTemplatesThunk, updateTem
 import { TemplateContextType, TemplateState } from '../../../config/interfaces';
 
 const initialState: TemplateState = {
-    templates: [],
+    templates: [] as TemplateContextType[],
     getStatus: 'idle',
     getError: null,
     updateStatus: 'idle',
@@ -82,8 +82,9 @@ export const templateSlice = createSlice({
                 state.createError = null;
                 state.createStatus = 'loading';
             })
-            .addCase(createTemplateThunk.fulfilled, (state) => {
+            .addCase(createTemplateThunk.fulfilled, (state, action) => {
                 state.createStatus = 'success';
+                state.templates.push(action.payload)
             })
             .addCase(createTemplateThunk.rejected, (state, action) => {
                 state.createError = action.payload ?? "Error desconocido";
