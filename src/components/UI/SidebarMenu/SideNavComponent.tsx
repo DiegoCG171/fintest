@@ -39,15 +39,16 @@ function SideNavComponent() {
   const { method, type } = params;
 
   useEffect(() => {
-    if (categories.status !== "success" && categories.status !== "loading") {
-      dispatch(getCategoriesByMethodThunk(`${method}/${type}`))
-        .unwrap()
-        .catch((err) => console.error("Error cargando categorías:", err));
-    }
-  }, [dispatch, categories.status, method, type]);
+  if (categories.status === "idle") {
+    dispatch(getCategoriesByMethodThunk(`${method}/${type}`))
+      .unwrap()
+      .catch((err) => console.error("Error cargando categorías:", err));
+  }
+}, [dispatch, categories.status, method, type]);
+
 
   useEffect(() => {
-    if (collections.status !== "success" && collections.status !== "loading") {
+    if (collections.status === "idle") {
       dispatch(getCollectionsThunk(`${method}/${type}`))
         .unwrap()
         .catch((err) => console.error("Error cargando categorías:", err));
