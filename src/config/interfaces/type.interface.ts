@@ -91,11 +91,11 @@ export interface ToastState {
   type: ToastType;
 }
 export interface ToastContextType {
-  initToast: (message: string, type?: "success" | "error" | "warning" | "info") => void;
+  initToast: (message: string, type?: ToastType) => void;
   closeToast: () => void;
   showToast: (
     message: string,
-    type?: "success" | "error" | "warning" | "info",
+    type?: ToastType,
     duration?: number
   ) => void;
 }
