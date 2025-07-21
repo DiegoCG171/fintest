@@ -2,18 +2,34 @@ import { createBrowserRouter } from "react-router-dom";
 import ThemeConfig from "./config/ThemeConfig";
 import MainLayoutComponent from "./components/layouts/MainLayoutComponent";
 import AuthLayout from "./components/layouts/AuthLayoutComponent";
-import LoginComponent from "./pages/Auth/login/LoginComponent";
-import RegisterComponent from "./pages/Auth/register/RegisterComponent";
 import PrivateLayoutContent from "./components/layouts/PrivateLayoutContent";
 import RootRedirect from "./config/guards/RootRedirect";
 import PublicGuard from "./config/guards/PublicGuard";
 import PrivateGuard from "./config/guards/PrivateGuard";
-import NotFoundComponent from "./pages/Generic/NotFoundComponent";
-import MainPage from "./pages/Catalogs/MainPageComponent";
-import ResetPassword from "./pages/Auth/reset-password/ResetPassword";
-import RecoveryPassword from "./pages/Auth/reset-password/RecoveryPassword";
 import RouteGuard from "./config/guards/RouteGuard";
-import DecisionComponent from "./pages/DecisionComponent";
+import { JSX, lazy, Suspense } from "react";
+import LoaderComponent from "./components/core/LoaderComponent";
+
+const LoginComponent = lazy(() => import("./pages/Auth/login/LoginComponent"));
+const RegisterComponent = lazy(
+  () => import("./pages/Auth/register/RegisterComponent")
+);
+const ResetPassword = lazy(
+  () => import("./pages/Auth/reset-password/ResetPassword")
+);
+const RecoveryPassword = lazy(
+  () => import("./pages/Auth/reset-password/RecoveryPassword")
+);
+const NotFoundComponent = lazy(
+  () => import("./pages/Generic/NotFoundComponent")
+);
+const MainPage = lazy(() => import("./pages/Catalogs/MainPageComponent"));
+const DecisionComponent = lazy(() => import("./pages/DecisionComponent"));
+
+const withSuspense = (Component: JSX.Element) => (
+  <Suspense fallback={<LoaderComponent/>}>{Component}</Suspense>
+);
+
 
 const router = createBrowserRouter([
   {
@@ -47,11 +63,15 @@ const router = createBrowserRouter([
             children: [
               {
                 path: "login",
-                element: <LoginComponent />,
+                element: (
+                  withSuspense(<LoginComponent/>)
+                ),
               },
               {
                 path: "register",
-                element: <RegisterComponent />,
+                element: (
+                  withSuspense(<RegisterComponent />)
+                ),
               },
             ],
           },
@@ -67,27 +87,23 @@ const router = createBrowserRouter([
                 path: ":method/:type",
                 element: (
                   <RouteGuard>
-                    <MainPage />
+                    {withSuspense(<MainPage />)}
                   </RouteGuard>
                 ),
               },
               {
                 path: ":method/:type/detalles",
-                element: (
-                  <MainPage />
-                ),
+                element: withSuspense(<MainPage />),
               },
               {
                 path: ":method/:type/errores",
-                element: (
-                  <MainPage />
-                ),
+                element: withSuspense(<MainPage />),
               },
               {
                 path: ":method/:type/categories/:categoryId",
                 element: (
                   <RouteGuard>
-                    <MainPage />
+                    {withSuspense(<MainPage />)}
                   </RouteGuard>
                 ),
               },
@@ -95,7 +111,7 @@ const router = createBrowserRouter([
                 path: ":method/:type/collections/:caseId",
                 element: (
                   <RouteGuard>
-                    <MainPage />
+                    {withSuspense(<MainPage />)}
                   </RouteGuard>
                 ),
               },
@@ -103,7 +119,7 @@ const router = createBrowserRouter([
           },
           {
             path: "home",
-            element: <DecisionComponent />,
+            element: withSuspense(<DecisionComponent />),
           },
         ],
       },

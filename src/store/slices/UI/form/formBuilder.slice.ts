@@ -43,7 +43,6 @@ export const formBuilderSlice = createSlice({
       action: PayloadAction<{ tabId: string; values: TableRowDataFormBuilder[]; originalValues?: TableRowDataFormBuilder[] }>
     ) => {
       const { tabId, values, originalValues } = action.payload;
-      console.log(tabId)
       const currentTab = state.tabForms[tabId];
       state.tabForms[tabId] = {
         ...currentTab,

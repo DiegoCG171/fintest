@@ -8,13 +8,8 @@ import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { StaticTabItem } from "../../config/interfaces";
 import { StatusRender } from "../../components/UI/table/StatusRender";
 import TabbedCardContainer from "../../components/UI/Tabs/TabbedCardContainer";
-import { addTab, getTemplatesThunk } from "../../store";
+import { addTab } from "../../store";
 import { getConfigTab } from "../../config/utils/tabsContent";
-import {
-  getGenetationFunctionsThunk,
-  getSelectionFunctionsThunk,
-  getValidationFunctionsThunk,
-} from "../../store/slices/functionsSelect/functionsSelect.thunk";
 const generateStaticTabs = (messagesData: MessagesState): StaticTabItem[] => [
   {
     label: "Detalles",
@@ -105,22 +100,6 @@ function MainPage() {
   useEffect(() => {
     connect();
   }, [connect, disconnect]);
-
-  useEffect(() => {
-    dispatch(getTemplatesThunk());
-  }, [dispatch]);
-
-  useEffect(() => {
-    dispatch(getGenetationFunctionsThunk());
-  }, [dispatch]);
-
-  useEffect(() => {
-    dispatch(getValidationFunctionsThunk());
-  }, [dispatch]);
-
-  useEffect(() => {
-    dispatch(getSelectionFunctionsThunk());
-  }, [dispatch]);
 
   useEffect(() => {
     const currentRoute = location.pathname.slice(1);
