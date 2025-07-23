@@ -18,6 +18,11 @@ import {
 import { getTransactionByType } from "../../config/utils";
 import { useAuth } from "../../config/hooks/useAuth";
 import { hasPermission } from "../../config/utils/permissions";
+import {
+  getGenetationFunctionsThunk,
+  getSelectionFunctionsThunk,
+  getValidationFunctionsThunk,
+} from "../../store/slices/functionsSelect/functionsSelect.thunk";
 
 function CatalogsDataMiddleware({
   tabId,
@@ -35,6 +40,19 @@ function CatalogsDataMiddleware({
   );
 
   const alreadyInitialized = useRef(false);
+
+  // Functions Selects states
+  const selectionState = useAppSelector(
+    (state) => state.functionSelect.selectionState
+  );
+  const validationState = useAppSelector(
+    (state) => state.functionSelect.validationState
+  );
+  const generationState = useAppSelector(
+    (state) => state.functionSelect.generationState
+  );
+
+  const functionsFetched = useRef(false);
 
   const mappedRules = useMemo(() => {
     if (!rawRules?.length) return [];
@@ -66,6 +84,24 @@ function CatalogsDataMiddleware({
   }, [dispatch, template, formType]);
 
   useEffect(() => {
+    if (functionsFetched.current) return;
+
+    if (generationState === "idle") {
+      dispatch(getGenetationFunctionsThunk());
+    }
+
+    if (validationState === "idle") {
+      dispatch(getValidationFunctionsThunk());
+    }
+
+    if (selectionState === "idle") {
+      dispatch(getSelectionFunctionsThunk());
+    }
+
+    functionsFetched.current = true;
+  }, [dispatch, generationState, validationState, selectionState]);
+
+  useEffect(() => {
     alreadyInitialized.current = false;
   }, [templateId]);
 
@@ -89,8 +125,12 @@ function CatalogsDataMiddleware({
     return false;
   }, [template.origin, permissions]);
 
-  return <FormBuilderContainer tabId={tabId} canEdit={canEdit} />;
+  return (
+    <FormBuilderContainer
+      tabId={tabId}
+      canEdit={canEdit}
+    />
+  );
 }
-
 
 export default CatalogsDataMiddleware;

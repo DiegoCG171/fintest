@@ -28,6 +28,10 @@ function MediaPlayer() {
   const [canStop, setCanStop] = useState(false)
 
   const [playerMessage, setPlayerMessage] = useState("Detenido...");
+  const updateMessage = (msg: string) => {
+  setPlayerMessage((prev) => (prev !== msg ? msg : prev));
+};
+
 
   const clearErrors = useCallback(() => {
     dispatch(clearServerError());
@@ -61,23 +65,23 @@ function MediaPlayer() {
 
   useEffect(() => {
     if (playStatus === "loading") {
-      setPlayerMessage("Conectando...");
+      updateMessage("Conectando...");
     }
     if (playStatus === "success" && serverIP) {
-      setPlayerMessage(`Escuchando ${serverIP}:${serverPort}`);
+      updateMessage(`Escuchando ${serverIP}:${serverPort}`);
     }
     if (playStatus === "error") {
-      setPlayerMessage("Detenido...");
+      updateMessage("Detenido...");
       showToast("Hubo un error al levantar la sesión", "error");
     }
     if (stopStatus === "loading") {
-      setPlayerMessage("Desconectando...");
+      updateMessage("Desconectando...");
     }
     if (stopStatus === "success") {
-      setPlayerMessage("Detenido...");
+      updateMessage("Detenido...");
     }
     if (stopStatus === "error") {
-      setPlayerMessage("Detenido...");
+      updateMessage("Detenido...");
     }
   }, [playStatus, serverIP, playError, stopStatus, stopError, serverPort, showToast]);
 

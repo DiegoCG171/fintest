@@ -91,7 +91,13 @@ export interface ToastState {
   type: ToastType;
 }
 export interface ToastContextType {
-  showToast: (message: string, type?: ToastType) => void;
+  initToast: (message: string, type?: ToastType) => void;
+  closeToast: () => void;
+  showToast: (
+    message: string,
+    type?: ToastType,
+    duration?: number
+  ) => void;
 }
 
 // UI props
