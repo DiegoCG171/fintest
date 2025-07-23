@@ -44,7 +44,7 @@ const router = createBrowserRouter([
         element: <RootRedirect />,
       },
       {
-        path: "not-found",
+        path: "*",
         element: <NotFoundComponent />,
       },
       {
@@ -83,14 +83,6 @@ const router = createBrowserRouter([
           {
             element: <PrivateLayoutContent />,
             children: [
-              {
-                path: ":method/:type",
-                element: (
-                  <RouteGuard>
-                    {withSuspense(<MainPage />)}
-                  </RouteGuard>
-                ),
-              },
               {
                 path: ":method/:type/detalles",
                 element: withSuspense(<MainPage />),
