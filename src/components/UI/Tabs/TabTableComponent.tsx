@@ -41,6 +41,12 @@ function TabTableComponent({
       } else {
         navigate(`/${baseRoute}/${suffix}`);
       }
+
+      if (suffix === "detalles" || suffix === "errores") {
+        navigate(`/${method}/${type}/${suffix}`);
+      } else {
+        navigate(`/${baseRoute}/${suffix}`);
+      }
     }
   };
 
@@ -78,6 +84,11 @@ function TabTableComponent({
         navigate(`/${navigateToTab.route}`);
       } else {
         const suffix = navigateToTab.label.toLowerCase();
+        if (suffix === "detalles" || suffix === "errores") {
+          navigate(`/${method}/${type}/${suffix}`);
+        } else {
+          navigate(`/${baseRoute}/${suffix}`);
+        }
         if (suffix === "detalles" || suffix === "errores") {
           navigate(`/${method}/${type}/${suffix}`);
         } else {
