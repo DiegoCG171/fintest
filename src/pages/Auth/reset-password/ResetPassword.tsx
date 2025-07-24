@@ -68,19 +68,25 @@ function ResetPassword() {
               retryPassword: "",
             }}
             validationSchema={validationSchema}
-            onSubmit={ async (_values, { setSubmitting }) => {
+            onSubmit={async (_values, { setSubmitting }) => {
               setSubmitting(false);
               const response = await dispatch(
                 resetPasswordThunk({ newPassword: _values.password, token })
               ).unwrap();
-              showToast(response || "Formulario enviado correctamente", "success");
+              showToast(
+                response || "Formulario enviado correctamente",
+                "success"
+              );
               navigate("/login");
             }}
           >
             {({ errors, touched, getFieldProps, submitForm }) => (
               <Form>
                 <Box sx={{ flexGrow: 1 }}>
-                  <Stack spacing={4} sx={{ width: "100%" }}>
+                  <Stack
+                    spacing={4}
+                    sx={{ width: "100%" }}
+                  >
                     <CustomInputComponent
                       label="Nueva contraseña"
                       id="password"
@@ -108,15 +114,15 @@ function ResetPassword() {
                     <Button
                       fullWidth
                       variant="contained"
-                      onClick={() => {
+                      type="submit"
+                      onClick={(e) => {
                         if (Object.keys(errors).length > 0) {
+                          e.preventDefault();
                           showToast(
                             "Revisa la información antes de enviarla.",
                             "info"
                           );
-                        } else {
-                          submitForm();
-                        }
+                        } else submitForm()
                       }}
                     >
                       Enviar
@@ -132,7 +138,11 @@ function ResetPassword() {
                       }}
                     >
                       <Typography>¿Ya tienes cuenta?</Typography>
-                      <Link variant="body2" component={RouterLink} to="/login">
+                      <Link
+                        variant="body2"
+                        component={RouterLink}
+                        to="/login"
+                      >
                         Ingresa aquí
                       </Link>
                     </Stack>

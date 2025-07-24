@@ -68,13 +68,15 @@ function RegisterComponent() {
             password: "",
             retryPassword: "",
             accepted: false,
-            surnames: ""
+            surnames: "",
           }}
           validationSchema={validationSchema}
-          onSubmit={ async(values, { setSubmitting }) => {
+          onSubmit={async (values, { setSubmitting }) => {
             dispatch(setLoading(true));
             try {
-              await dispatch(createUserThunk(values)).unwrap();
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              const { retryPassword, accepted, ...userData } = values;
+              await dispatch(createUserThunk(userData)).unwrap();
               navigate("/login");
               showToast("Formulario enviado correctamente", "success");
             } catch (error) {
@@ -85,7 +87,7 @@ function RegisterComponent() {
             }
           }}
         >
-          {({ errors, touched, getFieldProps, values, submitForm }) => (
+          {({ errors, touched, getFieldProps, values , submitForm}) => (
             <Form>
               <Grid
                 container
@@ -176,18 +178,18 @@ function RegisterComponent() {
                 <Button
                   fullWidth
                   variant="contained"
-                  onClick={() => {
+                  type="submit"
+                  onClick={(e) => {
                     if (Object.keys(errors).length > 0) {
+                      e.preventDefault();
                       showToast(
                         "Revisa la información antes de enviarla.",
                         "info"
                       );
-                    } else {
-                      submitForm();
-                    }
+                    } else submitForm()
                   }}
                 >
-                  Iniciar sesión
+                  Registrar usuario
                 </Button>
                 <Stack
                   direction="row"
