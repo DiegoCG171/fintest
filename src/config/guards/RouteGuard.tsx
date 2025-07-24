@@ -4,10 +4,7 @@ const validMethods = ["pos", "atm"];
 const validTypes = ["acquirer", "emmisor"];
 
 const allowedBasePaths = [
-  "pos/acquirer",
-  "pos/emmisor",
-  "atm/acquirer",
-  "atm/emmisor",
+  "pos/acquirer/detalles"
 ];
 
 const RouteGuard = ({ children }: { children: React.ReactNode }) => {

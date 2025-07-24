@@ -1,6 +1,6 @@
 import { Box, Icon, Tab, Tabs, Typography } from "@mui/material";
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import CustomTabPanel from "../../core/CustomTabPanel";
 import { TabTableComponentProps } from "../../../config/interfaces";
 import { removeTab, useAppDispatch, useAppSelector } from "../../../store";
@@ -21,6 +21,7 @@ function TabTableComponent({
   const baseRoute = categoryId
     ? `${method}/${type}/categories/${categoryId}`
     : `${method}/${type}/collections/${caseId}`;
+  const location = useLocation();
 
   useEffect(() => {
     setSelectedTab(initialTabIndex);
@@ -34,9 +35,39 @@ function TabTableComponent({
       navigate(`/${selectedTabItem.route}`);
     } else {
       const suffix = selectedTabItem.label.toLowerCase();
-      navigate(`/${baseRoute}/${suffix}`);
+
+      if (suffix === "detalles" || suffix === "errores") {
+        navigate(`/${method}/${type}/${suffix}`);
+      } else {
+        navigate(`/${baseRoute}/${suffix}`);
+      }
+
+      if (suffix === "detalles" || suffix === "errores") {
+        navigate(`/${method}/${type}/${suffix}`);
+      } else {
+        navigate(`/${baseRoute}/${suffix}`);
+      }
     }
   };
+
+  useEffect(() => {
+    const currentPath = location.pathname;
+    const matchedIndex = tabs.findIndex((tab) => {
+      const suffix = tab.label.toLowerCase();
+      if (tab.route) {
+        return currentPath.endsWith(tab.route);
+      }
+      if (suffix === "detalles" || suffix === "errores") {
+        return currentPath.endsWith(`/${suffix}`);
+      }
+      return currentPath.endsWith(`/${suffix}`);
+    });
+
+    if (matchedIndex !== -1 && matchedIndex !== selectedTab) {
+      setSelectedTab(matchedIndex);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname, tabs]);
 
   const closeTab = (index: number) => {
     const tab = tabs[index];
@@ -53,7 +84,16 @@ function TabTableComponent({
         navigate(`/${navigateToTab.route}`);
       } else {
         const suffix = navigateToTab.label.toLowerCase();
-        navigate(`/${baseRoute}/${suffix}`);
+        if (suffix === "detalles" || suffix === "errores") {
+          navigate(`/${method}/${type}/${suffix}`);
+        } else {
+          navigate(`/${baseRoute}/${suffix}`);
+        }
+        if (suffix === "detalles" || suffix === "errores") {
+          navigate(`/${method}/${type}/${suffix}`);
+        } else {
+          navigate(`/${baseRoute}/${suffix}`);
+        }
       }
     } else if (selectedTab > index) {
       setSelectedTab((prev) => prev - 1);

@@ -7,7 +7,12 @@ import * as Yup from "yup";
 import CustomInputComponent from "../../../components/core/forms/CustomInput";
 import TextBox from "../../../components/UI/TextBox";
 import { useToast } from "../../../config/hooks/useToast";
-import { clearAuthError, loginThunk, setLoading, useAppDispatch } from "../../../store";
+import {
+  clearAuthError,
+  loginThunk,
+  setLoading,
+  useAppDispatch,
+} from "../../../store";
 
 const validationSchema = Yup.object({
   username: Yup.string().required("El usuario es requerido"),
@@ -38,9 +43,10 @@ const LoginComponent = () => {
             try {
               await dispatch(
                 loginThunk({
-                username: values.username,
-                password: values.password,
-              })).unwrap();
+                  username: values.username,
+                  password: values.password,
+                })
+              ).unwrap();
               navigate("/home");
             } catch (error) {
               showToast(error as string, "error");
@@ -79,15 +85,15 @@ const LoginComponent = () => {
                 <Button
                   fullWidth
                   variant="contained"
-                  onClick={() => {
+                  type="submit"
+                  onClick={(e) => {
                     if (Object.keys(errors).length > 0) {
+                      e.preventDefault();
                       showToast(
                         "Revisa la información antes de enviarla.",
                         "info"
                       );
-                    } else {
-                      submitForm();
-                    }
+                    } else submitForm()
                   }}
                 >
                   Iniciar sesión
