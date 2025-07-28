@@ -1,16 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
 import { MenuItem, Select, TextField, Typography } from "@mui/material";
 import { DynamicFieldProps } from "../../../config/interfaces";
 import {
   updateFieldValue,
   updateNestedFieldValue,
   useAppDispatch,
-  useAppSelector,
 } from "../../../store";
-
-type Primitive = string | number | boolean;
-
-
 
 function DynamicField({
   column,
@@ -27,58 +21,23 @@ function DynamicField({
   const dependsOn = column?.dependsOn;
   const dependsValue = dependsOn ? row[dependsOn] : undefined;
   const isChild = path.length > 1;
-  const isParent =
-    Array.isArray(row.breakingRules) && row.breakingRules.length > 0;
-  const { generation, validation, selection } = useAppSelector(
-    (state) => state.functionSelect
-  );
-
-  const [localValue, setLocalValue] = useState<Primitive | "">("");
-
-  const localValueRef = useRef(localValue);
-
-  useEffect(() => {
-    localValueRef.current = localValue;
-  }, [localValue]);
-
-  function isPrimitive(val: unknown): val is Primitive {
-    return (
-      typeof val === "string" ||
-      typeof val === "number" ||
-      typeof val === "boolean"
-    );
-  }
-
-  useEffect(() => {
-    if (isPrimitive(value) && value !== localValueRef.current) {
-      setLocalValue(value);
-    } else if (
-      (value === undefined || value === null || value === "") &&
-      column.id === "function"
-    ) {
-      if (
-        tabId.includes("generationTransaction") &&
-        localValueRef.current !== "echo"
-      ) {
-        setLocalValue("echo");
-      } else if (
-        tabId.includes("validationTransaction") &&
-        localValueRef.current !== "not_validate"
-      ) {
-        setLocalValue("not_validate");
-      } else if (
-        tabId.includes("selectionTransaction") &&
-        localValueRef.current !== ""
-      ) {
-        setLocalValue("");
-      }
+  const isParent = row.breakingRules ? row.breakingRules.length > 0 : false;
+  const getStyles = () => {
+    if (isChild) {
+      return {
+        fontSize: "0.65rem",
+      };
+    } else if (!isParent) {
+      return {
+        fontSize: "0.75rem",
+      };
+    } else {
+      return {
+        fontSize: "0.75rem",
+        fontWeight: "600",
+      };
     }
-  }, [value, column.id, tabId]);
-
-  const getStyles = () => ({
-    fontSize: isChild ? "0.65rem" : "0.75rem",
-    fontWeight: isParent ? "600" : undefined,
-  });
+  };
 
   const getSelectStyles = (hasChanged: boolean, getStyles: () => object) => ({
     height: "24px",
@@ -188,43 +147,15 @@ function DynamicField({
     isChild: boolean,
     dependsValue: string | unknown
   ): boolean {
-    return !isChild && !dependsValue;
+    if (isChild) return false;
+    return !dependsValue;
   }
 
-  const getFilteredFunctionOptions = () => {
-    if (column.id !== "function" || !column.options) return [];
-
-    if (tabId.includes("generationTransaction")) return generation;
-    if (tabId.includes("validationTransaction")) return validation;
-    if (tabId.includes("selectionTransaction")) return selection;
-
-    return [];
-  };
-
-  const getFunctionsLabels = (text: string): string => {
-    if (tabId.includes("generationTransaction")) {
-      const option = generation.find((gen) => gen.value === text);
-      return option?.label ?? text;
-    }
-
-    if (tabId.includes("validationTransaction")) {
-      const option = validation.find((val) => val.value === text);
-      return option?.label ?? text;
-    }
-
-    if (tabId.includes("selectionTransaction")) {
-      const option = selection.find((sel) => sel.value === text);
-      return option?.label ?? text;
-    }
-
-    return text;
-  };
-
   if (onlyRead && column.type === "checkbox") {
-    const realValue = localValue ?? row.isRequired;
+    const realValue = value !== undefined ? value : row.isRequired;
     return (
       <input
-        disabled
+        disabled={true}
         type="checkbox"
         checked={Boolean(realValue)}
         onChange={(e) => handleChange({ target: { value: e.target.checked } })}
@@ -245,7 +176,7 @@ function DynamicField({
   ) {
     return (
       <Typography sx={getStyles()}>
-        {typeof localValue === "string" ? getFunctionsLabels(localValue) : ""}
+        {typeof value === "string" ? value : ""}
       </Typography>
     );
   }
@@ -258,7 +189,7 @@ function DynamicField({
       const options = dynamic.options ?? [];
       return (
         <Select
-          value={localValue ?? ""}
+          value={value ?? ""}
           onChange={handleChange}
           size="small"
           variant="outlined"
@@ -266,7 +197,11 @@ function DynamicField({
           sx={getSelectStyles(hasChanged, getStyles)}
         >
           {options.map((opt) => (
-            <MenuItem key={opt} value={opt} sx={getStyles()}>
+            <MenuItem
+              key={opt}
+              value={opt}
+              sx={getStyles()}
+            >
               {opt}
             </MenuItem>
           ))}
@@ -277,7 +212,7 @@ function DynamicField({
     if (dynamic.type === "input") {
       return (
         <TextField
-          value={localValue ?? ""}
+          value={value ?? ""}
           onChange={handleChange}
           fullWidth
           variant="outlined"
@@ -288,22 +223,26 @@ function DynamicField({
     }
   }
 
-  if (column.dependsOn && column.type === "checkbox") {
-    const isDisabled = shouldDisableCheckbox(isChild, dependsValue);
-    const realValue = localValue ?? row.isRequired;
-    return (
-      <input
-        disabled={Boolean(isDisabled)}
-        type="checkbox"
-        checked={Boolean(realValue)}
-        onChange={(e) => handleChange({ target: { value: e.target.checked } })}
-      />
-    );
+  if (column.dependsOn) {
+    if (column.type === "checkbox") {
+      const isDisabled = shouldDisableCheckbox(isChild, dependsValue);
+      const realValue = value !== undefined ? value : row.isRequired;
+      return (
+        <input
+          disabled={Boolean(isDisabled)}
+          type="checkbox"
+          checked={Boolean(realValue)}
+          onChange={(e) =>
+            handleChange({ target: { value: e.target.checked } })
+          }
+        />
+      );
+    }
   }
 
   if (!column.dependsOn) {
     if (column.type === "checkbox" && path.length === 1) {
-      const realValue = localValue ?? row.isRequired;
+      const realValue = value !== undefined ? value : row.isRequired;
       return (
         <input
           type="checkbox"
@@ -314,11 +253,9 @@ function DynamicField({
         />
       );
     }
-
     if (column.type === "input") {
       return (
         <TextField
-          value={localValue ?? ""}
           fullWidth
           variant="outlined"
           size="small"
@@ -326,24 +263,29 @@ function DynamicField({
         />
       );
     }
-
     if (column.type === "select" && !isParent) {
-      const options = getFilteredFunctionOptions();
       return (
         <Select
           fullWidth
-          value={localValue ?? ""}
+          value={value ?? ""}
           onChange={handleChange}
           size="small"
           variant="outlined"
           sx={getSelectStyles(hasChanged, getStyles)}
         >
-          <MenuItem value="" sx={getStyles()}>
+          <MenuItem
+            value=""
+            sx={getStyles()}
+          >
             <em>Seleccione una opción</em>
           </MenuItem>
-          {options?.map((opt) => (
-            <MenuItem key={opt.value} value={opt.value} sx={getStyles()}>
-              {opt.label}
+          {column.options?.map((opt) => (
+            <MenuItem
+              key={opt}
+              value={opt}
+              sx={getStyles()}
+            >
+              {opt}
             </MenuItem>
           ))}
         </Select>
@@ -359,9 +301,8 @@ function DynamicField({
         padding: isChild ? 6 : 0,
       }}
     >
-      {typeof localValue === "string" ? localValue : ""}
+      {typeof value === "string" ? value : ""}
     </Typography>
   );
 }
-
 export default DynamicField;
