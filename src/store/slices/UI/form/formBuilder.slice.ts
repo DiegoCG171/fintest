@@ -40,18 +40,18 @@ export const formBuilderSlice = createSlice({
 
     setValuesForTab: (
       state,
-      action: PayloadAction<{ tabId: string; values: TableRowDataFormBuilder[]; originalValues?: TableRowDataFormBuilder[] }>
+      action: PayloadAction<{
+        tabId: string;
+        values: TableRowDataFormBuilder[];
+        originalValues: TableRowDataFormBuilder[];
+      }>
     ) => {
       const { tabId, values, originalValues } = action.payload;
-      const currentTab = state.tabForms[tabId];
       state.tabForms[tabId] = {
-        ...currentTab,
         values,
-        originalValues: currentTab?.originalValues ?? originalValues ?? values,
-        visibility: currentTab?.visibility ?? {},
+        originalValues,
       };
     },
-
     setOriginalValuesForTab: (
       state,
       action: PayloadAction<{ tabId: string; originalValues: TableRowDataFormBuilder[] }>
@@ -112,7 +112,7 @@ export const formBuilderSlice = createSlice({
         state.tabForms[tabId] = { values: [], originalValues: [], visibility: {} };
       }
       state.tabForms[tabId].visibility = visibility;
-    },
+    }
   },
 })
 
@@ -123,7 +123,7 @@ export const {
   updateFieldValue,
   updateNestedFieldValue,
   setVisibility,
-  resetOriginalValues
+  resetOriginalValues,
 } = formBuilderSlice.actions
 
 export default formBuilderSlice
