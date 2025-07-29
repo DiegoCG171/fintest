@@ -67,7 +67,7 @@ function RecoveryPassword() {
               navigate("/login");
             }}
           >
-            {({ errors, touched, getFieldProps, submitForm }) => (
+            {({ errors, touched, getFieldProps }) => (
               <Form>
                 <Box sx={{ flexGrow: 1 }}>
                   <Stack
@@ -95,7 +95,7 @@ function RecoveryPassword() {
                             "Revisa la información antes de enviarla.",
                             "info"
                           );
-                        } else submitForm()
+                        }
                       }}
                     >
                       Enviar
