@@ -57,8 +57,13 @@ function RecoveryPassword() {
             validationSchema={validationSchema}
             onSubmit={async (values, { setSubmitting }) => {
               setSubmitting(false);
-              const response = await dispatch(recoveryTokenThunk(values.email)).unwrap()
-              showToast(response || "Formulario enviado correctamente", "success");
+              const response = await dispatch(
+                recoveryTokenThunk(values.email)
+              ).unwrap();
+              showToast(
+                response || "Formulario enviado correctamente",
+                "success"
+              );
               navigate("/login");
             }}
           >
@@ -82,15 +87,15 @@ function RecoveryPassword() {
                     <Button
                       fullWidth
                       variant="contained"
-                      onClick={() => {
+                      type="submit"
+                      onClick={(e) => {
                         if (Object.keys(errors).length > 0) {
+                          e.preventDefault();
                           showToast(
                             "Revisa la información antes de enviarla.",
                             "info"
                           );
-                        } else {
-                          submitForm();
-                        }
+                        } else submitForm()
                       }}
                     >
                       Enviar

@@ -107,7 +107,7 @@ function DecisionComponent() {
         <Button
           variant="contained"
           component={Link}
-          to="/pos/acquirer"
+          to="/pos/acquirer/detalles"
           sx={{ minWidth: 160 }}
           onClick={() => {
             dispatch(getCategoriesByMethodThunk("pos/acquirer"))
@@ -123,7 +123,7 @@ function DecisionComponent() {
         <Button
           variant="contained"
           component={Link}
-          to="/atm/acquirer"
+          to="/atm/acquirer/detalles"
           sx={{ minWidth: 160 }}
           onClick={() => {
             dispatch(getCategoriesByMethodThunk("atm/acquirer"))

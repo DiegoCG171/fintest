@@ -21,10 +21,6 @@ export const messagesSlice = createSlice({
       state.activeMessage.id = action.payload.id || 0;
       state.activeMessage.detail = mapToActiveFields(action.payload.data);
       state.activeMessage.errors = mapToErroredFields(action.payload.data);
-      console.log(action.payload.data)
-      console.log(action.payload.id)
-      console.log(state.activeMessage.detail)
-      console.log(state.activeMessage.errors)
     },
   },
 });

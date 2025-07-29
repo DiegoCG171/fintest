@@ -1,10 +1,14 @@
-import { useContext } from "react";
+import { useCallback, useContext } from "react";
 import { ToastContext } from "../context/ToastContext";
+import { ToastType } from "../interfaces";
 
 export const useToast = () => {
   const context = useContext(ToastContext);
-  if (!context) {
-    throw new Error("useToast must be used within a ToastProvider");
-  }
-  return context;
+  const showToast = useCallback((message: string, type: ToastType) => {
+    if(!context) return;
+    context.initToast(message, type);
+  }, [context]);
+
+  return { showToast };
 };
+

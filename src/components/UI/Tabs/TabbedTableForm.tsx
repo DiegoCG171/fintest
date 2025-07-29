@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { Box, Button, Stack, Tab, Tabs } from "@mui/material";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Box, Button, CircularProgress, Stack, Tab, Tabs } from "@mui/material";
 import CustomTabPanel from "../../core/CustomTabPanel";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import {
@@ -19,6 +19,7 @@ import {
 } from "../../../store";
 import { useToast } from "../../../config/hooks/useToast";
 import {
+  debounceThunk,
   getTemplateID,
   prepareUpdatePayload as preparePayload,
 } from "../../../config/utils";
@@ -54,17 +55,17 @@ function TabbedTableForm({
   const { error: rulesError, status: statusRules } = useAppSelector(
     (state) => state.rules
   );
-  
+
   const canEdit = useMemo(() => {
-      if (!permissions) return false;
-      if (tabs[0].origin === "categories") {
-        return hasPermission(permissions, "update", "template");
-      }
-      if (tabs[0].origin === "collections") {
-        return hasPermission(permissions, "update", "testCase");
-      }
-      return false;
-    }, [tabs, permissions]);
+    if (!permissions) return false;
+    if (tabs[0].origin === "categories") {
+      return hasPermission(permissions, "update", "template");
+    }
+    if (tabs[0].origin === "collections") {
+      return hasPermission(permissions, "update", "testCase");
+    }
+    return false;
+  }, [tabs, permissions]);
 
   const { getError: templatesError, getStatus: statusTemplates } =
     useAppSelector((state) => state.templates);
@@ -89,17 +90,39 @@ function TabbedTableForm({
   const params = useParams();
   const { method, type } = params;
 
+  const alreadyFetchedRules = useRef(false);
+
+  const templateExist = useMemo(() => {
+    return tabs[value].origin === "categories"
+      ? templates.some((template) => template.uuid === tabs[value].templateId)
+      : true;
+  }, [tabs, value, templates]);
+
+  const testCaseExist = useMemo(() => {
+    return tabs[value].origin === "collections"
+      ? testCases.some((testCase) => testCase.uuid === tabs[value].templateId)
+      : true;
+  }, [tabs, value, testCases]);
+
+  const isTabDataReady =
+    templateExist && testCaseExist && statusRules === "success";
+
+  const isLoading = !isTabDataReady;
 
   //Reglas
   useEffect(() => {
-    if (statusRules === "idle") {
+    if (!alreadyFetchedRules.current && statusRules === "idle") {
       dispatch(getRulesThunk());
+      alreadyFetchedRules.current = true;
     }
-    if (statusRules === "error") {
+  }, [dispatch, statusRules]);
+
+  useEffect(() => {
+    if (statusRules === "error" && rulesError) {
       showToast(rulesError as string, "error");
       dispatch(clearRulesError());
     }
-  }, [dispatch, rulesError, showToast, statusRules]);
+  }, [dispatch, showToast, rulesError, statusRules]);
 
   //Plantillas
   useEffect(() => {
@@ -109,11 +132,14 @@ function TabbedTableForm({
       (template) => template.uuid === tabs[value].templateId
     );
 
-    if(templateExist) return;
-
+    if (templateExist) return;
+    const templateId = tabs[value].templateId;
     const fetchTemplates = async () => {
-      const result = await dispatch(
-        getTemplateByIdThunk(tabs[value].templateId)
+      const result = await debounceThunk(
+        `template-${templateId}`,
+        () => getTemplateByIdThunk(templateId),
+        dispatch,
+        300
       );
       const template = result.payload;
       if (template) {
@@ -127,7 +153,15 @@ function TabbedTableForm({
       showToast(templatesError as string, "error");
       dispatch(clearTemplateError());
     }
-  }, [dispatch, showToast, statusTemplates, templatesError, tabs, value, templates]);
+  }, [
+    dispatch,
+    showToast,
+    statusTemplates,
+    templatesError,
+    tabs,
+    value,
+    templates,
+  ]);
 
   //Casos de prueba
   useEffect(() => {
@@ -137,11 +171,15 @@ function TabbedTableForm({
       (testCase) => testCase.uuid === tabs[value].templateId
     );
 
-    if(testCaseExist) return;
+    if (testCaseExist) return;
 
     const fetchTestCases = async () => {
-      const result = await dispatch(
-        getTestCaseByIdThunk(tabs[value].templateId)
+      const testCaseId = tabs[value].templateId;
+      const result = await debounceThunk(
+        `template-${testCaseId}`,
+        () => getTestCaseByIdThunk(testCaseId),
+        dispatch,
+        300
       );
       const testCase = result.payload;
       if (testCase) {
@@ -154,7 +192,15 @@ function TabbedTableForm({
       showToast(testCasesError as string, "error");
       dispatch(clearTemplateError());
     }
-  }, [dispatch, showToast, statusTestCases, testCasesError, tabs, value, testCases]);
+  }, [
+    dispatch,
+    showToast,
+    statusTestCases,
+    testCasesError,
+    tabs,
+    value,
+    testCases,
+  ]);
 
   //Handlers
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
@@ -185,7 +231,9 @@ function TabbedTableForm({
       ).unwrap();
       if (result) {
         dispatch(addOrUpdateTemplate(result as TemplateContextType));
-        dispatch(resetOriginalValues({ tabId: tab.templateId + '-' + tab.formType }));
+        dispatch(
+          resetOriginalValues({ tabId: tab.templateId + "-" + tab.formType })
+        );
       }
       showToast("Plantilla actualizada correctamente", "success");
     } catch (error) {
@@ -204,7 +252,9 @@ function TabbedTableForm({
       await dispatch(updateTestCaseThunk({ id, payload })).unwrap();
       dispatch(getCollectionsThunk(`${method}/${type}`));
       showToast("Caso de prueba actualizado correctamente", "success");
-      dispatch(resetOriginalValues({ tabId: tab.templateId + '-' + tab.formType }));
+      dispatch(
+        resetOriginalValues({ tabId: tab.templateId + "-" + tab.formType })
+      );
     } catch (error) {
       showToast(error as string, "error");
     } finally {
@@ -260,18 +310,28 @@ function TabbedTableForm({
       </Tabs>
 
       <Box sx={{ flex: 1, overflow: "auto" }}>
-        {tabs.map((template, index) => (
-          <CustomTabPanel
-            key={`${index}-tab-form-content`}
-            value={value}
-            index={index}
+        {isLoading ? (
+          <Stack
+            justifyContent="center"
+            alignItems="center"
+            sx={{ height: "100%" }}
           >
-            <CatalogsDataMiddleware
-              tabId={currentTabId}
-              template={template}
-            />
-          </CustomTabPanel>
-        ))}
+            <CircularProgress />
+          </Stack>
+        ) : (
+          tabs.map((template, index) => (
+            <CustomTabPanel
+              key={`${index}-tab-form-content`}
+              value={value}
+              index={index}
+            >
+              <CatalogsDataMiddleware
+                tabId={currentTabId}
+                template={template}
+              />
+            </CustomTabPanel>
+          ))
+        )}
       </Box>
     </Box>
   );
