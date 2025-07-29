@@ -72,7 +72,7 @@ export const setupAxiosInterceptors = (api: AxiosInstance, store: AppStore) => {
       } else {
         config.headers.Authorization = `Bearer ${token}`;
       }
-      
+
       if (latestToken) {
         config.headers.Authorization = `Bearer ${latestToken}`;
       }

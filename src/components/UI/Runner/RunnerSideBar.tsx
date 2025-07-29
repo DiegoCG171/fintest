@@ -1,6 +1,7 @@
 import { Box, Drawer, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import {
+  closeSession,
   toggleRunningSession,
   toggleSessionDetails,
 } from "../../../store/slices/sessions/sessionSlice";
@@ -60,6 +61,11 @@ export const RunnerSideBar = () => {
   };
 
   const handleCloseSession = () => {
+    if (activeSession.length === completedCount) {
+      dispatch(closeSession())
+      return
+    }
+
     dispatch(removeSessionThunk(id));
   };
 
@@ -126,7 +132,7 @@ export const RunnerSideBar = () => {
                 activeSession={activeSession}
                 completedCount={completedCount}
                 onTestCaseSelect={handleSetTestCaseDetails}
-                onCloseSession={handleCloseSession}
+                onCloseSession={ handleCloseSession}
               />
 
               <Typography

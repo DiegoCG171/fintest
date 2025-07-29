@@ -5,6 +5,7 @@ import SideNavComponent from "../UI/SidebarMenu/SideNavComponent";
 import FullScreenModal from "../core/FullScreenModal";
 import { PopMenuProvider } from "../../config/context/PopMenuProvider";
 import { ModalConfirmSession } from "../UI/Runner/ModalConfirmSession";
+import { ModalConfirmDelete } from "../UI/SidebarMenu/ModalConfirmDelete";
 
 function PrivateLayoutContent() {
   const FOOTER_HEIGHT = 40;
@@ -42,6 +43,7 @@ function PrivateLayoutContent() {
       </Box>
       <FullScreenModal />
       <ModalConfirmSession />
+      <ModalConfirmDelete />
     </>
   );
 }

@@ -1,31 +1,36 @@
 import { Box, Button, Modal, Portal, Stack, Typography } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../../store";
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { toggleConfirmSessionModal } from "../../../store/slices/UI/confirmSession/modalCoinfirmSession.slice";
 import { openSession } from "../../../store/slices/sessions/sessionSlice";
-import { createSessionThunk, removeSessionThunk } from "../../../store/slices/sessions/session.thunk";
+import {
+  createSessionThunk,
+  removeSessionThunk,
+} from "../../../store/slices/sessions/session.thunk";
 
 export const ModalConfirmSession = () => {
   const dispatch = useAppDispatch();
   const { isOpen } = useAppSelector((state) => state.modalConfirmSession);
-  const { id, prevConfigCreateSession } = useAppSelector((state) => state.session);
+  const { id, prevConfigCreateSession } = useAppSelector(
+    (state) => state.session
+  );
 
   const handleConfirm = () => {
-    dispatch(toggleConfirmSessionModal(false))
+    dispatch(toggleConfirmSessionModal(false));
     dispatch(openSession());
-  }
+  };
 
   const handleCancel = () => {
-  dispatch(removeSessionThunk(id))
-    .unwrap()
-    .then(() => {
-      dispatch(createSessionThunk(prevConfigCreateSession));
-    })
-    .catch((error) => {
-      console.error("Error al eliminar sesión:", error);
-    });
-};
+    dispatch(removeSessionThunk(id))
+      .unwrap()
+      .then(() => {
+        dispatch(createSessionThunk(prevConfigCreateSession));
+      })
+      .catch((error) => {
+        console.error("Error al eliminar sesión:", error);
+      });
+  };
 
   return (
     <Portal>
@@ -55,8 +60,20 @@ export const ModalConfirmSession = () => {
             ¿Deseas continuar desde donde la dejaste o crear una nueva sesión?
           </Typography>
           <Stack spacing={2} direction="row" justifyContent="end" mt={4}>
-            <Button startIcon={<CheckCircleIcon />} onClick={handleConfirm}  variant="contained">Continuar</Button>
-            <Button startIcon={<AddCircleIcon  />} onClick={handleCancel} variant="contained">Nueva</Button>
+            <Button
+              startIcon={<CheckCircleIcon />}
+              onClick={handleConfirm}
+              variant="contained"
+            >
+              Continuar
+            </Button>
+            <Button
+              startIcon={<AddCircleIcon />}
+              onClick={handleCancel}
+              variant="contained"
+            >
+              Nueva
+            </Button>
           </Stack>
         </Box>
       </Modal>

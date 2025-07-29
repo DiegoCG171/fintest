@@ -14,6 +14,7 @@ import ResetPassword from "./pages/Auth/reset-password/ResetPassword";
 import RecoveryPassword from "./pages/Auth/reset-password/RecoveryPassword";
 import RouteGuard from "./config/guards/RouteGuard";
 import DecisionComponent from "./pages/DecisionComponent";
+import { SettingsPage } from "./pages/Catalogs/SettingsPage";
 
 const router = createBrowserRouter([
   {
@@ -97,6 +98,12 @@ const router = createBrowserRouter([
                   <RouteGuard>
                     <MainPage />
                   </RouteGuard>
+                ),
+              },
+              {
+                path: "settings/users",
+                element: (
+                    <SettingsPage />
                 ),
               },
             ],

@@ -22,6 +22,7 @@ import { sessionSlice } from "./slices/sessions/sessionSlice";
 import api from "../api/api";
 import { functionsSelectSlice } from "./slices/functionsSelect/functionsSelect.slice";
 import { modalConfirmSessionSlice } from "./slices/UI/confirmSession/modalCoinfirmSession.slice";
+import { confirmDeleteModalSlice } from "./slices/UI/confirmDeleteModal/confirmDeleteModal.slice";
 
 export const store = configureStore({
     reducer: {
@@ -44,7 +45,8 @@ export const store = configureStore({
         testCases: testCasesSlice.reducer,
         session: sessionSlice.reducer,
         functionSelect: functionsSelectSlice.reducer,
-        modalConfirmSession: modalConfirmSessionSlice.reducer
+        modalConfirmSession: modalConfirmSessionSlice.reducer,
+        confirmDeleteModal: confirmDeleteModalSlice.reducer
     }
 });
 
