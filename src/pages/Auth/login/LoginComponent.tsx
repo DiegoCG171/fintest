@@ -56,7 +56,7 @@ const LoginComponent = () => {
             }
           }}
         >
-          {({ errors, touched, getFieldProps }) => (
+          {({ errors, touched, getFieldProps, submitForm }) => (
             <Form>
               <Stack spacing={2}>
                 <CustomInputComponent
@@ -92,8 +92,8 @@ const LoginComponent = () => {
                       showToast(
                         "Revisa la información antes de enviarla.",
                         "info"
-                      )
-                    } 
+                      );
+                    } else submitForm()
                   }}
                 >
                   Iniciar sesión
