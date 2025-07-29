@@ -44,14 +44,18 @@ export const formBuilderSlice = createSlice({
         tabId: string;
         values: TableRowDataFormBuilder[];
         originalValues: TableRowDataFormBuilder[];
+        isSynced: boolean;
       }>
     ) => {
-      const { tabId, values, originalValues } = action.payload;
+      const { tabId, values, originalValues, isSynced } = action.payload;
       state.tabForms[tabId] = {
+        ...(state.tabForms[tabId] || {}),
         values,
         originalValues,
+        isSynced,
       };
     },
+
     setOriginalValuesForTab: (
       state,
       action: PayloadAction<{ tabId: string; originalValues: TableRowDataFormBuilder[] }>
@@ -112,7 +116,7 @@ export const formBuilderSlice = createSlice({
         state.tabForms[tabId] = { values: [], originalValues: [], visibility: {} };
       }
       state.tabForms[tabId].visibility = visibility;
-    }
+    },
   },
 })
 
@@ -123,7 +127,7 @@ export const {
   updateFieldValue,
   updateNestedFieldValue,
   setVisibility,
-  resetOriginalValues,
+  resetOriginalValues
 } = formBuilderSlice.actions
 
 export default formBuilderSlice
