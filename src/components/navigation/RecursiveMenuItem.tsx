@@ -17,14 +17,39 @@ import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
 import KeyboardArrowRightOutlinedIcon from "@mui/icons-material/KeyboardArrowRightOutlined";
 import KeyboardArrowDownOutlinedIcon from "@mui/icons-material/KeyboardArrowDownOutlined";
 import { useNavigate } from "react-router-dom";
-import { setLoading, updateTestCaseThunk, useAppDispatch, useAppSelector } from "../../store";
+import {
+  setLoading,
+  updateTestCaseThunk,
+  useAppDispatch,
+  useAppSelector,
+} from "../../store";
 import RecursiveMenuSubItem from "./RecursiveMenuSubItem";
 import { useState } from "react";
 import { usePopMenu } from "../../config/hooks/usePopMenu";
-import { removeUpdateCollection, removeUpdateTestCase } from "../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
+import {
+  removeUpdateCollection,
+  removeUpdateTestCase,
+} from "../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
 import { updateCollectionThunk } from "../../store/slices/collections/collections.thunk";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { useRefreshCollectionsMenu } from "../../config/hooks/useRefreshCollectionsMenu";
+
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import {
+  restrictToVerticalAxis,
+} from '@dnd-kit/modifiers';
 
 const RecursiveMenuItem = ({
   item,
@@ -33,6 +58,7 @@ const RecursiveMenuItem = ({
   onSelectItem,
   buildOptions,
   buildSubItemOptions,
+  draggable = false
 }: RecursiveMenuItemProps) => {
   const refreshCollectionsMenu = useRefreshCollectionsMenu();
 
@@ -45,6 +71,24 @@ const RecursiveMenuItem = ({
   const { loading, updateCollection } = useAppSelector(
     (state) => state.sidebarMenu
   );
+
+  const sensors = useSensors(useSensor(PointerSensor));
+
+  const [itemsOrder, setItemsOrder] = useState(
+    item.items?.map((i) => i.id) || []
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+  const { active, over } = event;
+  if (over && active.id !== over.id) {
+    const oldIndex = itemsOrder.indexOf(String(active.id));
+    const newIndex = itemsOrder.indexOf(String(over.id));
+
+    const newOrder = arrayMove(itemsOrder, oldIndex, newIndex);
+    setItemsOrder(newOrder);
+  }
+};
+
 
   const onDecisionHandler = async (
     item: MenuServiceInterface | ItemsServiceMenu
@@ -190,10 +234,7 @@ const RecursiveMenuItem = ({
               <FolderOutlinedIcon
                 sx={{ fontSize: 16, color: "text.disabled" }}
               />
-              <Tooltip
-                title={item.name}
-                placement="top"
-              >
+              <Tooltip title={item.name} placement="top">
                 <Typography
                   sx={{
                     fontSize: 12,
@@ -251,8 +292,6 @@ const RecursiveMenuItem = ({
           </Stack>
         )}
       </Box>
-
-      {/* Render hijos recursivamente */}
       {expanded &&
         Array.isArray(item.children) &&
         item.children?.length > 0 && (
@@ -270,19 +309,34 @@ const RecursiveMenuItem = ({
             ))}
           </Box>
         )}
-
-      {/* Render ítems */}
       {expanded && Array.isArray(item.items) && item.items?.length > 0 && (
-        <Box sx={{ pl: 1 }}>
-          {item.items?.map((subItem, index) => (
-            <RecursiveMenuSubItem
-              key={`box-${index}-${subItem.id}`}
-              item={subItem}
-              optionsActive={optionsActive}
-              onClick={onDecisionHandler}
-              buildOptions={buildSubItemOptions}
-            />
-          ))}
+        <Box sx={{ pl: 1, maxWidth: '250px', overflow: 'hidden' }}>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+            modifiers={[restrictToVerticalAxis]}
+          >
+            <SortableContext
+              items={itemsOrder}
+              strategy={verticalListSortingStrategy}
+            >
+              {itemsOrder.map((id) => {
+                const subItem = item.items?.find((i) => i.id === id);
+                if (!subItem) return null;
+                return (
+                  <RecursiveMenuSubItem
+                    key={`box-${subItem.id}`}
+                    item={subItem}
+                    optionsActive={optionsActive}
+                    onClick={onDecisionHandler}
+                    buildOptions={buildSubItemOptions}
+                    draggable={draggable}
+                  />
+                );
+              })}
+            </SortableContext>
+          </DndContext>
         </Box>
       )}
     </Box>

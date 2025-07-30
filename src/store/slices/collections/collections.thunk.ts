@@ -70,6 +70,7 @@ export const createTestCaseThunk = createAsyncThunk(
   ) => {
     try {
       const testCase = await createTestCase({ id_collection, id_template });
+      console.log(testCase)
       return {
         id: testCase.uuid,
         name: testCase.name,

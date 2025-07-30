@@ -415,6 +415,7 @@ function SidebarBlock({
                 onSelectItem={handleSelectItem}
                 buildOptions={buildedCollectionOptions}
                 buildSubItemOptions={buildedTestCaseOptions}
+                draggable
               />
             ))
           ) : (

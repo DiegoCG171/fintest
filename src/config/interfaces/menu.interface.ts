@@ -46,6 +46,7 @@ export interface RecursiveMenuItemProps {
     onSelectItem?: (item: MenuServiceInterface | ItemsServiceMenu) => void;
     buildOptions?: (item: ItemsServiceMenu) => ContextMenuOption[];
     buildSubItemOptions?: (item: ItemsServiceMenu) => ContextMenuOption[];
+    draggable?: boolean;
 }
 
 export interface HeaderSidebarMenuProps {
@@ -86,4 +87,5 @@ export interface PropsRecursiveMenuSubItem {
     optionsActive?: boolean;
     onClick?: (item: ItemsServiceMenu) => void;
     buildOptions?: (item: ItemsServiceMenu) => ContextMenuOption[];
+    draggable: boolean;
 }

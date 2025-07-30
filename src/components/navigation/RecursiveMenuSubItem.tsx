@@ -25,12 +25,15 @@ import {
 import { PropsRecursiveMenuSubItem } from "../../config/interfaces";
 import { updateCollectionThunk } from "../../store/slices/collections/collections.thunk";
 import { useRefreshCollectionsMenu } from "../../config/hooks/useRefreshCollectionsMenu";
+import { useSortable } from "@dnd-kit/sortable";
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 
 const RecursiveMenuSubItem = ({
   item,
   optionsActive,
   onClick,
   buildOptions,
+  draggable,
 }: PropsRecursiveMenuSubItem) => {
   const [hovered, setHovered] = useState(false);
   const [value, setValue] = useState(item.name);
@@ -42,6 +45,9 @@ const RecursiveMenuSubItem = ({
   );
 
   const refreshCollectionsMenu = useRefreshCollectionsMenu();
+
+  const { attributes, listeners, setNodeRef, transform, isDragging } =
+    useSortable({ id: item.id });
 
   const isActive = item.linkMenu && location.pathname === `/${item.linkMenu}`;
   const dispatch = useAppDispatch();
@@ -75,17 +81,22 @@ const RecursiveMenuSubItem = ({
     <Box
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      ref={setNodeRef}
+      {...attributes}
       sx={{
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        cursor: "pointer",
         borderRadius: 2,
         p: 1,
         backgroundColor: isActive
           ? (theme) => theme.palette.action.selected
           : "transparent",
-        transition: "background-color 0.2s ease",
+        transition: "background-color 0.2s ease, transform 0.2s ease",
+        transform: transform
+          ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
+          : undefined,
+        opacity: isDragging ? 0.5 : 1,
         "&:hover": {
           backgroundColor: (theme) => theme.palette.action.hover,
         },
@@ -159,13 +170,17 @@ const RecursiveMenuSubItem = ({
               overflow: "hidden",
             }}
           >
+            {draggable && (
+              <Box {...listeners} sx={{ cursor: "grab" }}>
+                <DragIndicatorIcon
+                  sx={{ fontSize: 12, color: "text.disabled" }}
+                />
+              </Box>
+            )}
             <DescriptionOutlinedIcon
               sx={{ fontSize: 16, color: "text.disabled" }}
             />
-            <Tooltip
-              title={item.name}
-              placement="top"
-            >
+            <Tooltip title={item.name} placement="top">
               <Typography
                 sx={{
                   fontSize: 12,
