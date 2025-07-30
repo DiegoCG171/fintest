@@ -67,7 +67,7 @@ function RecoveryPassword() {
               navigate("/login");
             }}
           >
-            {({ errors, touched, getFieldProps}) => (
+            {({ errors, touched, getFieldProps }) => (
               <Form>
                 <Box sx={{ flexGrow: 1 }}>
                   <Stack
@@ -88,6 +88,15 @@ function RecoveryPassword() {
                       fullWidth
                       variant="contained"
                       type="submit"
+                      onClick={(e) => {
+                        if (Object.keys(errors).length > 0) {
+                          e.preventDefault();
+                          showToast(
+                            "Revisa la información antes de enviarla.",
+                            "info"
+                          );
+                        }
+                      }}
                     >
                       Enviar
                     </Button>
