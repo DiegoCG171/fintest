@@ -21,6 +21,7 @@ import { testCasesSlice } from "./slices/testCases/testCasesSlice";
 import { sessionSlice } from "./slices/sessions/sessionSlice";
 import { functionsSelectSlice } from "./slices/functionsSelect/functionsSelect.slice";
 import { modalConfirmSessionSlice } from "./slices/UI/confirmSession/modalCoinfirmSession.slice";
+import { confirmDeleteModalSlice } from "./slices/UI/confirmDeleteModal/confirmDeleteModal.slice";
 
 const appReducer = combineReducers({
     auth: authSlice.reducer,
@@ -42,7 +43,8 @@ const appReducer = combineReducers({
     testCases: testCasesSlice.reducer,
     session: sessionSlice.reducer,
     functionSelect: functionsSelectSlice.reducer,
-    modalConfirmSession: modalConfirmSessionSlice.reducer
+    modalConfirmSession: modalConfirmSessionSlice.reducer,
+    confirmDeleteModal: confirmDeleteModalSlice.reducer
 });
 
 const rootReducer = (state: ReturnType<typeof appReducer> | undefined, action: UnknownAction) => {

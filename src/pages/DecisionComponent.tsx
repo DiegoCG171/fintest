@@ -12,6 +12,7 @@ import {
 } from "../store";
 import { Link } from "react-router-dom";
 import { getCollectionsThunk } from "../store/slices/collections/collections.thunk";
+import { SettingsButton } from "../components/UI/Settings/SettingsButton";
 
 function DecisionComponent() {
   const [flipped, setFlipped] = useState(false);
@@ -155,6 +156,7 @@ function DecisionComponent() {
         perspective: 1000,
       }}
     >
+      <SettingsButton />
       <Box
         sx={{
           position: "relative",

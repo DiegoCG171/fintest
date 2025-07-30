@@ -9,6 +9,7 @@ import PrivateGuard from "./config/guards/PrivateGuard";
 import RouteGuard from "./config/guards/RouteGuard";
 import { JSX, lazy, Suspense } from "react";
 import LoaderComponent from "./components/core/LoaderComponent";
+import { SettingsPage } from "./pages/Catalogs/SettingsPage";
 
 const LoginComponent = lazy(() => import("./pages/Auth/login/LoginComponent"));
 const RegisterComponent = lazy(
@@ -105,6 +106,12 @@ const router = createBrowserRouter([
                   <RouteGuard>
                     {withSuspense(<MainPage />)}
                   </RouteGuard>
+                ),
+              },
+              {
+                path: "settings/users",
+                element: (
+                    <SettingsPage />
                 ),
               },
             ],
