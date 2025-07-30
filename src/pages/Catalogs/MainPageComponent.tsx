@@ -57,7 +57,6 @@ function MainPage() {
     ...rawMessagesData,
     route: `${method}/${type}`
   }
-
   const currentRoute = categoryId
   ? `${method}/${type}/categories/${categoryId}`
   : `${method}/${type}/collections/${caseId}`;

@@ -5,6 +5,7 @@ export interface TableRowData {
     ID?: number | string;
     error?: FieldError;
     [key: string]: ReactNode | TableRowData[] | FieldError;
+    "Tipo de Mensaje": string| number
 }
 
 export interface NestedTableProps {

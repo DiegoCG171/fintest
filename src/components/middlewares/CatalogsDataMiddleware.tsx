@@ -32,6 +32,7 @@ function CatalogsDataMiddleware({
   const { formType, templateId } = template;
   const { permissions } = useAuth();
 
+  const version = useAppSelector((state) => state.formBuilder.tabForms[tabId]?.version);
   const rawRules = useAppSelector((state) => state.rules.rules);
   const templates = useAppSelector((state) => state.templates.templates);
   const testCases = useAppSelector((state) => state.testCases.testCases);
@@ -70,17 +71,21 @@ function CatalogsDataMiddleware({
   }, [templates, templateId, formType, template, testCases]);
 
   useEffect(() => {
-    if (template.formType != "generationTransaction") {
+    if (template.formType === "generationTransaction") {
       dispatch(
-        setConfig(serviceConfig.rules.columns as ColumnConfigFormBuilder[])
+        setConfig(serviceConfig.rulesGeneration.columns as ColumnConfigFormBuilder[])
       );
-    } else {
+    } 
+    if (template.formType === "selectionTransaction") {
       dispatch(
-        setConfig(
-          serviceConfig.rulesGeneration.columns as ColumnConfigFormBuilder[]
-        )
+        setConfig(serviceConfig.rulesSelection.columns as ColumnConfigFormBuilder[])
       );
-    }
+    } 
+    if (template.formType === "validationTransaction") {
+      dispatch(
+        setConfig(serviceConfig.rulesValidation.columns as ColumnConfigFormBuilder[])
+      );
+    } 
   }, [dispatch, template, formType]);
 
   useEffect(() => {
@@ -107,9 +112,9 @@ function CatalogsDataMiddleware({
 
   useEffect(() => {
     if (alreadyInitialized.current) return;
-    if (!rawRules?.length || !transactionData?.length || formState) return;
-
-    const values = combineTemplateData(transactionData, mappedRules);
+    if (!rawRules?.length || formState) return;
+    const data = transactionData?.length ? transactionData : rawRules
+    const values = combineTemplateData(data, mappedRules, !transactionData?.length);
     dispatch(setValuesForTab({ tabId, values, originalValues: values }));
     alreadyInitialized.current = true;
   }, [dispatch, tabId, rawRules, transactionData, mappedRules, formState]);
@@ -127,6 +132,7 @@ function CatalogsDataMiddleware({
 
   return (
     <FormBuilderContainer
+      key={`${tabId}-${version}`}
       tabId={tabId}
       canEdit={canEdit}
     />

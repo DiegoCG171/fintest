@@ -87,7 +87,7 @@ function RegisterComponent() {
             }
           }}
         >
-          {({ errors, touched, getFieldProps, values , submitForm}) => (
+          {({ errors, touched, getFieldProps, values}) => (
             <Form>
               <Grid
                 container
@@ -186,7 +186,7 @@ function RegisterComponent() {
                         "Revisa la información antes de enviarla.",
                         "info"
                       );
-                    } else submitForm()
+                    }
                   }}
                 >
                   Registrar usuario

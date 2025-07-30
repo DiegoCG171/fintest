@@ -24,8 +24,9 @@ import { saleTemplate } from "../../../config/mock";
 import { deepClean } from "../../../config/utils/deepClean";
 import { useEffect, useState } from "react";
 import CategoriesFormJSON from "./CategoriesFormJSON";
-import { addOrUpdateTemplate } from "../../../store/slices/templates/template.slice";
 import { useParams } from "react-router-dom";
+import { setTabFormFromTemplate } from "../../../config/utils/setTabFormFromTemplate";
+import { addOrUpdateTemplate } from "../../../store/slices/templates/template.slice";
 
 function ModalFormJson({ mode = "create" }: ModalFormProps) {
   const [step, setStep] = useState<1 | 2>(1);
@@ -41,6 +42,7 @@ function ModalFormJson({ mode = "create" }: ModalFormProps) {
   const [newTemplateName, setVewTemplateName] = useState<string>(templateName);
   const [showTemplateNameError, setShowTemplateNameError] = useState(false);
   const preselectedItemId = category ?? categoryId ?? "";
+  const rawRules = useAppSelector((state) => state.rules.rules);
 
   const templateId = useAppSelector(
     (state) => state.templates.templateById?._id
@@ -122,9 +124,9 @@ function ModalFormJson({ mode = "create" }: ModalFormProps) {
 
   const editTemplate = async () => {
     if (!templateId) return null;
-    if (!category) return null
+    if (!category) return null;
     mutableJsonData.name = newTemplateName;
-    mutableJsonData.categoryId = category
+    mutableJsonData.categoryId = category;
     try {
       const result = await dispatch(
         updateTemplateThunk({
@@ -133,8 +135,26 @@ function ModalFormJson({ mode = "create" }: ModalFormProps) {
         })
       ).unwrap();
       const template = result;
+      dispatch(addOrUpdateTemplate(template as TemplateContextType))
       if (template) {
-        dispatch(addOrUpdateTemplate(template as TemplateContextType));
+        setTabFormFromTemplate(
+          template as TemplateContextType,
+          "generationTransaction",
+          rawRules,
+          dispatch
+        );
+        setTabFormFromTemplate(
+          template as TemplateContextType,
+          "validationTransaction",
+          rawRules,
+          dispatch
+        );
+        setTabFormFromTemplate(
+          template as TemplateContextType,
+          "selectionTransaction",
+          rawRules,
+          dispatch
+        );
       }
       dispatch(closeModal());
       showToast("Template actualizado correctamente.", "success");
@@ -201,7 +221,7 @@ function ModalFormJson({ mode = "create" }: ModalFormProps) {
             templateName={newTemplateName ?? ""}
             preselectedItemId={preselectedItemId}
             onSelectCategory={(id) => {
-              setCategory(id); 
+              setCategory(id);
             }}
             onSetTemplateName={(name: string) => {
               setVewTemplateName(name);

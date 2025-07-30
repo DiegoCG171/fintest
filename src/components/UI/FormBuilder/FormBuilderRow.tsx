@@ -8,7 +8,7 @@ import {
   TableRowDataFormBuilder,
 } from "../../../config/interfaces";
 import DynamicField from "./DynamicField";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useAppSelector } from "../../../store";
 
 function FormBuilderRow({
@@ -18,7 +18,6 @@ function FormBuilderRow({
   headers,
   canEdit,
 }: FormBuilderRowProps) {
-  
   const [expanded, setExpanded] = useState(false);
   const [edited, setEdited] = useState(false);
   const levelColors = ["#ffffff", "#f5f7fa", "#eef3f8", "#e4ecf2", "#d6e0eb"];
@@ -45,36 +44,58 @@ function FormBuilderRow({
     return current ?? null;
   }
 
-  const originalRow = useAppSelector((state) => {
-    const originals = state.formBuilder.tabForms[tabId]?.originalValues;
-    return getNestedRow(originals, path);
-  });
-
-  const hasRowChanges = headers.some((col) => {
-    const current = row[col.id];
-    const original = originalRow?.[col.id];
-
-    if (col.id === "breakingRules") {
-      const currentChildren = Array.isArray(current) ? current : [];
-      const originalChildren = Array.isArray(original) ? original : [];
-
-      if (currentChildren.length !== originalChildren.length) return true;
-
-      return currentChildren.some((child, index) => {
-        const originalChild = originalChildren[index];
-        if (!originalChild) return true;
-
-        return (
-          child.idBitmap !== originalChild.idBitmap ||
-          child.displayName !== originalChild.displayName ||
-          child.value !== originalChild.value ||
-          child.function !== originalChild.function ||
-          child.isRequired !== originalChild.isRequired
-        );
-      });
+  function deepNormalize(val: unknown): string {
+    if (typeof val === "boolean") return val ? "1" : "0";
+    if (val === undefined || val === null) return "";
+    if (typeof val === "object") {
+      try {
+        return JSON.stringify(val);
+      } catch {
+        return String(val);
+      }
     }
-    return current !== original;
-  });
+    return String(val).trim();
+  }
+
+  const originals = useAppSelector(
+    (state) => state.formBuilder.tabForms[tabId]?.originalValues
+  );
+
+  const originalRow = useMemo(() => {
+    return getNestedRow(originals, path);
+  }, [originals, path]);
+
+  const isSynced = useAppSelector(
+    (state) => state.formBuilder.tabForms[tabId]?.isSynced
+  );
+  const hasRowChanges = isSynced
+    ? false
+    : headers.some((col) => {
+        const current = row[col.id];
+        const original = originalRow?.[col.id];
+
+        if (col.id === "breakingRules") {
+          const currentChildren = Array.isArray(current) ? current : [];
+          const originalChildren = Array.isArray(original) ? original : [];
+
+          if (currentChildren.length !== originalChildren.length) return true;
+
+          return currentChildren.some((child, index) => {
+            const originalChild = originalChildren[index];
+            if (!originalChild) return true;
+
+            return (
+              child.idBitmap !== originalChild.idBitmap ||
+              child.displayName !== originalChild.displayName ||
+              child.value !== originalChild.value ||
+              child.function !== originalChild.function ||
+              child.isRequired !== originalChild.isRequired
+            );
+          });
+        }
+
+        return deepNormalize(current) !== deepNormalize(original);
+      });
 
   return (
     <>

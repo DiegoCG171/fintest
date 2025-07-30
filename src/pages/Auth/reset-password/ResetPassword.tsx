@@ -69,18 +69,30 @@ function ResetPassword() {
             }}
             validationSchema={validationSchema}
             onSubmit={async (_values, { setSubmitting }) => {
-              setSubmitting(false);
-              const response = await dispatch(
-                resetPasswordThunk({ newPassword: _values.password, token })
-              ).unwrap();
-              showToast(
-                response || "Formulario enviado correctamente",
-                "success"
-              );
-              navigate("/login");
+              try {
+                setSubmitting(true);
+                const response = await dispatch(
+                  resetPasswordThunk({ newPassword: _values.password, token })
+                ).unwrap();
+
+                showToast(
+                  response || "Formulario enviado correctamente",
+                  "success"
+                );
+                navigate("/login");
+              } catch (error) {
+                console.log(error)
+                showToast(
+                  error as string ||
+                    "Ocurrió un error al restablecer la contraseña",
+                  "error"
+                );
+              } finally {
+                setSubmitting(false);
+              }
             }}
           >
-            {({ errors, touched, getFieldProps, submitForm }) => (
+            {({ errors, touched, getFieldProps }) => (
               <Form>
                 <Box sx={{ flexGrow: 1 }}>
                   <Stack
@@ -122,7 +134,7 @@ function ResetPassword() {
                             "Revisa la información antes de enviarla.",
                             "info"
                           );
-                        } else submitForm()
+                        }
                       }}
                     >
                       Enviar

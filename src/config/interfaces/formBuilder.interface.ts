@@ -87,6 +87,8 @@ export interface FormBuilderState {
             values: TableRowDataFormBuilder[];
             originalValues: TableRowDataFormBuilder[];
             visibility?: Record<string, boolean>;
+            isSynced?: boolean;
+            version?: number;
         };
     };
     config: ColumnConfigFormBuilder[];
