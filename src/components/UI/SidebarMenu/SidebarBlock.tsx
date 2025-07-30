@@ -19,8 +19,6 @@ import {
 import { useCallback, useMemo } from "react";
 import { useToast } from "../../../config/hooks/useToast";
 import {
-  deleteCollectionThunk,
-  deleteTestCaseThunk,
   getCollectionsThunk,
 } from "../../../store/slices/collections/collections.thunk";
 
@@ -36,6 +34,8 @@ import PermissionGuard from "../../../config/guards/PermissionGuard";
 import { hasPermission } from "../../../config/utils/permissions";
 import { useAuth } from "../../../config/hooks/useAuth";
 import { useParams } from "react-router-dom";
+import { getTemplatesBackup } from "../../../services";
+import { openConfirmDeleteModal } from "../../../store/slices/UI/confirmDeleteModal/confirmDeleteModal.slice";
 
 function SidebarBlock({
   searchTerm,
@@ -155,7 +155,9 @@ function SidebarBlock({
             dispatch(getTemplatesThunk());
             dispatch(getCategoriesByMethodThunk(`${method}`))
               .unwrap()
-              .catch((err: string) => console.error("Error cargando categorías:", err));
+              .catch((err: string) =>
+                console.error("Error cargando categorías:", err)
+              );
           }
         },
       });
@@ -198,9 +200,9 @@ function SidebarBlock({
       options.push({
         item: { label: "Renombrar", id: item.id },
         action: () => {
-        dispatch(updateCollection(item));
-        dispatch(getCollectionsThunk(`${method}/${type}`));
-      },
+          dispatch(updateCollection(item));
+          dispatch(getCollectionsThunk(`${method}/${type}`));
+        },
       });
     }
 
@@ -208,11 +210,10 @@ function SidebarBlock({
       options.push({
         item: { label: "Eliminar", id: item.id },
         action: async () => {
-        await dispatch(deleteCollectionThunk(item.id)).unwrap();
-        if (method && type) {
-          dispatch(getCollectionsThunk(`${method}/${type}`));
-        }
-      },
+          dispatch(
+            openConfirmDeleteModal({ id: item.id, resource: "collection" })
+          );
+        },
       });
     }
 
@@ -253,11 +254,10 @@ function SidebarBlock({
       options.push({
         item: { label: "Eliminar", id: item.id },
         action: async () => {
-        await dispatch(deleteTestCaseThunk(item.id));
-        if (method && type) {
-          dispatch(getCollectionsThunk(`${method}/${type}`));
-        }
-      },
+          dispatch(
+            openConfirmDeleteModal({ id: item.id, resource: "testCase" })
+          );
+        },
       });
     }
 
@@ -370,6 +370,7 @@ function SidebarBlock({
           <SeparatorMenu
             label="Catálogo"
             onAction={handleModal}
+            onDownload={() => getTemplatesBackup()}
             permissions={[{ action: "create", resource: "template" }]}
           />
 

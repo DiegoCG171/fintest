@@ -55,6 +55,7 @@ export interface HeaderSidebarMenuProps {
 
 export interface SeparatorMenuProps {
     onAction?: () => void;
+    onDownload?: () => void;
     label: string;
     permissions: {
         action: string;
