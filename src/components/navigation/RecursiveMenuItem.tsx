@@ -17,11 +17,19 @@ import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
 import KeyboardArrowRightOutlinedIcon from "@mui/icons-material/KeyboardArrowRightOutlined";
 import KeyboardArrowDownOutlinedIcon from "@mui/icons-material/KeyboardArrowDownOutlined";
 import { useNavigate } from "react-router-dom";
-import { setLoading, updateTestCaseThunk, useAppDispatch, useAppSelector } from "../../store";
+import {
+  setLoading,
+  updateTestCaseThunk,
+  useAppDispatch,
+  useAppSelector,
+} from "../../store";
 import RecursiveMenuSubItem from "./RecursiveMenuSubItem";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePopMenu } from "../../config/hooks/usePopMenu";
-import { removeUpdateCollection, removeUpdateTestCase } from "../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
+import {
+  removeUpdateCollection,
+  removeUpdateTestCase,
+} from "../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
 import { updateCollectionThunk } from "../../store/slices/collections/collections.thunk";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { useRefreshCollectionsMenu } from "../../config/hooks/useRefreshCollectionsMenu";
@@ -30,9 +38,12 @@ const RecursiveMenuItem = ({
   item,
   depth = 0,
   optionsActive,
+  creatingChildId,
   onSelectItem,
   buildOptions,
   buildSubItemOptions,
+  renderCreateChildEditor,
+  renderEditNodeEditor,
 }: RecursiveMenuItemProps) => {
   const refreshCollectionsMenu = useRefreshCollectionsMenu();
 
@@ -45,6 +56,12 @@ const RecursiveMenuItem = ({
   const { loading, updateCollection } = useAppSelector(
     (state) => state.sidebarMenu
   );
+
+  useEffect(() => {
+    if (creatingChildId === item.id) {
+      setExpanded(true);
+    }
+  }, [creatingChildId, item.id]);
 
   const onDecisionHandler = async (
     item: MenuServiceInterface | ItemsServiceMenu
@@ -170,87 +187,89 @@ const RecursiveMenuItem = ({
             />
           </Stack>
         ) : (
-          <Stack
-            direction="row"
-            alignItems="center"
-            onMouseEnter={() => setHovered(true)}
-            onMouseLeave={() => setHovered(false)}
-            sx={{ width: "100%" }}
-          >
+          renderEditNodeEditor?.(item) ?? (
             <Stack
               direction="row"
-              spacing={1}
               alignItems="center"
-              sx={{
-                flexGrow: 1,
-                minWidth: 0,
-                overflow: "hidden",
-              }}
+              onMouseEnter={() => setHovered(true)}
+              onMouseLeave={() => setHovered(false)}
+              sx={{ width: "100%" }}
             >
-              <FolderOutlinedIcon
-                sx={{ fontSize: 16, color: "text.disabled" }}
-              />
-              <Tooltip
-                title={item.name}
-                placement="top"
+              <Stack
+                direction="row"
+                spacing={1}
+                alignItems="center"
+                sx={{
+                  flexGrow: 1,
+                  minWidth: 0,
+                  overflow: "hidden",
+                }}
               >
-                <Typography
+                <FolderOutlinedIcon
+                  sx={{ fontSize: 16, color: "text.disabled" }}
+                />
+                <Tooltip
+                  title={item.name}
+                  placement="top"
+                >
+                  <Typography
+                    sx={{
+                      fontSize: 12,
+                      color: "text.disabled",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {item.name}
+                  </Typography>
+                </Tooltip>
+              </Stack>
+              {optionsActive && (
+                <Box
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const options =
+                      buildOptions?.(item) || buildSubItemOptions?.(item);
+                    if (options) openMenu(e, options);
+                  }}
                   sx={{
-                    fontSize: 12,
-                    color: "text.disabled",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
+                    width: 24,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    cursor: "pointer",
+                    ml: 1,
                   }}
                 >
-                  {item.name}
-                </Typography>
-              </Tooltip>
-            </Stack>
-            {optionsActive && (
+                  <MoreHorizOutlinedIcon
+                    sx={{
+                      fontSize: 16,
+                      color: "text.disabled",
+                      visibility: hovered ? "visible" : "hidden",
+                    }}
+                  />
+                </Box>
+              )}
+              {/* Flecha expand/collapse */}
               <Box
-                onClick={(e) => {
-                  e.stopPropagation();
-                  const options =
-                    buildOptions?.(item) || buildSubItemOptions?.(item);
-                  if (options) openMenu(e, options);
-                }}
                 sx={{
-                  width: 24,
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  cursor: "pointer",
                   ml: 1,
+                  display: "flex",
+                  alignItems: "center",
                 }}
               >
-                <MoreHorizOutlinedIcon
-                  sx={{
-                    fontSize: 16,
-                    color: "text.disabled",
-                    visibility: hovered ? "visible" : "hidden",
-                  }}
-                />
+                {expanded ? (
+                  <KeyboardArrowDownOutlinedIcon sx={{ fontSize: 16 }} />
+                ) : (
+                  <KeyboardArrowRightOutlinedIcon sx={{ fontSize: 16 }} />
+                )}
               </Box>
-            )}
-
-            {/* Flecha expand/collapse */}
-            <Box
-              sx={{
-                ml: 1,
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
-              {expanded ? (
-                <KeyboardArrowDownOutlinedIcon sx={{ fontSize: 16 }} />
-              ) : (
-                <KeyboardArrowRightOutlinedIcon sx={{ fontSize: 16 }} />
-              )}
-            </Box>
-          </Stack>
+            </Stack>
+          )
         )}
       </Box>
+      {expanded && renderCreateChildEditor?.(item)}
 
       {/* Render hijos recursivamente */}
       {expanded &&
@@ -266,6 +285,9 @@ const RecursiveMenuItem = ({
                 onSelectItem={onDecisionHandler}
                 buildOptions={buildOptions}
                 buildSubItemOptions={buildSubItemOptions}
+                renderCreateChildEditor={renderCreateChildEditor}
+                renderEditNodeEditor={renderEditNodeEditor}
+                creatingChildId={creatingChildId}
               />
             ))}
           </Box>

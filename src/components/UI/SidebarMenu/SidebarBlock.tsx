@@ -1,13 +1,17 @@
 import { Box, Divider } from "@mui/material";
+import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
 import SeparatorMenu from "./SeparatorMenu";
 import RecursiveMenuItem from "../../navigation/RecursiveMenuItem";
 import {
+  createCategorieThunk,
   createTemplateThunk,
+  deleteCategorieThunk,
   getCategoriesByMethodThunk,
   getTemplateByIdThunk,
   getTemplatesThunk,
   openModal,
   setLoading,
+  updateCategorieThunk,
   useAppDispatch,
   useAppSelector,
 } from "../../../store";
@@ -16,7 +20,7 @@ import {
   ItemsServiceMenu,
   MenuServiceInterface,
 } from "../../../config/interfaces";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useToast } from "../../../config/hooks/useToast";
 import {
   deleteCollectionThunk,
@@ -36,6 +40,7 @@ import PermissionGuard from "../../../config/guards/PermissionGuard";
 import { hasPermission } from "../../../config/utils/permissions";
 import { useAuth } from "../../../config/hooks/useAuth";
 import { useParams } from "react-router-dom";
+import ItemInlineEditor from "./ItemInlineEditor";
 
 function SidebarBlock({
   searchTerm,
@@ -61,6 +66,76 @@ function SidebarBlock({
   const { templates } = useAppSelector((state) => state.templates);
   const { showToast } = useToast();
 
+  const [creatingChildId, setCreatingChildId] = useState<string | undefined>(
+    undefined
+  );
+
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
+
+  const renderEditNodeEditor = (item: MenuServiceInterface) => {
+    if (editingItemId !== item.id) return null;
+
+    return (
+      <ItemInlineEditor
+        icon={<FolderOutlinedIcon sx={{ fontSize: 16, color: "text.disabled" }} /> }
+        initialValue={item.name}
+        placeholder="Nuevo nombre"
+        onSubmit={async (newName: string) => {
+          try {
+            await dispatch(
+              updateCategorieThunk({ id: item.id, data: { name: newName } })
+            ).unwrap();
+            await dispatch(
+              getCategoriesByMethodThunk(`${method}/${type}`)
+            ).unwrap();
+            setEditingItemId(null);
+            showToast("Categoría editada exitoramente", "success");
+          } catch (error) {
+            showToast(
+              error as string | "Error al renombrar categoría",
+              "error"
+            );
+          }
+        }}
+        onCancel={() => setEditingItemId(null)}
+      />
+    );
+  };
+
+  const renderCreateChildEditor = (item: MenuServiceInterface) => {
+    if (creatingChildId !== item.id) return null;
+
+    return (
+      <Box sx={{ pl: 1, mt: 0.5 }}>
+        <ItemInlineEditor
+          icon={<FolderOutlinedIcon sx={{ fontSize: 16, color: "text.disabled" }} /> }
+          placeholder="Nombre de Categoría"
+          onSubmit={async (name: string) => {
+            createCategory(name);
+          }}
+          onCancel={() => setCreatingChildId(undefined)}
+        />
+      </Box>
+    );
+  };
+
+  const createCategory = async (name: string): Promise<void> => {
+    if (!creatingChildId) return;
+    const body = {
+      name,
+      parent: creatingChildId,
+    };
+
+    try {
+      await dispatch(createCategorieThunk(body)).unwrap();
+      await dispatch(getCategoriesByMethodThunk(`${method}/${type}`)).unwrap();
+      setCreatingChildId(undefined);
+      showToast("Categoría creada exitoramente", "success");
+    } catch (error) {
+      showToast(error as string | "Error al crear la categoría", "error");
+    }
+  };
+
   const addToCollections = (item: ItemsServiceMenu) => {
     dispatch(
       openModal({
@@ -68,6 +143,16 @@ function SidebarBlock({
         componentProps: { templateId: item.id },
       })
     );
+  };
+
+  const deleteCategorie = async (id: string) => {
+    try {
+      await dispatch(deleteCategorieThunk(id)).unwrap();
+      await dispatch(getCategoriesByMethodThunk(`${method}/${type}`)).unwrap();
+      showToast("Categoría eliminada exitoramente", "success");
+    } catch (error) {
+      showToast(error as string | "Error al eliminar la categoría", "error");
+    }
   };
 
   const handleSelectItem = useCallback(
@@ -94,17 +179,27 @@ function SidebarBlock({
   const buildedOptions = (item: ItemsServiceMenu): ContextMenuOption[] => {
     const options: ContextMenuOption[] = [];
 
-    if (hasPermission(permissions, "create", "collection")) {
+    if (hasPermission(permissions, "create", "category")) {
       options.push({
-        item: { label: "Agregar a Colecciones", id: item.id },
-        action: () => addToCollections(item),
+        item: { label: "Añadir", id: item.id },
+        action: () => setCreatingChildId(item.id),
       });
     }
 
-    if (hasPermission(permissions, "update", "template")) {
+    if (hasPermission(permissions, "update", "category")) {
       options.push({
-        item: { label: "Editar template", id: item.id },
-        action: () => handleSelectItem(item),
+        item: { label: "Renombrar", id: item.id },
+        action: () => {
+          setCreatingChildId(undefined);
+          setEditingItemId(item.id);
+        },
+      });
+    }
+
+    if (hasPermission(permissions, "delete", "category")) {
+      options.push({
+        item: { label: "Eliminar", id: item.id },
+        action: () => deleteCategorie(item.id),
       });
     }
 
@@ -153,9 +248,11 @@ function SidebarBlock({
             showToast(error as string, "error");
           } finally {
             dispatch(getTemplatesThunk());
-            dispatch(getCategoriesByMethodThunk(`${method}`))
+            dispatch(getCategoriesByMethodThunk(`${method}/${type}`))
               .unwrap()
-              .catch((err: string) => console.error("Error cargando categorías:", err));
+              .catch((err: string) =>
+                console.error("Error cargando categorías:", err)
+              );
           }
         },
       });
@@ -198,9 +295,9 @@ function SidebarBlock({
       options.push({
         item: { label: "Renombrar", id: item.id },
         action: () => {
-        dispatch(updateCollection(item));
-        dispatch(getCollectionsThunk(`${method}/${type}`));
-      },
+          dispatch(updateCollection(item));
+          dispatch(getCollectionsThunk(`${method}/${type}`));
+        },
       });
     }
 
@@ -208,11 +305,11 @@ function SidebarBlock({
       options.push({
         item: { label: "Eliminar", id: item.id },
         action: async () => {
-        await dispatch(deleteCollectionThunk(item.id)).unwrap();
-        if (method && type) {
-          dispatch(getCollectionsThunk(`${method}/${type}`));
-        }
-      },
+          await dispatch(deleteCollectionThunk(item.id)).unwrap();
+          if (method && type) {
+            dispatch(getCollectionsThunk(`${method}/${type}`));
+          }
+        },
       });
     }
 
@@ -253,11 +350,11 @@ function SidebarBlock({
       options.push({
         item: { label: "Eliminar", id: item.id },
         action: async () => {
-        await dispatch(deleteTestCaseThunk(item.id));
-        if (method && type) {
-          dispatch(getCollectionsThunk(`${method}/${type}`));
-        }
-      },
+          await dispatch(deleteTestCaseThunk(item.id));
+          if (method && type) {
+            dispatch(getCollectionsThunk(`${method}/${type}`));
+          }
+        },
       });
     }
 
@@ -372,7 +469,6 @@ function SidebarBlock({
             onAction={handleModal}
             permissions={[{ action: "create", resource: "template" }]}
           />
-
           {filteredCategories.length > 0 ? (
             filteredCategories.map((rootItem, index) => (
               <RecursiveMenuItem
@@ -382,6 +478,9 @@ function SidebarBlock({
                 onSelectItem={handleSelectItem}
                 buildOptions={buildedOptions}
                 buildSubItemOptions={buildedTemplateOptions}
+                renderCreateChildEditor={renderCreateChildEditor}
+                renderEditNodeEditor={renderEditNodeEditor}
+                creatingChildId={creatingChildId}
               />
             ))
           ) : (

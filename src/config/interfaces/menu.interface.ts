@@ -43,9 +43,12 @@ export interface RecursiveMenuItemProps {
     item: MenuServiceInterface;
     depth?: number;
     optionsActive: boolean
+    creatingChildId?: string;
     onSelectItem?: (item: MenuServiceInterface | ItemsServiceMenu) => void;
     buildOptions?: (item: ItemsServiceMenu) => ContextMenuOption[];
     buildSubItemOptions?: (item: ItemsServiceMenu) => ContextMenuOption[];
+    renderCreateChildEditor?: (item: MenuServiceInterface) => React.ReactNode;
+    renderEditNodeEditor?: (item: MenuServiceInterface) => React.ReactNode;
 }
 
 export interface HeaderSidebarMenuProps {
@@ -85,4 +88,12 @@ export interface PropsRecursiveMenuSubItem {
     optionsActive?: boolean;
     onClick?: (item: ItemsServiceMenu) => void;
     buildOptions?: (item: ItemsServiceMenu) => ContextMenuOption[];
+}
+
+export interface ItemInlineEditorProps {
+    initialValue?: string;
+    placeholder?: string;
+    icon?: React.ReactNode;
+    onSubmit: (value: string) => Promise<void>;
+    onCancel?: () => void;
 }

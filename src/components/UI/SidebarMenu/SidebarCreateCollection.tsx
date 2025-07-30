@@ -13,7 +13,6 @@ export const SidebarCreateCollection = () => {
   const [value, setValue] = useState("");
   const refreshCollectionsMenu = useRefreshCollectionsMenu();
   const params = useCreateCollections()
-  console.log(params)
 
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
   if (e.key === "Enter" && value.trim() !== "") {
