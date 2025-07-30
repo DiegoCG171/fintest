@@ -56,20 +56,8 @@ function BasicTable({
     if (typeTable === "events" && Array.isArray(message)) {
       dispatch(setActiveMessage({ data: message, id }));
       setTimeout(() => {
-  navigate(`${urlBase}/detalles`);
-}, 300);
-      /* const selectedRow = initialRows.find((row) => row.ID === id);
-
-      if (!selectedRow) {
-        console.warn("No se encontró el row con id:", id);
-        return;
-      } */
-      /* console.log(selectedRow)
-      if (!selectedRow.estado) {
         navigate(`${urlBase}/detalles`);
-      } else {
-        navigate(`${urlBase}/errores`);
-      } */
+      }, 300);
     }
   };
 

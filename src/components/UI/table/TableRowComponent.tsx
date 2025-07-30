@@ -38,11 +38,11 @@ export const TableRowComponent = ({
     <Fragment key={rowIndex}>
       <TableRow
         hover={type === "events"}
-        onClick={() => onSetActiveMessage(row["ID"], row.fields)}
+        onClick={() => onSetActiveMessage(row["Tipo de Mensaje"], row.fields)}
         sx={{
           cursor: type === "events" ? "pointer" : "default",
           background:
-            activeMessageId === row["ID"] ? "#efefef" : "transparent",
+            activeMessageId === row["Tipo de Mensaje"] ? "#D1D1D1" : "transparent",
         }}
       >
         {keys.map((key) => (
