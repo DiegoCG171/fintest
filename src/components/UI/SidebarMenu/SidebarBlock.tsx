@@ -40,6 +40,7 @@ import { useAuth } from "../../../config/hooks/useAuth";
 import { useParams } from "react-router-dom";
 import { getTemplatesBackup } from "../../../services";
 import { openConfirmDeleteModal } from "../../../store/slices/UI/confirmDeleteModal/confirmDeleteModal.slice";
+import ItemInlineEditor from "./ItemInlineEditor";
 
 function SidebarBlock({
   searchTerm,
