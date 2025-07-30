@@ -22,6 +22,7 @@ export const serverSlice = createSlice({
         clearServer: (state) => {
             state.server = null;
             state.status = 'idle'
+            state.stopServerStatus = 'success'
         },
         clearServerError: (state) => {
             state.error = null;

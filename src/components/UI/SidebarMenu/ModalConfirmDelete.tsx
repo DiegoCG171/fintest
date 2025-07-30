@@ -4,7 +4,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { closeConfirmDeleteModal } from "../../../store/slices/UI/confirmDeleteModal/confirmDeleteModal.slice";
 import {
-    deleteCollectionThunk,
+  deleteCollectionThunk,
   deleteTestCaseThunk,
   getCollectionsThunk,
 } from "../../../store/slices/collections/collections.thunk";
@@ -12,33 +12,59 @@ import { useParams } from "react-router-dom";
 import { useToast } from "../../../config/hooks/useToast";
 import { useEffect, useState } from "react";
 
+const resourceActions = {
+  testCase: {
+    deleteThunk: deleteTestCaseThunk,
+    toastMessage: "Caso de uso eliminado correctamente",
+    title: "¿Estás seguro de que deseas eliminar el caso de uso?",
+  },
+  collection: {
+    deleteThunk: deleteCollectionThunk,
+    toastMessage: "Colección eliminada correctamente",
+    title: "¿Estás seguro de que deseas eliminar la colección?",
+  },
+} as const;
+
+type ResourceKey = keyof typeof resourceActions;
+
+const isValidResource = (r: string): r is ResourceKey => {
+  return r in resourceActions;
+};
+
+const modalStyle = {
+  position: "absolute" as const,
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: "50%",
+  bgcolor: "background.paper",
+  borderRadius: 2,
+  boxShadow: 24,
+  p: 3,
+  outline: "none",
+};
+
 export const ModalConfirmDelete = () => {
   const { method, type } = useParams();
   const dispatch = useAppDispatch();
-  const [titleText, setTitleText] = useState('¿Estás seguro de que deseas eliminar esto?');
   const { showToast } = useToast();
   const { isOpen, id, resource } = useAppSelector(
     (state) => state.confirmDeleteModal
   );
+  const [titleText, setTitleText] = useState(
+    "¿Estás seguro de que deseas eliminar esto?"
+  );
 
   const handleConfirm = async () => {
-    if (resource === "testCase") {
-      await dispatch(deleteTestCaseThunk(id));
-      if (method && type) {
-        await dispatch(getCollectionsThunk(`${method}/${type}`));
-        dispatch(closeConfirmDeleteModal())
-        showToast("Caso de uso eliminado correctamente", "error");
-      }
-    }
+    if (!isValidResource(resource)) return;
 
-    if (resource === 'collection') {
-         await dispatch(deleteCollectionThunk(id)).unwrap();
-        if (method && type) {
-          dispatch(getCollectionsThunk(`${method}/${type}`));
-          dispatch(closeConfirmDeleteModal())
-          showToast("Collección eliminada correctamente", "error");
-        }
+    const config = resourceActions[resource];
+    await dispatch(config.deleteThunk(id));
+    if (method && type) {
+      await dispatch(getCollectionsThunk(`${method}/${type}`));
     }
+    dispatch(closeConfirmDeleteModal());
+    showToast(config.toastMessage, "success");
   };
 
   const handleCancel = () => {
@@ -46,35 +72,17 @@ export const ModalConfirmDelete = () => {
   };
 
   useEffect(() => {
-    if (resource === 'collection') {
-        setTitleText('¿Estás seguro de que deseas eliminar la colección?')
-    }
-    if (resource === 'testCase') {
-        setTitleText('¿Estás seguro de que deseas eliminar el caso de uso?')
+    if (isValidResource(resource)) {
+      setTitleText(resourceActions[resource].title);
     }
   }, [resource]);
 
   return (
     <Portal>
       <Modal open={isOpen}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: "50%",
-            bgcolor: "background.paper",
-            borderRadius: 2,
-            boxShadow: 24,
-            p: 3,
-            outline: "none",
-          }}
-        >
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-           {titleText}
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+        <Box sx={modalStyle}>
+          <Typography variant="h6">{titleText}</Typography>
+          <Typography sx={{ mt: 2 }}>
             Una vez eliminado, no podrás recuperar este contenido.
           </Typography>
           <Stack spacing={2} direction="row" justifyContent="end" mt={4}>
@@ -82,6 +90,7 @@ export const ModalConfirmDelete = () => {
               startIcon={<CheckCircleIcon />}
               onClick={handleConfirm}
               variant="contained"
+              color="error"
             >
               Eliminar
             </Button>
@@ -90,7 +99,7 @@ export const ModalConfirmDelete = () => {
               onClick={handleCancel}
               variant="contained"
             >
-              Canclear
+              Cancelar
             </Button>
           </Stack>
         </Box>
@@ -98,4 +107,3 @@ export const ModalConfirmDelete = () => {
     </Portal>
   );
 };
-
