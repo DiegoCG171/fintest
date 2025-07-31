@@ -1,4 +1,3 @@
-// src/config/utils/formBuilder.utils.ts
 import { setValuesForTab } from "../../store";
 import { AppDispatch } from "../../store/store";
 import {
@@ -31,9 +30,8 @@ export function generateTabFormValuesFromTemplate(
 
     const mappedRules = mapFieldRulesToFormStructure(rawRules);
     const fields = getFieldsByFormType(template, formType);
-    const isActive = !fields?.length;
-
-    const values = combineTemplateData(fields, mappedRules, isActive);
+    const isActive = Boolean(fields?.length);
+    const values = combineTemplateData(fields , mappedRules, isActive);
     return values;
 }
 
@@ -45,8 +43,7 @@ export function setTabFormFromTemplate(
 ): void {
     const tabId = `${template.uuid}-${formType}`;
     const values = generateTabFormValuesFromTemplate(template, rawRules, formType);
-    const clonedValues = JSON.parse(JSON.stringify(values)); // deep clone
-
+    const clonedValues = JSON.parse(JSON.stringify(values));
     dispatch(
         setValuesForTab({
             tabId,

@@ -188,13 +188,14 @@ const RecursiveMenuItem = ({
           </Stack>
         ) : (
           renderEditNodeEditor?.(item) ?? (
-            <Stack
-              direction="row"
-              alignItems="center"
-              onMouseEnter={() => setHovered(true)}
-              onMouseLeave={() => setHovered(false)}
-              sx={{ width: "100%" }}
-            >
+          <Stack
+            direction="row"
+            alignItems="center"
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
+            sx={{ width: "100%" }}
+          >
+            
               <Stack
                 direction="row"
                 spacing={1}
@@ -225,48 +226,48 @@ const RecursiveMenuItem = ({
                   </Typography>
                 </Tooltip>
               </Stack>
-              {optionsActive && (
-                <Box
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const options =
-                      buildOptions?.(item) || buildSubItemOptions?.(item);
-                    if (options) openMenu(e, options);
-                  }}
-                  sx={{
-                    width: 24,
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    cursor: "pointer",
-                    ml: 1,
-                  }}
-                >
-                  <MoreHorizOutlinedIcon
-                    sx={{
-                      fontSize: 16,
-                      color: "text.disabled",
-                      visibility: hovered ? "visible" : "hidden",
-                    }}
-                  />
-                </Box>
-              )}
-              {/* Flecha expand/collapse */}
+            
+            {optionsActive && (
               <Box
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const options =
+                    buildOptions?.(item) || buildSubItemOptions?.(item);
+                  if (options) openMenu(e, options);
+                }}
                 sx={{
-                  ml: 1,
+                  width: 24,
                   display: "flex",
+                  justifyContent: "center",
                   alignItems: "center",
+                  cursor: "pointer",
+                  ml: 1,
                 }}
               >
-                {expanded ? (
-                  <KeyboardArrowDownOutlinedIcon sx={{ fontSize: 16 }} />
-                ) : (
-                  <KeyboardArrowRightOutlinedIcon sx={{ fontSize: 16 }} />
-                )}
+                <MoreHorizOutlinedIcon
+                  sx={{
+                    fontSize: 16,
+                    color: "text.disabled",
+                    visibility: hovered ? "visible" : "hidden",
+                  }}
+                />
               </Box>
-            </Stack>
-          )
+            )}
+            {/* Flecha expand/collapse */}
+            <Box
+              sx={{
+                ml: 1,
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              {expanded ? (
+                <KeyboardArrowDownOutlinedIcon sx={{ fontSize: 16 }} />
+              ) : (
+                <KeyboardArrowRightOutlinedIcon sx={{ fontSize: 16 }} />
+              )}
+            </Box> 
+          </Stack> )
         )}
       </Box>
       {expanded && renderCreateChildEditor?.(item)}

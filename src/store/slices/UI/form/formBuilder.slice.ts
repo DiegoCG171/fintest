@@ -44,15 +44,13 @@ export const formBuilderSlice = createSlice({
         tabId: string;
         values: TableRowDataFormBuilder[];
         originalValues: TableRowDataFormBuilder[];
-        isSynced: boolean;
       }>
     ) => {
-      const { tabId, values, originalValues, isSynced } = action.payload;
+      const { tabId, values, originalValues } = action.payload;
       state.tabForms[tabId] = {
         ...(state.tabForms[tabId] || {}),
         values,
         originalValues,
-        isSynced,
       };
     },
 
