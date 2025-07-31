@@ -88,8 +88,7 @@ export const mapValidationTemplate = (validation: FieldValidation[], isActive: b
     });
 
 export const combineTemplateData = (data: FieldValidation[] | null, mappedRules: TableRowDataFormBuilder[], isActive: boolean): TableRowDataFormBuilder[] => {
-    if (!data?.length) return [];
-    const mapData = mapValidationTemplate(data, isActive);
+    const mapData = mapValidationTemplate(data ? data : [], isActive);
 
     const updateRules = (
         rules: TableRowDataFormBuilder[],
