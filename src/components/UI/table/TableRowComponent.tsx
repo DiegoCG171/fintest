@@ -11,17 +11,17 @@ export const TableRowComponent = ({
   keys,
   customRenderers,
   type,
-  activeMessageId,
   onSetActiveMessage,
   onToggle,
   openRows,
+  isActive,
 }: {
   row: TableRowData;
   rowIndex: number;
   keys: string[];
   customRenderers: CustomRenders;
   type?: string;
-  activeMessageId: number | string | undefined;
+  isActive: boolean;
   onSetActiveMessage: (
     id: number | string | undefined,
     message: TableRowData[] | ReactNode | FieldError
@@ -33,16 +33,15 @@ export const TableRowComponent = ({
   const fields = row.fields || [];
   const hasFields = Array.isArray(fields) && fields.length > 0;
   const isExpanded = openRows[rowId] || false;
-
   return (
     <Fragment key={rowIndex}>
       <TableRow
         hover={type === "events"}
-        onClick={() => onSetActiveMessage(row["Tipo de Mensaje"], row.fields)}
+        onClick={() => onSetActiveMessage(row["ID"], row.fields)}
         sx={{
           cursor: type === "events" ? "pointer" : "default",
           background:
-            activeMessageId === row["Tipo de Mensaje"] ? "#D1D1D1" : "transparent",
+            isActive  ? "#EEF7FF" : "transparent",
         }}
       >
         {keys.map((key) => (
