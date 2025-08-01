@@ -1,7 +1,12 @@
 import { AsyncStatus } from ".";
 
 export interface CreateCollection {
-    name: string
+    name: string;
+}
+
+export interface PathCollection {
+    name?: string;
+    cases?: string[];
 }
 
 export interface CollectionsState {

@@ -49,6 +49,7 @@ export interface RecursiveMenuItemProps {
     buildSubItemOptions?: (item: ItemsServiceMenu) => ContextMenuOption[];
     renderCreateChildEditor?: (item: MenuServiceInterface) => React.ReactNode;
     renderEditNodeEditor?: (item: MenuServiceInterface) => React.ReactNode;
+    draggable?: boolean;
 }
 
 export interface HeaderSidebarMenuProps {
@@ -89,6 +90,7 @@ export interface PropsRecursiveMenuSubItem {
     optionsActive?: boolean;
     onClick?: (item: ItemsServiceMenu) => void;
     buildOptions?: (item: ItemsServiceMenu) => ContextMenuOption[];
+    draggable: boolean;
 }
 
 export interface ItemInlineEditorProps {

@@ -60,7 +60,6 @@ function SidebarBlock({
   const createCollectionMenu = useAppSelector(
     (state) => state.sidebarMenu.createCollectionMenu
   );
-  const { templates } = useAppSelector((state) => state.templates);
   const { showToast } = useToast();
 
   const [creatingChildId, setCreatingChildId] = useState<string | undefined>(
@@ -231,9 +230,9 @@ function SidebarBlock({
       options.push({
         item: { label: "Duplicar", id: item.id },
         action: async () => {
-          const originalTemplate = templates.find(
-            (template) => template.uuid === item.id
-          );
+          const originalTemplate = await dispatch(
+            getTemplateByIdThunk(item.id)
+          ).unwrap();
 
           if (!originalTemplate) {
             showToast("Template no encontrado", "error");
@@ -521,6 +520,7 @@ function SidebarBlock({
                 onSelectItem={handleSelectItem}
                 buildOptions={buildedCollectionOptions}
                 buildSubItemOptions={buildedTestCaseOptions}
+                draggable
               />
             ))
           ) : (

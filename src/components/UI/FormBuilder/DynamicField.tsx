@@ -65,9 +65,9 @@ function DynamicField({
         setLocalValue("not_validate");
       } else if (
         tabId.includes("selectionTransaction") &&
-        localValueRef.current !== ""
+        localValueRef.current !== "equals"
       ) {
-        setLocalValue("");
+        setLocalValue("equals");
       }
     }
   }, [value, column.id, tabId]);

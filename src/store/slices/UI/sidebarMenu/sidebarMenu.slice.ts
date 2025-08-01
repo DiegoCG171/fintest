@@ -73,7 +73,7 @@ export const sidebarMenuSlice = createSlice({
       state.loading = false;
     });
     build.addCase(deleteTestCaseThunk.pending, (state, action) => {
-      state.idTestCase = action.meta.arg; // <- Aquí está el ID o datos que enviaste
+      state.idTestCase = action.meta.arg;
       state.loading = true;
     });
     build.addCase(updateTestCaseThunk
@@ -96,7 +96,6 @@ export const sidebarMenuSlice = createSlice({
       (
         state
       ) => {
-        
         state.loading = false;
       }
     );

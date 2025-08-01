@@ -18,6 +18,8 @@ export interface TemplateContextType {
     path: string[]
 }
 
+export type FormTypeKey = "generationTransaction" | "selectionTransaction" | "validationTransaction";
+
 export type CreateTemplate = Omit<TemplateContextType, "_id" | "uuid" | "__v" | "createdAt" | "updatedAt" | "type" | "path">;
 
 export interface JsonTemplateState {
