@@ -3,14 +3,16 @@ import {
     PatchGenerationTemplate,
     TableRowDataFormBuilder,
 } from "../interfaces";
+import { getDefaultFunctionByFormType } from "./setTabFormFromTemplate";
 
 
 function mapAllChildren(rows: TableRowDataFormBuilder[], typeForm: string): FieldUpdateTemplate[] {
+    const defaultFn = getDefaultFunctionByFormType(typeForm);
     return rows.map((row) => {
         const base = {
             idBitmap: row.idBitmap ?? '',
             ...(typeForm !== 'generationTransaction' && { isRequired: Boolean(row.isRequired) }),
-            function: row.function ?? '',
+            function: !row.function?.trim() ? defaultFn : row.function,
             value: row.value ?? '',
         };
 
@@ -30,6 +32,7 @@ export function prepareUpdatePayload(
     rows: TableRowDataFormBuilder[],
     typeForm: string
 ): PatchGenerationTemplate {
+    const defaultFn = getDefaultFunctionByFormType(typeForm);
     const formattedRows: FieldUpdateTemplate[] = rows
         .filter((row) => row.isActive)
         .map((row) => {
@@ -37,7 +40,7 @@ export function prepareUpdatePayload(
         if (typeForm === 'selectionTransaction') {
             return {
                 idBitmap: row.idBitmap ?? '',
-                function: row.function ?? '',
+                function: !row.function?.trim() ? defaultFn : row.function,
                 value: row.value ?? '',
             };
         }
@@ -45,7 +48,7 @@ export function prepareUpdatePayload(
         const base = {
             idBitmap: row.idBitmap ?? '',
             ...(typeForm !== 'generationTransaction' && { isRequired: Boolean(row.isRequired) }),
-            function: row.function ?? '',
+            function: !row.function?.trim() ? defaultFn : row.function,
             value: row.value ?? ''
         };
 
