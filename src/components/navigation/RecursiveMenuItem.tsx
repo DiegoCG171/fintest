@@ -53,9 +53,8 @@ const RecursiveMenuItem = ({
   const [hovered, setHovered] = useState(false);
   const [value, setValue] = useState(item.name);
   const { openMenu } = usePopMenu();
-  const { loading, updateCollection } = useAppSelector(
-    (state) => state.sidebarMenu
-  );
+  const { updateCollection } = useAppSelector((state) => state.sidebarMenu);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (creatingChildId === item.id) {
@@ -86,6 +85,7 @@ const RecursiveMenuItem = ({
 
     if (e.key === "Enter" && isEditing) {
       try {
+        setIsLoading(true);
         if (isCollection) {
           await dispatch(
             updateCollectionThunk({ id: item.id, payload: { name: value } })
@@ -101,13 +101,28 @@ const RecursiveMenuItem = ({
         await refreshCollectionsMenu();
         dispatch(removeUpdateCollection());
       } catch (error) {
+        setIsLoading(false);
         console.error("Error actualizando colección:", error);
+      } finally {
+        setIsLoading(false);
       }
     }
   };
 
   return (
-    <Box sx={{ width: "100%", pl: depth * 0.25, my: 1 }}>
+    <Box
+      sx={{
+        width: "100%",
+        pl: depth * 0.25,
+        my: 1,
+        opacity: 0,
+        animation: "fadeIn 0.3s ease-in forwards",
+        "@keyframes fadeIn": {
+          from: { opacity: 0, transform: "translateY(0)" },
+          to: { opacity: 1, transform: "translateY(0)" },
+        },
+      }}
+    >
       <Box
         sx={{
           display: "flex",
@@ -146,7 +161,7 @@ const RecursiveMenuItem = ({
               value={value}
               onChange={(e) => setValue(e.target.value)}
               onKeyDown={handleKeyDown}
-              disabled={loading}
+              disabled={isLoading}
               sx={{
                 "& .MuiInputBase-input": {
                   fontSize: "12px",
@@ -158,7 +173,7 @@ const RecursiveMenuItem = ({
                   endAdornment: (
                     <IconButton
                       size="small"
-                      disabled={loading}
+                      disabled={isLoading}
                       onClick={() => {
                         if (isEditing) {
                           dispatch(removeUpdateCollection());
@@ -166,7 +181,7 @@ const RecursiveMenuItem = ({
                         }
                       }}
                     >
-                      {loading ? (
+                      {isLoading ? (
                         <CircularProgress size="10px" />
                       ) : (
                         <CancelIcon
@@ -188,14 +203,13 @@ const RecursiveMenuItem = ({
           </Stack>
         ) : (
           renderEditNodeEditor?.(item) ?? (
-          <Stack
-            direction="row"
-            alignItems="center"
-            onMouseEnter={() => setHovered(true)}
-            onMouseLeave={() => setHovered(false)}
-            sx={{ width: "100%" }}
-          >
-            
+            <Stack
+              direction="row"
+              alignItems="center"
+              onMouseEnter={() => setHovered(true)}
+              onMouseLeave={() => setHovered(false)}
+              sx={{ width: "100%" }}
+            >
               <Stack
                 direction="row"
                 spacing={1}
@@ -226,51 +240,82 @@ const RecursiveMenuItem = ({
                   </Typography>
                 </Tooltip>
               </Stack>
-            
-            {optionsActive && (
+
+              {optionsActive && (
+                <Box
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const options =
+                      buildOptions?.(item) || buildSubItemOptions?.(item);
+                    if (options) openMenu(e, options);
+                  }}
+                  sx={{
+                    width: 24,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    cursor: "pointer",
+                    ml: 1,
+                  }}
+                >
+                  <MoreHorizOutlinedIcon
+                    sx={{
+                      fontSize: 16,
+                      color: "text.disabled",
+                      visibility: hovered ? "visible" : "hidden",
+                    }}
+                  />
+                </Box>
+              )}
+              {/* Flecha expand/collapse */}
               <Box
-                onClick={(e) => {
-                  e.stopPropagation();
-                  const options =
-                    buildOptions?.(item) || buildSubItemOptions?.(item);
-                  if (options) openMenu(e, options);
-                }}
                 sx={{
-                  width: 24,
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  cursor: "pointer",
                   ml: 1,
+                  display: "flex",
+                  alignItems: "center",
                 }}
               >
-                <MoreHorizOutlinedIcon
-                  sx={{
-                    fontSize: 16,
-                    color: "text.disabled",
-                    visibility: hovered ? "visible" : "hidden",
-                  }}
-                />
+                {expanded ? (
+                  <KeyboardArrowDownOutlinedIcon sx={{ fontSize: 16 }} />
+                ) : (
+                  <KeyboardArrowRightOutlinedIcon sx={{ fontSize: 16 }} />
+                )}
               </Box>
-            )}
-            {/* Flecha expand/collapse */}
-            <Box
-              sx={{
-                ml: 1,
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
-              {expanded ? (
-                <KeyboardArrowDownOutlinedIcon sx={{ fontSize: 16 }} />
-              ) : (
-                <KeyboardArrowRightOutlinedIcon sx={{ fontSize: 16 }} />
-              )}
-            </Box> 
-          </Stack> )
+            </Stack>
+          )
         )}
       </Box>
-      {expanded && renderCreateChildEditor?.(item)}
+
+      {expanded && creatingChildId === item.id && (
+        <Box
+          sx={{
+            pl: (depth + 1) * 0.25,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            borderRadius: 2,
+            border: "2px solid transparent",
+            padding: 1,
+            margin: 0.5,
+          }}
+        >
+          <Stack
+            direction="row"
+            spacing={1}
+            alignItems="center"
+            sx={{
+              flexGrow: 1,
+              minWidth: 0,
+              overflow: "hidden",
+            }}
+          >
+            <FolderOutlinedIcon sx={{ fontSize: 16, color: "text.disabled" }} />
+
+            {typeof renderCreateChildEditor === "function" &&
+              renderCreateChildEditor(item)}
+          </Stack>
+        </Box>
+      )}
 
       {/* Render hijos recursivamente */}
       {expanded &&

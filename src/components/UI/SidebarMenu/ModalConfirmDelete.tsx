@@ -1,7 +1,7 @@
 import { Box, Button, Modal, Portal, Stack, Typography } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
-import { useAppDispatch, useAppSelector } from "../../../store";
+import { deleteCategorieThunk, getCategoriesByMethodThunk, useAppDispatch, useAppSelector } from "../../../store";
 import { closeConfirmDeleteModal } from "../../../store/slices/UI/confirmDeleteModal/confirmDeleteModal.slice";
 import {
   deleteCollectionThunk,
@@ -22,6 +22,11 @@ const resourceActions = {
     deleteThunk: deleteCollectionThunk,
     toastMessage: "Colección eliminada correctamente",
     title: "¿Estás seguro de que deseas eliminar la colección?",
+  },
+  category: {
+    deleteThunk: deleteCategorieThunk,
+    toastMessage: "Categoria eliminada correctamente",
+    title: "¿Estás seguro de que deseas eliminar la categoría?",
   },
 } as const;
 
@@ -59,9 +64,10 @@ export const ModalConfirmDelete = () => {
     if (!isValidResource(resource)) return;
 
     const config = resourceActions[resource];
-    await dispatch(config.deleteThunk(id));
+    await dispatch<unknown>(config.deleteThunk(id));
     if (method && type) {
       await dispatch(getCollectionsThunk(`${method}/${type}`));
+      await dispatch(getCategoriesByMethodThunk(`${method}/${type}`))
     }
     dispatch(closeConfirmDeleteModal());
     showToast(config.toastMessage, "success");

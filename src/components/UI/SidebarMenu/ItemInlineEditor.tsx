@@ -6,7 +6,6 @@ import { useState } from "react";
 function ItemInlineEditor({
   initialValue = "",
   placeholder = "Escribe un nombre",
-  icon,
   onSubmit,
   onCancel,
 }: ItemInlineEditorProps) {

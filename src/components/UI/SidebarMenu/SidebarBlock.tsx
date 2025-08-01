@@ -5,7 +5,6 @@ import RecursiveMenuItem from "../../navigation/RecursiveMenuItem";
 import {
   createCategorieThunk,
   createTemplateThunk,
-  deleteCategorieThunk,
   getCategoriesByMethodThunk,
   getTemplateByIdThunk,
   getTemplatesThunk,
@@ -22,9 +21,7 @@ import {
 } from "../../../config/interfaces";
 import { useCallback, useMemo, useState } from "react";
 import { useToast } from "../../../config/hooks/useToast";
-import {
-  getCollectionsThunk,
-} from "../../../store/slices/collections/collections.thunk";
+import { getCollectionsThunk } from "../../../store/slices/collections/collections.thunk";
 
 import {
   toggleCreateCollectionMenu,
@@ -77,7 +74,9 @@ function SidebarBlock({
 
     return (
       <ItemInlineEditor
-        icon={<FolderOutlinedIcon sx={{ fontSize: 16, color: "text.disabled" }} /> }
+        icon={
+          <FolderOutlinedIcon sx={{ fontSize: 16, color: "text.disabled" }} />
+        }
         initialValue={item.name}
         placeholder="Nuevo nombre"
         onSubmit={async (newName: string) => {
@@ -108,10 +107,9 @@ function SidebarBlock({
     return (
       <Box sx={{ pl: 1, mt: 0.5 }}>
         <ItemInlineEditor
-          icon={<FolderOutlinedIcon sx={{ fontSize: 16, color: "text.disabled" }} /> }
           placeholder="Nombre de Categoría"
           onSubmit={async (name: string) => {
-            createCategory(name);
+            await createCategory(name);
           }}
           onCancel={() => setCreatingChildId(undefined)}
         />
@@ -129,10 +127,13 @@ function SidebarBlock({
     try {
       await dispatch(createCategorieThunk(body)).unwrap();
       await dispatch(getCategoriesByMethodThunk(`${method}/${type}`)).unwrap();
-      setCreatingChildId(undefined);
       showToast("Categoría creada exitoramente", "success");
+      setTimeout(() => {
+        setCreatingChildId(undefined);
+      }, 300);
     } catch (error) {
       showToast(error as string | "Error al crear la categoría", "error");
+      setCreatingChildId(undefined);
     }
   };
 
@@ -145,7 +146,7 @@ function SidebarBlock({
     );
   };
 
-  const deleteCategorie = async (id: string) => {
+  /* const deleteCategorie = async (id: string) => {
     try {
       await dispatch(deleteCategorieThunk(id)).unwrap();
       await dispatch(getCategoriesByMethodThunk(`${method}/${type}`)).unwrap();
@@ -153,7 +154,7 @@ function SidebarBlock({
     } catch (error) {
       showToast(error as string | "Error al eliminar la categoría", "error");
     }
-  };
+  }; */
 
   const handleSelectItem = useCallback(
     async (item: MenuServiceInterface | ItemsServiceMenu) => {
@@ -199,9 +200,17 @@ function SidebarBlock({
     if (hasPermission(permissions, "delete", "category")) {
       options.push({
         item: { label: "Eliminar", id: item.id },
-        action: () => deleteCategorie(item.id),
+        action: () => dispatch(
+            openConfirmDeleteModal({ id: item.id, resource: "category" })
+          ),
       });
     }
+    /* if (hasPermission(permissions, "delete", "category")) {
+      options.push({
+        item: { label: "Eliminar", id: item.id },
+        action: () => deleteCategorie(item.id),
+      });
+    } */
 
     return options;
   };

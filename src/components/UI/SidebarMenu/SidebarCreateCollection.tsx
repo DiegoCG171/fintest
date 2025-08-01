@@ -1,4 +1,4 @@
-import { IconButton, Stack, TextField } from "@mui/material";
+import { CircularProgress, IconButton, Stack, TextField } from "@mui/material";
 import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { useAppDispatch } from "../../../store";
@@ -12,25 +12,29 @@ export const SidebarCreateCollection = () => {
   const dispatch = useAppDispatch();
   const [value, setValue] = useState("");
   const refreshCollectionsMenu = useRefreshCollectionsMenu();
-  const params = useCreateCollections()
-
+  const params = useCreateCollections();
+  const [loading, setLoading] = useState(false);
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
-  if (e.key === "Enter" && value.trim() !== "") {
-    try {
-      const name = value.trim()
-      const body = {
-        ...params,
-        name
+    if (e.key === "Enter" && value.trim() !== "") {
+      try {
+        const name = value.trim();
+        const body = {
+          ...params,
+          name,
+        };
+        setLoading(true);
+        await dispatch(createCollectionThunk(body)).unwrap();
+        await refreshCollectionsMenu();
+        setValue("");
+        dispatch(toggleCreateCollectionMenu(false));
+      } catch (error) {
+        console.error("Error al crear la colección:", error);
+        setLoading(false);
+      } finally {
+        setLoading(false);
       }
-      await dispatch(createCollectionThunk(body)).unwrap();
-      await refreshCollectionsMenu();
-      setValue("");
-      dispatch(toggleCreateCollectionMenu(false));
-    } catch (error) {
-      console.error("Error al crear la colección:", error);
     }
-  }
-};
+  };
 
   return (
     <Stack
@@ -61,16 +65,20 @@ export const SidebarCreateCollection = () => {
                   dispatch(toggleCreateCollectionMenu(false));
                 }}
               >
-                <CancelIcon
-                  sx={{
-                    fontSize: 12,
-                    color: "text.disabled",
-                    cursor: "pointer",
-                    "&:hover": {
-                      color: "text.primary",
-                    },
-                  }}
-                />
+                {loading ? (
+                  <CircularProgress size="10px" />
+                ) : (
+                  <CancelIcon
+                    sx={{
+                      fontSize: 12,
+                      color: "text.disabled",
+                      cursor: "pointer",
+                      "&:hover": {
+                        color: "text.primary",
+                      },
+                    }}
+                  />
+                )}
               </IconButton>
             ),
           },
