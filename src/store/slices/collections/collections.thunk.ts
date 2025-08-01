@@ -5,13 +5,13 @@ import {
   getCollections,
   updateCollection,
 } from "../../../services/catalogs/collections.service";
-import { CreateCollection } from "../../../config/interfaces/collections.interface";
+import { CreateCollection, PathCollection } from "../../../config/interfaces/collections.interface";
 import {
   CreateTestCase,
   createTestCase,
   deleteTestCase
 } from "../../../services/catalogs/testCases.service";
-import { PatchGenerationTemplate, testCaseInterface } from "../../../config/interfaces";
+import { testCaseInterface } from "../../../config/interfaces";
 
 export const getCollectionsThunk = createAsyncThunk(
   "collections/getAll",
@@ -39,7 +39,7 @@ export const createCollectionThunk = createAsyncThunk(
 
 export const updateCollectionThunk = createAsyncThunk<
   testCaseInterface,
-  { id: string; payload: PatchGenerationTemplate },
+  { id: string; payload: PathCollection },
   { rejectValue: string }
 >("collection/update", async ({ id, payload }, { rejectWithValue }) => {
   try {
