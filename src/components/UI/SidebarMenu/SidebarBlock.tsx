@@ -18,9 +18,7 @@ import {
 } from "../../../config/interfaces";
 import { useCallback, useMemo } from "react";
 import { useToast } from "../../../config/hooks/useToast";
-import {
-  getCollectionsThunk,
-} from "../../../store/slices/collections/collections.thunk";
+import { getCollectionsThunk } from "../../../store/slices/collections/collections.thunk";
 
 import {
   toggleCreateCollectionMenu,
@@ -58,7 +56,6 @@ function SidebarBlock({
   const createCollectionMenu = useAppSelector(
     (state) => state.sidebarMenu.createCollectionMenu
   );
-  const { templates } = useAppSelector((state) => state.templates);
   const { showToast } = useToast();
 
   const addToCollections = (item: ItemsServiceMenu) => {
@@ -127,9 +124,9 @@ function SidebarBlock({
       options.push({
         item: { label: "Duplicar", id: item.id },
         action: async () => {
-          const originalTemplate = templates.find(
-            (template) => template.uuid === item.id
-          );
+          const originalTemplate = await dispatch(
+            getTemplateByIdThunk(item.id)
+          ).unwrap();
 
           if (!originalTemplate) {
             showToast("Template no encontrado", "error");

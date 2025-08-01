@@ -16,7 +16,7 @@ import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
 import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
 import KeyboardArrowRightOutlinedIcon from "@mui/icons-material/KeyboardArrowRightOutlined";
 import KeyboardArrowDownOutlinedIcon from "@mui/icons-material/KeyboardArrowDownOutlined";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   setLoading,
   updateTestCaseThunk,
@@ -24,13 +24,13 @@ import {
   useAppSelector,
 } from "../../store";
 import RecursiveMenuSubItem from "./RecursiveMenuSubItem";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePopMenu } from "../../config/hooks/usePopMenu";
 import {
   removeUpdateCollection,
   removeUpdateTestCase,
 } from "../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
-import { updateCollectionThunk } from "../../store/slices/collections/collections.thunk";
+import { getCollectionsThunk, updateCollectionThunk } from "../../store/slices/collections/collections.thunk";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { useRefreshCollectionsMenu } from "../../config/hooks/useRefreshCollectionsMenu";
 
@@ -47,9 +47,7 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import {
-  restrictToVerticalAxis,
-} from '@dnd-kit/modifiers';
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 
 const RecursiveMenuItem = ({
   item,
@@ -58,7 +56,7 @@ const RecursiveMenuItem = ({
   onSelectItem,
   buildOptions,
   buildSubItemOptions,
-  draggable = false
+  draggable = false,
 }: RecursiveMenuItemProps) => {
   const refreshCollectionsMenu = useRefreshCollectionsMenu();
 
@@ -73,22 +71,28 @@ const RecursiveMenuItem = ({
   );
 
   const sensors = useSensors(useSensor(PointerSensor));
+  const { method, type } = useParams();
 
   const [itemsOrder, setItemsOrder] = useState(
     item.items?.map((i) => i.id) || []
   );
 
-  const handleDragEnd = (event: DragEndEvent) => {
-  const { active, over } = event;
-  if (over && active.id !== over.id) {
-    const oldIndex = itemsOrder.indexOf(String(active.id));
-    const newIndex = itemsOrder.indexOf(String(over.id));
+  useEffect(() => {
+    setItemsOrder(item.items?.map((i) => i.id) || []);
+  }, [item]);
 
-    const newOrder = arrayMove(itemsOrder, oldIndex, newIndex);
-    setItemsOrder(newOrder);
-  }
-};
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const oldIndex = itemsOrder.indexOf(String(active.id));
+      const newIndex = itemsOrder.indexOf(String(over.id));
 
+      const newOrder = arrayMove(itemsOrder, oldIndex, newIndex);
+      setItemsOrder(newOrder);
+      await dispatch(updateCollectionThunk({id: item.id, payload: {cases: newOrder}}))
+      await dispatch(getCollectionsThunk(`${method}/${type}`));
+    }
+  };
 
   const onDecisionHandler = async (
     item: MenuServiceInterface | ItemsServiceMenu
@@ -274,8 +278,6 @@ const RecursiveMenuItem = ({
                 />
               </Box>
             )}
-
-            {/* Flecha expand/collapse */}
             <Box
               sx={{
                 ml: 1,
@@ -310,7 +312,7 @@ const RecursiveMenuItem = ({
           </Box>
         )}
       {expanded && Array.isArray(item.items) && item.items?.length > 0 && (
-        <Box sx={{ pl: 1, maxWidth: '250px', overflow: 'hidden' }}>
+        <Box sx={{ pl: 1, maxWidth: "250px", overflow: "hidden" }}>
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}

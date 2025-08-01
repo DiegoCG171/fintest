@@ -171,7 +171,7 @@ const RecursiveMenuSubItem = ({
             }}
           >
             {draggable && (
-              <Box {...listeners} sx={{ cursor: "grab" }}>
+              <Box {...listeners} sx={{  cursor: isDragging ? "grabbing" : "grab", }}>
                 <DragIndicatorIcon
                   sx={{ fontSize: 12, color: "text.disabled" }}
                 />
