@@ -31,7 +31,7 @@ function getNestedRow(
 }
 
 export const formBuilderSlice = createSlice({
-  name: 'formBuilder',
+  name: "formBuilder",
   initialState,
   reducers: {
     setConfig(state, action: PayloadAction<ColumnConfigFormBuilder[]>) {
@@ -58,7 +58,10 @@ export const formBuilderSlice = createSlice({
 
     setOriginalValuesForTab: (
       state,
-      action: PayloadAction<{ tabId: string; originalValues: TableRowDataFormBuilder[] }>
+      action: PayloadAction<{
+        tabId: string;
+        originalValues: TableRowDataFormBuilder[];
+      }>
     ) => {
       const { tabId, originalValues } = action.payload;
       if (state.tabForms[tabId]) {
@@ -106,19 +109,119 @@ export const formBuilderSlice = createSlice({
         targetRow[fieldKey] = value;
       }
     },
+    updateIsRequiredRecursive(
+      state,
+      action: PayloadAction<{
+        tabId: string;
+        path: number[];
+        value: boolean;
+      }>
+    ) {
+      const { tabId, path, value } = action.payload;
+      const tab = state.tabForms[tabId];
+      if (!tab) return;
 
+      // Función recursiva que actualiza sólo hijos últimos niveles
+      function updateRecursive(
+        rows: TableRowDataFormBuilder[],
+        currentPathIndex = 0
+      ) {
+        const index = path[currentPathIndex];
+        if (!rows || !rows[index]) return;
+
+        // Actualizar el nodo actual si es el destino exacto
+        if (currentPathIndex === path.length - 1) {
+          rows[index].isRequired = value;
+
+          if (Array.isArray(rows[index].breakingRules)) {
+            rows[index].breakingRules.forEach((child) => {
+              // Solo actualiza hijos que NO tienen hijos (último nivel)
+              if (
+                !Array.isArray(child.breakingRules) ||
+                child.breakingRules.length === 0
+              ) {
+                child.isRequired = value;
+              }
+              // No desciende en hijos con hijos
+            });
+          }
+          return;
+        }
+
+        // Si no es el destino, seguimos bajando
+        if (Array.isArray(rows[index].breakingRules)) {
+          updateRecursive(rows[index].breakingRules, currentPathIndex + 1);
+        }
+      }
+
+      updateRecursive(tab.values);
+    },
+    updateIsActiveRecursive(
+      state,
+      action: PayloadAction<{
+        tabId: string;
+        path: number[];
+        value: boolean;
+      }>
+    ) {
+      const { tabId, path, value } = action.payload;
+      const tab = state.tabForms[tabId];
+      if (!tab) return;
+
+      // Función recursiva que actualiza sólo hijos últimos niveles
+      function updateRecursive(
+        rows: TableRowDataFormBuilder[],
+        currentPathIndex = 0
+      ) {
+        const index = path[currentPathIndex];
+        if (!rows || !rows[index]) return;
+
+        // Actualizar el nodo actual si es el destino exacto
+        if (currentPathIndex === path.length - 1) {
+          rows[index].isActive = value;
+
+          if (Array.isArray(rows[index].breakingRules)) {
+            rows[index].breakingRules.forEach((child) => {
+              // Solo actualiza hijos que NO tienen hijos (último nivel)
+              if (
+                !Array.isArray(child.breakingRules) ||
+                child.breakingRules.length === 0
+              ) {
+                child.isActive = value;
+              }
+              // No desciende en hijos con hijos
+            });
+          }
+          return;
+        }
+
+        // Si no es el destino, seguimos bajando
+        if (Array.isArray(rows[index].breakingRules)) {
+          updateRecursive(rows[index].breakingRules, currentPathIndex + 1);
+        }
+      }
+
+      updateRecursive(tab.values);
+    },
     setVisibility(
       state,
-      action: PayloadAction<{ tabId: string; visibility: Record<string, boolean> }>
+      action: PayloadAction<{
+        tabId: string;
+        visibility: Record<string, boolean>;
+      }>
     ) {
       const { tabId, visibility } = action.payload;
       if (!state.tabForms[tabId]) {
-        state.tabForms[tabId] = { values: [], originalValues: [], visibility: {} };
+        state.tabForms[tabId] = {
+          values: [],
+          originalValues: [],
+          visibility: {},
+        };
       }
       state.tabForms[tabId].visibility = visibility;
     },
   },
-})
+});
 
 export const {
   setConfig,
@@ -126,8 +229,10 @@ export const {
   setOriginalValuesForTab,
   updateFieldValue,
   updateNestedFieldValue,
+  updateIsRequiredRecursive,
+  updateIsActiveRecursive,
   setVisibility,
-  resetOriginalValues
-} = formBuilderSlice.actions
+  resetOriginalValues,
+} = formBuilderSlice.actions;
 
-export default formBuilderSlice
+export default formBuilderSlice;

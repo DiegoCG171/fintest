@@ -36,15 +36,15 @@ export const transformCollectionsToMenu = (
 
         const items: ItemsServiceMenu[] = Array.isArray(collection.cases)
         ? collection.cases.map((c) => ({
-            id: c.uuid,
-            name: c.name,
-            linkMenu: [parentPath, c.uuid].join("/"),
+            id: c?.uuid,
+            name: c?.name,
+            linkMenu: [parentPath, c?.uuid].join("/"),
             }))
         : [];
 
         return {
-        id: collection.uuid,
-        name: collection.name,
+        id: collection?.uuid,
+        name: collection?.name,
         children: [],
         items,
         };
