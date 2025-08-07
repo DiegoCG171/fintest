@@ -29,27 +29,31 @@ export const addLinkMenu = (
 export const transformCollectionsToMenu = (
     collections: CollectionResponse[],
     parentPath: string
-    ): MenuServiceInterface[] => {
+): MenuServiceInterface[] => {
     if (!Array.isArray(collections)) return [];
 
-    return collections.map((collection) => {
+    return collections
+        .filter((collection): collection is CollectionResponse => Boolean(collection && collection.uuid && collection.name))
+        .map((collection) => {
+            const items: ItemsServiceMenu[] = Array.isArray(collection.cases)
+                ? collection.cases
+                    .filter((c): c is { uuid: string; name: string } => Boolean(c && c.uuid && c.name))
+                    .map((c) => ({
+                        id: c.uuid,
+                        name: c.name,
+                        linkMenu: [parentPath, c.uuid].join("/"),
+                    }))
+                : [];
 
-        const items: ItemsServiceMenu[] = Array.isArray(collection.cases)
-        ? collection.cases.map((c) => ({
-            id: c?.uuid,
-            name: c?.name,
-            linkMenu: [parentPath, c?.uuid].join("/"),
-            }))
-        : [];
-
-        return {
-        id: collection?.uuid,
-        name: collection?.name,
-        children: [],
-        items,
-        };
-    });
+            return {
+                id: collection?.uuid,
+                name: collection?.name,
+                children: [],
+                items,
+            };
+        });
 };
+
 
 
 

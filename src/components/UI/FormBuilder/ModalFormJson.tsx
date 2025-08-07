@@ -25,7 +25,7 @@ import { deepClean } from "../../../config/utils/deepClean";
 import { useEffect, useState } from "react";
 import CategoriesFormJSON from "./CategoriesFormJSON";
 import { useParams } from "react-router-dom";
-import { setTabFormFromTemplate } from "../../../config/utils/setTabFormFromTemplate";
+import { assignDefaultFunctions, setTabFormFromTemplate } from "../../../config/utils/setTabFormFromTemplate";
 import { addOrUpdateTemplate } from "../../../store/slices/templates/template.slice";
 
 function ModalFormJson({ mode = "create" }: ModalFormProps) {
@@ -63,6 +63,7 @@ function ModalFormJson({ mode = "create" }: ModalFormProps) {
       "Completa los campos necesarios para crear un nuevo template que podrás utilizar más adelante. Asegúrate de que toda la información esté correcta antes de guardar.";
   }
 
+
   useEffect(() => {
     if (isEditMode && templateName) {
       setVewTemplateName(templateName);
@@ -92,7 +93,8 @@ function ModalFormJson({ mode = "create" }: ModalFormProps) {
   }, [mode, templateData, dispatch]);
 
   const jsonData = useAppSelector((state) => state.jsonTemplate.data);
-  const mutableJsonData = { ...jsonData };
+  const mutableJsonData = JSON.parse(JSON.stringify(jsonData));
+
 
   const handleSubmit = () => {
     if (mode === "create") {
@@ -106,6 +108,7 @@ function ModalFormJson({ mode = "create" }: ModalFormProps) {
     if (!category) return;
     mutableJsonData.categoryId = category;
     mutableJsonData.name = newTemplateName;
+    assignDefaultFunctions(mutableJsonData);
     try {
       await dispatch(
         createTemplateThunk({ template: mutableJsonData })
@@ -127,6 +130,7 @@ function ModalFormJson({ mode = "create" }: ModalFormProps) {
     if (!category) return null;
     mutableJsonData.name = newTemplateName;
     mutableJsonData.categoryId = category;
+    assignDefaultFunctions(mutableJsonData);
     try {
       const result = await dispatch(
         updateTemplateThunk({
