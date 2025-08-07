@@ -46,8 +46,8 @@ export const transformCollectionsToMenu = (
                 : [];
 
             return {
-                id: collection.uuid,
-                name: collection.name,
+                id: collection?.uuid,
+                name: collection?.name,
                 children: [],
                 items,
             };

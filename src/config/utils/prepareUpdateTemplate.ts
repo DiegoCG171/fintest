@@ -1,7 +1,7 @@
 import {
-    FieldUpdateTemplate,
-    PatchGenerationTemplate,
-    TableRowDataFormBuilder,
+  FieldUpdateTemplate,
+  PatchGenerationTemplate,
+  TableRowDataFormBuilder,
 } from "../interfaces";
 import { getDefaultFunctionByFormType } from "./setTabFormFromTemplate";
 
@@ -15,22 +15,20 @@ function mapAllChildren(rows: TableRowDataFormBuilder[], typeForm: string): Fiel
             function: !row.function?.trim() ? defaultFn : row.function,
             value: row.value ?? '',
         };
-
         const children = Array.isArray(row.breakingRules)
             ? mapAllChildren(row.breakingRules as TableRowDataFormBuilder[], typeForm)
             : [];
-
-        /* return children.length > 0
+      /* return children.length > 0
             ? { ...base, fields: children }
             : base; */
 
-        return { ...base, fields: children }
+      return { ...base, fields: children };
     });
 }
 
 export function prepareUpdatePayload(
-    rows: TableRowDataFormBuilder[],
-    typeForm: string
+  rows: TableRowDataFormBuilder[],
+  typeForm: string
 ): PatchGenerationTemplate {
     const defaultFn = getDefaultFunctionByFormType(typeForm);
     const formattedRows: FieldUpdateTemplate[] = rows
@@ -52,16 +50,17 @@ export function prepareUpdatePayload(
             value: row.value ?? ''
         };
 
-        const children = Array.isArray(row.breakingRules)
-            ? mapAllChildren(row.breakingRules as TableRowDataFormBuilder[], typeForm)
-            : [];
+      const children = Array.isArray(row.breakingRules)
+        ? mapAllChildren(
+            row.breakingRules as TableRowDataFormBuilder[],
+            typeForm
+          )
+        : [];
 
-        return children.length > 0
-            ? { ...base, fields: children }
-            : base;
-        });
+      return children.length > 0 ? { ...base, fields: children } : base;
+    });
 
-    return {
-        [typeForm]: formattedRows,
-    };
+  return {
+    [typeForm]: formattedRows,
+  };
 }

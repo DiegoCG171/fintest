@@ -7,19 +7,18 @@ import {
     FieldValidation,
     FormTypeKey,
 } from "../interfaces";
-import {
-    mapFieldRulesToFormStructure,
-    combineTemplateData,
-} from "./mappers";
+import { mapFieldRulesToFormStructure, combineTemplateData } from "./mappers";
 
 function getFieldsByFormType(
-    template: TemplateContextType,
-    formType: string
+  template: TemplateContextType,
+  formType: string
 ): FieldValidation[] {
-    if (formType === "generationTransaction") return template.generationTransaction;
-    if (formType === "selectionTransaction") return template.selectionTransaction;
-    if (formType === "generationTransaction") return template.generationTransaction;
-    return template.validationTransaction;
+  if (formType === "generationTransaction")
+    return template.generationTransaction;
+  if (formType === "selectionTransaction") return template.selectionTransaction;
+  if (formType === "generationTransaction")
+    return template.generationTransaction;
+  return template.validationTransaction;
 }
 
 export function getDefaultFunctionByFormType(formType: string): string {
@@ -30,11 +29,11 @@ export function getDefaultFunctionByFormType(formType: string): string {
 }
 
 export function generateTabFormValuesFromTemplate(
-    template: TemplateContextType,
-    rawRules: Field[],
-    formType: string
+  template: TemplateContextType,
+  rawRules: Field[],
+  formType: string
 ): TableRowDataFormBuilder[] {
-    if (!rawRules?.length) return [];
+  if (!rawRules?.length) return [];
 
     const mappedRules = mapFieldRulesToFormStructure(rawRules);
     const fields = getFieldsByFormType(template, formType);
@@ -44,10 +43,10 @@ export function generateTabFormValuesFromTemplate(
 }
 
 export function setTabFormFromTemplate(
-    template: TemplateContextType,
-    formType: string,
-    rawRules: Field[],
-    dispatch: AppDispatch
+  template: TemplateContextType,
+  formType: string,
+  rawRules: Field[],
+  dispatch: AppDispatch
 ): void {
     const tabId = `${template.uuid}-${formType}`;
     const values = generateTabFormValuesFromTemplate(template, rawRules, formType);

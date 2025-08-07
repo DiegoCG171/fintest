@@ -7,6 +7,10 @@ import {
   useAppDispatch,
   useAppSelector,
 } from "../../../store";
+import {
+  updateIsActiveRecursive,
+  updateIsRequiredRecursive,
+} from "../../../store/slices/UI/form/formBuilder.slice";
 
 type Primitive = string | number | boolean;
 
@@ -19,7 +23,6 @@ function DynamicField({
   isEditable,
   onlyRead,
 }: DynamicFieldProps) {
-
   const dispatch = useAppDispatch();
   const dependsOn = column?.dependsOn;
   const dependsValue = dependsOn ? row[dependsOn] : undefined;
@@ -78,63 +81,127 @@ function DynamicField({
   });
 
   const handleChange = (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | any
-) => {
-  const newValue = e.target.value;
-  const fieldKey = column.id;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | any
+  ) => {
+    const newValue = e.target.value;
+    const fieldKey = column.id;
+    const boolValue = newValue === "true" || newValue === true;
 
-  if (path.length > 1) {
-    dispatch(
-      updateNestedFieldValue({
-        tabId,
-        path,
-        fieldKey,
-        value: newValue,
-      })
-    );
-  } else {
-    dispatch(
-      updateFieldValue({
-        tabId,
-        rowIndex: path[0],
-        fieldKey,
-        value: newValue,
-      })
-    );
-  }
+    const hasChildren =
+      Array.isArray(row.breakingRules) && row.breakingRules.length > 0;
 
-  if (fieldKey === "function" && newValue === "not_validate") {
-    const valueFieldKey = "value";
+    if (fieldKey === "isActive") {
+      if (hasChildren) {
+        dispatch(
+          updateIsActiveRecursive({
+            tabId,
+            path,
+            value: boolValue,
+          })
+        );
+      }
 
-    if (path.length > 1) {
-      dispatch(
-        updateNestedFieldValue({
-          tabId,
-          path,
-          fieldKey: valueFieldKey,
-          value: "",
-        })
-      );
-    } else {
-      dispatch(
-        updateFieldValue({
-          tabId,
-          rowIndex: path[0],
-          fieldKey: valueFieldKey,
-          value: "",
-        })
-      );
+      if (path.length > 1) {
+        dispatch(
+          updateNestedFieldValue({
+            tabId,
+            path,
+            fieldKey,
+            value: boolValue,
+          })
+        );
+      } else {
+        dispatch(
+          updateFieldValue({
+            tabId,
+            rowIndex: path[0],
+            fieldKey,
+            value: boolValue,
+          })
+        );
+      }
     }
-  }
-};
+    if (fieldKey === "isRequired") {
+      if (hasChildren) {
+        dispatch(
+          updateIsRequiredRecursive({
+            tabId,
+            path,
+            value: boolValue,
+          })
+        );
+      }
 
+      if (path.length > 1) {
+        dispatch(
+          updateNestedFieldValue({
+            tabId,
+            path,
+            fieldKey,
+            value: boolValue,
+          })
+        );
+      } else {
+        dispatch(
+          updateFieldValue({
+            tabId,
+            rowIndex: path[0],
+            fieldKey,
+            value: boolValue,
+          })
+        );
+      }
+    } else {
+      if (path.length > 1) {
+        dispatch(
+          updateNestedFieldValue({
+            tabId,
+            path,
+            fieldKey,
+            value: newValue,
+          })
+        );
+      } else {
+        dispatch(
+          updateFieldValue({
+            tabId,
+            rowIndex: path[0],
+            fieldKey,
+            value: newValue,
+          })
+        );
+      }
+    }
+
+    if (fieldKey === "function" && newValue === "not_validate") {
+      const valueFieldKey = "value";
+      if (path.length > 1) {
+        dispatch(
+          updateNestedFieldValue({
+            tabId,
+            path,
+            fieldKey: valueFieldKey,
+            value: "",
+          })
+        );
+      } else {
+        dispatch(
+          updateFieldValue({
+            tabId,
+            rowIndex: path[0],
+            fieldKey: valueFieldKey,
+            value: "",
+          })
+        );
+      }
+    }
+  };
 
   function shouldDisableCheckbox(
-    isChild: boolean,
     dependsValue: string | unknown
   ): boolean {
-    return !isChild && !dependsValue;
+    return !dependsValue;
   }
 
   const getFilteredFunctionOptions = () => {
@@ -252,7 +319,7 @@ function DynamicField({
   }
 
   if (column.dependsOn && column.type === "checkbox") {
-    const isDisabled = shouldDisableCheckbox(isChild, dependsValue);
+    const isDisabled = shouldDisableCheckbox(dependsValue);
     const realValue = localValue ?? row.isRequired;
     return (
       <input
@@ -265,7 +332,10 @@ function DynamicField({
   }
 
   if (!column.dependsOn) {
-    if (column.type === "checkbox" && path.length === 1) {
+    if (
+      column.type === "checkbox" &&
+      (path.length === 1 || (row.breakingRules?.length ?? 0) > 0)
+    ) {
       const realValue = localValue ?? row.isRequired;
       return (
         <input
