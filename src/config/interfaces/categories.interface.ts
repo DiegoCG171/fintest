@@ -25,5 +25,32 @@ export interface CategoriesState {
     categories: RootCategoryesInterface | null;
     status: AsyncStatus;
     error: string | null;
-} 
+}
+
+export interface createCategoryInterface {
+    name: string,
+    parent?: string | null
+}
+
+export interface createCategoryResponse {
+    id: string
+    name: string
+    parent: ParentCategory | null
+    createdAt: string
+    updatedAt: string
+    deletedAt: string | null
+}
+
+export interface ParentCategory {
+    id: string
+    name: string
+    createdAt: string
+    updatedAt: string
+    deletedAt: string | null
+}
+
+export interface UpdateCategoriePayload {
+    data: createCategoryInterface;
+    id: string;
+}
 

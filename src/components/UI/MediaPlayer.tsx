@@ -11,7 +11,7 @@ import {
   useAppDispatch,
   useAppSelector,
 } from "../../store";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useToast } from "../../config/hooks/useToast";
 
 function MediaPlayer() {
@@ -25,13 +25,15 @@ function MediaPlayer() {
   const serverPort = useAppSelector((state) => state.server.server?.portNumber);
   const playError = useAppSelector((state) => state.server.error);
   const stopError = useAppSelector((state) => state.server.stopServererror);
-  const [canStop, setCanStop] = useState(false)
+  const [canStop, setCanStop] = useState(false);
+  const showToastRef = useRef(showToast);
 
   const [playerMessage, setPlayerMessage] = useState("Detenido...");
-  const updateMessage = (msg: string) => {
-  setPlayerMessage((prev) => (prev !== msg ? msg : prev));
-};
-
+  const updateMessage = useCallback((msg: string) => {
+    setPlayerMessage((prev) => {
+      return prev !== msg ? msg : prev;
+    });
+  }, []);
 
   const clearErrors = useCallback(() => {
     dispatch(clearServerError());
@@ -42,21 +44,21 @@ function MediaPlayer() {
     clearErrors();
     try {
       await dispatch(startServerThunk()).unwrap();
-      setCanStop(true)
+      setCanStop(true);
     } catch (error) {
       console.error("Error al iniciar el servidor:", error);
     }
   }, [dispatch, clearErrors]);
 
-  const stopServer = useCallback(async() => {
+  const stopServer = useCallback(async () => {
     clearErrors();
     if (serverId) {
       try {
         await dispatch(stopServerThunk(serverId)).unwrap();
-        setCanStop(false)
+        setCanStop(false);
       } catch (error) {
         console.error("Error al detener el servidor:", error);
-        showToast(error as string, "error")
+        showToast(error as string, "error");
       } finally {
         dispatch(clearServer());
       }
@@ -72,7 +74,7 @@ function MediaPlayer() {
     }
     if (playStatus === "error") {
       updateMessage("Detenido...");
-      showToast("Hubo un error al levantar la sesión", "error");
+      showToastRef.current("Hubo un error al levantar la sesión", "error");
     }
     if (stopStatus === "loading") {
       updateMessage("Desconectando...");
@@ -83,7 +85,16 @@ function MediaPlayer() {
     if (stopStatus === "error") {
       updateMessage("Detenido...");
     }
-  }, [playStatus, serverIP, playError, stopStatus, stopError, serverPort, showToast]);
+  }, [
+    playStatus,
+    serverIP,
+    playError,
+    stopStatus,
+    stopError,
+    serverPort,
+    showToastRef,
+    updateMessage,
+  ]);
 
   return (
     <Box
@@ -108,7 +119,7 @@ function MediaPlayer() {
             display: "inline-block",
             color: (theme) => theme.palette.text.disabled,
             fontSize: 12,
-            fontWeight: 600
+            fontWeight: 600,
           }}
         >
           {playerMessage}
@@ -147,7 +158,7 @@ function MediaPlayer() {
               playStatus === "success"
                 ? {}
                 : {
-                    transform: "scale(0.95)"
+                    transform: "scale(0.95)",
                   },
           }}
           onClick={playStatus !== "success" ? startServer : undefined}
@@ -167,7 +178,7 @@ function MediaPlayer() {
               stopStatus === "success"
                 ? {}
                 : {
-                    transform: "scale(0.95)"
+                    transform: "scale(0.95)",
                   },
           }}
           onClick={stopServer}
