@@ -121,7 +121,6 @@ export const formBuilderSlice = createSlice({
       const tab = state.tabForms[tabId];
       if (!tab) return;
 
-      // Función recursiva que actualiza sólo hijos últimos niveles
       function updateRecursive(
         rows: TableRowDataFormBuilder[],
         currentPathIndex = 0
@@ -129,26 +128,21 @@ export const formBuilderSlice = createSlice({
         const index = path[currentPathIndex];
         if (!rows || !rows[index]) return;
 
-        // Actualizar el nodo actual si es el destino exacto
         if (currentPathIndex === path.length - 1) {
           rows[index].isRequired = value;
 
           if (Array.isArray(rows[index].breakingRules)) {
             rows[index].breakingRules.forEach((child) => {
-              // Solo actualiza hijos que NO tienen hijos (último nivel)
               if (
                 !Array.isArray(child.breakingRules) ||
                 child.breakingRules.length === 0
               ) {
                 child.isRequired = value;
               }
-              // No desciende en hijos con hijos
             });
           }
           return;
         }
-
-        // Si no es el destino, seguimos bajando
         if (Array.isArray(rows[index].breakingRules)) {
           updateRecursive(rows[index].breakingRules, currentPathIndex + 1);
         }
@@ -168,34 +162,27 @@ export const formBuilderSlice = createSlice({
       const tab = state.tabForms[tabId];
       if (!tab) return;
 
-      // Función recursiva que actualiza sólo hijos últimos niveles
       function updateRecursive(
         rows: TableRowDataFormBuilder[],
         currentPathIndex = 0
       ) {
         const index = path[currentPathIndex];
         if (!rows || !rows[index]) return;
-
-        // Actualizar el nodo actual si es el destino exacto
         if (currentPathIndex === path.length - 1) {
           rows[index].isActive = value;
 
           if (Array.isArray(rows[index].breakingRules)) {
             rows[index].breakingRules.forEach((child) => {
-              // Solo actualiza hijos que NO tienen hijos (último nivel)
               if (
                 !Array.isArray(child.breakingRules) ||
                 child.breakingRules.length === 0
               ) {
                 child.isActive = value;
               }
-              // No desciende en hijos con hijos
             });
           }
           return;
         }
-
-        // Si no es el destino, seguimos bajando
         if (Array.isArray(rows[index].breakingRules)) {
           updateRecursive(rows[index].breakingRules, currentPathIndex + 1);
         }
