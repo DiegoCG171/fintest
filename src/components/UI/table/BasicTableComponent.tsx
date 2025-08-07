@@ -11,7 +11,7 @@ import {
   FieldError,
   TableRowData,
 } from "../../../config/interfaces";
-import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+import { useAppDispatch } from "../../../store/hooks";
 import { setActiveMessage } from "../../../store/slices/messages/messages.slice";
 import { TableRowComponent } from "./TableRowComponent";
 import { TableHeader } from "./TableHeader";
@@ -24,7 +24,6 @@ function BasicTable({
   typeTable = "events",
 }: BasicTableProps) {
   const dispatch = useAppDispatch();
-  const { activeMessage } = useAppSelector((state) => state.messagesReducer);
   const navigate = useNavigate();
   const { method, type } = useParams();
   const urlBase = `/${method}/${type}`;
@@ -32,7 +31,7 @@ function BasicTable({
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [keys, setKeys] = useState<string[]>([]);
   const [openRows, setOpenRows] = useState<{ [key: string]: boolean }>({});
-
+  const [activeRowKey, setActiveRowKey] = useState<string | null>(null);
   const handleToggle = (id: string) => {
     setOpenRows((prev) => ({ ...prev, [id]: !prev[id] }));
   };
@@ -95,20 +94,28 @@ function BasicTable({
         <Table stickyHeader>
           <TableHeader keys={keys} />
           <TableBody>
-            {rowsToShow.map((row: TableRowData, rowIndex: number) => (
-              <TableRowComponent
-                key={rowIndex}
-                row={row}
-                rowIndex={rowIndex}
-                keys={keys}
-                customRenderers={customRenderers}
-                type={typeTable}
-                activeMessageId={activeMessage.id}
-                onSetActiveMessage={handleSetActiveMessage}
-                onToggle={handleToggle}
-                openRows={openRows}
-              />
-            ))}
+            {rowsToShow.map((row: TableRowData, rowIndex: number) => {
+              const currentKey = `${row["ID"]}-${rowIndex}`;
+              const isActive = !!row["ID"] && activeRowKey === currentKey;
+
+              return (
+                <TableRowComponent
+                  key={rowIndex}
+                  row={row}
+                  rowIndex={rowIndex}
+                  keys={keys}
+                  customRenderers={customRenderers}
+                  type={typeTable}
+                  isActive={isActive} 
+                  onSetActiveMessage={() => {
+                    setActiveRowKey(currentKey); 
+                    handleSetActiveMessage(row["ID"], row.fields);
+                  }}
+                  onToggle={handleToggle}
+                  openRows={openRows}
+                />
+              );
+            })}
           </TableBody>
         </Table>
       </TableContainer>

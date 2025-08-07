@@ -29,7 +29,7 @@ export * from './slices/users/user.thunk'
 //Categories
 export * from './slices/categories/categories.thunk'
 
-//Toutes
+//Routes
 export * from './slices/routes/validRoutes.slice.slice'
 
 //UI

@@ -53,9 +53,12 @@ const RecursiveMenuItem = ({
   item,
   depth = 0,
   optionsActive,
+  creatingChildId,
   onSelectItem,
   buildOptions,
   buildSubItemOptions,
+  renderCreateChildEditor,
+  renderEditNodeEditor,
   draggable = false,
 }: RecursiveMenuItemProps) => {
   const refreshCollectionsMenu = useRefreshCollectionsMenu();
@@ -66,9 +69,14 @@ const RecursiveMenuItem = ({
   const [hovered, setHovered] = useState(false);
   const [value, setValue] = useState(item.name);
   const { openMenu } = usePopMenu();
-  const { loading, updateCollection } = useAppSelector(
-    (state) => state.sidebarMenu
-  );
+  const { updateCollection } = useAppSelector((state) => state.sidebarMenu);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (creatingChildId === item.id) {
+      setExpanded(true);
+    }
+  }, [creatingChildId, item.id]);
 
   const sensors = useSensors(useSensor(PointerSensor));
   const { method, type } = useParams();
@@ -117,6 +125,7 @@ const RecursiveMenuItem = ({
 
     if (e.key === "Enter" && isEditing) {
       try {
+        setIsLoading(true);
         if (isCollection) {
           await dispatch(
             updateCollectionThunk({ id: item.id, payload: { name: value } })
@@ -132,13 +141,28 @@ const RecursiveMenuItem = ({
         await refreshCollectionsMenu();
         dispatch(removeUpdateCollection());
       } catch (error) {
+        setIsLoading(false);
         console.error("Error actualizando colección:", error);
+      } finally {
+        setIsLoading(false);
       }
     }
   };
 
   return (
-    <Box sx={{ width: "100%", pl: depth * 0.25, my: 1 }}>
+    <Box
+      sx={{
+        width: "100%",
+        pl: depth * 0.25,
+        my: 1,
+        opacity: 0,
+        animation: "fadeIn 0.3s ease-in forwards",
+        "@keyframes fadeIn": {
+          from: { opacity: 0, transform: "translateY(0)" },
+          to: { opacity: 1, transform: "translateY(0)" },
+        },
+      }}
+    >
       <Box
         sx={{
           display: "flex",
@@ -177,7 +201,7 @@ const RecursiveMenuItem = ({
               value={value}
               onChange={(e) => setValue(e.target.value)}
               onKeyDown={handleKeyDown}
-              disabled={loading}
+              disabled={isLoading}
               sx={{
                 "& .MuiInputBase-input": {
                   fontSize: "12px",
@@ -189,7 +213,7 @@ const RecursiveMenuItem = ({
                   endAdornment: (
                     <IconButton
                       size="small"
-                      disabled={loading}
+                      disabled={isLoading}
                       onClick={() => {
                         if (isEditing) {
                           dispatch(removeUpdateCollection());
@@ -197,7 +221,7 @@ const RecursiveMenuItem = ({
                         }
                       }}
                     >
-                      {loading ? (
+                      {isLoading ? (
                         <CircularProgress size="10px" />
                       ) : (
                         <CancelIcon
@@ -218,82 +242,122 @@ const RecursiveMenuItem = ({
             />
           </Stack>
         ) : (
-          <Stack
-            direction="row"
-            alignItems="center"
-            onMouseEnter={() => setHovered(true)}
-            onMouseLeave={() => setHovered(false)}
-            sx={{ width: "100%" }}
-          >
+          renderEditNodeEditor?.(item) ?? (
             <Stack
               direction="row"
-              spacing={1}
               alignItems="center"
-              sx={{
-                flexGrow: 1,
-                minWidth: 0,
-                overflow: "hidden",
-              }}
+              onMouseEnter={() => setHovered(true)}
+              onMouseLeave={() => setHovered(false)}
+              sx={{ width: "100%" }}
             >
-              <FolderOutlinedIcon
-                sx={{ fontSize: 16, color: "text.disabled" }}
-              />
-              <Tooltip title={item.name} placement="top">
-                <Typography
-                  sx={{
-                    fontSize: 12,
-                    color: "text.disabled",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {item.name}
-                </Typography>
-              </Tooltip>
-            </Stack>
-            {optionsActive && (
-              <Box
-                onClick={(e) => {
-                  e.stopPropagation();
-                  const options =
-                    buildOptions?.(item) || buildSubItemOptions?.(item);
-                  if (options) openMenu(e, options);
-                }}
+              <Stack
+                direction="row"
+                spacing={1}
+                alignItems="center"
                 sx={{
-                  width: 24,
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  cursor: "pointer",
-                  ml: 1,
+                  flexGrow: 1,
+                  minWidth: 0,
+                  overflow: "hidden",
                 }}
               >
-                <MoreHorizOutlinedIcon
-                  sx={{
-                    fontSize: 16,
-                    color: "text.disabled",
-                    visibility: hovered ? "visible" : "hidden",
-                  }}
+                <FolderOutlinedIcon
+                  sx={{ fontSize: 16, color: "text.disabled" }}
                 />
-              </Box>
-            )}
-            <Box
-              sx={{
-                ml: 1,
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
-              {expanded ? (
-                <KeyboardArrowDownOutlinedIcon sx={{ fontSize: 16 }} />
-              ) : (
-                <KeyboardArrowRightOutlinedIcon sx={{ fontSize: 16 }} />
+                <Tooltip
+                  title={item.name}
+                  placement="top"
+                >
+                  <Typography
+                    sx={{
+                      fontSize: 12,
+                      color: "text.disabled",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {item.name}
+                  </Typography>
+                </Tooltip>
+              </Stack>
+
+              {optionsActive && (
+                <Box
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const options =
+                      buildOptions?.(item) || buildSubItemOptions?.(item);
+                    if (options) openMenu(e, options);
+                  }}
+                  sx={{
+                    width: 24,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    cursor: "pointer",
+                    ml: 1,
+                  }}
+                >
+                  <MoreHorizOutlinedIcon
+                    sx={{
+                      fontSize: 16,
+                      color: "text.disabled",
+                      visibility: hovered ? "visible" : "hidden",
+                    }}
+                  />
+                </Box>
               )}
-            </Box>
-          </Stack>
+              {/* Flecha expand/collapse */}
+              <Box
+                sx={{
+                  ml: 1,
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                {expanded ? (
+                  <KeyboardArrowDownOutlinedIcon sx={{ fontSize: 16 }} />
+                ) : (
+                  <KeyboardArrowRightOutlinedIcon sx={{ fontSize: 16 }} />
+                )}
+              </Box>
+            </Stack>
+          )
         )}
       </Box>
+
+      {expanded && creatingChildId === item.id && (
+        <Box
+          sx={{
+            pl: (depth + 1) * 0.25,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            borderRadius: 2,
+            border: "2px solid transparent",
+            padding: 1,
+            margin: 0.5,
+          }}
+        >
+          <Stack
+            direction="row"
+            spacing={1}
+            alignItems="center"
+            sx={{
+              flexGrow: 1,
+              minWidth: 0,
+              overflow: "hidden",
+            }}
+          >
+            <FolderOutlinedIcon sx={{ fontSize: 16, color: "text.disabled" }} />
+
+            {typeof renderCreateChildEditor === "function" &&
+              renderCreateChildEditor(item)}
+          </Stack>
+        </Box>
+      )}
+
+      {/* Render hijos recursivamente */}
       {expanded &&
         Array.isArray(item.children) &&
         item.children?.length > 0 && (
@@ -307,6 +371,9 @@ const RecursiveMenuItem = ({
                 onSelectItem={onDecisionHandler}
                 buildOptions={buildOptions}
                 buildSubItemOptions={buildSubItemOptions}
+                renderCreateChildEditor={renderCreateChildEditor}
+                renderEditNodeEditor={renderEditNodeEditor}
+                creatingChildId={creatingChildId}
               />
             ))}
           </Box>
