@@ -102,7 +102,6 @@ function DynamicField({
         );
       }
 
-      // Se actualiza a sí mismo también
       if (path.length > 1) {
         dispatch(
           updateNestedFieldValue({
@@ -125,7 +124,6 @@ function DynamicField({
     }
     if (fieldKey === "isRequired") {
       if (hasChildren) {
-        // Si tiene hijos y es root o no, se propaga solo a hijos de último nivel
         dispatch(
           updateIsRequiredRecursive({
             tabId,
@@ -135,7 +133,6 @@ function DynamicField({
         );
       }
 
-      // Se actualiza a sí mismo también
       if (path.length > 1) {
         dispatch(
           updateNestedFieldValue({
@@ -156,7 +153,6 @@ function DynamicField({
         );
       }
     } else {
-      // Otros campos
       if (path.length > 1) {
         dispatch(
           updateNestedFieldValue({
@@ -178,7 +174,6 @@ function DynamicField({
       }
     }
 
-    // Lógica para el campo 'function'
     if (fieldKey === "function" && newValue === "not_validate") {
       const valueFieldKey = "value";
       if (path.length > 1) {
@@ -204,10 +199,9 @@ function DynamicField({
   };
 
   function shouldDisableCheckbox(
-    isChild: boolean,
     dependsValue: string | unknown
   ): boolean {
-    return !isChild && !dependsValue;
+    return !dependsValue;
   }
 
   const getFilteredFunctionOptions = () => {
@@ -325,7 +319,7 @@ function DynamicField({
   }
 
   if (column.dependsOn && column.type === "checkbox") {
-    const isDisabled = shouldDisableCheckbox(isChild, dependsValue);
+    const isDisabled = shouldDisableCheckbox(dependsValue);
     const realValue = localValue ?? row.isRequired;
     return (
       <input
