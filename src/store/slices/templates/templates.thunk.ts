@@ -1,6 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
   createTemplate,
+  deleteTemplate,
   getTemplate,
   getTemplateById,
   updateTemplate,
@@ -59,6 +60,22 @@ export const getTemplateByIdThunk = createAsyncThunk<
     async (id, { rejectWithValue }) => {
         try {
             const template = await getTemplateById(id)
+            return template;
+        } catch (error) {
+            return rejectWithValue(error as string);
+        }
+    }
+);
+
+export const deleteTemplateThunk = createAsyncThunk<
+    TemplateContextType,
+    string,
+    { rejectValue: string }
+>(
+    'templates/delete',
+    async (id, { rejectWithValue }) => {
+        try {
+            const template = await deleteTemplate(id)
             return template;
         } catch (error) {
             return rejectWithValue(error as string);

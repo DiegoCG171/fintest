@@ -11,6 +11,7 @@ import {
 import { useParams } from "react-router-dom";
 import { useToast } from "../../../config/hooks/useToast";
 import { useEffect, useState } from "react";
+import { deleteTemplateThunk } from "../../../store/slices/templates/templates.thunk";
 
 const resourceActions = {
   testCase: {
@@ -27,6 +28,11 @@ const resourceActions = {
     deleteThunk: deleteCategorieThunk,
     toastMessage: "Categoria eliminada correctamente",
     title: "¿Estás seguro de que deseas eliminar la categoría?",
+  },
+  template: {
+    deleteThunk: deleteTemplateThunk,
+    toastMessage: "Template eliminado correctamente",
+    title: "¿Estás seguro de que deseas eliminar el template?",
   },
 } as const;
 
