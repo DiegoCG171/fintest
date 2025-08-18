@@ -19,7 +19,7 @@ import {
   ItemsServiceMenu,
   MenuServiceInterface,
 } from "../../../config/interfaces";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useToast } from "../../../config/hooks/useToast";
 import { getCollectionsThunk } from "../../../store/slices/collections/collections.thunk";
 
@@ -38,6 +38,22 @@ import { useParams } from "react-router-dom";
 import { getTemplatesBackup } from "../../../services";
 import { openConfirmDeleteModal } from "../../../store/slices/UI/confirmDeleteModal/confirmDeleteModal.slice";
 import ItemInlineEditor from "./ItemInlineEditor";
+import {
+  closestCenter,
+  DndContext,
+  DragEndEvent,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import {
+  moveItemBetweenTrees,
+  moveItemInItems,
+} from "../../../config/utils/moveItemInItems";
 
 function SidebarBlock({
   searchTerm,
@@ -199,7 +215,8 @@ function SidebarBlock({
     if (hasPermission(permissions, "delete", "category")) {
       options.push({
         item: { label: "Eliminar", id: item.id },
-        action: () => dispatch(
+        action: () =>
+          dispatch(
             openConfirmDeleteModal({ id: item.id, resource: "category" })
           ),
       });
@@ -461,76 +478,114 @@ function SidebarBlock({
     searchOnItem,
   ]);
 
+  const sensors = useSensors(useSensor(PointerSensor));
+  const [tree, setTree] = useState(filteredCategories);
+  const [treeCollections, setTreeCollections] = useState(filteredCollections);
+
+  useEffect(() => {
+    setTree(filteredCategories);
+    setTreeCollections(filteredCollections);
+  }, [filteredCategories, filteredCollections]);
+
+  const handleDragEnd = ({ active, over }: DragEndEvent) => {
+    if (!over) return;
+    const { newCategories, newCollections } = moveItemBetweenTrees(
+      tree,
+      treeCollections,
+      active.id as string,
+      over.id as string
+    );
+    setTree(newCategories);
+    setTreeCollections(newCollections);
+  };
+
   return (
-    <Box>
-      <Box
-        sx={{ px: 1, overflowY: "auto", flexGrow: 1, my: 4, marginRight: 1 }}
-        key={"box-catalogo"}
-      >
-        <PermissionGuard
-          permissions={[{ action: "read", resource: "template" }]}
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+    >
+      <Box>
+        <Box
+          sx={{ px: 1, overflowY: "auto", flexGrow: 1, my: 4, marginRight: 1 }}
+          key={"box-catalogo"}
         >
-          <SeparatorMenu
-            label="Catálogo"
-            onAction={handleModal}
-            onDownload={() => getTemplatesBackup()}
-            permissions={[{ action: "create", resource: "template" }]}
-          />
-          {filteredCategories.length > 0 ? (
-            filteredCategories.map((rootItem, index) => (
-              <RecursiveMenuItem
-                key={`${index}-${rootItem.id}`}
-                item={rootItem}
-                optionsActive={true}
-                onSelectItem={handleSelectItem}
-                buildOptions={buildedOptions}
-                buildSubItemOptions={buildedTemplateOptions}
-                renderCreateChildEditor={renderCreateChildEditor}
-                renderEditNodeEditor={renderEditNodeEditor}
-                creatingChildId={creatingChildId}
-              />
-            ))
-          ) : (
-            <Box sx={{ px: 2, py: 1, fontSize: 14, color: "gray" }}>
-              Sin resultados
-            </Box>
-          )}
-        </PermissionGuard>
-      </Box>
-      <Divider />
-      <Box
-        sx={{ px: 1, overflowY: "auto", flexGrow: 1, my: 4, marginRight: 1 }}
-        key={"box-colecciones"}
-      >
-        <PermissionGuard
-          permissions={[{ action: "read", resource: "collection" }]}
+          <PermissionGuard
+            permissions={[{ action: "read", resource: "template" }]}
+          >
+            <SeparatorMenu
+              label="Catálogo"
+              onAction={handleModal}
+              onDownload={() => getTemplatesBackup()}
+              permissions={[{ action: "create", resource: "template" }]}
+            />
+            <SortableContext
+              items={tree.map((i) => i.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              {tree.length > 0 ? (
+                tree.map((rootItem, index) => (
+                  <RecursiveMenuItem
+                    key={`${index}-${rootItem.id}`}
+                    item={rootItem}
+                    optionsActive={true}
+                    onSelectItem={handleSelectItem}
+                    buildOptions={buildedOptions}
+                    buildSubItemOptions={buildedTemplateOptions}
+                    renderCreateChildEditor={renderCreateChildEditor}
+                    renderEditNodeEditor={renderEditNodeEditor}
+                    creatingChildId={creatingChildId}
+                    draggable
+                  />
+                ))
+              ) : (
+                <Box sx={{ px: 2, py: 1, fontSize: 14, color: "gray" }}>
+                  Sin resultados
+                </Box>
+              )}
+            </SortableContext>
+          </PermissionGuard>
+        </Box>
+        <Divider />
+        <Box
+          sx={{ px: 1, overflowY: "auto", flexGrow: 1, my: 4, marginRight: 1 }}
+          key={"box-colecciones"}
         >
-          <SeparatorMenu
-            permissions={[{ action: "create", resource: "collection" }]}
-            label="Colecciones"
-            onAction={handleOpenCreateCollection}
-          />
-          {createCollectionMenu && <SidebarCreateCollection />}
-          {filteredCollections.length > 0 ? (
-            filteredCollections.map((rootItem, index) => (
-              <RecursiveMenuItem
-                key={`${index}-${rootItem?.id ?? rootItem.name}`}
-                item={rootItem}
-                optionsActive={true}
-                onSelectItem={handleSelectItem}
-                buildOptions={buildedCollectionOptions}
-                buildSubItemOptions={buildedTestCaseOptions}
-                draggable
-              />
-            ))
-          ) : (
-            <Box sx={{ px: 2, py: 1, fontSize: 14, color: "gray" }}>
-              Sin resultados
-            </Box>
-          )}
-        </PermissionGuard>
+          <PermissionGuard
+            permissions={[{ action: "read", resource: "collection" }]}
+          >
+            <SeparatorMenu
+              permissions={[{ action: "create", resource: "collection" }]}
+              label="Colecciones"
+              onAction={handleOpenCreateCollection}
+            />
+            {createCollectionMenu && <SidebarCreateCollection />}
+            <SortableContext
+              items={treeCollections.map((i) => i.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              {treeCollections.length > 0 ? (
+                treeCollections.map((rootItem, index) => (
+                  <RecursiveMenuItem
+                    key={`${index}-${rootItem?.id ?? rootItem.name}`}
+                    item={rootItem}
+                    optionsActive={true}
+                    onSelectItem={handleSelectItem}
+                    buildOptions={buildedCollectionOptions}
+                    buildSubItemOptions={buildedTestCaseOptions}
+                    draggable
+                  />
+                ))
+              ) : (
+                <Box sx={{ px: 2, py: 1, fontSize: 14, color: "gray" }}>
+                  Sin resultados
+                </Box>
+              )}
+            </SortableContext>
+          </PermissionGuard>
+        </Box>
       </Box>
-    </Box>
+    </DndContext>
   );
 }
 

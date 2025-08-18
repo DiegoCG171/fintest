@@ -90,6 +90,7 @@ export interface PropsRecursiveMenuSubItem {
     optionsActive?: boolean;
     onClick?: (item: ItemsServiceMenu) => void;
     buildOptions?: (item: ItemsServiceMenu) => ContextMenuOption[];
+    parentId?: string;
     draggable: boolean;
 }
 
