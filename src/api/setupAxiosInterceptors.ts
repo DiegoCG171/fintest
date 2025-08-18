@@ -5,7 +5,7 @@ import { logout } from "../store";
 import { renewTokenThunk } from "../store/slices/auth/renewTokenThunk.thunk";
 import { emitToast } from "../config/utils/toastEmitter";
 
-const ONE_MINUTE_IN_SECONDS = 60*3;
+const ONE_MINUTE_IN_SECONDS = 60;
 
 interface JwtPayload {
   exp: number;
