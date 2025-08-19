@@ -7,9 +7,9 @@ export const renewTokenThunk = createAsyncThunk<
   { rejectValue: string }
 >("auth/renewToken", async (_, { rejectWithValue }) => {
   try {
-    const data = await renewToken();
-    console.log("📬 Token received in thunk:", data.token);
-    return data.token;
+    const token = await renewToken();
+    console.log("📬 Token received in thunk:", token);
+    return token;
   } catch (error) {
     console.log("❌ Error in renewTokenThunk:", error);
     return rejectWithValue("Sesión expirada");

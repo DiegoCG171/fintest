@@ -2,7 +2,7 @@ import { apiBare } from "../../api/apiBare";
 import { ENDPOINTS } from "../../config/constants/endpoints";
 import { handleAxiosError } from "../../config/utils/axiosErrorHandler";
 
-export const renewToken = async (): Promise<{ token: string }> => {
+export const renewToken = async (): Promise<string> => {
   const token = localStorage.getItem("token");
 
   if (!token) {
@@ -10,7 +10,7 @@ export const renewToken = async (): Promise<{ token: string }> => {
   }
 
   try {
-    const { data } = await apiBare.get<{ token: string }>(ENDPOINTS.renewToken, {
+    const { data } = await apiBare.get<string>(ENDPOINTS.renewToken, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

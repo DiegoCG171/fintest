@@ -56,6 +56,16 @@ export const getTemplateById = async (
   }
 };
 
+export const deleteTemplate = async (id: string) => {
+  try {
+    const response = await api.delete(`${ENDPOINTS.template}/${id}`);
+    return response.data;
+  } catch (error) {
+    const errorMessage = handleAxiosError(error);
+    throw errorMessage;
+  }
+}
+
 export const getTemplatesBackup = async () => {
   try {
     const response = await api.get(`${ENDPOINTS.template}/backup`, {
