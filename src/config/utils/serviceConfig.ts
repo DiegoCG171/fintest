@@ -28,13 +28,12 @@ export const serviceConfig = {
                     "equals": { render: true, type: "input" as const },
                     "includes": { render: true, type: "input" as const },
                     "not_validate": { render: false },
-                    "compare_to": { render: true, type: "input" as const },
-                    /* 
-                    "de request": {
-                        render: true,
-                        type: "select" as const,
-                        options: ["Opción 1", "Opción 2", "Opción 3"],
-                    }, */
+                    "compare_to": { render: true, type: "auto-complete" as const, options: [] },
+                    // "de request": {
+                    //     render: true,
+                    //     type: "select" as const,
+                    //     options: ["Opción 1", "Opción 2", "Opción 3"],
+                    // },
                 },
                 width: "20%",
                 type: "dynamic" as const
