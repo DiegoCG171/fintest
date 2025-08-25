@@ -2,10 +2,10 @@ import { arrayMove } from "@dnd-kit/sortable";
 import { MenuServiceInterface } from "../interfaces";
 
 interface ItemResult {
-  node: any;
+  node: MenuServiceInterface;
   parentNode: MenuServiceInterface;
   index: number;
-  array: any[];
+  array: MenuServiceInterface[];
   isFolder: false;
 }
 
@@ -71,7 +71,7 @@ export function moveItemBetweenTrees(
     collectionId?: string;
     sourceTree?: 'categories' | 'collections';
     targetTree?: 'categories' | 'collections';
-    reorderedArray?: any[];
+    reorderedArray?: string[];
   };
 } {
   const newCategories = structuredClone(categoriesTree);
