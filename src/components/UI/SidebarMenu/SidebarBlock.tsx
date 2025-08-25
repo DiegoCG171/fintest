@@ -1,4 +1,4 @@
-import { Box, Divider } from "@mui/material";
+import { Box, Divider, Stack, Typography } from "@mui/material";
 import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
 import SeparatorMenu from "./SeparatorMenu";
 import RecursiveMenuItem from "../../navigation/RecursiveMenuItem";
@@ -21,8 +21,11 @@ import {
 } from "../../../config/interfaces";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useToast } from "../../../config/hooks/useToast";
-import { getCollectionsThunk } from "../../../store/slices/collections/collections.thunk";
-
+import {
+  getCollectionsThunk,
+} from "../../../store/slices/collections/collections.thunk";
+import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import {
   toggleCreateCollectionMenu,
   updateCollection,
@@ -39,21 +42,14 @@ import { getTemplatesBackup } from "../../../services";
 import { openConfirmDeleteModal } from "../../../store/slices/UI/confirmDeleteModal/confirmDeleteModal.slice";
 import ItemInlineEditor from "./ItemInlineEditor";
 import {
-  closestCenter,
   DndContext,
-  DragEndEvent,
-  PointerSensor,
-  useSensor,
-  useSensors,
+  DragOverlay,
 } from "@dnd-kit/core";
 import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import {
-  moveItemBetweenTrees,
-  moveItemInItems,
-} from "../../../config/utils/moveItemInItems";
+import { useSidebarDnd } from "../../../config/hooks/useSidebarDnd";
 
 function SidebarBlock({
   searchTerm,
@@ -83,6 +79,20 @@ function SidebarBlock({
   );
 
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
+  const [categoriesTree, setCategoriesTree] = useState(categoriesMenu);
+  const [collectionsTree, setCollectionsTree] = useState(collectionsMenu);
+
+  const { activeId, overId, dndContextProps } = useSidebarDnd({
+    categoriesTree,
+    collectionsTree,
+    setCategoriesTree,
+    setCollectionsTree,
+  });
+
+  useEffect(() => {
+    setCategoriesTree(categoriesMenu);
+    setCollectionsTree(collectionsMenu);
+  }, [categoriesMenu, collectionsMenu]);
 
   const renderEditNodeEditor = (item: MenuServiceInterface) => {
     if (editingItemId !== item.id) return null;
@@ -449,61 +459,35 @@ function SidebarBlock({
   const { filteredCategories, filteredCollections } = useMemo(() => {
     const normalized = searchTerm.trim().toLowerCase();
 
+    const filterTree = (tree: MenuServiceInterface[]) =>
+      tree
+        .map((node) => filterRecursive(node, normalized, !searchOnItem))
+        .filter((node): node is MenuServiceInterface => node !== null);
+
     if (!normalized) {
       return {
-        filteredCategories: categoriesMenu,
-        filteredCollections: collectionsMenu,
+        filteredCategories: categoriesTree,
+        filteredCollections: collectionsTree,
       };
     }
 
-    const filteredCategories =
-      categoriesMenu
-        ?.map((category) =>
-          filterRecursive(category, normalized, !searchOnItem)
-        )
-        .filter((item): item is MenuServiceInterface => item !== null) ?? [];
-
-    const filteredCollections =
-      collectionsMenu
-        ?.map((category) =>
-          filterRecursive(category, normalized, !searchOnItem)
-        )
-        .filter((item): item is MenuServiceInterface => item !== null) ?? [];
-    return { filteredCategories, filteredCollections };
+    return {
+      filteredCategories: filterTree(categoriesTree),
+      filteredCollections: filterTree(collectionsTree),
+    };
   }, [
     searchTerm,
-    categoriesMenu,
-    collectionsMenu,
+    categoriesTree,
+    collectionsTree,
     filterRecursive,
     searchOnItem,
   ]);
 
-  const sensors = useSensors(useSensor(PointerSensor));
-  const [tree, setTree] = useState(filteredCategories);
-  const [treeCollections, setTreeCollections] = useState(filteredCollections);
-
-  useEffect(() => {
-    setTree(filteredCategories);
-    setTreeCollections(filteredCollections);
-  }, [filteredCategories, filteredCollections]);
-
-  const handleDragEnd = ({ active, over }: DragEndEvent) => {
-    if (!over) return;
-    const { newCategories, newCollections } = moveItemBetweenTrees(
-      tree,
-      treeCollections,
-      active.id as string,
-      over.id as string
-    );
-    setTree(newCategories);
-    setTreeCollections(newCollections);
-  };
+  
 
   return (
     <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragEnd={handleDragEnd}
+      {...dndContextProps}
     >
       <Box>
         <Box
@@ -520,11 +504,11 @@ function SidebarBlock({
               permissions={[{ action: "create", resource: "template" }]}
             />
             <SortableContext
-              items={tree.map((i) => i.id)}
+              items={filteredCategories.map((i) => i.id)}
               strategy={verticalListSortingStrategy}
             >
-              {tree.length > 0 ? (
-                tree.map((rootItem, index) => (
+              {filteredCategories.length > 0 ? (
+                filteredCategories.map((rootItem, index) => (
                   <RecursiveMenuItem
                     key={`${index}-${rootItem.id}`}
                     item={rootItem}
@@ -535,6 +519,7 @@ function SidebarBlock({
                     renderCreateChildEditor={renderCreateChildEditor}
                     renderEditNodeEditor={renderEditNodeEditor}
                     creatingChildId={creatingChildId}
+                    overId={overId!}
                     draggable
                   />
                 ))
@@ -561,11 +546,11 @@ function SidebarBlock({
             />
             {createCollectionMenu && <SidebarCreateCollection />}
             <SortableContext
-              items={treeCollections.map((i) => i.id)}
+              items={filteredCollections.map((i) => i.id)}
               strategy={verticalListSortingStrategy}
             >
-              {treeCollections.length > 0 ? (
-                treeCollections.map((rootItem, index) => (
+              {filteredCollections.length > 0 ? (
+                filteredCollections.map((rootItem, index) => (
                   <RecursiveMenuItem
                     key={`${index}-${rootItem?.id ?? rootItem.name}`}
                     item={rootItem}
@@ -574,6 +559,7 @@ function SidebarBlock({
                     buildOptions={buildedCollectionOptions}
                     buildSubItemOptions={buildedTestCaseOptions}
                     draggable
+                    overId={overId!}
                   />
                 ))
               ) : (
@@ -585,6 +571,36 @@ function SidebarBlock({
           </PermissionGuard>
         </Box>
       </Box>
+      <DragOverlay style={{ cursor: "grabbing" }}>
+        {activeId ? (
+          <Stack
+            direction="row"
+            spacing={1}
+            alignItems="center"
+            sx={{
+              flexGrow: 1,
+              minWidth: 0,
+              overflow: "hidden",
+            }}
+          >
+            <DragIndicatorIcon sx={{ fontSize: 12, color: "text.disabled" }} />
+            <DescriptionOutlinedIcon
+              sx={{ fontSize: 16, color: "text.disabled" }}
+            />
+            <Typography
+              sx={{
+                fontSize: 12,
+                color: "text.disabled",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {activeId}
+            </Typography>
+          </Stack>
+        ) : null}
+      </DragOverlay>
     </DndContext>
   );
 }

@@ -40,7 +40,7 @@ export interface FieldValidation {
 export interface PatchGenerationTemplate {
     name?: string
     description?: string
-    category?:string
+    categoryId?: string
     type?: string
     generationTransaction?: FieldUpdateTemplate[]
     validationTransaction?: FieldUpdateTemplate[]

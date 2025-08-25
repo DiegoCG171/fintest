@@ -1,38 +1,56 @@
 import { arrayMove } from "@dnd-kit/sortable";
 import { MenuServiceInterface } from "../interfaces";
 
-function findItemOrFolder(tree: MenuServiceInterface[], id: string) {
-  let result: any = null;
+interface ItemResult {
+  node: any;
+  parentNode: MenuServiceInterface;
+  index: number;
+  array: any[];
+  isFolder: false;
+}
 
-  function dfs(nodes: MenuServiceInterface[]) {
-    for (let node of nodes) {
+interface FolderResult {
+  folderNode: MenuServiceInterface;
+  isFolder: true;
+}
+
+type SearchResult = ItemResult | FolderResult | null;
+
+function findItemOrFolder(tree: MenuServiceInterface[], id: string): SearchResult {
+  function dfs(nodes: MenuServiceInterface[]): SearchResult {
+    for (const node of nodes) {
+      // Primero buscar en items de este nodo
+      if (node.items?.length) {
+        const itemIndex = node.items.findIndex((item) => item.id === id);
+        if (itemIndex !== -1) {
+          return {
+            node: node.items[itemIndex],
+            parentNode: node,
+            index: itemIndex,
+            array: node.items,
+            isFolder: false,
+          };
+        }
+      }
+
+      // Luego verificar si el nodo mismo es el que buscamos (carpeta)
       if (node.id === id) {
-        // Es carpeta destino
-        result = { folderNode: node, isFolder: true };
-        return;
-      }
-
-      // Buscar en items
-      const itemIndex = node.items?.findIndex((it) => it.id === id);
-      if (itemIndex !== undefined && itemIndex > -1) {
-        result = {
-          node: node.items[itemIndex],
-          parentNode: node,
-          index: itemIndex,
-          array: node.items,
+        return {
+          folderNode: node,
+          isFolder: true,
         };
-        return;
       }
 
+      // Buscar recursivamente en children
       if (node.children?.length) {
-        dfs(node.children);
-        if (result) return;
+        const result = dfs(node.children);
+        if (result) return result;
       }
     }
+    return null;
   }
 
-  dfs(tree);
-  return result;
+  return dfs(tree);
 }
 
 export function moveItemBetweenTrees(
@@ -40,7 +58,22 @@ export function moveItemBetweenTrees(
   collectionsTree: MenuServiceInterface[],
   activeId: string,
   overId: string
-) {
+): {
+  newCategories: MenuServiceInterface[];
+  newCollections: MenuServiceInterface[];
+  action: 'none' | 'reorder' | 'move' | 'create_test_case';
+  metadata?: {
+    itemId?: string;
+    sourceParentId?: string;
+    targetParentId?: string;
+    newIndex?: number;
+    templateId?: string;
+    collectionId?: string;
+    sourceTree?: 'categories' | 'collections';
+    targetTree?: 'categories' | 'collections';
+    reorderedArray?: any[];
+  };
+} {
   const newCategories = structuredClone(categoriesTree);
   const newCollections = structuredClone(collectionsTree);
 
@@ -52,65 +85,171 @@ export function moveItemBetweenTrees(
   const active = activeInCategories || activeInCollections;
   const over = overInCategories || overInCollections;
 
-  if (!active || !active.array) return { newCategories, newCollections };
-  if (!over) return { newCategories, newCollections };
+  if (!active) {
+    return { 
+      newCategories, 
+      newCollections, 
+      action: 'none' 
+    };
+  }
 
-  console.log("Active:", active);
-  console.log(
-    "Over node:",
-    over.isFolder ? over.folderNode?.id : over.node?.id,
-    "isFolder:",
-    over.isFolder
-  );
+  if (!over) {
+    return { 
+      newCategories, 
+      newCollections, 
+      action: 'none' 
+    };
+  }
 
-  // 🚫 Si active viene de collections y over está en categories → no mover
+  // Solo permitir mover items, no carpetas
+  if (active.isFolder) {
+    return { 
+      newCategories, 
+      newCollections, 
+      action: 'none' 
+    };
+  }
+  // No permitir: collections → categories
   if (activeInCollections && overInCategories) {
-    console.log("Drop inválido: collections → categories");
-    return { newCategories, newCollections };
+    return { 
+      newCategories, 
+      newCollections, 
+      action: 'none' 
+    };
   }
 
-  // ℹ️ Si active viene de categories y over está en collections → no mover, pero log
+  //  Caso especial: categories → collections (crear test case)
   if (activeInCategories && overInCollections) {
-    const overCollectionParentId = over.isFolder
-      ? over.folderNode?.id
+    const overCollectionId = over.isFolder 
+      ? over.folderNode?.id 
       : over.parentNode?.id;
-
-    console.log("Intento drop inválido: categories → collections");
-    console.log("ID del item de categories:", active.node?.id);
-    console.log("ID de la carpeta destino en collections:", overCollectionParentId);
-    return { newCategories, newCollections };
+    return {
+      newCategories,
+      newCollections,
+      action: 'create_test_case',
+      metadata: {
+        templateId: active.node?.id,
+        collectionId: overCollectionId
+      }
+    };
   }
 
-  // 1️⃣ Reordenar en mismo array
-  if (over.array && active.array === over.array) {
-    active.array.splice(
-      0,
-      active.array.length,
-      ...arrayMove(active.array, active.index, over.index)
-    );
-    return { newCategories, newCollections };
+  //  Reordenar en el mismo array
+  if (!over.isFolder && active.array === over.array) {
+    const newArray = arrayMove(active.array, active.index, over.index);
+    active.array.splice(0, active.array.length, ...newArray);
+    
+    const sourceTree = activeInCategories ? 'categories' : 'collections';
+    
+    return {
+      newCategories,
+      newCollections,
+      action: 'reorder',
+      metadata: {
+        itemId: active.node?.id,
+        sourceParentId: active.parentNode?.id,
+        newIndex: over.index,
+        sourceTree: sourceTree as 'categories' | 'collections',
+        reorderedArray: [...newArray.map(data => data.id)]
+      }
+    };
   }
 
-  // 2️⃣ Determinar carpeta destino
-  let targetFolder: MenuServiceInterface | null = null;
-  if (over.isFolder) {
-    targetFolder = over.folderNode ?? null;
-  } else if (over.parentNode) {
-    targetFolder = over.parentNode;
+  //  Mover a carpeta diferente
+  const targetFolder = over.isFolder ? over.folderNode : over.parentNode;
+  
+  if (targetFolder && targetFolder !== active.parentNode) {
+    // Remover del array original
+    const [movedItem] = active.array.splice(active.index, 1);
+
+    // Agregar al array destino
+    if (!targetFolder.items) {
+      targetFolder.items = [];
+    }
+
+    let newIndex = targetFolder.items.length; // Por defecto al final
+
+    if (over.isFolder) {
+      // Agregar al final de la carpeta
+      targetFolder.items.push(movedItem);
+    } else {
+      // Insertar después del item over
+      newIndex = over.index + 1;
+      targetFolder.items.splice(newIndex, 0, movedItem);
+    }
+
+    const sourceTree = activeInCategories ? 'categories' : 'collections';
+    const targetTree = overInCategories ? 'categories' : 'collections';
+    
+
+    return {
+      newCategories,
+      newCollections,
+      action: 'move',
+      metadata: {
+        itemId: active.node?.id,
+        sourceParentId: active.parentNode?.id,
+        targetParentId: targetFolder.id,
+        newIndex: newIndex,
+        sourceTree: sourceTree as 'categories' | 'collections',
+        targetTree: targetTree as 'categories' | 'collections'
+      }
+    };
   }
 
-  // 3️⃣ Mover dentro de carpeta o después de otro item
-  if (targetFolder) {
-    const [moved] = active.array.splice(active.index, 1);
-
-    if (!targetFolder.items) targetFolder.items = [];
-    targetFolder.items.push(moved);
-
-    console.log("Dropping into folder:", targetFolder.id);
-    console.log("Folder items before:", targetFolder.items.map(i => i.id), targetFolder);
-    console.log("Item moved:", moved.id);
-    return { newCategories, newCollections };
+  // Mover dentro de la misma carpeta pero a posición diferente
+  if (targetFolder && targetFolder === active.parentNode && !over.isFolder) {
+    const newArray = arrayMove(active.array, active.index, over.index);
+    active.array.splice(0, active.array.length, ...newArray);
+    
+    const sourceTree = activeInCategories ? 'categories' : 'collections';
+    
+    return {
+      newCategories,
+      newCollections,
+      action: 'reorder',
+      metadata: {
+        itemId: active.node?.id,
+        sourceParentId: active.parentNode?.id,
+        newIndex: over.index,
+        sourceTree: sourceTree as 'categories' | 'collections',
+        reorderedArray: [...newArray.map(data => data.id)]
+      }
+    };
   }
 
-  return { newCategories, newCollections };
+  // Drop sobre carpeta de la misma jerarquía
+  if (over.isFolder && targetFolder && targetFolder !== active.parentNode) {
+    // Remover del array original
+    const [movedItem] = active.array.splice(active.index, 1);
+
+    // Agregar al final de la carpeta destino
+    if (!targetFolder.items) {
+      targetFolder.items = [];
+    }
+    targetFolder.items.push(movedItem);
+
+    const sourceTree = activeInCategories ? 'categories' : 'collections';
+    const targetTree = overInCategories ? 'categories' : 'collections';
+  
+    return {
+      newCategories,
+      newCollections,
+      action: 'move',
+      metadata: {
+        itemId: active.node?.id,
+        sourceParentId: active.parentNode?.id,
+        targetParentId: targetFolder.id,
+        newIndex: targetFolder.items.length - 1,
+        sourceTree: sourceTree as 'categories' | 'collections',
+        targetTree: targetTree as 'categories' | 'collections'
+      }
+    };
+  }
+
+  return { 
+    newCategories, 
+    newCollections, 
+    action: 'none' 
+  };
 }

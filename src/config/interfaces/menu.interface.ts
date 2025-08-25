@@ -44,6 +44,7 @@ export interface RecursiveMenuItemProps {
     depth?: number;
     optionsActive: boolean
     creatingChildId?: string;
+    overId: string;
     onSelectItem?: (item: MenuServiceInterface | ItemsServiceMenu) => void;
     buildOptions?: (item: ItemsServiceMenu) => ContextMenuOption[];
     buildSubItemOptions?: (item: ItemsServiceMenu) => ContextMenuOption[];

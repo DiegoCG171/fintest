@@ -43,6 +43,7 @@ const RecursiveMenuItem = ({
   item,
   depth = 0,
   optionsActive,
+  overId,
   creatingChildId,
   onSelectItem,
   buildOptions,
@@ -75,6 +76,13 @@ const RecursiveMenuItem = ({
   useEffect(() => {
     setItemsOrder(item.items?.map((i) => i.id) || []);
   }, [item]);
+
+  useEffect(() => {
+    if (overId?.toString() === item.id && !expanded) {
+      const timer = setTimeout(() => setExpanded(true), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [overId, item.id, expanded]);
 
   const onDecisionHandler = async (
     item: MenuServiceInterface | ItemsServiceMenu
@@ -125,6 +133,9 @@ const RecursiveMenuItem = ({
 
   const { attributes, listeners, setNodeRef, transform } = useSortable({
     id: item.id,
+    data: {
+      name: item.name,
+    },
   });
 
   return (
@@ -153,9 +164,14 @@ const RecursiveMenuItem = ({
             ? depth === 0
               ? (theme) => theme.palette.secondary.light
               : (theme) => theme.palette.background.default
+            : overId === item.id
+            ? "rgba(0,150,255,0.2)"
             : "transparent",
           borderRadius: 2,
-          border: "2px solid transparent",
+          border:
+            overId === item.id
+              ? "2px solid rgba(111, 125, 136, 0.45)"
+              : "2px solid transparent",
           padding: 1,
           margin: 0.5,
           cursor: "pointer",
@@ -350,6 +366,7 @@ const RecursiveMenuItem = ({
                 renderEditNodeEditor={renderEditNodeEditor}
                 creatingChildId={creatingChildId}
                 draggable={draggable}
+                overId={overId!}
               />
             ))}
           </Box>

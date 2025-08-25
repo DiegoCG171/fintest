@@ -47,7 +47,7 @@ const RecursiveMenuSubItem = ({
   const refreshCollectionsMenu = useRefreshCollectionsMenu();
 
   const { attributes, listeners, setNodeRef, transform, isDragging } =
-    useSortable({ id: item.id });
+    useSortable({ id: item.id, data: {name: item.name} });
 
   const isActive = item.linkMenu && location.pathname === `/${item.linkMenu}`;
   const dispatch = useAppDispatch();
