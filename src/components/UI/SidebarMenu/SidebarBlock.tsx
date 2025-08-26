@@ -300,6 +300,17 @@ function SidebarBlock({
       });
     }
 
+    if (hasPermission(permissions, "delete", "template")) {
+      options.push({
+        item: { label: "Eliminar", id: item.id },
+        action: async () => {
+          dispatch(
+            openConfirmDeleteModal({ id: item.id, resource: "template" })
+          );
+        },
+      });
+    }
+
     return options;
   };
 

@@ -281,7 +281,7 @@ const RecursiveMenuItem = ({
                     e.stopPropagation();
                     const options =
                       buildOptions?.(item) || buildSubItemOptions?.(item);
-                    if (options) openMenu(e, options);
+                    if (options?.length) openMenu(e, options);
                   }}
                   sx={{
                     width: 24,

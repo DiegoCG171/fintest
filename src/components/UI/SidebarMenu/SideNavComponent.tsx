@@ -41,7 +41,7 @@ function SideNavComponent() {
   const { method, type } = params;
 
   useEffect(() => {
-    if (categories.status !== "success" && categories.status !== "loading" && location.pathname !== '/settings/users') {
+    if (categories.status === "idle" && location.pathname !== '/settings/users') {
       dispatch(getCategoriesByMethodThunk(`${method}/${type}`))
         .unwrap()
         .catch((err) => console.error("Error cargando categorías:", err));
@@ -49,7 +49,7 @@ function SideNavComponent() {
   }, [dispatch, categories.status, method, type, location]);
 
   useEffect(() => {
-    if (collections.status !== "success" && collections.status !== "loading" && location.pathname !== '/settings/users') {
+    if (collections.status === "idle" && location.pathname !== '/settings/users') {
       dispatch(getCollectionsThunk(`${method}/${type}`))
         .unwrap()
         .catch((err) => console.error("Error cargando categorías:", err));

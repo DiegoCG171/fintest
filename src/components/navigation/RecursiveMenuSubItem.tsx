@@ -77,6 +77,8 @@ const RecursiveMenuSubItem = ({
     }
   };
 
+  const options = buildOptions?.(item)
+
   return (
     <Box
       onMouseEnter={() => setHovered(true)}
@@ -206,7 +208,9 @@ const RecursiveMenuSubItem = ({
             <Box
               onClick={(e) => {
                 e.stopPropagation();
-                openMenu(e, buildOptions(item));
+                if (options && options.length) {
+                  openMenu(e, buildOptions(item));
+                }
               }}
               sx={{
                 width: 24,
