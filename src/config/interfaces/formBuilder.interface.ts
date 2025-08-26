@@ -103,7 +103,7 @@ export interface ColumnConfigFormBuilder {
     options?: string[];
     affects?: string[];
     dependsOn?: string;
-    dynamicRender?: Record<string, { render: boolean; type?: 'input' | 'select'; options?: string[] }>;
+    dynamicRender?: Record<string, { render: boolean; type?: 'input' | 'select' | 'auto-complete'; options?: string[] }>;
     hide?: boolean;
 }
 

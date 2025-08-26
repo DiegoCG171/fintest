@@ -1,6 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
-import { MenuItem, Select, TextField, Typography } from "@mui/material";
-import { DynamicFieldProps } from "../../../config/interfaces";
+import {
+  Autocomplete,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
+} from "@mui/material";
+import {
+  DynamicFieldProps,
+  TableRowDataFormBuilder,
+} from "../../../config/interfaces";
 import {
   updateFieldValue,
   updateNestedFieldValue,
@@ -13,6 +22,23 @@ import {
 } from "../../../store/slices/UI/form/formBuilder.slice";
 
 type Primitive = string | number | boolean;
+
+function extractIdBitMap(arr: TableRowDataFormBuilder[]): string[] {
+  const result = arr.flatMap((item) => {
+    const current = [item.idBitmap];
+
+    let children: string[] = [];
+    if (Array.isArray(item.breakingRules)) {
+      children = extractIdBitMap(item.breakingRules);
+    }
+
+    return [...current, ...children];
+  });
+
+  // eliminar duplicados
+  return Array.from(new Set(result));
+}
+
 
 function DynamicField({
   column,
@@ -31,6 +57,9 @@ function DynamicField({
     Array.isArray(row.breakingRules) && row.breakingRules.length > 0;
   const { generation, validation, selection } = useAppSelector(
     (state) => state.functionSelect
+  );
+  const { values } = useAppSelector(
+    (state) => state.formBuilder.tabForms[tabId]
   );
 
   const [localValue, setLocalValue] = useState<Primitive | "">("");
@@ -68,9 +97,9 @@ function DynamicField({
         setLocalValue("not_validate");
       } else if (
         tabId.includes("selectionTransaction") &&
-        localValueRef.current !== "equals"
+        localValueRef.current !== "ignore"
       ) {
-        setLocalValue("equals");
+        setLocalValue("ignore");
       }
     }
   }, [value, column.id, tabId]);
@@ -87,7 +116,6 @@ function DynamicField({
     const newValue = e.target.value;
     const fieldKey = column.id;
     const boolValue = newValue === "true" || newValue === true;
-
     const hasChildren =
       Array.isArray(row.breakingRules) && row.breakingRules.length > 0;
 
@@ -198,9 +226,7 @@ function DynamicField({
     }
   };
 
-  function shouldDisableCheckbox(
-    dependsValue: string | unknown
-  ): boolean {
+  function shouldDisableCheckbox(dependsValue: string | unknown): boolean {
     return !dependsValue;
   }
 
@@ -264,11 +290,12 @@ function DynamicField({
   }
 
   if (column.dynamicRender && dependsValue !== undefined) {
+    console.log(column.dynamicRender);
     const dynamic = column.dynamicRender[dependsValue as string];
     if (!dynamic?.render) return null;
+    let options = dynamic.options ?? [];
 
     if (dynamic.type === "select") {
-      const options = dynamic.options ?? [];
       return (
         <Select
           value={localValue ?? ""}
@@ -284,13 +311,68 @@ function DynamicField({
               padding: "4px 8px",
             },
           }}
+          MenuProps={{
+            PaperProps: {
+              style: {
+                maxHeight: 200,
+              },
+            },
+          }}
         >
-          {options.map((opt) => (
-            <MenuItem key={opt} value={opt} sx={getStyles()}>
+          {options.map((opt, index) => (
+            <MenuItem key={`${opt}-${index}`} value={opt} sx={getStyles()}>
               {opt}
             </MenuItem>
           ))}
         </Select>
+      );
+    }
+
+    if (dynamic.type === "auto-complete") {
+      options = extractIdBitMap(values);
+      return (
+        <Autocomplete
+          options={options}
+          value={localValue != null ? String(localValue) : null}
+          onChange={(_, newValue) => {
+            setLocalValue(newValue!);
+            handleChange({ target: { value: newValue } });
+          }}
+          freeSolo={false}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              variant="outlined"
+              size="small"
+              sx={{
+                "& .MuiInputBase-root": {
+                  height: "28px",
+                  borderRadius: 2,
+                },
+                "& input": {
+                  padding: "4px 8px",
+                  fontSize: "0.75rem",
+                },
+                "& .MuiAutocomplete-clearIndicator": {
+                  fontSize: "16px",
+                },
+                "& .MuiAutocomplete-popupIndicator": {
+                  fontSize: "16px",
+                },
+              }}
+            />
+          )}
+          ListboxProps={{
+            sx: {
+              maxHeight: 300, // limitar alto del dropdown
+              "& .MuiAutocomplete-option": {
+                fontSize: "0.75rem",
+                padding: "4px 8px",
+              },
+            },
+          }}
+          fullWidth
+        />
       );
     }
 

@@ -1,4 +1,4 @@
-import { Box, Divider } from "@mui/material";
+import { Box, Divider, Stack, Typography } from "@mui/material";
 import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
 import SeparatorMenu from "./SeparatorMenu";
 import RecursiveMenuItem from "../../navigation/RecursiveMenuItem";
@@ -19,10 +19,13 @@ import {
   ItemsServiceMenu,
   MenuServiceInterface,
 } from "../../../config/interfaces";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useToast } from "../../../config/hooks/useToast";
-import { getCollectionsThunk } from "../../../store/slices/collections/collections.thunk";
-
+import {
+  getCollectionsThunk,
+} from "../../../store/slices/collections/collections.thunk";
+import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import {
   toggleCreateCollectionMenu,
   updateCollection,
@@ -38,6 +41,15 @@ import { useParams } from "react-router-dom";
 import { getTemplatesBackup } from "../../../services";
 import { openConfirmDeleteModal } from "../../../store/slices/UI/confirmDeleteModal/confirmDeleteModal.slice";
 import ItemInlineEditor from "./ItemInlineEditor";
+import {
+  DndContext,
+  DragOverlay,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { useSidebarDnd } from "../../../config/hooks/useSidebarDnd";
 
 function SidebarBlock({
   searchTerm,
@@ -67,6 +79,20 @@ function SidebarBlock({
   );
 
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
+  const [categoriesTree, setCategoriesTree] = useState(categoriesMenu);
+  const [collectionsTree, setCollectionsTree] = useState(collectionsMenu);
+
+  const { activeId, overId, dndContextProps } = useSidebarDnd({
+    categoriesTree,
+    collectionsTree,
+    setCategoriesTree,
+    setCollectionsTree,
+  });
+
+  useEffect(() => {
+    setCategoriesTree(categoriesMenu);
+    setCollectionsTree(collectionsMenu);
+  }, [categoriesMenu, collectionsMenu]);
 
   const renderEditNodeEditor = (item: MenuServiceInterface) => {
     if (editingItemId !== item.id) return null;
@@ -199,7 +225,8 @@ function SidebarBlock({
     if (hasPermission(permissions, "delete", "category")) {
       options.push({
         item: { label: "Eliminar", id: item.id },
-        action: () => dispatch(
+        action: () =>
+          dispatch(
             openConfirmDeleteModal({ id: item.id, resource: "category" })
           ),
       });
@@ -443,105 +470,149 @@ function SidebarBlock({
   const { filteredCategories, filteredCollections } = useMemo(() => {
     const normalized = searchTerm.trim().toLowerCase();
 
+    const filterTree = (tree: MenuServiceInterface[]) =>
+      tree
+        .map((node) => filterRecursive(node, normalized, !searchOnItem))
+        .filter((node): node is MenuServiceInterface => node !== null);
+
     if (!normalized) {
       return {
-        filteredCategories: categoriesMenu,
-        filteredCollections: collectionsMenu,
+        filteredCategories: categoriesTree,
+        filteredCollections: collectionsTree,
       };
     }
 
-    const filteredCategories =
-      categoriesMenu
-        ?.map((category) =>
-          filterRecursive(category, normalized, !searchOnItem)
-        )
-        .filter((item): item is MenuServiceInterface => item !== null) ?? [];
-
-    const filteredCollections =
-      collectionsMenu
-        ?.map((category) =>
-          filterRecursive(category, normalized, !searchOnItem)
-        )
-        .filter((item): item is MenuServiceInterface => item !== null) ?? [];
-    return { filteredCategories, filteredCollections };
+    return {
+      filteredCategories: filterTree(categoriesTree),
+      filteredCollections: filterTree(collectionsTree),
+    };
   }, [
     searchTerm,
-    categoriesMenu,
-    collectionsMenu,
+    categoriesTree,
+    collectionsTree,
     filterRecursive,
     searchOnItem,
   ]);
 
+  
+
   return (
-    <Box>
-      <Box
-        sx={{ px: 1, overflowY: "auto", flexGrow: 1, my: 4, marginRight: 1 }}
-        key={"box-catalogo"}
-      >
-        <PermissionGuard
-          permissions={[{ action: "read", resource: "template" }]}
+    <DndContext
+      {...dndContextProps}
+    >
+      <Box>
+        <Box
+          sx={{ px: 1, overflowY: "auto", flexGrow: 1, my: 4, marginRight: 1 }}
+          key={"box-catalogo"}
         >
-          <SeparatorMenu
-            label="Catálogo"
-            onAction={handleModal}
-            onDownload={() => getTemplatesBackup()}
-            permissions={[{ action: "create", resource: "template" }]}
-          />
-          {filteredCategories.length > 0 ? (
-            filteredCategories.map((rootItem, index) => (
-              <RecursiveMenuItem
-                key={`${index}-${rootItem.id}`}
-                item={rootItem}
-                optionsActive={true}
-                onSelectItem={handleSelectItem}
-                buildOptions={buildedOptions}
-                buildSubItemOptions={buildedTemplateOptions}
-                renderCreateChildEditor={renderCreateChildEditor}
-                renderEditNodeEditor={renderEditNodeEditor}
-                creatingChildId={creatingChildId}
-              />
-            ))
-          ) : (
-            <Box sx={{ px: 2, py: 1, fontSize: 14, color: "gray" }}>
-              Sin resultados
-            </Box>
-          )}
-        </PermissionGuard>
-      </Box>
-      <Divider />
-      <Box
-        sx={{ px: 1, overflowY: "auto", flexGrow: 1, my: 4, marginRight: 1 }}
-        key={"box-colecciones"}
-      >
-        <PermissionGuard
-          permissions={[{ action: "read", resource: "collection" }]}
+          <PermissionGuard
+            permissions={[{ action: "read", resource: "template" }]}
+          >
+            <SeparatorMenu
+              label="Catálogo"
+              onAction={handleModal}
+              onDownload={() => getTemplatesBackup()}
+              permissions={[{ action: "create", resource: "template" }]}
+            />
+            <SortableContext
+              items={filteredCategories.map((i) => i.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              {filteredCategories.length > 0 ? (
+                filteredCategories.map((rootItem, index) => (
+                  <RecursiveMenuItem
+                    key={`${index}-${rootItem.id}`}
+                    item={rootItem}
+                    optionsActive={true}
+                    onSelectItem={handleSelectItem}
+                    buildOptions={buildedOptions}
+                    buildSubItemOptions={buildedTemplateOptions}
+                    renderCreateChildEditor={renderCreateChildEditor}
+                    renderEditNodeEditor={renderEditNodeEditor}
+                    creatingChildId={creatingChildId}
+                    overId={overId!}
+                    draggable
+                  />
+                ))
+              ) : (
+                <Box sx={{ px: 2, py: 1, fontSize: 14, color: "gray" }}>
+                  Sin resultados
+                </Box>
+              )}
+            </SortableContext>
+          </PermissionGuard>
+        </Box>
+        <Divider />
+        <Box
+          sx={{ px: 1, overflowY: "auto", flexGrow: 1, my: 4, marginRight: 1 }}
+          key={"box-colecciones"}
         >
-          <SeparatorMenu
-            permissions={[{ action: "create", resource: "collection" }]}
-            label="Colecciones"
-            onAction={handleOpenCreateCollection}
-          />
-          {createCollectionMenu && <SidebarCreateCollection />}
-          {filteredCollections.length > 0 ? (
-            filteredCollections.map((rootItem, index) => (
-              <RecursiveMenuItem
-                key={`${index}-${rootItem?.id ?? rootItem.name}`}
-                item={rootItem}
-                optionsActive={true}
-                onSelectItem={handleSelectItem}
-                buildOptions={buildedCollectionOptions}
-                buildSubItemOptions={buildedTestCaseOptions}
-                draggable
-              />
-            ))
-          ) : (
-            <Box sx={{ px: 2, py: 1, fontSize: 14, color: "gray" }}>
-              Sin resultados
-            </Box>
-          )}
-        </PermissionGuard>
+          <PermissionGuard
+            permissions={[{ action: "read", resource: "collection" }]}
+          >
+            <SeparatorMenu
+              permissions={[{ action: "create", resource: "collection" }]}
+              label="Colecciones"
+              onAction={handleOpenCreateCollection}
+            />
+            {createCollectionMenu && <SidebarCreateCollection />}
+            <SortableContext
+              items={filteredCollections.map((i) => i.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              {filteredCollections.length > 0 ? (
+                filteredCollections.map((rootItem, index) => (
+                  <RecursiveMenuItem
+                    key={`${index}-${rootItem?.id ?? rootItem.name}`}
+                    item={rootItem}
+                    optionsActive={true}
+                    onSelectItem={handleSelectItem}
+                    buildOptions={buildedCollectionOptions}
+                    buildSubItemOptions={buildedTestCaseOptions}
+                    draggable
+                    overId={overId!}
+                  />
+                ))
+              ) : (
+                <Box sx={{ px: 2, py: 1, fontSize: 14, color: "gray" }}>
+                  Sin resultados
+                </Box>
+              )}
+            </SortableContext>
+          </PermissionGuard>
+        </Box>
       </Box>
-    </Box>
+      <DragOverlay style={{ cursor: "grabbing" }}>
+        {activeId ? (
+          <Stack
+            direction="row"
+            spacing={1}
+            alignItems="center"
+            sx={{
+              flexGrow: 1,
+              minWidth: 0,
+              overflow: "hidden",
+            }}
+          >
+            <DragIndicatorIcon sx={{ fontSize: 12, color: "text.disabled" }} />
+            <DescriptionOutlinedIcon
+              sx={{ fontSize: 16, color: "text.disabled" }}
+            />
+            <Typography
+              sx={{
+                fontSize: 12,
+                color: "text.disabled",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {activeId}
+            </Typography>
+          </Stack>
+        ) : null}
+      </DragOverlay>
+    </DndContext>
   );
 }
 
