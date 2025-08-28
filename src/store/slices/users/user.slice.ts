@@ -4,7 +4,7 @@ import { createUserThunk } from "./user.thunk";
 
 const initialState: UserState = {
     status: 'idle',
-    error: null
+    error: null,
 };
 
 export const userSlice = createSlice({

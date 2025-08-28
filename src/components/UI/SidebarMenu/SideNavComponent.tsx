@@ -41,7 +41,7 @@ function SideNavComponent() {
   const { method, type } = params;
 
   useEffect(() => {
-    if (categories.status === "idle" && location.pathname !== '/settings/users') {
+    if (categories.status === "idle" && !location.pathname.includes('/settings/')) {
       dispatch(getCategoriesByMethodThunk(`${method}/${type}`))
         .unwrap()
         .catch((err) => console.error("Error cargando categorías:", err));
@@ -49,7 +49,7 @@ function SideNavComponent() {
   }, [dispatch, categories.status, method, type, location]);
 
   useEffect(() => {
-    if (collections.status === "idle" && location.pathname !== '/settings/users') {
+    if (collections.status === "idle" && !location.pathname.includes('/settings/')) {
       dispatch(getCollectionsThunk(`${method}/${type}`))
         .unwrap()
         .catch((err) => console.error("Error cargando categorías:", err));
@@ -57,7 +57,7 @@ function SideNavComponent() {
   }, [dispatch, collections.status, method, type, location]);
 
   useEffect(() => {
-    if (categories.status === "success" && categories.categories && location.pathname !== '/settings/users') {
+    if (categories.status === "success" && categories.categories && !location.pathname.includes('/settings/')) {
       const menuCategories = addLinkMenu(
         categories.categories,
         `${method}/${type}/categories`
@@ -69,7 +69,7 @@ function SideNavComponent() {
   }, [dispatch, categories.status, categories.categories, method, type, location]);
 
   useEffect(() => {
-    if (collections.status === "success" && collections.collections && location.pathname !== '/settings/users') {
+    if (collections.status === "success" && collections.collections && !location.pathname.includes('/settings/')) {
       const transformCollections = transformCollectionsToMenu(
         collections.collections,
         `${method}/${type}/collections`
@@ -111,7 +111,7 @@ function SideNavComponent() {
           onToggleMenu={toggleMenu}
           isHide={hideMenu}
         />
-        {(!hideMenu && location.pathname !== '/settings/users') &&  (
+        {(!hideMenu && !location.pathname.includes('/settings/')) &&  (
           <Box sx={{ px: 2, overflowY: "auto", flexGrow: 1, my: 4 }}>
             <SearchBar onSearch={handleSearch}></SearchBar>
             <SidebarBlock
@@ -124,7 +124,7 @@ function SideNavComponent() {
           </Box>
         )}
         {
-          (!hideMenu && location.pathname === '/settings/users') && (
+          (!hideMenu && location.pathname.includes('/settings/')) && (
             <SidebarSettingsMenu />
           )
         }

@@ -22,6 +22,16 @@ export const getUserById = async (id: string) => {
         const errorMessage = handleAxiosError(error);
         throw errorMessage;
     }
+}
+
+export const getAllUsers = async () => {
+    try {
+        const response = await api.get(`${ENDPOINTS.user}`);
+        return response.data
+    } catch (error) {
+        const errorMessage = handleAxiosError(error);
+        throw errorMessage;
+    }
 } 
 
 export const createUser = async (body: createUserInterface) => {

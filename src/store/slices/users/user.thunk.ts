@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { createUserInterface } from "../../../config/interfaces";
-import { createUser } from "../../../services";
+import { createUser, getAllUsers } from "../../../services";
 
 export const createUserThunk = createAsyncThunk<
     void,
@@ -16,3 +16,11 @@ export const createUserThunk = createAsyncThunk<
         }
     }
 )
+
+export const getAllUsersThunk = createAsyncThunk('users/getAll', async (_, {rejectWithValue}) => {
+    try {
+       return await getAllUsers()
+    } catch (error) {
+        return rejectWithValue(error)
+    }
+})
