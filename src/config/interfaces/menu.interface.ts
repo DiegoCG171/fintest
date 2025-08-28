@@ -14,6 +14,10 @@ export interface ItemsServiceMenu {
 }
 
 export interface MenuSidebarState {
+    isCollapsed: boolean;
+    menus: Record<string, MenuServiceInterface[]>;
+}
+/* export interface MenuSidebarState {
     categoriesMenu: MenuServiceInterface[],
     collectionsMenu: MenuServiceInterface[],
     isCollapsed: boolean,
@@ -22,7 +26,7 @@ export interface MenuSidebarState {
     updateCollection: MenuServiceInterface | null;
     loading: boolean;
     idTestCase: string;
-}
+} */
 
 //Menu props
 export interface MenuItem {

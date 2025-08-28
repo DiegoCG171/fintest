@@ -13,11 +13,6 @@ import {
   getLinksArray,
   transformCollectionsToMenu,
 } from "../../../config/utils";
-import {
-  setCategoriesData,
-  setCollapsedState,
-  setCollectionsData,
-} from "../../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
 import { getCollectionsThunk } from "../../../store/slices/collections/collections.thunk";
 import {
   setCategoriesRoutesThunk,
@@ -27,6 +22,7 @@ import SearchBar from "./SearchBar";
 import { RunnerSideBar } from "../Runner/RunnerSideBar";
 import { useLocation, useParams } from "react-router-dom";
 import { SidebarSettingsMenu } from "./SidebarSettingsMenu";
+import { setCollapsedState, setRecursiveMenuData } from "../../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
 
 export const drawerWidth = 240;
 
@@ -41,7 +37,7 @@ function SideNavComponent() {
   const { method, type } = params;
 
   useEffect(() => {
-    if (categories.status === "idle" && location.pathname !== '/settings/users') {
+    if (categories.status !== "success" && categories.status !== "loading" && location.pathname !== '/settings/users') {
       dispatch(getCategoriesByMethodThunk(`${method}/${type}`))
         .unwrap()
         .catch((err) => console.error("Error cargando categorías:", err));
@@ -49,7 +45,7 @@ function SideNavComponent() {
   }, [dispatch, categories.status, method, type, location]);
 
   useEffect(() => {
-    if (collections.status === "idle" && location.pathname !== '/settings/users') {
+    if (collections.status !== "success" && collections.status !== "loading" && location.pathname !== '/settings/users') {
       dispatch(getCollectionsThunk(`${method}/${type}`))
         .unwrap()
         .catch((err) => console.error("Error cargando categorías:", err));
@@ -63,7 +59,7 @@ function SideNavComponent() {
         `${method}/${type}/categories`
       );
 
-      dispatch(setCategoriesData(menuCategories));
+      dispatch(setRecursiveMenuData({type: "category", items: menuCategories}));
       dispatch(setCategoriesRoutesThunk(getLinksArray(menuCategories)));
     }
   }, [dispatch, categories.status, categories.categories, method, type, location]);
@@ -74,8 +70,7 @@ function SideNavComponent() {
         collections.collections,
         `${method}/${type}/collections`
       );
-
-      dispatch(setCollectionsData(transformCollections));
+      dispatch(setRecursiveMenuData({type: "collection", items: transformCollections}));
       dispatch(setCollectionsRoutesThunk(getLinksArray(transformCollections)));
     }
   }, [dispatch, collections, method, type, location]);

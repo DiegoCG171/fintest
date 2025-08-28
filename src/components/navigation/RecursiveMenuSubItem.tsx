@@ -1,32 +1,17 @@
 import {
   Box,
-  CircularProgress,
-  IconButton,
   Stack,
-  TextField,
   Tooltip,
-  Typography,
+  Typography
 } from "@mui/material";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
-import CancelIcon from "@mui/icons-material/Cancel";
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { usePopMenu } from "../../config/hooks/usePopMenu";
-import {
-  updateTestCaseThunk,
-  useAppDispatch,
-  useAppSelector,
-} from "../../store";
-import {
-  removeUpdateCollection,
-  removeUpdateTestCase,
-} from "../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
 import { PropsRecursiveMenuSubItem } from "../../config/interfaces";
-import { updateCollectionThunk } from "../../store/slices/collections/collections.thunk";
-import { useRefreshCollectionsMenu } from "../../config/hooks/useRefreshCollectionsMenu";
 import { useSortable } from "@dnd-kit/sortable";
-import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
+import { usePopMenu } from "../../config/hooks/usePopMenu";
 
 const RecursiveMenuSubItem = ({
   item,
@@ -36,47 +21,13 @@ const RecursiveMenuSubItem = ({
   draggable,
 }: PropsRecursiveMenuSubItem) => {
   const [hovered, setHovered] = useState(false);
-  const [value, setValue] = useState(item.name);
   const location = useLocation();
   const navigate = useNavigate();
   const { openMenu } = usePopMenu();
-  const { updateTestCase, loading, idTestCase } = useAppSelector(
-    (state) => state.sidebarMenu
-  );
-
-  const refreshCollectionsMenu = useRefreshCollectionsMenu();
-
   const { attributes, listeners, setNodeRef, transform, isDragging } =
-    useSortable({ id: item.id, data: {name: item.name} });
+    useSortable({ id: item.id });
 
   const isActive = item.linkMenu && location.pathname === `/${item.linkMenu}`;
-  const dispatch = useAppDispatch();
-  const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      try {
-        const payload = { name: value };
-
-        const isTestCase = updateTestCase && updateTestCase.id === item.id;
-
-        if (isTestCase) {
-          await dispatch(
-            updateTestCaseThunk({ id: item.id, payload })
-          ).unwrap();
-          dispatch(removeUpdateTestCase());
-        } else {
-          await dispatch(
-            updateCollectionThunk({ id: item.id, payload })
-          ).unwrap();
-          dispatch(removeUpdateCollection());
-        }
-
-        await refreshCollectionsMenu();
-      } catch (error) {
-        console.error("Error actualizando ítem:", error);
-      }
-    }
-  };
-
   const options = buildOptions?.(item)
 
   return (
@@ -104,65 +55,7 @@ const RecursiveMenuSubItem = ({
         },
       }}
     >
-      {updateTestCase && updateTestCase.id === item.id ? (
-        <Stack
-          direction="row"
-          spacing={1}
-          alignItems="center"
-          sx={{ width: "100%" }}
-        >
-          <TextField
-            variant="standard"
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-            disabled={loading}
-            sx={{
-              "& .MuiInputBase-input": {
-                fontSize: "12px",
-                color: "text.disabled",
-              },
-            }}
-            slotProps={{
-              input: {
-                endAdornment: (
-                  <IconButton
-                    size="small"
-                    disabled={loading}
-                    onClick={() => {
-                      const isTestCase =
-                        updateTestCase && updateTestCase.id === item.id;
-                      if (isTestCase) {
-                        dispatch(removeUpdateTestCase());
-                      } else {
-                        dispatch(removeUpdateCollection());
-                      }
-                      setValue(item.name);
-                    }}
-                  >
-                    {loading ? (
-                      <CircularProgress size="10px" />
-                    ) : (
-                      <CancelIcon
-                        sx={{
-                          fontSize: 12,
-                          color: "text.disabled",
-                          cursor: "pointer",
-                          "&:hover": {
-                            color: "text.primary",
-                          },
-                        }}
-                      />
-                    )}
-                  </IconButton>
-                ),
-              },
-            }}
-          />
-        </Stack>
-      ) : (
-        <>
-          <Stack
+      <Stack
             direction="row"
             alignItems="center"
             spacing={1}
@@ -200,11 +93,9 @@ const RecursiveMenuSubItem = ({
                 {item.name}
               </Typography>
             </Tooltip>
-            {loading && idTestCase === item.id && (
-              <CircularProgress size="10px" />
-            )}
           </Stack>
-          {optionsActive && buildOptions && !loading && (
+          {
+          optionsActive && buildOptions?.(item)  && (
             <Box
               onClick={(e) => {
                 e.stopPropagation();
@@ -229,8 +120,6 @@ const RecursiveMenuSubItem = ({
               />
             </Box>
           )}
-        </>
-      )}
     </Box>
   );
 };

@@ -2,14 +2,8 @@ import { Box, Typography } from "@mui/material";
 import CreateNewFolderOutlinedIcon from "@mui/icons-material/CreateNewFolderOutlined";
 import DownloadIcon from "@mui/icons-material/Download";
 import { SeparatorMenuProps } from "../../../config/interfaces";
-import PermissionGuard from "../../../config/guards/PermissionGuard";
 
-function SeparatorMenu({
-  label,
-  onAction,
-  permissions,
-  onDownload,
-}: SeparatorMenuProps) {
+function SeparatorMenu({ label, onAction, onDownload }: SeparatorMenuProps) {
   return (
     <Box
       sx={{
@@ -23,8 +17,12 @@ function SeparatorMenu({
       >
         {label.toUpperCase()}
       </Typography>
-      <PermissionGuard permissions={[...permissions]}>
-        <Box>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
         {onDownload && (
           <DownloadIcon
             sx={{
@@ -44,8 +42,7 @@ function SeparatorMenu({
             cursor: onAction ? "pointer" : "",
           }}
         />
-        </Box>
-      </PermissionGuard>
+      </Box>
     </Box>
   );
 }
