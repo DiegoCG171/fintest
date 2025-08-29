@@ -8,7 +8,7 @@ interface TagColors {
 const labelMap: Record<string, string> = {
   active: "Activo",
   new: "Nuevo",
-  inactivo: "Inactivo",
+  deactive: "Inactivo",
   pendiente: "Pendiente",
   create: "Crear",
   read: "Leer",
@@ -27,7 +27,7 @@ const labelMap: Record<string, string> = {
 const colorMap: Record<string, TagColors> = {
   active: { bg: "#C8FFC9", text: "#35AA3B", border: "transparent" }, 
   new: { bg: "#D9EDFF", text: "#184190", border: "transparent" }, 
-  inactive: { bg: "#f44336", text: "#ffffff", border: "transparent" },
+  deactive: { bg: "#ffdcdc", text: "#ff0000", border: "transparent" },
 };
 
 const capitalize = (str: string): string => {

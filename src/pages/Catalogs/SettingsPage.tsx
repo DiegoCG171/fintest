@@ -17,7 +17,6 @@ import DomainAddOutlinedIcon from "@mui/icons-material/DomainAddOutlined";
 import VpnKeyOutlinedIcon from "@mui/icons-material/VpnKeyOutlined";
 import { useEffect } from "react";
 import { getAllUsersThunk, useAppDispatch, useAppSelector } from "../../store";
-import { ModalSettingsUpdate } from "../../components/UI/Settings/ModalSettingsUpdate";
 import { getAllInstitutionsThunk } from "../../store/slices/institutions/institutions.thunk";
 import {
   getAllSecurityPermissionsThunk,
@@ -25,6 +24,7 @@ import {
 } from "../../store/slices/security/security.thunk";
 import { useLocation } from "react-router-dom";
 import { DynamicSettingForm } from "../../components/UI/Settings/DynamicSettingForm";
+import { setUpdateUser } from "../../store/slices/admin/admin.slice";
 
 export const SettingsPage = () => {
   const dispatch = useAppDispatch();
@@ -45,7 +45,7 @@ export const SettingsPage = () => {
       return {
         text: "Crear usuario",
         icon: <PersonAddOutlinedIcon />,
-        onClick: () => console.log("Crear usuario"),
+        onClick: () => dispatch(setUpdateUser({type: "create"})),
       };
     }
     if (location.pathname.includes("/settings/institutions")) {
@@ -163,7 +163,6 @@ export const SettingsPage = () => {
           {formActive ? <DynamicSettingForm /> : <DynamicSettingTable />}
         </Card>
       </Box>
-      <ModalSettingsUpdate />
     </Box>
   );
 };

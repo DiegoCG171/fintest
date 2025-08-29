@@ -21,17 +21,22 @@ const iconMap: Record<string, React.ElementType> = {
   VpnKeyOutlinedIcon: VpnKeyOutlinedIcon,
 };
 
-export const SidebarSettingsMenuItem = ({ label, active, icon, path }: Props) => {
+export const SidebarSettingsMenuItem = ({
+  label,
+  active,
+  icon,
+  path,
+}: Props) => {
   const dispatch = useAppDispatch();
-  const {formActive} = useAppSelector(state => state.admin)
+  const { formActive } = useAppSelector((state) => state.admin);
   const navigate = useNavigate();
   const IconComponent = iconMap[icon] || null;
 
   const handleNavigate = () => {
     if (formActive) return;
-    dispatch(changeActiveMenuOption(label))
-    navigate(`/settings/${path}`)
-  }
+    dispatch(changeActiveMenuOption(label));
+    navigate(`/settings/${path}`);
+  };
 
   return (
     <Box sx={{ width: "100%", my: 1 }}>
@@ -47,10 +52,13 @@ export const SidebarSettingsMenuItem = ({ label, active, icon, path }: Props) =>
           border: "2px solid transparent",
           padding: 1,
           margin: 0.5,
-          cursor: "pointer",
-          transition: "border-color 0.2s ease",
+          cursor: formActive ? "default" : "pointer", // <-- cambio aquí
+          opacity: formActive ? 0.5 : 1, // <-- hace que parezca deshabilitado
+          transition: "border-color 0.2s ease, opacity 0.2s ease",
           "&:hover": {
-            borderColor: (theme) => theme.palette.background.default,
+            borderColor: !formActive
+              ? (theme) => theme.palette.background.default
+              : "transparent",
           },
         }}
         onClick={handleNavigate}

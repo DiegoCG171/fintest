@@ -339,6 +339,7 @@ function DynamicField({
             handleChange({ target: { value: newValue } });
           }}
           freeSolo={false}
+          noOptionsText="Sin opciones"
           renderInput={(params) => (
             <TextField
               {...params}
@@ -364,7 +365,7 @@ function DynamicField({
           )}
           ListboxProps={{
             sx: {
-              maxHeight: 300, // limitar alto del dropdown
+              maxHeight: 300,
               "& .MuiAutocomplete-option": {
                 fontSize: "0.75rem",
                 padding: "4px 8px",

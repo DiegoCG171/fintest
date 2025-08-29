@@ -24,6 +24,8 @@ import { modalConfirmSessionSlice } from "./slices/UI/confirmSession/modalCoinfi
 import { confirmDeleteModalSlice } from "./slices/UI/confirmDeleteModal/confirmDeleteModal.slice";
 import { adminSlice } from "./slices/admin/admin.slice";
 import { sidebarMenuSettingsSlice } from "./slices/UI/sidebarMenuSettings/sidebarMenuSettings.slice";
+import { institutionSlice } from "./slices/institutions/institutions.slice";
+import { securitySlice } from "./slices/security/security.slice";
 
 const appReducer = combineReducers({
     auth: authSlice.reducer,
@@ -48,7 +50,9 @@ const appReducer = combineReducers({
     modalConfirmSession: modalConfirmSessionSlice.reducer,
     confirmDeleteModal: confirmDeleteModalSlice.reducer,
     admin: adminSlice.reducer,
-    sidebarMenuSettings: sidebarMenuSettingsSlice.reducer
+    sidebarMenuSettings: sidebarMenuSettingsSlice.reducer,
+    institutions: institutionSlice.reducer,
+    security: securitySlice.reducer
 });
 
 const rootReducer = (state: ReturnType<typeof appReducer> | undefined, action: UnknownAction) => {

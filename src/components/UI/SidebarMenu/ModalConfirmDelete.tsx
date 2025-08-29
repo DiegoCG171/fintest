@@ -1,7 +1,7 @@
 import { Box, Button, Modal, Portal, Stack, Typography } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
-import { deleteCategorieThunk, getCategoriesByMethodThunk, useAppDispatch, useAppSelector } from "../../../store";
+import { deleteCategorieThunk, deleteUserThunk, getCategoriesByMethodThunk, useAppDispatch, useAppSelector } from "../../../store";
 import { closeConfirmDeleteModal } from "../../../store/slices/UI/confirmDeleteModal/confirmDeleteModal.slice";
 import {
   deleteCollectionThunk,
@@ -12,6 +12,8 @@ import { useParams } from "react-router-dom";
 import { useToast } from "../../../config/hooks/useToast";
 import { useEffect, useState } from "react";
 import { deleteTemplateThunk } from "../../../store/slices/templates/templates.thunk";
+import { deleteInstitutionsThunk } from "../../../store/slices/institutions/institutions.thunk";
+import { deleteSecurityPermissionsThunk, deleteSecurityRolesThunk } from "../../../store/slices/security/security.thunk";
 
 const resourceActions = {
   testCase: {
@@ -34,6 +36,26 @@ const resourceActions = {
     toastMessage: "Template eliminado correctamente",
     title: "¿Estás seguro de que deseas eliminar el template?",
   },
+  user: {
+    deleteThunk: deleteUserThunk,
+    toastMessage: "Usuario eliminado correctamente",
+    title: "¿Estás seguro de que deseas eliminar el usuario?",
+  },
+  institution: {
+    deleteThunk: deleteInstitutionsThunk,
+    toastMessage: "Institución eliminado correctamente",
+    title: "¿Estás seguro de que deseas eliminar la institución?",
+  },
+  rol: {
+    deleteThunk: deleteSecurityRolesThunk,
+    toastMessage: "Rol eliminado correctamente",
+    title: "¿Estás seguro de que deseas eliminar el rol?",
+  },
+  permission: {
+    deleteThunk: deleteSecurityPermissionsThunk,
+    toastMessage: "Permiso eliminado correctamente",
+    title: "¿Estás seguro de que deseas eliminar el permiso?",
+  }
 } as const;
 
 type ResourceKey = keyof typeof resourceActions;

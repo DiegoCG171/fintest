@@ -20,7 +20,7 @@ import {
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useState } from "react";
-import { setUpdateUser } from "../../../store/slices/admin/admin.slice";
+import { setUpdateInstitution, setUpdatePermission, setUpdateRol, setUpdateUser } from "../../../store/slices/admin/admin.slice";
 import { TagSettingTable } from "./TagSettingTable";
 import { Institution, UserDB } from "../../../config/interfaces";
 import {
@@ -28,6 +28,7 @@ import {
   PermissionRol,
   Rol,
 } from "../../../config/interfaces/security.interface";
+import { openConfirmDeleteModal } from "../../../store/slices/UI/confirmDeleteModal/confirmDeleteModal.slice";
 
 export interface TableColumn<T> {
   key: keyof T;
@@ -239,13 +240,56 @@ export const DynamicSettingTable = () => {
       selectedItem &&
       isUserDB(selectedItem)
     ) {
-      dispatch(setUpdateUser(selectedItem));
+      dispatch(setUpdateUser({type: "update", user: selectedItem} ));
+    }
+
+    if (
+      location.pathname === "/settings/institutions" && selectedItem
+    ) {
+      dispatch(setUpdateInstitution(selectedItem as Institution));
+    }
+
+    if (
+      location.pathname === "/settings/roles"
+    ) {
+      dispatch(setUpdateRol(selectedItem as Rol));
+    }
+
+    if (
+      location.pathname === "/settings/permissions"
+    ) {
+      dispatch(setUpdatePermission(selectedItem as Permission));
+    
     }
     handleClose();
   };
 
   const handleDelete = () => {
-    console.log("Eliminar:", selectedItem);
+    if (
+      location.pathname === "/settings/users" &&
+      selectedItem &&
+      isUserDB(selectedItem)
+    ) {
+      dispatch(openConfirmDeleteModal({ id: selectedItem.id, resource: "user" }));
+    }
+
+    if (
+      location.pathname === "/settings/institutions"
+    ) {
+      dispatch(openConfirmDeleteModal({ id: selectedItem?.id as string, resource: "institution" }));
+    }
+    
+    if (
+      location.pathname === "/settings/roles"
+    ) {
+      dispatch(openConfirmDeleteModal({ id: selectedItem?.id as string, resource: "rol" }));
+    }
+    
+    if (
+      location.pathname === "/settings/permissions"
+    ) {
+      dispatch(openConfirmDeleteModal({ id: selectedItem?.id as string, resource: "permission" }));
+    }
     handleClose();
   };
 
@@ -347,7 +391,7 @@ export const DynamicSettingTable = () => {
           {config.data.length === 0 ? (
             <TableRow>
               <TableCell colSpan={config.columns.length + 1} align="center">
-                No data available
+                Sin datos
               </TableCell>
             </TableRow>
           ) : (

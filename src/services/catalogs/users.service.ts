@@ -49,9 +49,19 @@ export const createUser = async (body: createUserInterface) => {
     }
 }
 
-export const updateUser = async (body: createUserInterface) => {
+export const updateUser = async (id:string, body: createUserInterface) => {
     try {
-        const response = await api.put(ENDPOINTS.user, body)
+        const response = await api.put(`${ENDPOINTS.user}/${id}`, body)
+        return response
+    } catch (error) {
+        const errorMessage = handleAxiosError(error);
+        throw errorMessage;
+    }
+}
+
+export const deleteUser = async (id: string) => {
+    try {
+        const response = await api.delete(`${ENDPOINTS.user}/${id}`);
         return response
     } catch (error) {
         const errorMessage = handleAxiosError(error);
