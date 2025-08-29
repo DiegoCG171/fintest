@@ -1,14 +1,14 @@
 import { Box, Button, Modal, Portal, Stack, Typography } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
-import { deleteCategorieThunk, getCategoriesByMethodThunk, useAppDispatch, useAppSelector } from "../../../store";
+import { deleteCategorieThunk, getCategoriesByMethodThunk, removeTab, useAppDispatch, useAppSelector } from "../../../store";
 import { closeConfirmDeleteModal } from "../../../store/slices/UI/confirmDeleteModal/confirmDeleteModal.slice";
 import {
   deleteCollectionThunk,
   deleteTestCaseThunk,
   getCollectionsThunk,
 } from "../../../store/slices/collections/collections.thunk";
-import { useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useToast } from "../../../config/hooks/useToast";
 import { useEffect, useState } from "react";
 import { deleteTemplateThunk } from "../../../store/slices/templates/templates.thunk";
@@ -16,23 +16,31 @@ import { deleteTemplateThunk } from "../../../store/slices/templates/templates.t
 const resourceActions = {
   testCase: {
     deleteThunk: deleteTestCaseThunk,
+    hasTab: true,
     toastMessage: "Caso de uso eliminado correctamente",
     title: "¿Estás seguro de que deseas eliminar el caso de uso?",
+    origin: 'collections'
   },
   collection: {
     deleteThunk: deleteCollectionThunk,
+    hasTab: false,
     toastMessage: "Colección eliminada correctamente",
     title: "¿Estás seguro de que deseas eliminar la colección?",
+    origin: 'collections'
   },
   category: {
     deleteThunk: deleteCategorieThunk,
+    hasTab: false,
     toastMessage: "Categoria eliminada correctamente",
     title: "¿Estás seguro de que deseas eliminar la categoría?",
+    origin: 'categories'
   },
   template: {
     deleteThunk: deleteTemplateThunk,
+    hasTab: true,
     toastMessage: "Template eliminado correctamente",
     title: "¿Estás seguro de que deseas eliminar el template?",
+    origin: 'categories'
   },
 } as const;
 
@@ -56,6 +64,8 @@ const modalStyle = {
 };
 
 export const ModalConfirmDelete = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const { method, type } = useParams();
   const dispatch = useAppDispatch();
   const { showToast } = useToast();
@@ -70,7 +80,21 @@ export const ModalConfirmDelete = () => {
     if (!isValidResource(resource)) return;
 
     const config = resourceActions[resource];
+    const { origin } = config
+
     await dispatch<unknown>(config.deleteThunk(id));
+ 
+    if (config.hasTab) {
+      const route = `${method}/${type}/${origin}`;
+      const deletedTabRoute = `/${route}/${id}`;
+
+      dispatch(removeTab(`${route}/${id}`));
+
+      if (location.pathname === deletedTabRoute) {
+        navigate(`/${method}/${type}/detalles`, { replace: true });
+      }
+    }
+
     if (method && type) {
       await dispatch(getCollectionsThunk(`${method}/${type}`));
       await dispatch(getCategoriesByMethodThunk(`${method}/${type}`))
