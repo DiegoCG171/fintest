@@ -64,10 +64,10 @@ function MainPage() {
   const dynamicTabs = useAppSelector((state) => state.tabs.dynamicTabs);
   const dynamicIndex = dynamicTabs.findIndex((tab) => tab.route === currentRoute);
   const categories = useAppSelector(
-    (state) => state.sidebarMenu.categoriesMenu
+    (state) => state.sidebarMenu.menus["category"]
   );
   const collections = useAppSelector(
-    (state) => state.sidebarMenu.collectionsMenu
+    (state) => state.sidebarMenu.menus["collection"]
   );
   const dispatch = useAppDispatch();
   const { connect, disconnect } = useMultiSocket();
