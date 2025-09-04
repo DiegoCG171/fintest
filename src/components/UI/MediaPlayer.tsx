@@ -25,7 +25,7 @@ function MediaPlayer() {
   const serverPort = useAppSelector((state) => state.server.server?.portNumber);
   const playError = useAppSelector((state) => state.server.error);
   const stopError = useAppSelector((state) => state.server.stopServererror);
-  const [canStop, setCanStop] = useState(false);
+  const [canStop, setCanStop] = useState<boolean>(() => Boolean(serverIP));
   const showToastRef = useRef(showToast);
 
   const [playerMessage, setPlayerMessage] = useState("Detenido...");
@@ -47,21 +47,21 @@ function MediaPlayer() {
       setCanStop(true);
     } catch (error) {
       console.error("Error al iniciar el servidor:", error);
+      showToastRef.current("Hubo un error al levantar la sesión", "error");
     }
   }, [dispatch, clearErrors]);
 
   const stopServer = useCallback(async () => {
     clearErrors();
-    if (serverId) {
-      try {
-        await dispatch(stopServerThunk(serverId)).unwrap();
-        setCanStop(false);
-      } catch (error) {
-        console.error("Error al detener el servidor:", error);
-        showToast(error as string, "error");
-      } finally {
-        dispatch(clearServer());
-      }
+    if (!serverId) return;
+    try {
+      await dispatch(stopServerThunk(serverId)).unwrap();
+      setCanStop(false);
+    } catch (error) {
+      console.error("Error al detener el servidor:", error);
+      showToast(String(error), "error");
+    } finally {
+      dispatch(clearServer());
     }
   }, [dispatch, clearErrors, serverId, showToast]);
 
@@ -95,6 +95,10 @@ function MediaPlayer() {
     showToastRef,
     updateMessage,
   ]);
+
+  useEffect(() => {
+    setCanStop(Boolean(serverIP) && Boolean(serverId));
+  }, [serverIP, serverId, playStatus]);
 
   return (
     <Box
@@ -165,23 +169,20 @@ function MediaPlayer() {
         />
         <StopIcon
           sx={{
-            cursor: !canStop ? "not-allowed" : "pointer",
-            opacity: !canStop ? 0.5 : 1,
+            cursor:
+              canStop && stopStatus !== "loading" ? "pointer" : "not-allowed",
+            opacity: canStop && stopStatus !== "loading" ? 1 : 0.5,
             transition: "color 0.2s, transform 0.2s",
             "&:hover":
-              stopStatus === "success"
-                ? {}
-                : {
-                    transform: "scale(1.1)",
-                  },
+              canStop && stopStatus !== "loading"
+                ? { transform: "scale(1.1)" }
+                : {},
             "&:active":
-              stopStatus === "success"
-                ? {}
-                : {
-                    transform: "scale(0.95)",
-                  },
+              canStop && stopStatus !== "loading"
+                ? { transform: "scale(0.95)" }
+                : {},
           }}
-          onClick={stopServer}
+          onClick={canStop && stopStatus !== "loading" ? stopServer : undefined}
         />
       </Stack>
     </Box>
