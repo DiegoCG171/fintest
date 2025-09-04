@@ -1,28 +1,13 @@
 import { Box } from "@mui/material";
+import { labelMap } from "../../../config/utils/labelMap";
+import { toCapitalCase } from "../../../config/utils";
 
 interface TagColors {
   bg: string;
   text: string;
   border: string;
 }
-const labelMap: Record<string, string> = {
-  active: "Activo",
-  new: "Nuevo",
-  deactive: "Inactivo",
-  pendiente: "Pendiente",
-  create: "Crear",
-  read: "Leer",
-  update: "Actualizar",
-  delete: "Eliminar",
-  backup: "Respaldar",
-  user: "Usuario",
-  template: "Template",
-  collection: "Coleccción",
-  session: "Sesión",
-  testcase: "Caso de Prueba",
-  category: "Categoría",
-  server: "Servidor"
-};
+
 
 const colorMap: Record<string, TagColors> = {
   active: { bg: "#C8FFC9", text: "#35AA3B", border: "transparent" }, 
@@ -30,10 +15,7 @@ const colorMap: Record<string, TagColors> = {
   deactive: { bg: "#ffdcdc", text: "#ff0000", border: "transparent" },
 };
 
-const capitalize = (str: string): string => {
-  if (!str) return "";
-  return str.charAt(0).toUpperCase() + str.slice(1);
-};
+
 
 interface Props {
   value: string;
@@ -64,7 +46,7 @@ export const TagSettingTable = ({ value, onClick, style }: Props) => {
       }}
       onClick={onClick}
     >
-      {capitalize(label)}
+      {toCapitalCase(label)}
     </Box>
   );
 };

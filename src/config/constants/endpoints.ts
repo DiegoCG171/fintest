@@ -51,4 +51,6 @@ export const ENDPOINTS = {
 
     securityRol: getEndpoint('security/rol'),
     securityPermissions: getEndpoint('security/permission'),
+    securityAction: getEndpoint('security/action'),
+    securityResource: getEndpoint('security/resource'),
 }

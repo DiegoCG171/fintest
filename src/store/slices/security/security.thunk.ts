@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
-import { deleteSecurityPermissions, deleteSecurityRoles, getAllSecurityPermissions, getAllSecurityRoles, updateSecurityPermission, updateSecurityRoles } from "../../../services/catalogs/security.service"
-import { Permission, Rol } from "../../../config/interfaces/security.interface"
+import { createSecurityPermission, createSecurityRol, deleteSecurityPermissions, deleteSecurityRoles, getAllSecurityAction, getAllSecurityPermissions, getAllSecurityResource, getAllSecurityRoles, updateSecurityPermission, updateSecurityRoles } from "../../../services/catalogs/security.service"
+import { CreateSecurityPermission, CreateSecurityRol, Permission, Rol } from "../../../config/interfaces/security.interface"
 
 export const getAllSecurityRolesThunk = createAsyncThunk('security/getAllRoles', async (_, {rejectWithValue}) => {
     try {
@@ -17,6 +17,52 @@ export const getAllSecurityPermissionsThunk = createAsyncThunk('security/getAllP
         return rejectWithValue(error)
     }
 })
+
+export const getAllSecurityActionsThunk = createAsyncThunk('security/getAllActions', async (_, {rejectWithValue}) => {
+    try {
+       return await getAllSecurityAction()
+    } catch (error) {
+        return rejectWithValue(error)
+    }
+})
+
+export const getAllSecurityResourcesThunk = createAsyncThunk('security/getAllResources', async (_, {rejectWithValue}) => {
+    try {
+       return await getAllSecurityResource()
+    } catch (error) {
+        return rejectWithValue(error)
+    }
+})
+
+export const createSecurityRolThunk = createAsyncThunk<
+    Rol,
+    CreateSecurityRol,
+    { rejectValue: string }
+>(
+    'security/createRol',
+    async (role: CreateSecurityRol, { rejectWithValue }) => {
+        try {
+          return await createSecurityRol(role)
+        } catch (error) {
+            return rejectWithValue(error as string)
+        }
+    }
+)
+
+export const createSecurityPermissionThunk = createAsyncThunk<
+    Permission,
+    CreateSecurityPermission,
+    { rejectValue: string }
+>(
+    'security/createPermission',
+    async (permission: CreateSecurityPermission, { rejectWithValue }) => {
+        try {
+          return await createSecurityPermission(permission)
+        } catch (error) {
+            return rejectWithValue(error as string)
+        }
+    }
+)
 
 export const deleteSecurityRolesThunk = createAsyncThunk('security/removeSecurityRole', async (id: string, {rejectWithValue}) => {
     try {

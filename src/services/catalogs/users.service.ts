@@ -42,7 +42,7 @@ export const createUser = async (body: createUserInterface) => {
     }
     try {
         const response = await api.post(ENDPOINTS.user, user)
-        return response
+        return response.data;
     } catch (error) {
         const errorMessage = handleAxiosError(error);
         throw errorMessage;
@@ -52,7 +52,7 @@ export const createUser = async (body: createUserInterface) => {
 export const updateUser = async (id:string, body: createUserInterface) => {
     try {
         const response = await api.put(`${ENDPOINTS.user}/${id}`, body)
-        return response
+        return response.data;
     } catch (error) {
         const errorMessage = handleAxiosError(error);
         throw errorMessage;

@@ -1,78 +1,167 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AxiosResponse } from "axios";
 import { UserDB, Users } from "../../../config/interfaces";
-import { Institution } from "../../../config/interfaces/institutions.interface";
-import { Permission, Rol } from "../../../config/interfaces/security.interface";
 import {
+  Institution,
+  Institutions,
+} from "../../../config/interfaces/institutions.interface";
+import {
+  Action,
+  Actions,
+  Permission,
+  Permissions,
+  Resource,
+  Resources,
+  Rol,
+  Roles,
+} from "../../../config/interfaces/security.interface";
+import {
+  createUserThunk,
   deleteUserThunk,
   getAllUsersThunk,
   updateUserThunk,
 } from "../users/user.thunk";
 import {
+  createInstitutionThunk,
   deleteInstitutionsThunk,
   getAllInstitutionsThunk,
+  updateInstitutionsThunk,
 } from "../institutions/institutions.thunk";
 import {
+  createSecurityPermissionThunk,
+  createSecurityRolThunk,
   deleteSecurityPermissionsThunk,
   deleteSecurityRolesThunk,
+  getAllSecurityActionsThunk,
   getAllSecurityPermissionsThunk,
+  getAllSecurityResourcesThunk,
   getAllSecurityRolesThunk,
   updateSecurityPermissionThunk,
+  updateSecurityRolesThunk,
 } from "../security/security.thunk";
 
 interface InitialState {
   formActive: boolean;
   users: Users;
-  institutions: Institution[];
-  roles: Rol[];
-  permissions: Permission[];
   updateUser?: UserDB;
+  institutions: Institutions;
   updateInstitution?: Institution;
+  roles: Roles;
   updateRol?: Rol;
+  permissions: Permissions;
   updatePermission?: Permission;
-  type?: 'update' | 'create';
+  actions: Actions;
+  updateAction?: Action;
+  resources: Resources;
+  updateResource?: Resource;
+  type?: "update" | "create";
 }
 
 const initialState: InitialState = {
   formActive: false,
   users: {
     data: [],
-    currentPage: 0,
+    totalAll: 0,
+    totalResults: 0,
     limit: 0,
-    offset: 0,
-    total: 0,
-    totalPages: 0,
+    page: 0,
+    pages: 0,
+    order: ""
   },
-  institutions: [],
-  roles: [],
-  permissions: [],
+  institutions: {
+    data: [],
+    totalAll: 0,
+    totalResults: 0,
+    limit: 0,
+    page: 0,
+    pages: 0,
+    order: ""
+  },
+  roles: {
+    data: [],
+    totalAll: 0,
+    totalResults: 0,
+    limit: 0,
+    page: 0,
+    pages: 0,
+    order: ""
+  },
+  permissions: {
+    data: [],
+    totalAll: 0,
+    totalResults: 0,
+    limit: 0,
+    page: 0,
+    pages: 0,
+    order: ""
+  },
+  actions: {
+    data: [],
+    totalAll: 0,
+    totalResults: 0,
+    limit: 0,
+    page: 0,
+    pages: 0,
+    order: ""
+  },
+  resources: {
+    data: [],
+    totalAll: 0,
+    totalResults: 0,
+    limit: 0,
+    page: 0,
+    pages: 0,
+    order: ""
+  },
   updateUser: undefined,
   updateInstitution: undefined,
   updateRol: undefined,
   updatePermission: undefined,
-  type: "update"
+  updateAction: undefined,
+  updateResource: undefined,
+  type: "update",
 };
 
 export const adminSlice = createSlice({
   name: "admin",
   initialState,
   reducers: {
-    setUpdateUser: (state, action: PayloadAction<{type?: 'update' | "create", user?: UserDB}>) => {
+    setUpdateUser: (
+      state,
+      action: PayloadAction<{ type?: "update" | "create"; user?: UserDB }>
+    ) => {
       state.formActive = true;
       state.updateUser = action.payload.user;
-      state.type = action.payload.type
+      state.type = action.payload.type;
     },
-    setUpdateInstitution: (state, action: PayloadAction<Institution>) => {
+    setUpdateInstitution: (
+      state,
+      action: PayloadAction<{
+        type?: "update" | "create";
+        institution?: Institution;
+      }>
+    ) => {
       state.formActive = true;
-      state.updateInstitution = action.payload;
+      state.updateInstitution = action.payload.institution;
+      state.type = action.payload.type;
     },
-    setUpdateRol: (state, action: PayloadAction<Rol>) => {
+    setUpdateRol: (
+      state,
+      action: PayloadAction<{ type?: "update" | "create"; role?: Rol }>
+    ) => {
       state.formActive = true;
-      state.updateRol = action.payload;
+      state.updateRol = action.payload.role;
+      state.type = action.payload.type;
     },
-    setUpdatePermission: (state, action: PayloadAction<Permission>) => {
+    setUpdatePermission: (
+      state,
+      action: PayloadAction<{
+        type?: "update" | "create";
+        permission?: Permission;
+      }>
+    ) => {
       state.formActive = true;
-      state.updatePermission = action.payload;
+      state.updatePermission = action.payload.permission;
+      state.type = action.payload.type;
     },
     closeModalSettings: (state) => {
       state.formActive = false;
@@ -85,57 +174,155 @@ export const adminSlice = createSlice({
   extraReducers: (builder) => {
     builder
       // ===== USERS =====
-      .addCase(getAllUsersThunk.fulfilled, (state, action: PayloadAction<Users>) => {
-        state.users = action.payload;
-      })
-      .addCase(deleteUserThunk.fulfilled, (state, action: PayloadAction<string>) => {
-        state.users.data = state.users.data.filter((user) => user.id !== action.payload);
-        state.users.total -= 1;
-      })
-      .addCase(updateUserThunk.fulfilled, (state, action: PayloadAction<AxiosResponse<UserDB>>) => {
-        const updatedUser = action.payload.data;
-        state.users.data = state.users.data.map((user) =>
-          user.id === updatedUser.id ?  updatedUser : user
-        );
-        state.updateUser = undefined;
-      })
+      .addCase(
+        getAllUsersThunk.fulfilled,
+        (state, action: PayloadAction<Users>) => {
+          state.users = action.payload;
+        }
+      )
+      .addCase(
+        deleteUserThunk.fulfilled,
+        (state, action: PayloadAction<string>) => {
+          state.users.data = state.users.data.filter(
+            (user) => user.id !== action.payload
+          );
+          state.users.totalAll -= 1;
+        }
+      )
+      .addCase(
+        updateUserThunk.fulfilled,
+        (state, action: PayloadAction<UserDB>) => {
+          state.users.data = state.users.data.map((user) =>
+            user.id === action.payload.id ? action.payload : user
+          );
+          state.updateUser = undefined;
+        }
+      )
+      .addCase(
+        createUserThunk.fulfilled,
+        (state, action: PayloadAction<UserDB>) => {
+          state.users.data.push(action.payload);
+          state.users.totalAll += 1;
+        }
+      )
 
       // ===== INSTITUTIONS =====
-      .addCase(getAllInstitutionsThunk.fulfilled, (state, action: PayloadAction<Institution[]>) => {
-        state.institutions = action.payload;
+      .addCase(
+        getAllInstitutionsThunk.fulfilled,
+        (state, action: PayloadAction<Institutions>) => {
+          state.institutions = action.payload;
+        }
+      )
+      .addCase(
+        deleteInstitutionsThunk.fulfilled,
+        (state, action: PayloadAction<number>) => {
+          state.institutions.data = state.institutions.data.filter(
+            (inst) => inst.id !== action.payload
+          );
+          state.updateInstitution = undefined;
+        }
+      )
+      .addCase(createInstitutionThunk.fulfilled, (state, action) => {
+        state.institutions.data.push(action.payload);
+        state.institutions.totalAll += 1;
       })
-      .addCase(deleteInstitutionsThunk.fulfilled, (state, action: PayloadAction<number>) => {
-        state.institutions = state.institutions.filter((inst) => inst.id !== action.payload);
-        state.updateInstitution = undefined;
-      })
+      .addCase(
+        updateInstitutionsThunk.fulfilled,
+        (state, action: PayloadAction<Institution>) => {
+          state.institutions.data = state.institutions.data.map((inst) =>
+            inst.id === action.payload.id ? action.payload : inst
+          );
+          state.updateInstitution = undefined;
+        }
+      )
 
       // ===== ROLES =====
-      .addCase(getAllSecurityRolesThunk.fulfilled, (state, action: PayloadAction<Rol[]>) => {
-        state.roles = action.payload;
-      })
-      .addCase(deleteSecurityRolesThunk.fulfilled, (state, action: PayloadAction<string>) => {
-        state.roles = state.roles.filter((rol) => rol.id !== action.payload);
-        state.updateRol = undefined;
-      })
+      .addCase(
+        getAllSecurityRolesThunk.fulfilled,
+        (state, action: PayloadAction<Roles>) => {
+          state.roles = action.payload;
+        }
+      )
+      .addCase(
+        createSecurityRolThunk.fulfilled,
+        (state, action: PayloadAction<Rol>) => {
+          state.roles.data.push(action.payload);
+        }
+      )
+      .addCase(
+        deleteSecurityRolesThunk.fulfilled,
+        (state, action: PayloadAction<string>) => {
+          state.roles.data = state.roles.data.filter(
+            (rol) => rol.id !== action.payload
+          );
+          state.updateRol = undefined;
+        }
+      )
+      .addCase(
+        updateSecurityRolesThunk.fulfilled,
+        (state, action: PayloadAction<Rol>) => {
+          state.roles.data = state.roles.data.map((rol) =>
+            rol.id === action.payload.id ? action.payload : rol
+          );
+          state.updateRol = undefined;
+        }
+      )
 
       // ===== PERMISSIONS =====
-      .addCase(getAllSecurityPermissionsThunk.fulfilled, (state, action: PayloadAction<Permission[]>) => {
-        state.permissions = action.payload;
-      })
-      .addCase(deleteSecurityPermissionsThunk.fulfilled, (state, action: PayloadAction<number>) => {
-        state.permissions = state.permissions.filter((perm) => perm.id !== action.payload);
-      })
-      .addCase(updateSecurityPermissionThunk.fulfilled, (state, action: PayloadAction<{ id: number; data: Partial<Permission> }>) => {
-        const { id, data } = action.payload;
-        const index = state.permissions.findIndex((perm) => perm.id === id);
-        if (index !== -1) {
-          state.permissions[index] = {
-            ...state.permissions[index],
-            ...data,
-          };
+      .addCase(
+        getAllSecurityPermissionsThunk.fulfilled,
+        (state, action: PayloadAction<Permissions>) => {
+          state.permissions = action.payload;
         }
-        state.updatePermission = undefined;
-      });
+      )
+      .addCase(
+        createSecurityPermissionThunk.fulfilled,
+        (state, action: PayloadAction<Permission>) => {
+          state.permissions.data.push(action.payload);
+        }
+      )
+      .addCase(
+        deleteSecurityPermissionsThunk.fulfilled,
+        (state, action: PayloadAction<number>) => {
+          state.permissions.data = state.permissions.data.filter(
+            (perm) => perm.id !== action.payload
+          );
+        }
+      )
+      .addCase(
+        updateSecurityPermissionThunk.fulfilled,
+        (
+          state,
+          action: PayloadAction<{ id: number; data: Partial<Permission> }>
+        ) => {
+          const { id, data } = action.payload;
+          const index = state.permissions.data.findIndex(
+            (perm) => perm.id === id
+          );
+          if (index !== -1) {
+            state.permissions.data[index] = {
+              ...state.permissions.data[index],
+              ...data,
+            };
+          }
+          state.updatePermission = undefined;
+        }
+      )
+
+      // ===== ACTIONS =====
+      .addCase(
+        getAllSecurityActionsThunk.fulfilled,
+        (state, action: PayloadAction<Actions>) => {
+          state.actions = action.payload;
+        }
+      )
+      // ===== RESOURCE =====
+      .addCase(
+        getAllSecurityResourcesThunk.fulfilled,
+        (state, action: PayloadAction<Resources>) => {
+          state.resources = action.payload;
+        }
+      );
   },
 });
 

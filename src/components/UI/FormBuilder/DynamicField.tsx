@@ -349,16 +349,20 @@ function DynamicField({
                 "& .MuiInputBase-root": {
                   height: "28px",
                   borderRadius: 2,
+                  color: "#000"
                 },
                 "& input": {
                   padding: "4px 8px",
                   fontSize: "0.75rem",
+                  color: "#000"
                 },
                 "& .MuiAutocomplete-clearIndicator": {
                   fontSize: "16px",
+                  color: "#000"
                 },
                 "& .MuiAutocomplete-popupIndicator": {
                   fontSize: "16px",
+                  color: "#000"
                 },
               }}
             />
@@ -369,6 +373,7 @@ function DynamicField({
               "& .MuiAutocomplete-option": {
                 fontSize: "0.75rem",
                 padding: "4px 8px",
+                color: "#000"
               },
             },
           }}

@@ -1,6 +1,6 @@
 import api from "../../api/api";
 import { ENDPOINTS } from "../../config/constants/endpoints";
-import { Permission, Rol } from "../../config/interfaces/security.interface";
+import { CreateSecurityPermission, CreateSecurityRol, Permission, Rol } from "../../config/interfaces/security.interface";
 import { handleAxiosError } from "../../config/utils/axiosErrorHandler";
 
 export const  getAllSecurityRoles = async () => {
@@ -23,10 +23,51 @@ export const  getAllSecurityPermissions = async () => {
     }
 }
 
+export const  getAllSecurityAction = async () => {
+    try {
+        const response = await api.get(`${ENDPOINTS.securityAction}`);
+        return response.data
+    } catch (error) {
+        const errorMessage = handleAxiosError(error);
+        throw errorMessage;
+    }
+}
+
+export const  getAllSecurityResource = async () => {
+    try {
+        const response = await api.get(`${ENDPOINTS.securityResource}`);
+        return response.data
+    } catch (error) {
+        const errorMessage = handleAxiosError(error);
+        throw errorMessage;
+    }
+}
+
+export const createSecurityRol = async (body: CreateSecurityRol) => {
+    try {
+        const response = await api.post(ENDPOINTS.securityRol, body)
+        return response.data;
+    } catch (error) {
+        const errorMessage = handleAxiosError(error);
+        throw errorMessage;
+    }
+}
+
+export const createSecurityPermission = async (body: CreateSecurityPermission) => {
+    try {
+        const response = await api.post(ENDPOINTS.securityPermissions, body)
+        return response.data;
+    } catch (error) {
+        const errorMessage = handleAxiosError(error);
+        throw errorMessage;
+    }
+}
+
 export const updateSecurityRoles = async (id:string, body:  Partial<Rol>) => {
     try {
         const response = await api.patch(`${ENDPOINTS.securityRol}/${id}`, body)
-        return response
+        console.log(response)
+        return response.data
     } catch (error) {
         const errorMessage = handleAxiosError(error);
         throw errorMessage;

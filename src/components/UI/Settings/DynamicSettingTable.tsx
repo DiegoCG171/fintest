@@ -17,10 +17,16 @@ import {
   List,
   ListItem,
   ListItemText,
+  TablePagination,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useState } from "react";
-import { setUpdateInstitution, setUpdatePermission, setUpdateRol, setUpdateUser } from "../../../store/slices/admin/admin.slice";
+import {
+  setUpdateInstitution,
+  setUpdatePermission,
+  setUpdateRol,
+  setUpdateUser,
+} from "../../../store/slices/admin/admin.slice";
 import { TagSettingTable } from "./TagSettingTable";
 import { Institution, UserDB } from "../../../config/interfaces";
 import {
@@ -36,17 +42,37 @@ export interface TableColumn<T> {
   render?: (row: T) => React.ReactNode;
 }
 
+// Interface para datos de paginación de Redux
+interface PaginationData {
+  total: number; // totalResults
+  totalAll: number; // total sin filtros
+  limit: number; // tamaño de página
+  page: number; // página actual
+  pages: number; // total de páginas
+  order: string;
+}
+
 // Configuración tipada por ruta
 type TableConfigMap = {
-  "/settings/users": { columns: TableColumn<UserDB>[]; data: UserDB[] };
+  "/settings/users": {
+    columns: TableColumn<UserDB>[];
+    data: UserDB[];
+    pagination: PaginationData;
+  };
   "/settings/institutions": {
     columns: TableColumn<Institution>[];
     data: Institution[];
+    pagination: PaginationData;
   };
-  "/settings/roles": { columns: TableColumn<Rol>[]; data: Rol[] };
+  "/settings/roles": {
+    columns: TableColumn<Rol>[];
+    data: Rol[];
+    pagination: PaginationData;
+  };
   "/settings/permissions": {
     columns: TableColumn<Permission>[];
     data: Permission[];
+    pagination: PaginationData;
   };
 };
 
@@ -55,9 +81,18 @@ const useTableData = (): TableConfigMap => {
   const { users, institutions, roles, permissions } = useAppSelector(
     (state) => state.admin
   );
+
   return {
     "/settings/users": {
       data: users?.data ?? [],
+      pagination: {
+        total: users?.totalResults ?? 0,
+        totalAll: users?.totalAll ?? 0,
+        limit: users?.limit ?? 10,
+        page: users?.page ?? 1,
+        pages: users?.pages ?? 1,
+        order: users?.order ?? "ASC",
+      },
       columns: [
         { key: "username", label: "Usuario" },
         {
@@ -82,14 +117,30 @@ const useTableData = (): TableConfigMap => {
       ],
     },
     "/settings/institutions": {
-      data: institutions ?? [],
+      data: institutions?.data ?? [],
+      pagination: {
+        total: institutions?.totalResults ?? 0,
+        totalAll: institutions?.totalAll ?? 0,
+        limit: institutions?.limit ?? 10,
+        page: institutions?.page ?? 1,
+        pages: institutions?.pages ?? 1,
+        order: institutions?.order ?? "ASC",
+      },
       columns: [
         { key: "name", label: "Nombre" },
         { key: "description", label: "Descripción" },
       ],
     },
     "/settings/roles": {
-      data: roles ?? [],
+      data: roles?.data ?? [],
+      pagination: {
+        total: roles?.totalResults ?? 0,
+        totalAll: roles?.totalAll ?? 0,
+        limit: roles?.limit ?? 10,
+        page: roles?.page ?? 1,
+        pages: roles?.pages ?? 1,
+        order: roles?.order ?? "ASC",
+      },
       columns: [
         { key: "name", label: "Nombre" },
         { key: "description", label: "Descripción" },
@@ -103,7 +154,15 @@ const useTableData = (): TableConfigMap => {
       ],
     },
     "/settings/permissions": {
-      data: permissions ?? [],
+      data: permissions?.data ?? [],
+      pagination: {
+        total: permissions?.totalResults ?? 0,
+        totalAll: permissions?.totalAll ?? 0,
+        limit: permissions?.limit ?? 10,
+        page: permissions?.page ?? 1,
+        pages: permissions?.pages ?? 1,
+        order: permissions?.order ?? "ASC",
+      },
       columns: [
         { key: "description", label: "Nombre" },
         {
@@ -166,7 +225,7 @@ export const PermissionsCell = ({ permissions }: PermissionsCellProps) => {
                     maxHeight: 300,
                     overflowY: "auto",
                     padding: 8,
-                    margin: 8
+                    margin: 8,
                   },
                 },
               }}
@@ -175,7 +234,11 @@ export const PermissionsCell = ({ permissions }: PermissionsCellProps) => {
                 {hidden.map((r) => (
                   <ListItem key={r.id}>
                     <ListItemText
-                      primary={<TagSettingTable value={r.description.replace(/^Permiso para\s*/i, "")} />}
+                      primary={
+                        <TagSettingTable
+                          value={r.description.replace(/^Permiso para\s*/i, "")}
+                        />
+                      }
                     />
                   </ListItem>
                 ))}
@@ -221,6 +284,51 @@ export const DynamicSettingTable = () => {
 
   if (!config) return <p>No table config for this route</p>;
 
+  const { pagination } = config;
+
+  // Función para manejar cambio de página
+  const handleChangePage = (event: unknown, newPage: number) => {
+    const newOffset = newPage * pagination.limit;
+    console.log(newOffset);
+
+    // Aquí debes disparar la acción de Redux para cargar la nueva página
+    // Ejemplo (ajusta según tus actions):
+    if (location.pathname === "/settings/users") {
+      // dispatch(fetchUsers({ limit: pagination.limit, offset: newOffset }));
+    }
+    if (location.pathname === "/settings/institutions") {
+      // dispatch(fetchInstitutions({ limit: pagination.limit, offset: newOffset }));
+    }
+    if (location.pathname === "/settings/roles") {
+      // dispatch(fetchRoles({ limit: pagination.limit, offset: newOffset }));
+    }
+    if (location.pathname === "/settings/permissions") {
+      // dispatch(fetchPermissions({ limit: pagination.limit, offset: newOffset }));
+    }
+  };
+
+  // Función para manejar cambio en filas por página
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const newLimit = +event.target.value;
+    console.log(newLimit);
+    // Aquí debes disparar la acción de Redux para cargar con el nuevo limit
+    // Ejemplo (ajusta según tus actions):
+    if (location.pathname === "/settings/users") {
+      // dispatch(fetchUsers({ limit: newLimit, offset: 0 }));
+    }
+    if (location.pathname === "/settings/institutions") {
+      // dispatch(fetchInstitutions({ limit: newLimit, offset: 0 }));
+    }
+    if (location.pathname === "/settings/roles") {
+      // dispatch(fetchRoles({ limit: newLimit, offset: 0 }));
+    }
+    if (location.pathname === "/settings/permissions") {
+      // dispatch(fetchPermissions({ limit: newLimit, offset: 0 }));
+    }
+  };
+
   const handleClick = (
     e: React.MouseEvent<HTMLButtonElement>,
     item: RowType
@@ -240,26 +348,29 @@ export const DynamicSettingTable = () => {
       selectedItem &&
       isUserDB(selectedItem)
     ) {
-      dispatch(setUpdateUser({type: "update", user: selectedItem} ));
+      dispatch(setUpdateUser({ type: "update", user: selectedItem }));
     }
 
-    if (
-      location.pathname === "/settings/institutions" && selectedItem
-    ) {
-      dispatch(setUpdateInstitution(selectedItem as Institution));
+    if (location.pathname === "/settings/institutions" && selectedItem) {
+      dispatch(
+        setUpdateInstitution({
+          type: "update",
+          institution: selectedItem as Institution,
+        })
+      );
     }
 
-    if (
-      location.pathname === "/settings/roles"
-    ) {
-      dispatch(setUpdateRol(selectedItem as Rol));
+    if (location.pathname === "/settings/roles") {
+      dispatch(setUpdateRol({ type: "update", role: selectedItem as Rol }));
     }
 
-    if (
-      location.pathname === "/settings/permissions"
-    ) {
-      dispatch(setUpdatePermission(selectedItem as Permission));
-    
+    if (location.pathname === "/settings/permissions") {
+      dispatch(
+        setUpdatePermission({
+          type: "update",
+          permission: selectedItem as Permission,
+        })
+      );
     }
     handleClose();
   };
@@ -270,25 +381,36 @@ export const DynamicSettingTable = () => {
       selectedItem &&
       isUserDB(selectedItem)
     ) {
-      dispatch(openConfirmDeleteModal({ id: selectedItem.id, resource: "user" }));
+      dispatch(
+        openConfirmDeleteModal({ id: selectedItem.id, resource: "user" })
+      );
     }
 
-    if (
-      location.pathname === "/settings/institutions"
-    ) {
-      dispatch(openConfirmDeleteModal({ id: selectedItem?.id as string, resource: "institution" }));
+    if (location.pathname === "/settings/institutions") {
+      dispatch(
+        openConfirmDeleteModal({
+          id: selectedItem?.id as string,
+          resource: "institution",
+        })
+      );
     }
-    
-    if (
-      location.pathname === "/settings/roles"
-    ) {
-      dispatch(openConfirmDeleteModal({ id: selectedItem?.id as string, resource: "rol" }));
+
+    if (location.pathname === "/settings/roles") {
+      dispatch(
+        openConfirmDeleteModal({
+          id: selectedItem?.id as string,
+          resource: "rol",
+        })
+      );
     }
-    
-    if (
-      location.pathname === "/settings/permissions"
-    ) {
-      dispatch(openConfirmDeleteModal({ id: selectedItem?.id as string, resource: "permission" }));
+
+    if (location.pathname === "/settings/permissions") {
+      dispatch(
+        openConfirmDeleteModal({
+          id: selectedItem?.id as string,
+          resource: "permission",
+        })
+      );
     }
     handleClose();
   };
@@ -300,7 +422,7 @@ export const DynamicSettingTable = () => {
     if (pathname === "/settings/users") {
       const usersConfig = config as TableConfigMap["/settings/users"];
       return usersConfig.data.map((row, idx) => (
-        <TableRow key={idx}>
+        <TableRow key={row.id || idx}>
           {usersConfig.columns.map((col) => (
             <TableCell key={col.key as string}>
               {renderCell(col, row)}
@@ -319,7 +441,7 @@ export const DynamicSettingTable = () => {
       const institutionsConfig =
         config as TableConfigMap["/settings/institutions"];
       return institutionsConfig.data.map((row, idx) => (
-        <TableRow key={idx}>
+        <TableRow key={row.id || idx}>
           {institutionsConfig.columns.map((col) => (
             <TableCell key={col.key as string}>
               {renderCell(col, row)}
@@ -337,7 +459,7 @@ export const DynamicSettingTable = () => {
     if (pathname === "/settings/roles") {
       const rolesConfig = config as TableConfigMap["/settings/roles"];
       return rolesConfig.data.map((row, idx) => (
-        <TableRow key={idx}>
+        <TableRow key={row.id || idx}>
           {rolesConfig.columns.map((col) => (
             <TableCell key={col.key as string}>
               {renderCell(col, row)}
@@ -356,7 +478,7 @@ export const DynamicSettingTable = () => {
       const permissionsConfig =
         config as TableConfigMap["/settings/permissions"];
       return permissionsConfig.data.map((row, idx) => (
-        <TableRow key={idx}>
+        <TableRow key={row.id || idx}>
           {permissionsConfig.columns.map((col) => (
             <TableCell key={col.key as string}>
               {renderCell(col, row)}
@@ -384,7 +506,7 @@ export const DynamicSettingTable = () => {
                 {col.label}
               </TableCell>
             ))}
-            <TableCell align="center" sx={{ fontWeight: "bold" }} />
+            <TableCell align="center" sx={{ fontWeight: "bold" }}></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -399,6 +521,27 @@ export const DynamicSettingTable = () => {
           )}
         </TableBody>
       </Table>
+
+      <TablePagination
+        rowsPerPageOptions={[5, 10, 25]}
+        component="div"
+        count={pagination.total}
+        rowsPerPage={pagination.limit}
+        page={pagination.page - 1}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+        labelRowsPerPage="Filas por página:"
+        labelDisplayedRows={({ from, to, count }) =>
+          `${from}–${to} de ${count !== -1 ? count : `más de ${to}`}`
+        }
+        sx={{
+          borderTop: "1px solid #e0e0e0",
+          "& .MuiTablePagination-toolbar": {
+            paddingLeft: 2,
+            paddingRight: 2,
+          },
+        }}
+      />
 
       <Menu
         anchorEl={anchorEl}

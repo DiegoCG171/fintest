@@ -162,7 +162,7 @@ export default function CategoriesTreeSelector({
           variant="body2"
           color="text.secondary"
         >
-          No hay categorías disponibles.
+          No hay coleccioness disponibles.
         </Typography>
       )}
     </Box>

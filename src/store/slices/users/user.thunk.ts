@@ -1,16 +1,16 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { createUserInterface } from "../../../config/interfaces";
+import { createUserInterface, UserDB } from "../../../config/interfaces";
 import { createUser, deleteUser, getAllUsers, updateUser } from "../../../services";
 
 export const createUserThunk = createAsyncThunk<
-    void,
+    UserDB,
     createUserInterface,
     { rejectValue: string }
 >(
     'users/create',
     async (user: createUserInterface, { rejectWithValue }) => {
         try {
-            await createUser(user)
+          return await createUser(user)
         } catch (error) {
             return rejectWithValue(error as string)
         }

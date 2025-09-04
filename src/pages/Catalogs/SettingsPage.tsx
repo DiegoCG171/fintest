@@ -19,12 +19,14 @@ import { useEffect } from "react";
 import { getAllUsersThunk, useAppDispatch, useAppSelector } from "../../store";
 import { getAllInstitutionsThunk } from "../../store/slices/institutions/institutions.thunk";
 import {
+  getAllSecurityActionsThunk,
   getAllSecurityPermissionsThunk,
+  getAllSecurityResourcesThunk,
   getAllSecurityRolesThunk,
 } from "../../store/slices/security/security.thunk";
 import { useLocation } from "react-router-dom";
 import { DynamicSettingForm } from "../../components/UI/Settings/DynamicSettingForm";
-import { setUpdateUser } from "../../store/slices/admin/admin.slice";
+import { setUpdateInstitution, setUpdatePermission, setUpdateRol, setUpdateUser } from "../../store/slices/admin/admin.slice";
 
 export const SettingsPage = () => {
   const dispatch = useAppDispatch();
@@ -36,6 +38,8 @@ export const SettingsPage = () => {
     dispatch(getAllInstitutionsThunk());
     dispatch(getAllSecurityRolesThunk());
     dispatch(getAllSecurityPermissionsThunk());
+    dispatch(getAllSecurityActionsThunk());
+    dispatch(getAllSecurityResourcesThunk());
   }, [dispatch]);
 
   const responsiveWidth = () => "calc(100vw - 300px)";
@@ -52,21 +56,21 @@ export const SettingsPage = () => {
       return {
         text: "Crear institución",
         icon: <DomainAddOutlinedIcon />,
-        onClick: () => console.log("Crear institución"),
+        onClick: () => dispatch(setUpdateInstitution({type: "create"})),
       };
     }
     if (location.pathname.includes("/settings/roles")) {
       return {
         text: "Crear rol",
         icon: <AddModeratorOutlinedIcon />,
-        onClick: () => console.log("Crear rol"),
+        onClick: () => dispatch(setUpdateRol({type: "create"})),
       };
     }
     if (location.pathname.includes("/settings/permissions")) {
       return {
         text: "Crear permiso",
         icon: <VpnKeyOutlinedIcon />,
-        onClick: () => console.log("Crear permiso"),
+        onClick: () => dispatch(setUpdatePermission({type: "create"})),
       };
     }
     return {
@@ -92,7 +96,7 @@ export const SettingsPage = () => {
       <Typography
         sx={{ marginLeft: 4, marginTop: 4, fontSize: 24, fontWeight: "bold" }}
       >
-        Gestión de Usuarios
+        {/* Gestión de */}
       </Typography>
       <Box
         sx={{
