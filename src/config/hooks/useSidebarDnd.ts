@@ -86,7 +86,7 @@ export function useSidebarDnd({
           const template = await dispatch(getTemplateByIdThunk(metadata.itemId!)).unwrap()
           await dispatch(
             updateTemplateThunk({
-              id: template._id,
+              id: template.uuid,
               payload: { categoryId: metadata.targetParentId },
             })
           ).unwrap();

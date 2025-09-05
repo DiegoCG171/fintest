@@ -45,7 +45,7 @@ function ModalFormJson({ mode = "create" }: ModalFormProps) {
   const rawRules = useAppSelector((state) => state.rules.rules);
 
   const templateId = useAppSelector(
-    (state) => state.templates.templateById?._id
+    (state) => state.templates.templateById?.uuid
   );
 
   const params = useParams();
