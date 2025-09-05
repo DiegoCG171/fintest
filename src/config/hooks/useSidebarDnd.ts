@@ -1,6 +1,6 @@
 // hooks/useSidebarDnd.ts
 import { useParams } from "react-router-dom";
-import { updateTemplateThunk, useAppDispatch } from "../../store";
+import { getTemplateByIdThunk, updateTemplateThunk, useAppDispatch } from "../../store";
 import { MenuServiceInterface } from "../interfaces";
 import { useToast } from "./useToast";
 import { useCallback, useState } from "react";
@@ -83,12 +83,14 @@ export function useSidebarDnd({
         }
 
         if (action === "move" && metadata?.sourceTree === "categories") {
+          const template = await dispatch(getTemplateByIdThunk(metadata.itemId!)).unwrap()
           await dispatch(
             updateTemplateThunk({
-              id: metadata.itemId!,
+              id: template.uuid,
               payload: { categoryId: metadata.targetParentId },
             })
           ).unwrap();
+          showToast("El template ha sido reubicado", "success");
         }
       } catch (err) {
         // 🔁 Rollback si falla

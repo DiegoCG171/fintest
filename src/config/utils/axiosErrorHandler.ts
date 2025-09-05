@@ -10,8 +10,9 @@ export function handleAxiosError(error: unknown): string {
       console.error("Error en el servicio:", error.message);
       return error.message;
     }
+  } else if (error instanceof Error) {
+    return error.message;
   } else {
-    console.error("Error desconocido en el servicio");
     return "Error desconocido al intentar realizar la operación.";
   }
 }

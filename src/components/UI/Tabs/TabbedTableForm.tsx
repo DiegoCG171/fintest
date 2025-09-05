@@ -20,7 +20,6 @@ import {
 import { useToast } from "../../../config/hooks/useToast";
 import {
   debounceThunk,
-  getTemplateID,
   prepareUpdatePayload as preparePayload,
 } from "../../../config/utils";
 import {
@@ -222,9 +221,9 @@ function TabbedTableForm({
   const saveTemplates = async (tab: FormTabItem) => {
     dispatch(setLoading(true));
     const payload = preparePayload(valuesToSend, tab.formType);
-    const id = getTemplateID(templates, tab.templateId);
+    const id = tab.templateId;
     if (!id) return;
-
+    console.log(tab)
     try {
       const result = await dispatch(
         updateTemplateThunk({ id, payload })

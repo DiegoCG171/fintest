@@ -34,18 +34,10 @@ export function prepareUpdatePayload(
     const formattedRows: FieldUpdateTemplate[] = rows
         .filter((row) => row.isActive)
         .map((row) => {
-        
-        if (typeForm === 'selectionTransaction') {
-            return {
-                idBitmap: row.idBitmap ?? '',
-                function: !row.function?.trim() ? defaultFn : row.function,
-                value: row.value ?? '',
-            };
-        }
 
         const base = {
             idBitmap: row.idBitmap ?? '',
-            ...(typeForm !== 'generationTransaction' && { isRequired: Boolean(row.isRequired) }),
+            ...(typeForm === 'validationTransaction' && { isRequired: Boolean(row.isRequired) }),
             function: !row.function?.trim() ? defaultFn : row.function,
             value: row.value ?? ''
         };
