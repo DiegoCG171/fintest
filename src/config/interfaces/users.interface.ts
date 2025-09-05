@@ -15,12 +15,11 @@ export interface UserState {
 
 export interface Users {
   data: UserDB[];
-  totalResults: number;
-  totalAll: number;
+  totalSearch: number;
+  total: number;
   limit: number;
   page: number;
   pages: number;
-  order: string;
 }
 
 export interface UserDB {

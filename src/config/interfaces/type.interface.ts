@@ -147,3 +147,11 @@ export interface CategoriesFormJSONProps {
 export type BreadcrumbComponentProps = {
     pathNames: string[]
 };
+
+export interface GetFilters  {
+  order?: string;
+  search?: string;
+  sortBy?: string;
+  page?: number;
+  limit?: number;
+}

@@ -1,12 +1,14 @@
 import api from "../../api/api";
 import { ENDPOINTS } from "../../config/constants/endpoints";
-import { Institution } from "../../config/interfaces";
+import { GetFilters, Institution } from "../../config/interfaces";
 import { CreateInstitution } from "../../config/interfaces/institutions.interface";
 import { handleAxiosError } from "../../config/utils/axiosErrorHandler";
 
-export const getAllInstitutions = async () => {
+export const getAllInstitutions = async (filters?: GetFilters) => {
     try {
-        const response = await api.get(`${ENDPOINTS.institution}`);
+        const response = await api.get(`${ENDPOINTS.institution}`,{
+      params: filters,
+    });
         return response.data
     } catch (error) {
         const errorMessage = handleAxiosError(error);

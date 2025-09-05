@@ -1,11 +1,16 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import { createInstitution, deleteInstitution, getAllInstitutions, updateInstitution } from "../../../services/catalogs/institutions.service"
-import { Institution } from "../../../config/interfaces"
+import { GetFilters, Institution } from "../../../config/interfaces"
 import { CreateInstitution } from "../../../config/interfaces/institutions.interface"
 
-export const getAllInstitutionsThunk = createAsyncThunk('institutions/getAll', async (_, {rejectWithValue}) => {
+export const getAllInstitutionsThunk = createAsyncThunk('institutions/getAll', async (filters: GetFilters | undefined, {rejectWithValue}) => {
     try {
-       return await getAllInstitutions()
+        const stored = localStorage.getItem("institutionFilters");
+      const appliedFilters: GetFilters =
+        filters ?? (stored ? JSON.parse(stored) : { page: 1, limit: 10 });
+
+      localStorage.setItem("institutionFilters", JSON.stringify(appliedFilters));
+       return await getAllInstitutions(appliedFilters)
     } catch (error) {
         return rejectWithValue(error)
     }

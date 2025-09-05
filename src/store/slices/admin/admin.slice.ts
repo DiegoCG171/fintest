@@ -32,6 +32,7 @@ import {
   deleteSecurityPermissionsThunk,
   deleteSecurityRolesThunk,
   getAllSecurityActionsThunk,
+  getAllSecurityPermissionsMenuOptionsThunk,
   getAllSecurityPermissionsThunk,
   getAllSecurityResourcesThunk,
   getAllSecurityRolesThunk,
@@ -60,57 +61,52 @@ const initialState: InitialState = {
   formActive: false,
   users: {
     data: [],
-    totalAll: 0,
-    totalResults: 0,
-    limit: 0,
+    total: 0,
+    totalSearch: 0,
+    limit: 5,
     page: 0,
     pages: 0,
-    order: ""
   },
   institutions: {
     data: [],
-    totalAll: 0,
-    totalResults: 0,
-    limit: 0,
+    total: 0,
+    totalSearch: 0,
+    limit: 5,
     page: 0,
     pages: 0,
-    order: ""
   },
   roles: {
     data: [],
-    totalAll: 0,
-    totalResults: 0,
-    limit: 0,
+    total: 0,
+    totalSearch: 0,
+    limit: 5,
     page: 0,
     pages: 0,
-    order: ""
   },
   permissions: {
     data: [],
-    totalAll: 0,
-    totalResults: 0,
-    limit: 0,
+    menuOptions: [],
+    total: 0,
+    totalSearch: 0,
+    limit: 5,
     page: 0,
     pages: 0,
-    order: ""
   },
   actions: {
     data: [],
-    totalAll: 0,
-    totalResults: 0,
-    limit: 0,
+    total: 0,
+    totalSearch: 0,
+    limit: 5,
     page: 0,
     pages: 0,
-    order: ""
   },
   resources: {
     data: [],
-    totalAll: 0,
-    totalResults: 0,
-    limit: 0,
+    total: 0,
+    totalSearch: 0,
+    limit: 5,
     page: 0,
     pages: 0,
-    order: ""
   },
   updateUser: undefined,
   updateInstitution: undefined,
@@ -170,6 +166,9 @@ export const adminSlice = createSlice({
       state.updateRol = undefined;
       state.updatePermission = undefined;
     },
+    resetPermissionsMenuOptions: (state) => {
+      state.permissions.menuOptions = [];
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -186,7 +185,7 @@ export const adminSlice = createSlice({
           state.users.data = state.users.data.filter(
             (user) => user.id !== action.payload
           );
-          state.users.totalAll -= 1;
+          state.users.total -= 1;
         }
       )
       .addCase(
@@ -202,7 +201,7 @@ export const adminSlice = createSlice({
         createUserThunk.fulfilled,
         (state, action: PayloadAction<UserDB>) => {
           state.users.data.push(action.payload);
-          state.users.totalAll += 1;
+          state.users.total += 1;
         }
       )
 
@@ -224,7 +223,7 @@ export const adminSlice = createSlice({
       )
       .addCase(createInstitutionThunk.fulfilled, (state, action) => {
         state.institutions.data.push(action.payload);
-        state.institutions.totalAll += 1;
+        state.institutions.total += 1;
       })
       .addCase(
         updateInstitutionsThunk.fulfilled,
@@ -272,9 +271,29 @@ export const adminSlice = createSlice({
       .addCase(
         getAllSecurityPermissionsThunk.fulfilled,
         (state, action: PayloadAction<Permissions>) => {
-          state.permissions = action.payload;
+          state.permissions = { ...state.permissions, ...action.payload };
         }
       )
+      .addCase(
+        getAllSecurityPermissionsMenuOptionsThunk.fulfilled,
+        (state, action) => {
+          const page = action.meta?.arg?.page ?? 1;
+
+          if (page === 1) {
+            // resetea solo si aún no hay datos
+            state.permissions.menuOptions =
+              state.permissions.menuOptions.length === 0
+                ? action.payload.data
+                : state.permissions.menuOptions;
+          } else {
+            state.permissions.menuOptions = [
+              ...state.permissions.menuOptions,
+              ...action.payload.data,
+            ];
+          }
+        }
+      )
+
       .addCase(
         createSecurityPermissionThunk.fulfilled,
         (state, action: PayloadAction<Permission>) => {
@@ -332,4 +351,5 @@ export const {
   setUpdateRol,
   setUpdatePermission,
   closeModalSettings,
+  resetPermissionsMenuOptions,
 } = adminSlice.actions;

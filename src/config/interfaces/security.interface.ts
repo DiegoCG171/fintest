@@ -1,41 +1,38 @@
 export interface Roles {
   data: Rol[];
-  totalResults: number;
-  totalAll: number;
+  totalSearch: number;
+  total: number;
   limit: number;
   page: number;
   pages: number;
-  order: string;
 }
 
 export interface Permissions {
   data: Permission[];
-  totalResults: number;
-  totalAll: number;
+  menuOptions: Permission[];
+  totalSearch: number;
+  total: number;
   limit: number;
   page: number;
   pages: number;
-  order: string;
 }
 
 export interface Actions {
   data: Action[];
-  totalResults: number;
-  totalAll: number;
+  totalSearch: number;
+  total: number;
   limit: number;
   page: number;
   pages: number;
-  order: string;
 }
 
 export interface Resources {
   data: Resource[];
-  totalResults: number;
-  totalAll: number;
+  totalSearch: number;
+  total: number;
   limit: number;
   page: number;
   pages: number;
-  order: string;
 }
 
 export interface Rol {

@@ -9,12 +9,11 @@ export interface Institution {
 
 export interface Institutions {
   data: Institution[];
-  totalResults: number;
-  totalAll: number;
+  totalSearch: number;
+  total: number;
   limit: number;
   page: number;
   pages: number;
-  order: string;
 }
 
 export interface CreateInstitution {

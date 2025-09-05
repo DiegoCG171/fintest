@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { createUserInterface, UserDB } from "../../../config/interfaces";
+import { createUserInterface, GetFilters, UserDB } from "../../../config/interfaces";
 import { createUser, deleteUser, getAllUsers, updateUser } from "../../../services";
 
 export const createUserThunk = createAsyncThunk<
@@ -17,13 +17,25 @@ export const createUserThunk = createAsyncThunk<
     }
 )
 
-export const getAllUsersThunk = createAsyncThunk('users/getAll', async (_, {rejectWithValue}) => {
+export const getAllUsersThunk = createAsyncThunk(
+  'users/getAll',
+  async (filters: GetFilters | undefined, { rejectWithValue }) => {
     try {
-       return await getAllUsers()
+      const stored = localStorage.getItem("userFilters");
+      const appliedFilters: GetFilters =
+        filters ??
+        (stored ? JSON.parse(stored) : { page: 1, limit: 10 });
+
+      localStorage.setItem("userFilters", JSON.stringify(appliedFilters));
+
+      return await getAllUsers(appliedFilters);
     } catch (error) {
-        return rejectWithValue(error)
+      return rejectWithValue(error);
     }
-})
+  }
+);
+
+
 
 export const deleteUserThunk = createAsyncThunk('users/remove', async (id: string, {rejectWithValue}) => {
     try {

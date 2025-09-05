@@ -21,7 +21,10 @@ import {
 } from "../../../store";
 import { useEffect, useMemo, useRef, useState } from "react";
 import CancelIcon from "@mui/icons-material/Cancel";
-import { closeModalSettings } from "../../../store/slices/admin/admin.slice";
+import {
+  closeModalSettings,
+  resetPermissionsMenuOptions,
+} from "../../../store/slices/admin/admin.slice";
 import { useLocation } from "react-router-dom";
 import {
   createInstitutionThunk,
@@ -30,6 +33,8 @@ import {
 import {
   createSecurityPermissionThunk,
   createSecurityRolThunk,
+  getAllSecurityPermissionsMenuOptionsThunk,
+  getAllSecurityPermissionsThunk,
   updateSecurityPermissionThunk,
   updateSecurityRolesThunk,
 } from "../../../store/slices/security/security.thunk";
@@ -56,12 +61,6 @@ const modalStyle = {
 };
 
 const MENU_PROPS = {
-  PaperProps: {
-    style: {
-      maxHeight: 200, // altura máxima
-      width: 250, // ancho opcional
-    },
-  },
   anchorOrigin: {
     vertical: "bottom" as const,
     horizontal: "left" as const,
@@ -70,7 +69,7 @@ const MENU_PROPS = {
     vertical: "top" as const,
     horizontal: "left" as const,
   },
-  getContentAnchorEl: null, // ⚡️ para que siempre aparezca debajo
+  getContentAnchorEl: null,
 };
 
 const formConfigs: Record<
@@ -338,7 +337,7 @@ export const DynamicSettingForm = () => {
         description: updateRol?.description ?? "",
         permissionId: (updateRol?.permissions ?? [])
           .map((perm: PermissionRol) => {
-            const match = permissions.data.find(
+            const match = permissions.menuOptions.find(
               (p) => p.description === perm.description
             );
             return match ? String(match.id) : null;
@@ -377,22 +376,12 @@ export const DynamicSettingForm = () => {
     let payload: any = { ...formData };
 
     if (config.storeKey === "updateUser") {
-      // const institution =
-      //   institutions.find((i: any) => String(i.id) === formData.institutionId) ||
-      //   null;
-
-      // const role =
-      //   roles.find((r: any) => String(r.id) === formData.roleId) || null;
-
       payload = {
         names: formData.names,
         surnames: formData.surnames,
         username: formData.username,
         email: formData.email,
         status: formData.status,
-        // institution: institution
-        //   ? { id: institution.id, name: institution.name }
-        //   : null,
         roleIds: formData.roleId,
       };
       try {
@@ -405,7 +394,6 @@ export const DynamicSettingForm = () => {
       }
     }
 
-    // Agrega aquí los otros casos si ya tienes sus thunks:
     if (config.storeKey === "updateInstitution") {
       payload = {
         name: formData.name,
@@ -512,6 +500,7 @@ export const DynamicSettingForm = () => {
   };
 
   const handleCancel = () => {
+    dispatch(resetPermissionsMenuOptions());
     dispatch(closeModalSettings());
   };
 
@@ -655,7 +644,7 @@ export const DynamicSettingForm = () => {
                   {actions.data?.map((inst: Action) => (
                     <MenuItem key={inst.id} value={String(inst.id)}>
                       {" "}
-                      {labelMap[inst.name.toLowerCase()]}{" "}
+                      {inst.description}{" "}
                     </MenuItem>
                   ))}{" "}
                 </Select>{" "}
@@ -682,7 +671,7 @@ export const DynamicSettingForm = () => {
                   {resources.data?.map((inst: Action) => (
                     <MenuItem key={inst.id} value={String(inst.id)}>
                       {" "}
-                      {labelMap[inst.name.toLowerCase()]}{" "}
+                      {inst.description}{" "}
                     </MenuItem>
                   ))}{" "}
                 </Select>{" "}
@@ -697,15 +686,15 @@ export const DynamicSettingForm = () => {
                 <Select
                   multiple
                   label={field.label}
-                  value={formData.permissionId ?? []} // ahora es un array
+                  value={formData.permissionId ?? []}
                   onChange={(e) =>
                     setFormData((prev) => ({
                       ...prev,
-                      permissionId: e.target.value, // MUI devuelve array
+                      permissionId: e.target.value,
                     }))
                   }
                   renderValue={(selected: any) =>
-                    permissions.data
+                    permissions.menuOptions
                       .filter((perm: Permission) =>
                         (selected as string[]).includes(String(perm.id))
                       )
@@ -716,16 +705,43 @@ export const DynamicSettingForm = () => {
                         />
                       ))
                   }
-                  MenuProps={MENU_PROPS}
+                  MenuProps={{
+                    ...MENU_PROPS,
+                    PaperProps: {
+                      style: {
+                        maxHeight: 250,
+                        width: 250,
+                      },
+                      // onScroll: (event: React.UIEvent<HTMLDivElement>) => {
+                      //   const target = event.currentTarget;
+                      //   const scrollBottom =
+                      //     target.scrollTop + target.clientHeight;
+
+                      //   if (scrollBottom + 50 >= target.scrollHeight) {
+                      //     if (permissionsPage < permissions.pages) {
+                      //       const nextPage = permissionsPage + 1;
+                      //       setPermissionsPage(nextPage);
+                      //       dispatch(
+                      //         getAllSecurityPermissionsMenuOptionsThunk({
+                      //           page: nextPage,
+                      //           limit: permissionsPerPage,
+                      //         })
+                      //       );
+                      //     }
+                      //   }
+                      // },
+                    },
+                  }}
                 >
-                  {permissions.data.map((perm: Permission) => (
+                  {permissions.menuOptions.map((perm: Permission) => (
                     <MenuItem key={perm.id} value={String(perm.id)}>
+                      {" "}
                       <Checkbox
                         checked={(formData.permissionId ?? []).includes(
                           String(perm.id)
                         )}
-                      />
-                      <ListItemText primary={perm.description} />
+                      />{" "}
+                      <ListItemText primary={perm.description} />{" "}
                     </MenuItem>
                   ))}
                 </Select>

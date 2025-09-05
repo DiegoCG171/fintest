@@ -1,6 +1,10 @@
 // DynamicSettingTable.tsx
 import { useLocation } from "react-router-dom";
-import { useAppSelector, useAppDispatch } from "../../../store";
+import {
+  useAppSelector,
+  useAppDispatch,
+  getAllUsersThunk,
+} from "../../../store";
 import {
   Table,
   TableBody,
@@ -28,13 +32,19 @@ import {
   setUpdateUser,
 } from "../../../store/slices/admin/admin.slice";
 import { TagSettingTable } from "./TagSettingTable";
-import { Institution, UserDB } from "../../../config/interfaces";
+import { GetFilters, Institution, UserDB } from "../../../config/interfaces";
 import {
   Permission,
   PermissionRol,
   Rol,
 } from "../../../config/interfaces/security.interface";
 import { openConfirmDeleteModal } from "../../../store/slices/UI/confirmDeleteModal/confirmDeleteModal.slice";
+import { getAllInstitutionsThunk } from "../../../store/slices/institutions/institutions.thunk";
+import {
+  getAllSecurityPermissionsThunk,
+  getAllSecurityRolesThunk,
+} from "../../../store/slices/security/security.thunk";
+import { updateFilters } from "../../../config/utils/updateFilters";
 
 export interface TableColumn<T> {
   key: keyof T;
@@ -42,14 +52,12 @@ export interface TableColumn<T> {
   render?: (row: T) => React.ReactNode;
 }
 
-// Interface para datos de paginación de Redux
 interface PaginationData {
-  total: number; // totalResults
-  totalAll: number; // total sin filtros
-  limit: number; // tamaño de página
-  page: number; // página actual
-  pages: number; // total de páginas
-  order: string;
+  total: number;
+  totalAll: number;
+  limit: number;
+  page: number;
+  pages: number;
 }
 
 // Configuración tipada por ruta
@@ -86,12 +94,11 @@ const useTableData = (): TableConfigMap => {
     "/settings/users": {
       data: users?.data ?? [],
       pagination: {
-        total: users?.totalResults ?? 0,
-        totalAll: users?.totalAll ?? 0,
+        total: users?.totalSearch ?? 0,
+        totalAll: users?.total ?? 0,
         limit: users?.limit ?? 10,
         page: users?.page ?? 1,
         pages: users?.pages ?? 1,
-        order: users?.order ?? "ASC",
       },
       columns: [
         { key: "username", label: "Usuario" },
@@ -119,12 +126,11 @@ const useTableData = (): TableConfigMap => {
     "/settings/institutions": {
       data: institutions?.data ?? [],
       pagination: {
-        total: institutions?.totalResults ?? 0,
-        totalAll: institutions?.totalAll ?? 0,
+        total: institutions?.totalSearch ?? 0,
+        totalAll: institutions?.total ?? 0,
         limit: institutions?.limit ?? 10,
         page: institutions?.page ?? 1,
         pages: institutions?.pages ?? 1,
-        order: institutions?.order ?? "ASC",
       },
       columns: [
         { key: "name", label: "Nombre" },
@@ -134,12 +140,11 @@ const useTableData = (): TableConfigMap => {
     "/settings/roles": {
       data: roles?.data ?? [],
       pagination: {
-        total: roles?.totalResults ?? 0,
-        totalAll: roles?.totalAll ?? 0,
+        total: roles?.totalSearch ?? 0,
+        totalAll: roles?.total ?? 0,
         limit: roles?.limit ?? 10,
         page: roles?.page ?? 1,
         pages: roles?.pages ?? 1,
-        order: roles?.order ?? "ASC",
       },
       columns: [
         { key: "name", label: "Nombre" },
@@ -156,12 +161,11 @@ const useTableData = (): TableConfigMap => {
     "/settings/permissions": {
       data: permissions?.data ?? [],
       pagination: {
-        total: permissions?.totalResults ?? 0,
-        totalAll: permissions?.totalAll ?? 0,
+        total: permissions?.totalSearch ?? 0,
+        totalAll: permissions?.total ?? 0,
         limit: permissions?.limit ?? 10,
         page: permissions?.page ?? 1,
         pages: permissions?.pages ?? 1,
-        order: permissions?.order ?? "ASC",
       },
       columns: [
         { key: "description", label: "Nombre" },
@@ -251,7 +255,6 @@ export const PermissionsCell = ({ permissions }: PermissionsCellProps) => {
   );
 };
 
-// Función helper para renderizar una celda de manera type-safe
 const renderCell = <T,>(column: TableColumn<T>, row: T): React.ReactNode => {
   if (column.render) {
     return column.render(row);
@@ -261,7 +264,6 @@ const renderCell = <T,>(column: TableColumn<T>, row: T): React.ReactNode => {
   return value !== null && value !== undefined ? String(value) : "—";
 };
 
-// Función helper para determinar si un item es UserDB
 const isUserDB = (
   item: UserDB | Institution | Rol | Permission
 ): item is UserDB => {
@@ -286,48 +288,47 @@ export const DynamicSettingTable = () => {
 
   const { pagination } = config;
 
-  // Función para manejar cambio de página
-  const handleChangePage = (event: unknown, newPage: number) => {
-    const newOffset = newPage * pagination.limit;
-    console.log(newOffset);
+  const handleChangePage = (_: unknown, newPage: number) => {
+  if (location.pathname === "/settings/users") {
+    const filters = updateFilters<GetFilters>("userFilters", { page: newPage + 1 });
+    dispatch(getAllUsersThunk(filters));
+  }
+  if (location.pathname === "/settings/institutions") {
+    const filters = updateFilters<GetFilters>("institutionFilters", { page: newPage + 1 });
+    dispatch(getAllInstitutionsThunk(filters));
+  }
+  if (location.pathname === "/settings/roles") {
+    const filters = updateFilters<GetFilters>("roleFilters", { page: newPage + 1 });
+    dispatch(getAllSecurityRolesThunk(filters));
+  }
+  if (location.pathname === "/settings/permissions") {
+    const filters = updateFilters<GetFilters>("permissionFilters", { page: newPage + 1 });
+    dispatch(getAllSecurityPermissionsThunk(filters));
+  }
+};
 
-    // Aquí debes disparar la acción de Redux para cargar la nueva página
-    // Ejemplo (ajusta según tus actions):
-    if (location.pathname === "/settings/users") {
-      // dispatch(fetchUsers({ limit: pagination.limit, offset: newOffset }));
-    }
-    if (location.pathname === "/settings/institutions") {
-      // dispatch(fetchInstitutions({ limit: pagination.limit, offset: newOffset }));
-    }
-    if (location.pathname === "/settings/roles") {
-      // dispatch(fetchRoles({ limit: pagination.limit, offset: newOffset }));
-    }
-    if (location.pathname === "/settings/permissions") {
-      // dispatch(fetchPermissions({ limit: pagination.limit, offset: newOffset }));
-    }
-  };
 
-  // Función para manejar cambio en filas por página
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const newLimit = +event.target.value;
-    console.log(newLimit);
-    // Aquí debes disparar la acción de Redux para cargar con el nuevo limit
-    // Ejemplo (ajusta según tus actions):
-    if (location.pathname === "/settings/users") {
-      // dispatch(fetchUsers({ limit: newLimit, offset: 0 }));
-    }
-    if (location.pathname === "/settings/institutions") {
-      // dispatch(fetchInstitutions({ limit: newLimit, offset: 0 }));
-    }
-    if (location.pathname === "/settings/roles") {
-      // dispatch(fetchRoles({ limit: newLimit, offset: 0 }));
-    }
-    if (location.pathname === "/settings/permissions") {
-      // dispatch(fetchPermissions({ limit: newLimit, offset: 0 }));
-    }
-  };
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const newLimit = +event.target.value;
+
+  if (location.pathname === "/settings/users") {
+    const filters = updateFilters<GetFilters>("userFilters", { limit: newLimit });
+    dispatch(getAllUsersThunk(filters));
+  }
+  if (location.pathname === "/settings/institutions") {
+    const filters = updateFilters<GetFilters>("institutionFilters", { limit: newLimit });
+    dispatch(getAllInstitutionsThunk(filters));
+  }
+  if (location.pathname === "/settings/roles") {
+    const filters = updateFilters<GetFilters>("roleFilters", { limit: newLimit });
+    dispatch(getAllSecurityRolesThunk(filters));
+  }
+  if (location.pathname === "/settings/permissions") {
+    const filters = updateFilters<GetFilters>("permissionFilters", { limit: newLimit });
+    dispatch(getAllSecurityPermissionsThunk(filters));
+  }
+};
+
 
   const handleClick = (
     e: React.MouseEvent<HTMLButtonElement>,

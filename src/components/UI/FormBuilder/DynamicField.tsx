@@ -39,7 +39,6 @@ function extractIdBitMap(arr: TableRowDataFormBuilder[]): string[] {
   return Array.from(new Set(result));
 }
 
-
 function DynamicField({
   column,
   value,
@@ -349,31 +348,37 @@ function DynamicField({
                 "& .MuiInputBase-root": {
                   height: "28px",
                   borderRadius: 2,
-                  color: "#000"
+                  color: "#000",
                 },
                 "& input": {
                   padding: "4px 8px",
                   fontSize: "0.75rem",
-                  color: "#000"
+                  color: "#000",
                 },
                 "& .MuiAutocomplete-clearIndicator": {
-                  fontSize: "16px",
-                  color: "#000"
+                  fontSize: "12px",
+                  color: "#000",
                 },
                 "& .MuiAutocomplete-popupIndicator": {
-                  fontSize: "16px",
-                  color: "#000"
+                  fontSize: "12px",
+                  color: "#000",
                 },
               }}
             />
           )}
-          ListboxProps={{
-            sx: {
-              maxHeight: 300,
-              "& .MuiAutocomplete-option": {
-                fontSize: "0.75rem",
-                padding: "4px 8px",
-                color: "#000"
+          slotProps={{
+            paper: {
+              sx: {
+                "& .MuiAutocomplete-option": {
+                  fontSize: "0.75rem",
+                  padding: "8px 8px",
+                  color: "#000",
+                },
+                "& .MuiAutocomplete-noOptions": {
+                  fontSize: "0.75rem",
+                  padding: "16px 8px",
+                  color: "#000",
+                },
               },
             },
           }}
