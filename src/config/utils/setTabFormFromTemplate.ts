@@ -24,7 +24,7 @@ function getFieldsByFormType(
 export function getDefaultFunctionByFormType(formType: string): string {
     if (formType === "generationTransaction") return "echo";
     if (formType === "validationTransaction") return "not_validate";
-    if (formType === "selectionTransaction") return "equals";
+    if (formType === "selectionTransaction") return "ignore";
     return "";
 }
 
