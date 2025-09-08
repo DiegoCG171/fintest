@@ -3,6 +3,9 @@ import { createSession, removeSession } from "../../../services/catalogs/session
 import { toggleConfirmSessionModal } from "../UI/confirmSession/modalCoinfirmSession.slice";
 
 export interface CreateSessionPayload {
+    processingMethod: string;
+    ip?: string;
+    portNumber?: number; 
     toExecute: RunnableToExecute[]
 }
 
@@ -17,6 +20,7 @@ export const createSessionThunk = createAsyncThunk(
   "auth/createSession",
   async (createSessionPayload: CreateSessionPayload, { rejectWithValue, dispatch }) => {
     try {
+      console.log(createSessionPayload)
       const {type, data} = await createSession(createSessionPayload);
 
       if(type === 'SESSION_CONFLICT') {

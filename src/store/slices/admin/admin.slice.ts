@@ -188,6 +188,7 @@ export const adminSlice = createSlice({
             (user) => user.id !== action.payload
           );
           state.users.total -= 1;
+          state.users.totalSearch -= 1;
         }
       )
       .addCase(
@@ -222,6 +223,8 @@ export const adminSlice = createSlice({
             (inst) => inst.id !== action.payload
           );
           state.updateInstitution = undefined;
+          state.institutions.total -= 1
+          state.institutions.totalSearch -= 1
         }
       )
       .addCase(createInstitutionThunk.fulfilled, (state, action) => {
@@ -259,6 +262,8 @@ export const adminSlice = createSlice({
             (rol) => rol.id !== action.payload
           );
           state.updateRol = undefined;
+          state.roles.total -= 1
+          state.roles.totalSearch -= 1
         }
       )
       .addCase(
@@ -311,6 +316,9 @@ export const adminSlice = createSlice({
           state.permissions.data = state.permissions.data.filter(
             (perm) => perm.id !== action.payload
           );
+          state.updatePermission = undefined;
+          state.permissions.total -= 1
+          state.permissions.totalSearch -= 1
         }
       )
       .addCase(

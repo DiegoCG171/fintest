@@ -21,9 +21,7 @@ import {
 } from "../../../config/interfaces";
 import { useCallback, useEffect, useState } from "react";
 import { useToast } from "../../../config/hooks/useToast";
-import {
-  getCollectionsThunk,
-} from "../../../store/slices/collections/collections.thunk";
+import { getCollectionsThunk } from "../../../store/slices/collections/collections.thunk";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import {
@@ -32,7 +30,10 @@ import {
   updateTestCase,
 } from "../../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
 import { SidebarCreateCollection } from "./SidebarCreateCollection";
-import { createSessionThunk } from "../../../store/slices/sessions/session.thunk";
+import {
+  CreateSessionPayload,
+  createSessionThunk,
+} from "../../../store/slices/sessions/session.thunk";
 import { cleanObject } from "../../../config/utils/cleandObject";
 import PermissionGuard from "../../../config/guards/PermissionGuard";
 import { hasPermission } from "../../../config/utils/permissions";
@@ -41,10 +42,7 @@ import { useParams } from "react-router-dom";
 import { getTemplatesBackup } from "../../../services";
 import { openConfirmDeleteModal } from "../../../store/slices/UI/confirmDeleteModal/confirmDeleteModal.slice";
 import ItemInlineEditor from "./ItemInlineEditor";
-import {
-  DndContext,
-  DragOverlay,
-} from "@dnd-kit/core";
+import { DndContext, DragOverlay } from "@dnd-kit/core";
 import {
   SortableContext,
   verticalListSortingStrategy,
@@ -59,7 +57,6 @@ function SidebarBlock({
   searchTerm: string;
   searchOnItem: boolean;
 }) {
-  
   const dispatch = useAppDispatch();
   const { permissions } = useAuth();
 
@@ -97,10 +94,10 @@ function SidebarBlock({
   }, [categoriesMenu, collectionsMenu]);
 
   const filteredCategories = useFilterRecursive(
-        categoriesTree,
-        searchTerm,
-        !searchOnItem
-    );
+    categoriesTree,
+    searchTerm,
+    !searchOnItem
+  );
 
   const renderEditNodeEditor = (item: MenuServiceInterface) => {
     if (editingItemId !== item.id) return null;
@@ -327,20 +324,26 @@ function SidebarBlock({
   ): ContextMenuOption[] => {
     const options: ContextMenuOption[] = [];
 
-    if (hasPermission(permissions, "create", "session")) {
+    if ((hasPermission(permissions, "create", "session"), type)) {
       options.push({
         item: { label: "Ejecutar", id: item.id },
         action: () => {
-          dispatch(
-            createSessionThunk({
-              toExecute: [
-                {
-                  runnableId: item.id,
-                  runnableType: "collection",
-                },
-              ],
-            })
-          );
+          const sessionPayload: CreateSessionPayload = {
+            processingMethod: type,
+            toExecute: [
+              {
+                runnableId: item.id,
+                runnableType: "collection",
+              },
+            ],
+          };
+
+          if (type === "emmisor") {
+            sessionPayload.ip = "1.2.3.4";
+            sessionPayload.portNumber = 1234;
+          }
+
+          dispatch(createSessionThunk(sessionPayload));
         },
       });
     }
@@ -374,20 +377,26 @@ function SidebarBlock({
   ): ContextMenuOption[] => {
     const options: ContextMenuOption[] = [];
 
-    if (hasPermission(permissions, "create", "session")) {
+    if (hasPermission(permissions, "create", "session") && type) {
       options.push({
         item: { label: "Ejecutar", id: item.id },
         action: () => {
-          dispatch(
-            createSessionThunk({
-              toExecute: [
-                {
-                  runnableId: item.id,
-                  runnableType: "testCase",
-                },
-              ],
-            })
-          );
+          const sessionPayload: CreateSessionPayload = {
+            processingMethod: type,
+            toExecute: [
+              {
+                runnableId: item.id,
+                runnableType: "testCase",
+              },
+            ],
+          };
+
+          if (type === "emmisor") {
+            sessionPayload.ip = "1.2.3.4";
+            sessionPayload.portNumber = 1234;
+          }
+
+          dispatch(createSessionThunk(sessionPayload));
         },
       });
     }
@@ -425,12 +434,9 @@ function SidebarBlock({
       })
     );
   }, [dispatch]);
-  
 
   return (
-    <DndContext
-      {...dndContextProps}
-    >
+    <DndContext {...dndContextProps}>
       <Box>
         <Box
           sx={{ px: 1, overflowY: "auto", flexGrow: 1, my: 4, marginRight: 1 }}
