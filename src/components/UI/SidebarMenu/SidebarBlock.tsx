@@ -19,7 +19,7 @@ import {
   ItemsServiceMenu,
   MenuServiceInterface,
 } from "../../../config/interfaces";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useToast } from "../../../config/hooks/useToast";
 import {
   getCollectionsThunk,
@@ -50,6 +50,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { useSidebarDnd } from "../../../config/hooks/useSidebarDnd";
+import useFilterRecursive from "../../../config/hooks/sidebar/useFilterRecursive";
 
 function SidebarBlock({
   searchTerm,
@@ -58,6 +59,7 @@ function SidebarBlock({
   searchTerm: string;
   searchOnItem: boolean;
 }) {
+  
   const dispatch = useAppDispatch();
   const { permissions } = useAuth();
 
@@ -93,6 +95,12 @@ function SidebarBlock({
     setCategoriesTree(categoriesMenu);
     setCollectionsTree(collectionsMenu);
   }, [categoriesMenu, collectionsMenu]);
+
+  const filteredCategories = useFilterRecursive(
+        categoriesTree,
+        searchTerm,
+        !searchOnItem
+    );
 
   const renderEditNodeEditor = (item: MenuServiceInterface) => {
     if (editingItemId !== item.id) return null;
@@ -417,83 +425,6 @@ function SidebarBlock({
       })
     );
   }, [dispatch]);
-
-  const filterRecursive = useCallback(
-    (
-      node: MenuServiceInterface,
-      term: string,
-      searchOnFile: boolean
-    ): MenuServiceInterface | null => {
-      const normalized = term.toLowerCase();
-
-      const isNodeMatch = node.name?.toLowerCase().includes(normalized);
-      const matchedItems =
-        node.items?.filter((item) =>
-          item.name.toLowerCase().includes(normalized)
-        ) ?? [];
-
-      const matchedChildren = (node.children ?? [])
-        .map((child) => filterRecursive(child, term, searchOnFile))
-        .filter((child): child is MenuServiceInterface => child !== null);
-
-      if (searchOnFile) {
-        if (isNodeMatch) {
-          return {
-            ...node,
-            items: matchedItems,
-            children: matchedChildren,
-          };
-        }
-        if (matchedItems.length > 0 || matchedChildren.length > 0) {
-          return {
-            ...node,
-            items: matchedItems,
-            children: matchedChildren,
-          };
-        }
-        return null;
-      }
-
-      if (matchedItems.length > 0 || matchedChildren.length > 0) {
-        return {
-          ...node,
-          items: matchedItems,
-          children: matchedChildren,
-        };
-      }
-
-      return null;
-    },
-    []
-  );
-
-  const { filteredCategories, filteredCollections } = useMemo(() => {
-    const normalized = searchTerm.trim().toLowerCase();
-
-    const filterTree = (tree: MenuServiceInterface[]) =>
-      tree
-        .map((node) => filterRecursive(node, normalized, !searchOnItem))
-        .filter((node): node is MenuServiceInterface => node !== null);
-
-    if (!normalized) {
-      return {
-        filteredCategories: categoriesTree,
-        filteredCollections: collectionsTree,
-      };
-    }
-
-    return {
-      filteredCategories: filterTree(categoriesTree),
-      filteredCollections: filterTree(collectionsTree),
-    };
-  }, [
-    searchTerm,
-    categoriesTree,
-    collectionsTree,
-    filterRecursive,
-    searchOnItem,
-  ]);
-
   
 
   return (
@@ -557,11 +488,11 @@ function SidebarBlock({
             />
             {createCollectionMenu && <SidebarCreateCollection />}
             <SortableContext
-              items={filteredCollections.map((i) => i.id)}
+              items={collectionsTree.map((i) => i.id)}
               strategy={verticalListSortingStrategy}
             >
-              {filteredCollections.length > 0 ? (
-                filteredCollections.map((rootItem, index) => (
+              {collectionsTree.length > 0 ? (
+                collectionsTree.map((rootItem, index) => (
                   <RecursiveMenuItem
                     key={`${index}-${rootItem?.id ?? rootItem.name}`}
                     item={rootItem}
