@@ -14,6 +14,7 @@ export interface Institutions {
   limit: number;
   page: number;
   pages: number;
+  searchTerm?: string;
 }
 
 export interface CreateInstitution {

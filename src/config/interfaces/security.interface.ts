@@ -5,6 +5,7 @@ export interface Roles {
   limit: number;
   page: number;
   pages: number;
+  searchTerm?: string;
 }
 
 export interface Permissions {
@@ -15,6 +16,7 @@ export interface Permissions {
   limit: number;
   page: number;
   pages: number;
+  searchTerm?: string;
 }
 
 export interface Actions {
@@ -24,6 +26,7 @@ export interface Actions {
   limit: number;
   page: number;
   pages: number;
+  searchTerm?: string;
 }
 
 export interface Resources {
@@ -33,6 +36,7 @@ export interface Resources {
   limit: number;
   page: number;
   pages: number;
+  searchTerm?: string;
 }
 
 export interface Rol {

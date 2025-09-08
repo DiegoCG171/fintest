@@ -23,12 +23,13 @@ export const getAllSecurityRolesThunk = createAsyncThunk(
   "security/getAllRoles",
   async (filters: GetFilters | undefined, { rejectWithValue }) => {
     try {
-        const stored = localStorage.getItem("roleFilters");
+      const stored = localStorage.getItem("roleFilters");
       const appliedFilters: GetFilters =
         filters ?? (stored ? JSON.parse(stored) : { page: 1, limit: 10 });
 
       localStorage.setItem("roleFilters", JSON.stringify(appliedFilters));
-      return await getAllSecurityRoles(appliedFilters);
+      const rolesDB = await getAllSecurityRoles(appliedFilters);
+      return { ...rolesDB, searchTerm: appliedFilters.search };
     } catch (error) {
       return rejectWithValue(error);
     }
@@ -44,7 +45,8 @@ export const getAllSecurityPermissionsThunk = createAsyncThunk(
         filters ?? (stored ? JSON.parse(stored) : { page: 1, limit: 10 });
 
       localStorage.setItem("permissionFilters", JSON.stringify(appliedFilters));
-      return await getAllSecurityPermissions(appliedFilters);
+      const permissionsDB = await getAllSecurityPermissions(appliedFilters);
+      return { ...permissionsDB, searchTerm: appliedFilters.search };
     } catch (error) {
       return rejectWithValue(error);
     }

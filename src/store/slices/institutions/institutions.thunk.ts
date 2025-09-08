@@ -10,7 +10,8 @@ export const getAllInstitutionsThunk = createAsyncThunk('institutions/getAll', a
         filters ?? (stored ? JSON.parse(stored) : { page: 1, limit: 10 });
 
       localStorage.setItem("institutionFilters", JSON.stringify(appliedFilters));
-       return await getAllInstitutions(appliedFilters)
+       const institutionsDB = await getAllInstitutions(appliedFilters)
+       return  { ...institutionsDB, searchTerm: appliedFilters.search };
     } catch (error) {
         return rejectWithValue(error)
     }

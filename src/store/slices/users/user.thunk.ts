@@ -27,8 +27,8 @@ export const getAllUsersThunk = createAsyncThunk(
         (stored ? JSON.parse(stored) : { page: 1, limit: 10 });
 
       localStorage.setItem("userFilters", JSON.stringify(appliedFilters));
-
-      return await getAllUsers(appliedFilters);
+      const usersDB = await getAllUsers(appliedFilters)
+      return  { ...usersDB, searchTerm: appliedFilters.search };
     } catch (error) {
       return rejectWithValue(error);
     }

@@ -6,30 +6,58 @@ const settingsMenu = [
     active: true,
     icon: "GroupsOutlinedIcon",
     path: "users",
+    requiredPermissions: [
+      { action: "read", resource: "user" },
+      { action: "create", resource: "user" },
+      { action: "update", resource: "user" },
+      { action: "delete", resource: "user" },
+    ],
   },
   {
     label: "Institutions",
     active: false,
     icon: "BusinessOutlinedIcon",
     path: "institutions",
+    requiredPermissions: [
+      { action: "read", resource: "institution" },
+      { action: "create", resource: "institution" },
+      { action: "update", resource: "institution" },
+      { action: "delete", resource: "institution" },
+    ],
   },
   {
     label: "Roles",
     active: false,
     icon: "AdminPanelSettingsOutlinedIcon",
     path: "roles",
+    requiredPermissions: [
+      { action: "read", resource: "rol" },
+      { action: "create", resource: "rol" },
+      { action: "update", resource: "rol" },
+      { action: "delete", resource: "rol" },
+    ],
   },
   {
     label: "Permissions",
     active: false,
     icon: "VpnKeyOutlinedIcon",
     path: "permissions",
+    requiredPermissions: [
+      { action: "read", resource: "permission" },
+      { action: "create", resource: "permission" },
+      { action: "update", resource: "permission" },
+      { action: "delete", resource: "permission" },
+    ],
   },
 ];
 
-
 interface InitialState {
   menuOptions: MenuOptions[];
+}
+
+interface PermissionRequirement {
+  action: string;
+  resource: string;
 }
 
 interface MenuOptions {
@@ -37,6 +65,7 @@ interface MenuOptions {
   icon: string;
   active: boolean;
   path: string;
+  requiredPermissions?: PermissionRequirement[]; // ✅ ahora es opcional
 }
 
 const initialState: InitialState = {
@@ -55,4 +84,4 @@ export const sidebarMenuSettingsSlice = createSlice({
   },
 });
 
-export const {changeActiveMenuOption} = sidebarMenuSettingsSlice.actions;
+export const { changeActiveMenuOption } = sidebarMenuSettingsSlice.actions;

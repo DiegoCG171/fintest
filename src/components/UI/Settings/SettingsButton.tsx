@@ -43,6 +43,14 @@ export const SettingsButton = () => {
         { action: "create", resource: "permission" },
         { action: "update", resource: "permission" },
         { action: "delete", resource: "permission" },
+        { action: "read", resource: "action" },
+        { action: "create", resource: "action" },
+        { action: "update", resource: "action" },
+        { action: "delete", resource: "action" },
+        { action: "read", resource: "resource" },
+        { action: "create", resource: "resource" },
+        { action: "update", resource: "resource" },
+        { action: "delete", resource: "resource" },
       ]}
     >
       <Box sx={{ position: "absolute", top: 24, right: 24, cursor: "pointer" }}>

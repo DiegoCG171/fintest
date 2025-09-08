@@ -2,7 +2,7 @@ import { AsyncStatus } from ".";
 
 export interface createUserInterface {
   username: string;
-  password: string;
+  password?: string;
   email: string;
   names: string;
   surnames: string;
@@ -20,6 +20,7 @@ export interface Users {
   limit: number;
   page: number;
   pages: number;
+  searchTerm?: string;
 }
 
 export interface UserDB {

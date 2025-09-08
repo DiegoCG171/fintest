@@ -55,6 +55,7 @@ interface InitialState {
   resources: Resources;
   updateResource?: Resource;
   type?: "update" | "create";
+  searchTerm?: string;
 }
 
 const initialState: InitialState = {
@@ -177,6 +178,7 @@ export const adminSlice = createSlice({
         getAllUsersThunk.fulfilled,
         (state, action: PayloadAction<Users>) => {
           state.users = action.payload;
+          state.searchTerm = action.payload.searchTerm
         }
       )
       .addCase(
@@ -210,6 +212,7 @@ export const adminSlice = createSlice({
         getAllInstitutionsThunk.fulfilled,
         (state, action: PayloadAction<Institutions>) => {
           state.institutions = action.payload;
+          state.searchTerm = action.payload.searchTerm
         }
       )
       .addCase(
@@ -240,6 +243,7 @@ export const adminSlice = createSlice({
         getAllSecurityRolesThunk.fulfilled,
         (state, action: PayloadAction<Roles>) => {
           state.roles = action.payload;
+          state.searchTerm = action.payload.searchTerm
         }
       )
       .addCase(
@@ -272,6 +276,7 @@ export const adminSlice = createSlice({
         getAllSecurityPermissionsThunk.fulfilled,
         (state, action: PayloadAction<Permissions>) => {
           state.permissions = { ...state.permissions, ...action.payload };
+          state.searchTerm = action.payload.searchTerm
         }
       )
       .addCase(
@@ -333,6 +338,7 @@ export const adminSlice = createSlice({
         getAllSecurityActionsThunk.fulfilled,
         (state, action: PayloadAction<Actions>) => {
           state.actions = action.payload;
+          state.searchTerm = action.payload.searchTerm
         }
       )
       // ===== RESOURCE =====
@@ -340,6 +346,7 @@ export const adminSlice = createSlice({
         getAllSecurityResourcesThunk.fulfilled,
         (state, action: PayloadAction<Resources>) => {
           state.resources = action.payload;
+          state.searchTerm = action.payload.searchTerm
         }
       );
   },
