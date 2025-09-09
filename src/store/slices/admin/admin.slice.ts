@@ -40,7 +40,7 @@ import {
   updateSecurityRolesThunk,
 } from "../security/security.thunk";
 
-interface InitialState {
+export interface AdminInitialState {
   formActive: boolean;
   users: Users;
   updateUser?: UserDB;
@@ -58,7 +58,7 @@ interface InitialState {
   searchTerm?: string;
 }
 
-const initialState: InitialState = {
+const initialState: AdminInitialState = {
   formActive: false,
   users: {
     data: [],

@@ -15,6 +15,7 @@ interface CreateFieldComponentProps {
   setFormData: (updater: (prev: FormData) => FormData) => void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   additionalProps?: any;
+  key?: React.Key;
 }
 
 export const createFieldComponent = ({
@@ -22,33 +23,34 @@ export const createFieldComponent = ({
   formData,
   setFormData,
   additionalProps = {},
+  key
 }: CreateFieldComponentProps) => {
   const commonProps = { field, formData, setFormData, ...additionalProps };
 
   switch (field.type) {
     case "text":
-      return <TextFieldComponent {...commonProps} />;
+      return <TextFieldComponent key={key} {...commonProps} />;
       
     case "password":
-      return <PasswordFieldComponent {...commonProps} />;
+      return <PasswordFieldComponent key={key} {...commonProps} />;
       
     case "select":
-      return <SelectFieldComponent {...commonProps} />;
+      return <SelectFieldComponent key={key} {...commonProps} />;
       
     case "institutionSelect":
-      return <InstitutionSelectComponent {...commonProps} />;
+      return <InstitutionSelectComponent key={key} {...commonProps} />;
       
     case "actionSelect":
-      return <ActionSelectComponent {...commonProps} />;
+      return <ActionSelectComponent key={key} {...commonProps} />;
       
     case "resourceSelect":
-      return <ResourceSelectComponent {...commonProps} />;
+      return <ResourceSelectComponent key={key} {...commonProps} />;
       
     case "permissionSelect":
-      return <PermissionSelectComponent {...commonProps} />;
+      return <PermissionSelectComponent key={key} {...commonProps} />;
       
     case "roleSelect":
-      return <RoleSelectComponent {...commonProps} />;
+      return <RoleSelectComponent key={key} {...commonProps} />;
       
     default:
       return null;

@@ -26,7 +26,7 @@ export const createSubmitHandlers = (
         email: formData.email,
         status: formData.status,
         institutionId: Number(formData.institutionId),
-        roleIds: [Number(formData.roleId)],
+        roleIds: formData.roleIds,
       };
       
       try {

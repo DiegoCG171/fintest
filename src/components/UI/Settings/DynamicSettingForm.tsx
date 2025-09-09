@@ -48,6 +48,7 @@ export const DynamicSettingForm = () => {
   // Manejadores de eventos
   const handleConfirm = async () => {
     const handler = submitHandlers[config.storeKey];
+    console.log(formData)
     if (handler) {
       await handler(formData);
       dispatch(closeModalSettings());
@@ -80,8 +81,8 @@ export const DynamicSettingForm = () => {
               showPassword,
               setShowPassword,
               ...adminState,
-              key: field.name
             },
+            key: field.name
           })
         )}
       </Box>

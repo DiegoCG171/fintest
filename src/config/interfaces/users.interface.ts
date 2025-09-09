@@ -6,6 +6,7 @@ export interface createUserInterface {
   email: string;
   names: string;
   surnames: string;
+  roleIds?: string[];
 }
 
 export interface UserState {

@@ -1,10 +1,10 @@
+import { AdminInitialState } from "../../store/slices/admin/admin.slice";
 import { StoreKey } from "../interfaces/formSettings.interface";
 import { PermissionRol } from "../interfaces/security.interface";
 
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const getInitialFormData = (storeKey: StoreKey, adminState: any) => {
-  const { updateUser, updateInstitution, updateRol, updatePermission, permissions } = adminState;
+export const getInitialFormData = (storeKey: StoreKey, adminState: AdminInitialState) => {
+  const { updateUser, updateInstitution, updateRol, updatePermission, permissions,} = adminState;
 
   switch (storeKey) {
     case "updateUser":
@@ -15,6 +15,7 @@ export const getInitialFormData = (storeKey: StoreKey, adminState: any) => {
         username: updateUser?.username ?? "",
         email: updateUser?.email ?? "",
         status: updateUser?.status ?? "",
+        roleIds: (updateUser?.roles ?? []).map(role => String(role.id)),
       };
     
     case "updateInstitution":

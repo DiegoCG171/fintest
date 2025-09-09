@@ -19,11 +19,11 @@ export const RoleSelectComponent = ({
     <InputLabel>{field.label}</InputLabel>
     <Select
       label={field.label}
-      value={formData.roleId ?? []}
+      value={formData.roleIds?.length ? formData.roleIds : ""}
       onChange={(e) =>
         setFormData((prev) => ({
           ...prev,
-          roleId: [String(e.target.value)],
+          roleIds: [String(e.target.value)],
         }))
       }
     >

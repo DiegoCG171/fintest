@@ -13,7 +13,7 @@ export const formConfigs: Record<string, FormConfig> = {
       { type: "text", name: "username", label: "Nombre de usuario" },
       { type: "text", name: "email", label: "Correo electrónico" },
       { type: "institutionSelect", name: "institutionId", label: "Institución" },
-      { type: "roleSelect", name: "roleId", label: "Rol" },
+      { type: "roleSelect", name: "roleIds", label: "Rol" },
       {
         type: "select",
         name: "status",
@@ -72,7 +72,7 @@ export const formConfigsCreate: Record<string, FormConfig> = {
       { type: "text", name: "email", label: "Correo electrónico" },
       { type: "password", name: "password", label: "Contraseña" },
       { type: "institutionSelect", name: "institutionId", label: "Institución" },
-      { type: "roleSelect", name: "roleId", label: "Rol" },
+      { type: "roleSelect", name: "roleIds", label: "Rol" },
     ],
   },
   "/settings/institutions": {
