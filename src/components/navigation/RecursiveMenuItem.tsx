@@ -19,7 +19,7 @@ export default function RecursiveMenuItem({
   renderCreateChildEditor,
   renderEditNodeEditor,
   renderChildrenEditNodeEditor,
-  draggable = false,
+  draggable = false, // solo aplica a items
   overId,
 }: RecursiveMenuItemProps) {
   const [expanded, setExpanded] = useState(false);
