@@ -18,6 +18,7 @@ const RecursiveMenuSubItem = ({
   optionsActive,
   onClick,
   buildOptions,
+  renderEditNodeEditor,
   draggable,
 }: PropsRecursiveMenuSubItem) => {
   const [hovered, setHovered] = useState(false);
@@ -55,7 +56,8 @@ const RecursiveMenuSubItem = ({
         },
       }}
     >
-      <Stack
+      {renderEditNodeEditor?.(item) ?? (
+        <Stack
             direction="row"
             alignItems="center"
             spacing={1}
@@ -94,6 +96,7 @@ const RecursiveMenuSubItem = ({
               </Typography>
             </Tooltip>
           </Stack>
+      )}
           {
           optionsActive && buildOptions?.(item)  && (
             <Box

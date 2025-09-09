@@ -11,23 +11,34 @@ import { createSessionThunk } from "../../../store/slices/sessions/session.thunk
 import { openConfirmDeleteModal } from "../../../store/slices/UI/confirmDeleteModal/confirmDeleteModal.slice";
 import EditNodeEditor from "../../../components/navigation/EditNodeEditor";
 import useCollectionsActions from "./useCollectionsActions";
+import CreateNodeEditor from "../../../components/navigation/CreateNodeEditor";
 
+type Setter<T> = React.Dispatch<React.SetStateAction<T>>;
 interface useCollectionsSidebarProps {
-    editingCollectionId: string | null;
-    setEditingCollectionId: (id: string | null) => void;
-    creatingCollectionId: string | undefined;
-    setCreatingCollectionId: (id: string | undefined) => void;
+    editingCollectionId: string | undefined;
+    setEditingCollectionId: (id: string | undefined) => void;
+    isCreatingCollection: boolean;
+    setIsCreatingCollection: Setter<boolean>;
+    renameTestCaseId: string | undefined;
+    setRenameTestCaseId: (id: string | undefined) => void;
 }
 const useCollectionsSidebar = ({
-    setEditingCollectionId,
     editingCollectionId,
-}: /* setCreatingCollectionId,
-    creatingCollectionId, */
+    setEditingCollectionId,
+    isCreatingCollection,
+    setIsCreatingCollection,
+    setRenameTestCaseId,
+    renameTestCaseId
+}: 
 useCollectionsSidebarProps) => {
     const dispatch = useAppDispatch();
     const { permissions } = useAuth();
 
-    const handleActions = useCollectionsActions({ setEditingCollectionId });
+    const handleActions = useCollectionsActions({ 
+        setEditingCollectionId,
+        setRenameTestCaseId,
+        setIsCreatingCollection,
+    });
 
     const colectionsMenu = useAppSelector(
         (state) => state.sidebarMenu.menus["collection"]
@@ -79,7 +90,7 @@ useCollectionsSidebarProps) => {
         [dispatch, permissions, setEditingCollectionId]
     );
 
-    const buildSubItemOptions = (item: ItemsServiceMenu): ContextMenuOption[] => {
+    const buildSubItemOptions = useCallback((item: ItemsServiceMenu): ContextMenuOption[] => {
         const options: ContextMenuOption[] = [];
 
         if (hasPermission(permissions, "create", "session")) {
@@ -103,7 +114,7 @@ useCollectionsSidebarProps) => {
         if (hasPermission(permissions, "update", "testCase")) {
         options.push({
             item: { label: "Renombrar", id: item.id },
-            action: () => console.log(item),
+            action: () => setRenameTestCaseId(item.id),
         });
         }
 
@@ -119,13 +130,13 @@ useCollectionsSidebarProps) => {
         }
 
         return options;
-    };
+    }, [dispatch, permissions, setRenameTestCaseId])
 
     return {
         resource: colectionsMenu,
         separatorMenuProps: {
         label: "Categorías",
-        onAction: () => console.log("Onaction colecciiones"),
+        onAction: () => setIsCreatingCollection(true),
         },
         optionsActive: true,
         draggable: true,
@@ -138,14 +149,29 @@ useCollectionsSidebarProps) => {
             onSubmit={(newName) =>
                 handleActions.renameCollection(item.id, newName)
             }
-            onCancel={() => setEditingCollectionId(null)}
+            onCancel={() => setEditingCollectionId(undefined)}
             />
         ) : null,
-        renderSeparatorChildren: () => (
-        <div>
-            Holaaaaa!
-        </div>
-        ),
+        renderChildrenEditNodeEditor: (
+        item: MenuServiceInterface | ItemsServiceMenu
+        ) =>
+        renameTestCaseId === item.id ? (
+            <EditNodeEditor
+                item={item}
+                onSubmit={(newName) =>
+                handleActions.renameTestCase(item.id, newName)
+                }
+                onCancel={() => setRenameTestCaseId(undefined)}
+            />
+        ) : null,
+        renderSeparatorChildren: () => 
+        isCreatingCollection  ? (
+            <CreateNodeEditor
+            placeholder="Nombre de Categoría"
+            onSubmit={(name) => handleActions.createCollecetion(name)}
+            onCancel={() => setIsCreatingCollection(false)}
+            />
+        ) : null,
     };
 };
 export default useCollectionsSidebar;

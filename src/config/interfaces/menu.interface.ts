@@ -54,6 +54,7 @@ export interface RecursiveMenuItemProps {
     buildSubItemOptions?: (item: ItemsServiceMenu) => ContextMenuOption[];
     renderCreateChildEditor?: (item: MenuServiceInterface) => React.ReactNode;
     renderEditNodeEditor?: (item: MenuServiceInterface) => React.ReactNode;
+    renderChildrenEditNodeEditor?: (item: MenuServiceInterface) => React.ReactNode;
     draggable?: boolean;
 }
 
@@ -70,6 +71,14 @@ export interface SeparatorMenuProps {
         action: string;
         resource: string;
     }[]
+}
+
+export interface SidebarSectionProps extends Omit<RecursiveMenuItemProps, "item" | "depth"> {
+    separatorMenuProps: SeparatorMenuProps;
+    searchTerm: string;
+    searchOnItem: boolean;
+    resource: MenuServiceInterface[];
+    renderSeparatorChildren?: () => React.ReactNode;
 }
 
 //Menu context
@@ -97,6 +106,7 @@ export interface PropsRecursiveMenuSubItem {
     buildOptions?: (item: ItemsServiceMenu) => ContextMenuOption[];
     parentId?: string;
     draggable: boolean;
+    renderEditNodeEditor?: (item: MenuServiceInterface) => React.ReactNode;
 }
 
 export interface ItemInlineEditorProps {

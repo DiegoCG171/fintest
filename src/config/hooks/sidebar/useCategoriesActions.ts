@@ -1,16 +1,18 @@
 import { useParams } from "react-router-dom";
 import { getTemplatesBackup } from "../../../services";
-import { createCategorieThunk, createTemplateThunk, getCategoriesByMethodThunk, getTemplateByIdThunk, getTemplatesThunk, openModal, setLoading, updateCategorieThunk, useAppDispatch } from "../../../store";
+import { createCategorieThunk, createTemplateThunk, getCategoriesByMethodThunk, getTemplateByIdThunk, getTemplatesThunk, openModal, setLoading, updateCategorieThunk, updateTemplateThunk, useAppDispatch } from "../../../store";
 import { cleanObject } from "../../utils/cleandObject";
 import { useToast } from "../useToast";
 
 
 const useCategoriesActions = ({
     setEditingCategoryId,
-    setCreatingCategoryId
+    setCreatingCategoryId,
+    setRenameTemplateId
 }: {
     setEditingCategoryId: (id: string | null) => void;
     setCreatingCategoryId: (id: string | undefined) => void;
+    setRenameTemplateId: (id: string | undefined) => void;
 }) => {
     const dispatch = useAppDispatch();
     const { showToast } = useToast();
@@ -25,7 +27,7 @@ const useCategoriesActions = ({
         );
     };
 
-    const createCategory = async (name: string, parent: string ) => {
+    const createCategory = async (name: string, parent: string) => {
         const body = {
             name,
             parent
@@ -33,8 +35,8 @@ const useCategoriesActions = ({
         try {
             await dispatch(createCategorieThunk(body)).unwrap();
             await dispatch(getCategoriesByMethodThunk(`${method}/${type}`))
-                    .unwrap()
-                    .catch((err) => console.error("Error cargando categorías:", err));
+                .unwrap()
+                .catch((err) => console.error("Error cargando categorías:", err));
             showToast("Categoría creada exitoramente", "success");
             setTimeout(() => {
                 setCreatingCategoryId(undefined);
@@ -123,7 +125,24 @@ const useCategoriesActions = ({
                 "error"
             );
         }
-    }
+    };
+
+    const renameTemplate = async (id: string, name: string) => {
+        console.log(id)
+        dispatch(setLoading(true));
+        try {
+            await dispatch(updateTemplateThunk({ id, payload: { name } })).unwrap();
+            await dispatch(
+                getCategoriesByMethodThunk(`${method}/${type}`)
+            ).unwrap();
+            setRenameTemplateId(undefined);
+            showToast("Template renombrado exitoramente" as string, "success");
+        } catch (error) {
+            showToast(error as string, "error");
+        } finally {
+            dispatch(setLoading(false));
+        }
+    };
 
 
     return {
@@ -133,7 +152,8 @@ const useCategoriesActions = ({
         editTemplate,
         downloadTemplates,
         duplicateTemplate,
-        renameCategory
+        renameCategory,
+        renameTemplate
     }
 }
 export default useCategoriesActions

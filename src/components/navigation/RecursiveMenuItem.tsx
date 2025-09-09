@@ -43,6 +43,7 @@ const RecursiveMenuItem = ({
   buildSubItemOptions,
   renderCreateChildEditor,
   renderEditNodeEditor,
+  renderChildrenEditNodeEditor,
   draggable = false,
 }: RecursiveMenuItemProps) => {
   const [expanded, setExpanded] = useState(false);
@@ -290,6 +291,7 @@ const RecursiveMenuItem = ({
                 if (!subItem) return null;
                 return (
                   <RecursiveMenuSubItem
+                    renderEditNodeEditor={renderChildrenEditNodeEditor}
                     key={`box-${subItem.id}`}
                     item={subItem}
                     optionsActive={optionsActive}

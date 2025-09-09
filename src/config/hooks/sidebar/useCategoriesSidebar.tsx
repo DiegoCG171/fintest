@@ -2,9 +2,9 @@ import { useCallback } from "react";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { openConfirmDeleteModal } from "../../../store/slices/UI/confirmDeleteModal/confirmDeleteModal.slice";
 import {
-  ContextMenuOption,
-  ItemsServiceMenu,
-  MenuServiceInterface,
+    ContextMenuOption,
+    ItemsServiceMenu,
+    MenuServiceInterface,
 } from "../../interfaces";
 import { hasPermission } from "../../utils/permissions";
 import { useAuth } from "../useAuth";
@@ -17,6 +17,8 @@ interface UseCategoriesSidebarProps {
     setEditingCategoryId: (id: string | null) => void;
     creatingCategoryId: string | undefined;
     setCreatingCategoryId: (id: string | undefined) => void;
+    renameTemplateId: string | undefined;
+    setRenameTemplateId: (id: string | undefined) => void;
 }
 
 const useCategoriesSidebar = ({
@@ -24,12 +26,15 @@ const useCategoriesSidebar = ({
     editingCategoryId,
     setCreatingCategoryId,
     creatingCategoryId,
-    }: UseCategoriesSidebarProps) => {
+    setRenameTemplateId,
+    renameTemplateId,
+}: UseCategoriesSidebarProps) => {
     const dispatch = useAppDispatch();
     const { permissions } = useAuth();
     const handleActions = useCategoriesActions({
         setEditingCategoryId,
         setCreatingCategoryId,
+        setRenameTemplateId,
     });
 
     const canDownload = hasPermission(permissions, "read", "template");
@@ -46,7 +51,7 @@ const useCategoriesSidebar = ({
             options.push({
             item: { label: "Añadir", id: item.id },
             action: () => {
-                setCreatingCategoryId(item.id)
+                setCreatingCategoryId(item.id);
             },
             });
         }
@@ -99,6 +104,13 @@ const useCategoriesSidebar = ({
             action: async () => handleActions.editTemplate(item.id),
             });
         }
+        
+        if (hasPermission(permissions, "update", "template")) {
+            options.push({
+            item: { label: "Renombrar", id: item.id },
+            action: () => setRenameTemplateId(item.id),
+            });
+        }
 
         if (hasPermission(permissions, "delete", "template")) {
             options.push({
@@ -113,9 +125,8 @@ const useCategoriesSidebar = ({
 
         return options;
         },
-        [handleActions, permissions, dispatch]
+        [permissions, handleActions, dispatch, setRenameTemplateId]
     );
-
 
     return {
         resource: categoriesMenu,
@@ -141,8 +152,20 @@ const useCategoriesSidebar = ({
         creatingCategoryId === item.id ? (
             <CreateNodeEditor
             placeholder="Nombre de Categoría"
-            onSubmit={(name) => handleActions.createCategory(name, item.id,)}
+            onSubmit={(name) => handleActions.createCategory(name, item.id)}
             onCancel={() => setCreatingCategoryId(undefined)}
+            />
+        ) : null,
+        renderChildrenEditNodeEditor: (
+        item: MenuServiceInterface | ItemsServiceMenu
+        ) =>
+        renameTemplateId === item.id ? (
+            <EditNodeEditor
+                item={item}
+                onSubmit={(newName) =>
+                handleActions.renameTemplate(item.id, newName)
+                }
+                onCancel={() => setRenameTemplateId(undefined)}
             />
         ) : null,
     };

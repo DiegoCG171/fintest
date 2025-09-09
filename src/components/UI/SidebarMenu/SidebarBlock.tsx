@@ -15,28 +15,40 @@ function SidebarBlock({
     null
   );
 
+  const [renameTemplateId, setRenameTemplateId] = useState<
+    string | undefined
+  >();
+  
   const [creatingCategoryId, setCreatingCategoryId] = useState<
     string | undefined
   >();
 
-  const [editingCollectionId, setEditingCollectionId] = useState<string | null>(
-    null
-  );
-  const [creatingCollectionId, setCreatingCollectionId] = useState<
+  const [editingCollectionId, setEditingCollectionId] = useState<
     string | undefined
   >();
+  
+  const [renameTestCaseId, setRenameTestCaseId] = useState<
+    string | undefined
+  >();
+
+  const [isCreatingCollection, setIsCreatingCollection] = useState<boolean>(false);
 
   const categories = useCategoriesSidebar({
     setEditingCategoryId,
     editingCategoryId,
     creatingCategoryId,
     setCreatingCategoryId,
+    renameTemplateId,
+    setRenameTemplateId
   });
+
   const collections = useCollectionsSidebar({
     editingCollectionId,
     setEditingCollectionId,
-    creatingCollectionId,
-    setCreatingCollectionId,
+    renameTestCaseId,
+    setRenameTestCaseId,
+    isCreatingCollection,        
+    setIsCreatingCollection, 
   });
 
   return (
