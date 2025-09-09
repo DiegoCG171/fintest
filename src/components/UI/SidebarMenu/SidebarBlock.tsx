@@ -15,13 +15,6 @@ function SidebarBlock({
   searchTerm: string;
   searchOnItem: boolean;
 }) {
-  // Logs de props iniciales
-  console.log(
-    "[SidebarBlock] searchTerm:",
-    searchTerm,
-    "| searchOnItem:",
-    searchOnItem
-  );
 
   //Llenado de secciones
   const [editingCategoryId, setEditingCategoryId] = useState<string | null>(

@@ -223,7 +223,6 @@ function TabbedTableForm({
     const payload = preparePayload(valuesToSend, tab.formType);
     const id = tab.templateId;
     if (!id) return;
-    console.log(tab)
     try {
       const result = await dispatch(
         updateTemplateThunk({ id, payload })

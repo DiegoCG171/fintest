@@ -128,7 +128,6 @@ const useCategoriesActions = ({
     };
 
     const renameTemplate = async (id: string, name: string) => {
-        console.log(id)
         dispatch(setLoading(true));
         try {
             await dispatch(updateTemplateThunk({ id, payload: { name } })).unwrap();
