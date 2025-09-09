@@ -18,7 +18,8 @@ function SidebarSection({
     renderCreateChildEditor,
     renderEditNodeEditor,
     renderChildrenEditNodeEditor,
-    renderSeparatorChildren
+    renderSeparatorChildren,
+    overId
     }: SidebarSectionProps) {
     const filteredResourses = useFilterRecursive(
         resource,
@@ -48,6 +49,7 @@ function SidebarSection({
                     renderEditNodeEditor,
                     renderChildrenEditNodeEditor,
                     draggable,
+                    overId
                 }}
                 />
             ))

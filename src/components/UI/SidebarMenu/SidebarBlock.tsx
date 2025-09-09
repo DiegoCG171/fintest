@@ -3,6 +3,7 @@ import SidebarSection from "./SidebarSection";
 import useCategoriesSidebar from "../../../config/hooks/sidebar/useCategoriesSidebar";
 import useCollectionsSidebar from "../../../config/hooks/sidebar/useCollectionsSidebar";
 import { useState } from "react";
+import { useSidebarDnd } from "../../../config/hooks/useSidebarDnd";
 
 function SidebarBlock({
   searchTerm,
@@ -18,7 +19,7 @@ function SidebarBlock({
   const [renameTemplateId, setRenameTemplateId] = useState<
     string | undefined
   >();
-  
+
   const [creatingCategoryId, setCreatingCategoryId] = useState<
     string | undefined
   >();
@@ -26,12 +27,13 @@ function SidebarBlock({
   const [editingCollectionId, setEditingCollectionId] = useState<
     string | undefined
   >();
-  
+
   const [renameTestCaseId, setRenameTestCaseId] = useState<
     string | undefined
   >();
 
-  const [isCreatingCollection, setIsCreatingCollection] = useState<boolean>(false);
+  const [isCreatingCollection, setIsCreatingCollection] =
+    useState<boolean>(false);
 
   const categories = useCategoriesSidebar({
     setEditingCategoryId,
@@ -39,7 +41,7 @@ function SidebarBlock({
     creatingCategoryId,
     setCreatingCategoryId,
     renameTemplateId,
-    setRenameTemplateId
+    setRenameTemplateId,
   });
 
   const collections = useCollectionsSidebar({
@@ -47,8 +49,19 @@ function SidebarBlock({
     setEditingCollectionId,
     renameTestCaseId,
     setRenameTestCaseId,
-    isCreatingCollection,        
-    setIsCreatingCollection, 
+    isCreatingCollection,
+    setIsCreatingCollection,
+  });
+
+  const [categoriesTree, setCategoriesTree] = useState(categories.resource);
+  const [collectionsTree, setCollectionsTree] = useState(collections.resource);
+
+
+  const { activeId, overId, dndContextProps } = useSidebarDnd({
+    categoriesTree,
+    collectionsTree,
+    setCategoriesTree,
+    setCollectionsTree,
   });
 
   return (
@@ -56,12 +69,14 @@ function SidebarBlock({
       <SidebarSection
         searchOnItem={searchOnItem}
         searchTerm={searchTerm}
+        overId={overId!}
         {...categories}
       />
       <Divider />
       <SidebarSection
         searchOnItem={searchOnItem}
-        searchTerm={searchTerm}
+        searchTerm={""}
+        overId={overId!}
         {...collections}
       />
     </Box>
