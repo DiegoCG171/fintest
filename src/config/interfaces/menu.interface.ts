@@ -58,6 +58,33 @@ export interface RecursiveMenuItemProps {
     draggable?: boolean;
 }
 
+export interface ItemsListSortableProps {
+    items: ItemsServiceMenu[];
+    optionsActive?: boolean;
+    onClick?: (item: MenuServiceInterface | ItemsServiceMenu) => void;
+    buildSubItemOptions?: (item: ItemsServiceMenu) => ContextMenuOption[];
+    renderEditNodeEditor?: (item: MenuServiceInterface) => React.ReactNode;
+    draggable?: boolean;
+}
+
+export interface FolderHeaderDroppableProps {
+    item: MenuServiceInterface;
+    depth: number;
+    expanded: boolean;
+    overId?: string | null;
+    optionsActive?: boolean;
+    onToggleExpand: () => void;
+    buildOptions?: (item: ItemsServiceMenu) => ContextMenuOption[];
+    buildSubItemOptions?: (item: ItemsServiceMenu) => ContextMenuOption[];
+    renderEditNodeEditor?: (item: MenuServiceInterface) => React.ReactNode;
+}
+
+export interface InlineCreateChildEditorProps {
+    depth: number;
+    item: MenuServiceInterface;
+    renderCreateChildEditor?: (item: MenuServiceInterface) => React.ReactNode;
+}
+
 export interface HeaderSidebarMenuProps {
     isHide: boolean,
     onToggleMenu: () => void;
