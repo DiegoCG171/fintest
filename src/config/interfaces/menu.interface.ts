@@ -67,10 +67,6 @@ export interface SeparatorMenuProps {
     onAction?: () => void;
     onDownload?: () => void;
     label: string;
-    permissions: {
-        action: string;
-        resource: string;
-    }[]
 }
 
 export interface SidebarSectionProps extends Omit<RecursiveMenuItemProps, "item" | "depth"> {

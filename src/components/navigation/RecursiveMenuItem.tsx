@@ -8,29 +8,15 @@ import {
   RecursiveMenuItemProps,
 } from "../../config/interfaces";
 import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { setLoading, useAppDispatch } from "../../store";
 import RecursiveMenuSubItem from "./RecursiveMenuSubItem";
 import { useEffect, useState } from "react";
 import {
-  getCollectionsThunk,
-  updateCollectionThunk,
-} from "../../store/slices/collections/collections.thunk";
-
-import {
-  DndContext,
-  closestCenter,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-} from "@dnd-kit/core";
-import {
-  arrayMove,
   SortableContext,
+  useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { usePopMenu } from "../../config/hooks/usePopMenu";
 
 const RecursiveMenuItem = ({
@@ -45,6 +31,7 @@ const RecursiveMenuItem = ({
   renderEditNodeEditor,
   renderChildrenEditNodeEditor,
   draggable = false,
+  overId,
 }: RecursiveMenuItemProps) => {
   const [expanded, setExpanded] = useState(false);
   const [hovered, setHovered] = useState(false);
@@ -58,9 +45,6 @@ const RecursiveMenuItem = ({
     }
   }, [creatingChildId, item.id]);
 
-  const sensors = useSensors(useSensor(PointerSensor));
-  const { method, type } = useParams();
-
   const [itemsOrder, setItemsOrder] = useState(
     item.items?.map((i) => i.id) || []
   );
@@ -69,20 +53,13 @@ const RecursiveMenuItem = ({
     setItemsOrder(item.items?.map((i) => i.id) || []);
   }, [item]);
 
-  const handleDragEnd = async (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (over && active.id !== over.id) {
-      const oldIndex = itemsOrder.indexOf(String(active.id));
-      const newIndex = itemsOrder.indexOf(String(over.id));
 
-      const newOrder = arrayMove(itemsOrder, oldIndex, newIndex);
-      setItemsOrder(newOrder);
-      await dispatch(
-        updateCollectionThunk({ id: item.id, payload: { cases: newOrder } })
-      );
-      await dispatch(getCollectionsThunk(`${method}/${type}`));
+  useEffect(() => {
+    if (overId?.toString() === item.id && !expanded) {
+      const timer = setTimeout(() => setExpanded(true), 500);
+      return () => clearTimeout(timer);
     }
-  };
+  }, [overId, item.id, expanded]);
 
   const onDecisionHandler = async (
     item: MenuServiceInterface | ItemsServiceMenu
@@ -99,9 +76,19 @@ const RecursiveMenuItem = ({
     }
   };
 
+  const { attributes, setNodeRef, transform, listeners } = useSortable({
+      id: item.id,
+      data: {
+        name: item.name,
+      },
+    });
+
   return (
     <Box
+      ref={setNodeRef}
+      {...attributes}
       sx={{
+        transform,
         width: "100%",
         pl: depth * 0.25,
         my: 1,
@@ -122,9 +109,14 @@ const RecursiveMenuItem = ({
             ? depth === 0
               ? (theme) => theme.palette.secondary.light
               : (theme) => theme.palette.background.default
+            : overId === item.id
+            ? "rgba(0,150,255,0.2)"
             : "transparent",
           borderRadius: 2,
-          border: "2px solid transparent",
+          border:
+            overId === item.id
+              ? "2px solid rgba(111, 125, 136, 0.45)"
+              : "2px solid transparent",
           padding: 1,
           margin: 0.5,
           cursor: "pointer",
@@ -258,32 +250,28 @@ const RecursiveMenuItem = ({
         Array.isArray(item.children) &&
         item.children?.length > 0 && (
           <Box>
-            {item.children?.map((child) => (
-              <RecursiveMenuItem
-                optionsActive={optionsActive}
-                key={child.id}
-                item={child}
-                depth={depth + 1}
-                onSelectItem={onDecisionHandler}
-                buildOptions={buildOptions}
-                buildSubItemOptions={buildSubItemOptions}
-                renderCreateChildEditor={renderCreateChildEditor}
-                renderEditNodeEditor={renderEditNodeEditor}
-                creatingChildId={creatingChildId}
-              />
-            ))}
+                {item.children?.map((child) => (
+                  <RecursiveMenuItem
+                    overId={overId}
+                    optionsActive={optionsActive}
+                    key={child.id}
+                    item={child}
+                    depth={depth + 1}
+                    onSelectItem={onDecisionHandler}
+                    buildOptions={buildOptions}
+                    buildSubItemOptions={buildSubItemOptions}
+                    renderCreateChildEditor={renderCreateChildEditor}
+                    renderEditNodeEditor={renderEditNodeEditor}
+                    creatingChildId={creatingChildId}
+                    draggable={draggable}
+                  />
+                ))}
           </Box>
         )}
       {expanded && Array.isArray(item.items) && item.items?.length > 0 && (
         <Box sx={{ pl: 1, maxWidth: "250px", overflow: "hidden" }}>
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-            modifiers={[restrictToVerticalAxis]}
-          >
             <SortableContext
-              items={itemsOrder}
+              items={item.items.map((i) => i.id)}
               strategy={verticalListSortingStrategy}
             >
               {itemsOrder.map((id) => {
@@ -302,7 +290,6 @@ const RecursiveMenuItem = ({
                 );
               })}
             </SortableContext>
-          </DndContext>
         </Box>
       )}
     </Box>

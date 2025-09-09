@@ -137,7 +137,7 @@ const useCategoriesSidebar = ({
         },
         creatingChildId: creatingCategoryId,
         optionsActive: true,
-        draggable: false,
+        draggable: true,
         buildOptions,
         buildSubItemOptions,
         renderEditNodeEditor: (item: MenuServiceInterface | ItemsServiceMenu) =>
