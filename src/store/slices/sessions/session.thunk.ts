@@ -14,7 +14,7 @@ export interface RunnableToExecute {
     runnableType: RunnableType;
 }
 
-type RunnableType = 'collection' | 'testCase';
+export type RunnableType = 'collection' | 'testCase';
 
 export const createSessionThunk = createAsyncThunk(
   "auth/createSession",

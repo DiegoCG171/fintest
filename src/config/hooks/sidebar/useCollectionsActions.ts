@@ -2,6 +2,7 @@ import { useParams } from "react-router-dom";
 import { updateTestCaseThunk, useAppDispatch } from "../../../store";
 import { createCollectionThunk, getCollectionsThunk, updateCollectionThunk } from "../../../store/slices/collections/collections.thunk";
 import { useToast } from "../useToast";
+import { CreateSessionPayload, createSessionThunk, RunnableType } from "../../../store/slices/sessions/session.thunk";
 
 type Setter<T> = React.Dispatch<React.SetStateAction<T>>;
 
@@ -22,7 +23,7 @@ const useCollectionsActions = ({
         const origin = method?.toUpperCase()
         try {
             await dispatch(
-                createCollectionThunk({ name, origin})
+                createCollectionThunk({ name, origin })
             ).unwrap();
             await dispatch(getCollectionsThunk(`${method}/${type}`))
                 .unwrap()
@@ -30,7 +31,7 @@ const useCollectionsActions = ({
             showToast("Colección creada exitoramente", "success");
             setIsCreatingCollection(false)
         } catch (err) {
-            showToast(err as string | "Error al crear la colección" , "error")
+            showToast(err as string | "Error al crear la colección", "error")
         } finally {
             setIsCreatingCollection(false);
         }
@@ -72,10 +73,31 @@ const useCollectionsActions = ({
         }
 
     }
-    return {
-        createCollecetion,
-        renameCollection,
-        renameTestCase
+
+    const createSession = (runnableId: string, runnableType: RunnableType ) => {
+        const sessionPayload: CreateSessionPayload = {
+            processingMethod: type!,
+            toExecute: [
+                {
+                    runnableId,
+                    runnableType
+                },
+            ],
+        };
+
+        if (type === "emmisor") {
+            sessionPayload.ip = "1.2.3.4";
+            sessionPayload.portNumber = 1234;
+        }
+
+        dispatch(createSessionThunk(sessionPayload));
     }
+
+return {
+    createCollecetion,
+    createSession,
+    renameCollection,
+    renameTestCase
+}
 }
 export default useCollectionsActions

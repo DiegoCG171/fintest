@@ -7,7 +7,6 @@ import {
 } from "../../interfaces";
 import { hasPermission } from "../../utils/permissions";
 import { useAuth } from "../useAuth";
-import { createSessionThunk } from "../../../store/slices/sessions/session.thunk";
 import { openConfirmDeleteModal } from "../../../store/slices/UI/confirmDeleteModal/confirmDeleteModal.slice";
 import EditNodeEditor from "../../../components/navigation/EditNodeEditor";
 import useCollectionsActions from "./useCollectionsActions";
@@ -28,13 +27,14 @@ const useCollectionsSidebar = ({
     isCreatingCollection,
     setIsCreatingCollection,
     setRenameTestCaseId,
-    renameTestCaseId
-}: 
-useCollectionsSidebarProps) => {
+    renameTestCaseId,
+    }: useCollectionsSidebarProps) => {
     const dispatch = useAppDispatch();
     const { permissions } = useAuth();
 
-    const handleActions = useCollectionsActions({ 
+    const canCreate = hasPermission(permissions, "create", "collection");
+
+    const handleActions = useCollectionsActions({
         setEditingCollectionId,
         setRenameTestCaseId,
         setIsCreatingCollection,
@@ -52,16 +52,7 @@ useCollectionsSidebarProps) => {
             options.push({
             item: { label: "Ejecutar", id: item.id },
             action: () => {
-                dispatch(
-                createSessionThunk({
-                    toExecute: [
-                    {
-                        runnableId: item.id,
-                        runnableType: "collection",
-                    },
-                    ],
-                })
-                );
+                handleActions.createSession(item.id, 'collection');
             },
             });
         }
@@ -87,56 +78,50 @@ useCollectionsSidebarProps) => {
         }
         return options;
         },
-        [dispatch, permissions, setEditingCollectionId]
+        [dispatch, handleActions, permissions, setEditingCollectionId]
     );
 
-    const buildSubItemOptions = useCallback((item: ItemsServiceMenu): ContextMenuOption[] => {
+    const buildSubItemOptions = useCallback(
+        (item: ItemsServiceMenu): ContextMenuOption[] => {
         const options: ContextMenuOption[] = [];
 
         if (hasPermission(permissions, "create", "session")) {
-        options.push({
+            options.push({
             item: { label: "Ejecutar", id: item.id },
             action: () => {
-            dispatch(
-                createSessionThunk({
-                toExecute: [
-                    {
-                    runnableId: item.id,
-                    runnableType: "testCase",
-                    },
-                ],
-                })
-            );
+                handleActions.createSession(item.id, 'testCase');
             },
-        });
+            });
         }
 
         if (hasPermission(permissions, "update", "testCase")) {
-        options.push({
+            options.push({
             item: { label: "Renombrar", id: item.id },
             action: () => setRenameTestCaseId(item.id),
-        });
+            });
         }
 
         if (hasPermission(permissions, "delete", "testCase")) {
-        options.push({
+            options.push({
             item: { label: "Eliminar", id: item.id },
             action: async () => {
-            dispatch(
+                dispatch(
                 openConfirmDeleteModal({ id: item.id, resource: "testCase" })
-            );
+                );
             },
-        });
+            });
         }
 
         return options;
-    }, [dispatch, permissions, setRenameTestCaseId])
+        },
+        [dispatch, handleActions, permissions, setRenameTestCaseId]
+    );
 
     return {
         resource: colectionsMenu,
         separatorMenuProps: {
         label: "Categorías",
-        onAction: () => setIsCreatingCollection(true),
+        onAction: canCreate ? () => setIsCreatingCollection(true) : undefined,
         },
         optionsActive: true,
         draggable: true,
@@ -157,15 +142,13 @@ useCollectionsSidebarProps) => {
         ) =>
         renameTestCaseId === item.id ? (
             <EditNodeEditor
-                item={item}
-                onSubmit={(newName) =>
-                handleActions.renameTestCase(item.id, newName)
-                }
-                onCancel={() => setRenameTestCaseId(undefined)}
+            item={item}
+            onSubmit={(newName) => handleActions.renameTestCase(item.id, newName)}
+            onCancel={() => setRenameTestCaseId(undefined)}
             />
         ) : null,
-        renderSeparatorChildren: () => 
-        isCreatingCollection  ? (
+        renderSeparatorChildren: () =>
+        isCreatingCollection ? (
             <CreateNodeEditor
             placeholder="Nombre de Categoría"
             onSubmit={(name) => handleActions.createCollecetion(name)}
