@@ -57,6 +57,8 @@ function AccountMenu() {
         open={open}
         onClose={handleClose}
       >
+        <MenuItem  
+        sx= {{ fontSize: '0.75rem' }}>Cambiar contraseña</MenuItem>
         <MenuItem onClick={handleLogout} 
         sx= {{ fontSize: '0.75rem' }}>Cerrar sesión</MenuItem>
       </Menu>

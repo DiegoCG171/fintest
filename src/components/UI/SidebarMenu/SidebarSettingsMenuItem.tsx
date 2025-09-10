@@ -1,16 +1,43 @@
-import { Box, Stack, SvgIconProps, Typography } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
+import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
+import BusinessOutlinedIcon from "@mui/icons-material/BusinessOutlined";
+import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
+import VpnKeyOutlinedIcon from "@mui/icons-material/VpnKeyOutlined";
+import { useAppDispatch, useAppSelector } from "../../../store";
+import { changeActiveMenuOption } from "../../../store/slices/UI/sidebarMenuSettings/sidebarMenuSettings.slice";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   label: string;
-  icon: React.ComponentType<SvgIconProps>;
+  icon: string;
   active: boolean;
+  path: string;
 }
+
+const iconMap: Record<string, React.ElementType> = {
+  GroupsOutlinedIcon: GroupsOutlinedIcon,
+  BusinessOutlinedIcon: BusinessOutlinedIcon,
+  AdminPanelSettingsOutlinedIcon: AdminPanelSettingsOutlinedIcon,
+  VpnKeyOutlinedIcon: VpnKeyOutlinedIcon,
+};
 
 export const SidebarSettingsMenuItem = ({
   label,
   active,
-  icon: Icon,
+  icon,
+  path,
 }: Props) => {
+  const dispatch = useAppDispatch();
+  const { formActive } = useAppSelector((state) => state.admin);
+  const navigate = useNavigate();
+  const IconComponent = iconMap[icon] || null;
+
+  const handleNavigate = () => {
+    if (formActive) return;
+    dispatch(changeActiveMenuOption(label));
+    navigate(`/settings/${path}`);
+  };
+
   return (
     <Box sx={{ width: "100%", my: 1 }}>
       <Box
@@ -25,13 +52,16 @@ export const SidebarSettingsMenuItem = ({
           border: "2px solid transparent",
           padding: 1,
           margin: 0.5,
-          cursor: "pointer",
-          transition: "border-color 0.2s ease",
+          cursor: formActive ? "default" : "pointer", // <-- cambio aquí
+          opacity: formActive ? 0.5 : 1, // <-- hace que parezca deshabilitado
+          transition: "border-color 0.2s ease, opacity 0.2s ease",
           "&:hover": {
-            borderColor: (theme) => theme.palette.background.default,
+            borderColor: !formActive
+              ? (theme) => theme.palette.background.default
+              : "transparent",
           },
         }}
-        onClick={() => {}}
+        onClick={handleNavigate}
       >
         <Stack direction="row" alignItems="center" sx={{ width: "100%" }}>
           <Stack
@@ -44,7 +74,7 @@ export const SidebarSettingsMenuItem = ({
               overflow: "hidden",
             }}
           >
-            <Icon />
+            {IconComponent && <IconComponent />}
             <Typography
               sx={{
                 fontSize: 12,

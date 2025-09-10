@@ -53,7 +53,7 @@ function SideNavComponent() {
   }, [dispatch, collections.status, method, type, location]);
 
   useEffect(() => {
-    if (categories.status === "success" && categories.categories && location.pathname !== '/settings/users') {
+    if (categories.status === "success" && categories.categories && !location.pathname.includes('/settings/')) {
       const menuCategories = addLinkMenu(
         categories.categories,
         `${method}/${type}/categories`
@@ -65,7 +65,7 @@ function SideNavComponent() {
   }, [dispatch, categories.status, categories.categories, method, type, location]);
 
   useEffect(() => {
-    if (collections.status === "success" && collections.collections && location.pathname !== '/settings/users') {
+    if (collections.status === "success" && collections.collections && !location.pathname.includes('/settings/')) {
       const transformCollections = transformCollectionsToMenu(
         collections.collections,
         `${method}/${type}/collections`
@@ -106,7 +106,7 @@ function SideNavComponent() {
           onToggleMenu={toggleMenu}
           isHide={hideMenu}
         />
-        {(!hideMenu && location.pathname !== '/settings/users') &&  (
+        {(!hideMenu && !location.pathname.includes('/settings/')) &&  (
           <Box sx={{ px: 2, overflowY: "auto", flexGrow: 1, my: 4 }}>
             <SearchBar onSearch={handleSearch}></SearchBar>
             <SidebarBlock
@@ -119,7 +119,7 @@ function SideNavComponent() {
           </Box>
         )}
         {
-          (!hideMenu && location.pathname === '/settings/users') && (
+          (!hideMenu && location.pathname.includes('/settings/')) && (
             <SidebarSettingsMenu />
           )
         }

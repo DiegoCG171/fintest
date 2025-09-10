@@ -45,5 +45,12 @@ export const ENDPOINTS = {
     category: getEndpoint('category'),
 
     //Sessions
-    session: getEndpoint('session')
+    session: getEndpoint('session'),
+
+    institution: getEndpoint('institution'),
+
+    securityRol: getEndpoint('security/rol'),
+    securityPermissions: getEndpoint('security/permission'),
+    securityAction: getEndpoint('security/action'),
+    securityResource: getEndpoint('security/resource'),
 }

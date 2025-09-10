@@ -3,8 +3,8 @@ export interface MenuServiceInterface {
     name: string
     pathMenu?: string
     linkMenu?: string
-    children?: MenuServiceInterface[] | []
-    items?: ItemsServiceMenu[] | []
+    children?: MenuServiceInterface[]
+    items?: ItemsServiceMenu[]
 }
 
 export interface ItemsServiceMenu {
