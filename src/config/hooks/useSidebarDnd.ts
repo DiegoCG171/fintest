@@ -57,6 +57,15 @@ export function useSidebarDnd({
           over.id as string
         );
 
+      if (action === "move" && metadata?.sourceTree === "collections") {
+        setCategoriesTree(prevCategories);
+        setCollectionsTree(prevCollections);
+        showToast("Las colecciones solo pueden reordenarse dentro de su carpeta", "warning");
+        setActiveId(null);
+        setOverId(null);
+        return;
+      }
+
       // ✅ Actualiza UI al instante (optimista)
       setCategoriesTree(newCategories);
       setCollectionsTree(newCollections);
