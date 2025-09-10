@@ -19,9 +19,10 @@ const useCollectionsActions = ({
     const { method, type } = useParams();
 
     const createCollecetion = async (name: string) => {
+        const origin = method?.toUpperCase()
         try {
             await dispatch(
-                createCollectionThunk({ name })
+                createCollectionThunk({ name, origin})
             ).unwrap();
             await dispatch(getCollectionsThunk(`${method}/${type}`))
                 .unwrap()
