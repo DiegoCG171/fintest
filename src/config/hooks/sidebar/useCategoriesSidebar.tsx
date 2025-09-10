@@ -37,7 +37,8 @@ const useCategoriesSidebar = ({
         setRenameTemplateId,
     });
 
-    const canDownload = hasPermission(permissions, "read", "template");
+    const canDownload = hasPermission(permissions, "backup", "template");
+    const canCreate = hasPermission(permissions, "create", "template");
 
     const categoriesMenu = useAppSelector(
         (state) => state.sidebarMenu.menus["category"]
@@ -132,8 +133,8 @@ const useCategoriesSidebar = ({
         resource: categoriesMenu,
         separatorMenuProps: {
         label: "Catálogo",
-        onAction: () => handleActions.createTemplate(),
-        ...(canDownload && { onDownload: handleActions.downloadTemplates }),
+        onAction: canCreate ? () => handleActions.createTemplate() : undefined,
+        onDownload: canDownload ? () => handleActions.downloadTemplates() : undefined,
         },
         creatingChildId: creatingCategoryId,
         optionsActive: true,
