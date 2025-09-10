@@ -109,9 +109,9 @@ const router = createBrowserRouter([
                 ),
               },
               {
-                path: "settings/users",
+                path: "settings/:option",
                 element: (
-                    <SettingsPage />
+                    withSuspense(<SettingsPage />)
                 ),
               },
             ],

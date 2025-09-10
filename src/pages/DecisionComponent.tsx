@@ -62,7 +62,8 @@ function DecisionComponent() {
         </Button>
         <Button
           variant="contained"
-          disabled={true}
+          // disabled={true}
+          onClick={() => setFlipped(true)}
           endIcon={<PeopleAltOutlinedIcon />}
         >
           Soy emisor

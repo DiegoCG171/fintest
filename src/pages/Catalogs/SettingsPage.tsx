@@ -1,23 +1,28 @@
-import {
-  Box,
-  Button,
-  Card,
-  IconButton,
-  InputBase,
-  Paper,
-  Stack,
-  Typography,
-} from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
-import BasicTable from "../../components/UI/Settings/SettingsTable";
-import FilterListOutlinedIcon from '@mui/icons-material/FilterListOutlined';
-import PersonAddOutlinedIcon from '@mui/icons-material/PersonAddOutlined';
+import { Box, Button, Card, Stack, Typography } from "@mui/material";
+import { DynamicSettingTable } from "../../components/UI/Settings/DynamicSettingTable";
+
+import { useState } from "react";
+import { useAppSelector } from "../../store";
+
+import { DynamicSettingForm } from "../../components/UI/Settings/DynamicSettingForm";
+import PermissionGuard from "../../config/guards/PermissionGuard";
+import { useSettingsButtonConfig } from "../../config/hooks/useSettingsButtonConfig";
+import { useLoadSettingsData } from "../../config/hooks/useLoadSettingsData";
+import { useLoadSecurityPermissionOptions } from "../../config/hooks/useLoadSecurityPermissionOptions";
+import { useSettingsSearch } from "../../config/hooks/useSettingsSearch";
+import { SettingsSearchBar } from "../../components/UI/Settings/SettingsSearchBar";
 
 export const SettingsPage = () => {
-  const responsiveWidth = () => {
-    // if (hideMenu) return "calc(100vw - 100px)";
-    return "calc(100vw - 300px)";
-  };
+  const { formActive } = useAppSelector((state) => state.admin);
+  const [searchValue, setSearchValue] = useState("");
+
+  useLoadSettingsData();
+  useLoadSecurityPermissionOptions();
+  const buttonConfig = useSettingsButtonConfig();
+  const { search } = useSettingsSearch();
+  const Icon = buttonConfig.icon;
+  const responsiveWidth = () => "calc(100vw - 300px)";
+
   return (
     <Box
       sx={{
@@ -32,7 +37,7 @@ export const SettingsPage = () => {
       <Typography
         sx={{ marginLeft: 4, marginTop: 4, fontSize: 24, fontWeight: "bold" }}
       >
-        Gestión de Usuarios
+        {/* Gestión de */}
       </Typography>
       <Box
         sx={{
@@ -57,37 +62,25 @@ export const SettingsPage = () => {
             overflow: "hidden",
           }}
         >
-          <Stack direction={"row"} justifyContent="space-between">
-            <Stack direction={"row"} gap={2}>
-              <Paper
-                component="form"
-                sx={{
-                  p: "2px 4px",
-                  display: "flex",
-                  alignItems: "center",
-                  width: 200,
-                  height: 36,
-                }}
-                onSubmit={(e) => e.preventDefault()}
-              >
-                <InputBase
-                  sx={{ ml: 1, flex: 1, fontSize: 14 }}
-                  placeholder="Buscar"
-                  inputProps={{ "aria-label": "barra de búsqueda" }}
-                />
-                <IconButton type="submit" sx={{ p: "6px" }} aria-label="search">
-                  <SearchIcon />
-                </IconButton>
-              </Paper>
-              <Button variant="outlined"  endIcon={<FilterListOutlinedIcon />}>
-                Filtrar
-              </Button>
+          {!formActive && (
+            <Stack direction={"row"} justifyContent="space-between">
+              <SettingsSearchBar
+                value={searchValue}
+                onChange={setSearchValue}
+                onSubmit={() => search(searchValue)}
+              />
+              <PermissionGuard permissions={buttonConfig.requiredPermissions}>
+                <Button
+                  variant="outlined"
+                  startIcon={<Icon />}
+                  onClick={buttonConfig.onClick}
+                >
+                  {buttonConfig.text}
+                </Button>
+              </PermissionGuard>
             </Stack>
-             <Button variant="outlined"  endIcon={<PersonAddOutlinedIcon />}>
-                Crear usuario
-              </Button>
-          </Stack>
-          <BasicTable />
+          )}
+          {formActive ? <DynamicSettingForm /> : <DynamicSettingTable />}
         </Card>
       </Box>
     </Box>

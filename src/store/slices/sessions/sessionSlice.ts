@@ -40,6 +40,9 @@ const initialState: sessionInitialState = {
   completedCount: 0,
   processedIncrementals: [],
   prevConfigCreateSession: {
+    processingMethod: "",
+    ip: '',
+    portNumber: 0,
     toExecute: [],
   },
 };
