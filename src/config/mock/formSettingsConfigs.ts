@@ -12,6 +12,7 @@ export const formConfigs: Record<string, FormConfig> = {
       { type: "text", name: "surnames", label: "Apellidos" },
       { type: "text", name: "username", label: "Nombre de usuario" },
       { type: "text", name: "email", label: "Correo electrónico" },
+      { type: "password", name: "password", label: "Generar nueva contraseña" },
       { type: "institutionSelect", name: "institutionId", label: "Institución" },
       { type: "roleSelect", name: "roleIds", label: "Rol" },
       {

@@ -24,4 +24,6 @@ export interface ServerState {
     stopServerResponse: StopServerSuccessResponse | null,
     stopServerStatus: AsyncStatus,
     stopServererror: string | null;
+    configHost?: string;
+    configPort?: number;
 }

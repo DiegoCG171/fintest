@@ -22,12 +22,12 @@ export const InstitutionSelectComponent = ({
       onChange={(e) =>
         setFormData((prev) => ({
           ...prev,
-          institutionId: String(e.target.value),
+          institutionId: e.target.value,
         }))
       }
     >
       {institutions.data.map((inst) => (
-        <MenuItem key={inst.id} value={String(inst.id)}>
+        <MenuItem key={inst.id} value={inst.id}>
           {inst.name}
         </MenuItem>
       ))}

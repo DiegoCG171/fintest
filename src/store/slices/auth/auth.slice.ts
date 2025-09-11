@@ -8,6 +8,7 @@ const initialState: AuthState = {
     loading: false,
     error: null,
     isAuthenticated: !!localStorage.getItem('token'),
+    changePasswordActive: false
 };
 
 export const authSlice = createSlice({
@@ -24,6 +25,9 @@ export const authSlice = createSlice({
         },
         clearAuthError(state) {
             state.error = null
+        },
+        activeChangePassword: (state) => {
+            state.changePasswordActive = true
         }
     },
     extraReducers: (builder) => {
@@ -47,4 +51,4 @@ export const authSlice = createSlice({
     },
 });
 
-export const { logout, clearAuthError } = authSlice.actions; 
+export const { logout, clearAuthError, activeChangePassword } = authSlice.actions; 

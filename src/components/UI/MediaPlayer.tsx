@@ -1,4 +1,4 @@
-import { Box, Stack, Typography } from "@mui/material";
+import { Box, IconButton, Stack, Typography } from "@mui/material";
 import PlayCircleFilledWhiteIcon from "@mui/icons-material/PlayCircleFilledWhite";
 import PauseIcon from "@mui/icons-material/Pause";
 import StopIcon from "@mui/icons-material/Stop";
@@ -13,6 +13,9 @@ import {
 } from "../../store";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useToast } from "../../config/hooks/useToast";
+import SettingsIcon from "@mui/icons-material/Settings";
+import { useParams } from "react-router-dom";
+import { toggleEmmisorModalConfig } from "../../store/slices/UI/emmisorModalConfig/emmisorModalConfig.slice";
 
 function MediaPlayer() {
   const dispatch = useAppDispatch();
@@ -25,8 +28,11 @@ function MediaPlayer() {
   const serverPort = useAppSelector((state) => state.server.server?.portNumber);
   const playError = useAppSelector((state) => state.server.error);
   const stopError = useAppSelector((state) => state.server.stopServererror);
+  const configHost = useAppSelector((state) => state.server.configHost);
+  const configPort = useAppSelector((state) => state.server.configPort);
   const [canStop, setCanStop] = useState<boolean>(() => Boolean(serverIP));
   const showToastRef = useRef(showToast);
+  const { type } = useParams();
 
   const [playerMessage, setPlayerMessage] = useState("Detenido...");
   const updateMessage = useCallback((msg: string) => {
@@ -100,9 +106,14 @@ function MediaPlayer() {
     setCanStop(Boolean(serverIP) && Boolean(serverId));
   }, [serverIP, serverId, playStatus]);
 
+  const handleToggleEmmisorModalConfig = () => {
+    dispatch(toggleEmmisorModalConfig(true));
+  };
+
   return (
     <Box
       sx={{
+        position: "relative",
         justifyContent: "center",
         alignItems: "center",
         borderRadius: 4,
@@ -111,6 +122,24 @@ function MediaPlayer() {
         borderColor: (theme) => theme.palette.background.default,
       }}
     >
+      {type === "emmisor" && (
+        <IconButton
+          sx={{
+            position: "absolute",
+            top: 4,
+            right: 4,
+          }}
+          size="small"
+          onClick={handleToggleEmmisorModalConfig}
+        >
+          <SettingsIcon
+            sx={{
+              fontSize: 14,
+              color: (configHost && configPort) ? "#42be5bff" : "#f15454ff",
+            }}
+          />
+        </IconButton>
+      )}
       <Box
         sx={{
           overflow: "visible",

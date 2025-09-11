@@ -35,6 +35,10 @@ export const serverSlice = createSlice({
         clearStopServerError: (state) => {
             state.stopServererror = null;
             state.stopServerStatus = 'idle'
+        },
+        setEmmisorConfiguration: (state, action) => {
+            state.configHost = action.payload.host
+            state.configPort = action.payload.port
         }
     },
     extraReducers: (builder) => {
@@ -67,4 +71,4 @@ export const serverSlice = createSlice({
     }
 })
 
-export const {clearServer, clearServerError, clearStopServer, clearStopServerError, setServer} = serverSlice.actions
+export const {clearServer, clearServerError, clearStopServer, clearStopServerError, setServer,  setEmmisorConfiguration} = serverSlice.actions
