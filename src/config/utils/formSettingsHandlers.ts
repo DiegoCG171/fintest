@@ -3,7 +3,7 @@ import { createUserThunk, updateUserThunk } from "../../store";
 import { createInstitutionThunk, updateInstitutionsThunk } from "../../store/slices/institutions/institutions.thunk";
 import { createSecurityPermissionThunk, createSecurityRolThunk, updateSecurityPermissionThunk, updateSecurityRolesThunk } from "../../store/slices/security/security.thunk";
 import { AppDispatch } from "../../store/store";
-import { FormData, StoreKey } from "../interfaces/formSettings.interface";
+import { FormData, FormField, StoreKey } from "../interfaces/formSettings.interface";
 
 
 type DispatchFunction = AppDispatch; // Replace with actual dispatch type
@@ -145,4 +145,29 @@ export const createSubmitHandlers = (
       }
     },
   };
+};
+
+export const validateForm = (fields: FormField[], formData: FormData) => {
+  const errors: Record<string, string> = {};
+
+  fields.forEach((field) => {
+    const value = formData[field.name];
+
+    if (field.validation?.required && (!value || value === "")) {
+      errors[field.name] = "Este campo es obligatorio";
+      return;
+    }
+
+    if (field.validation?.minLength && value.length < field.validation.minLength) {
+      errors[field.name] = `Mínimo ${field.validation.minLength} caracteres`;
+    }
+
+    if (field.validation?.email) {
+      const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!regex.test(value)) errors[field.name] = "Correo no válido";
+    }
+
+  });
+
+  return errors;
 };

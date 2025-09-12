@@ -1,24 +1,30 @@
-import { TextField, IconButton, InputAdornment, Tooltip } from "@mui/material";
+import { TextField, IconButton, InputAdornment, Tooltip, FormHelperText } from "@mui/material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import AutorenewIcon from "@mui/icons-material/Autorenew";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { FieldComponentProps } from "../../../../config/interfaces/formSettings.interface";
 
 interface PasswordFieldProps extends FieldComponentProps {
-  setFormData: React.Dispatch<React.SetStateAction<any>>;
+  formErrors?: Record<string, string>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  setFormData: Dispatch<SetStateAction<Record<string, any>>>;
 }
 
 export const PasswordFieldComponent = ({
   field,
   formData,
   setFormData,
+  formErrors,
 }: PasswordFieldProps) => {
   const [copied, setCopied] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  const value = formData[field.name] ?? "";
+  const error = formErrors?.[field.name] ?? "";
+
   const handleCopy = async () => {
-    if (!copied && formData[field.name]) {
-      await navigator.clipboard.writeText(formData[field.name]);
+    if (!copied && value) {
+      await navigator.clipboard.writeText(value);
       setCopied(true);
       setShowPassword(false);
     }
@@ -31,7 +37,6 @@ export const PasswordFieldComponent = ({
     const symbols = "!@#$%^&*()_+[]{}|;:,.<>?";
     const all = upper + lower + numbers + symbols;
 
-    // Garantizar al menos 1 de cada tipo
     const getRandom = (chars: string) =>
       chars.charAt(Math.floor(Math.random() * chars.length));
 
@@ -46,29 +51,30 @@ export const PasswordFieldComponent = ({
       password.push(getRandom(all));
     }
 
-    // Mezclar aleatoriamente
     password = password.sort(() => Math.random() - 0.5);
 
     const newPassword = password.join("");
 
-    setFormData((prev: any) => ({
+    setFormData((prev) => ({
       ...prev,
       [field.name]: newPassword,
     }));
 
     setCopied(false);
-    setShowPassword(true); // 👁️ se revela al generar
+    setShowPassword(true);
   };
 
   return (
-    <TextField
-      key={field.name}
-      label={field.label}
-      type={showPassword ? "text" : "password"}
-      value={formData[field.name] ?? ""}
-      autoComplete="new-password"
-      slotProps={{
-        input: {
+    <>
+      <TextField
+        key={field.name}
+        label={field.label}
+        type={showPassword ? "text" : "password"}
+        value={value}
+        autoComplete="new-password"
+        error={Boolean(error)}
+        fullWidth
+        InputProps={{
           readOnly: true,
           endAdornment: (
             <InputAdornment position="end">
@@ -79,12 +85,11 @@ export const PasswordFieldComponent = ({
                 </IconButton>
               </Tooltip>
 
-              {/* Copiar */}
               <Tooltip title={copied ? "Ya copiada" : "Copiar"}>
                 <span>
                   <IconButton
                     onClick={handleCopy}
-                    disabled={copied || !formData[field.name]}
+                    disabled={copied || !value}
                     edge="end"
                   >
                     <ContentCopyIcon />
@@ -93,8 +98,9 @@ export const PasswordFieldComponent = ({
               </Tooltip>
             </InputAdornment>
           ),
-        },
-      }}
-    />
+        }}
+      />
+      {error && <FormHelperText error>{error}</FormHelperText>}
+    </>
   );
 };

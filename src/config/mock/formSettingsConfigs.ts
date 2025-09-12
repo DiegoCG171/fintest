@@ -8,13 +8,12 @@ export const formConfigs: Record<string, FormConfig> = {
     confirmText: "Actualizar usuario",
     storeKey: "updateUser",
     fields: [
-      { type: "text", name: "names", label: "Nombre" },
-      { type: "text", name: "surnames", label: "Apellidos" },
-      { type: "text", name: "username", label: "Nombre de usuario" },
-      { type: "text", name: "email", label: "Correo electrónico" },
-      { type: "password", name: "password", label: "Generar nueva contraseña" },
-      { type: "institutionSelect", name: "institutionId", label: "Institución" },
-      { type: "roleSelect", name: "roleIds", label: "Rol" },
+      { type: "text", name: "names", label: "Nombre", validation: {required: false} },
+      { type: "text", name: "surnames", label: "Apellidos", validation: {required: false} },
+      { type: "text", name: "username", label: "Nombre de usuario", validation: {required: false} },
+      { type: "text", name: "email", label: "Correo electrónico", validation: {required: false} },
+      { type: "institutionSelect", name: "institutionId", label: "Institución", validation: {required: false} },
+      { type: "roleSelect", name: "roleIds", label: "Rol", validation: {required: false} },
       {
         type: "select",
         name: "status",
@@ -23,7 +22,9 @@ export const formConfigs: Record<string, FormConfig> = {
           { value: "active", label: "Activo" },
           { value: "deactive", label: "Inactivo" },
         ],
+        validation: {required: false}
       },
+      { type: "password", name: "password", label: "Generar nueva contraseña", validation: {required: false} },
     ],
   },
   "/settings/institutions": {
@@ -32,8 +33,8 @@ export const formConfigs: Record<string, FormConfig> = {
     confirmText: "Actualizar institución",
     storeKey: "updateInstitution",
     fields: [
-      { type: "text", name: "name", label: "Nombre de la institución" },
-      { type: "text", name: "description", label: "Descripción" },
+      { type: "text", name: "name", label: "Nombre de la institución", validation: {required: false} },
+      { type: "text", name: "description", label: "Descripción", validation: {required: false} },
     ],
   },
   "/settings/roles": {
@@ -42,9 +43,9 @@ export const formConfigs: Record<string, FormConfig> = {
     confirmText: "Actualizar rol",
     storeKey: "updateRol",
     fields: [
-      { type: "text", name: "name", label: "Nombre del rol" },
-      { type: "text", name: "description", label: "Descripción" },
-      { type: "permissionSelect", name: "permissionId", label: "Permisos" },
+      { type: "text", name: "name", label: "Nombre del rol", validation: {required: false} },
+      { type: "text", name: "description", label: "Descripción", validation: {required: false} },
+      { type: "permissionSelect", name: "permissionId", label: "Permisos", validation: {required: false} },
     ],
   },
   "/settings/permissions": {
@@ -53,9 +54,9 @@ export const formConfigs: Record<string, FormConfig> = {
     confirmText: "Actualizar permiso",
     storeKey: "updatePermission",
     fields: [
-      { type: "text", name: "description", label: "Descripción" },
-      { type: "actionSelect", name: "action", label: "Acción" },
-      { type: "resourceSelect", name: "resource", label: "Recurso" },
+      { type: "text", name: "description", label: "Descripción", validation: {required: false} },
+      { type: "actionSelect", name: "action", label: "Acción", validation: {required: false} },
+      { type: "resourceSelect", name: "resource", label: "Recurso", validation: {required: false} },
     ],
   },
 };
@@ -67,13 +68,13 @@ export const formConfigsCreate: Record<string, FormConfig> = {
     confirmText: "Crear usuario",
     storeKey: "createUser",
     fields: [
-      { type: "text", name: "names", label: "Nombre" },
-      { type: "text", name: "surnames", label: "Apellidos" },
-      { type: "text", name: "username", label: "Nombre de usuario" },
-      { type: "text", name: "email", label: "Correo electrónico" },
-      { type: "password", name: "password", label: "Contraseña" },
-      { type: "institutionSelect", name: "institutionId", label: "Institución" },
-      { type: "roleSelect", name: "roleIds", label: "Rol" },
+      { type: "text", name: "names", label: "Nombre", validation: {required: true}},
+      { type: "text", name: "surnames", label: "Apellidos", validation: {required: true} },
+      { type: "text", name: "username", label: "Nombre de usuario", validation: {required: true} },
+      { type: "text", name: "email", label: "Correo electrónico", validation: {required: true, email: true} },
+      { type: "institutionSelect", name: "institutionId", label: "Institución", validation: {required: false} },
+      { type: "roleSelect", name: "roleIds", label: "Rol", validation: {required: false} },
+      { type: "password", name: "password", label: "Contraseña", validation: {required: false} },
     ],
   },
   "/settings/institutions": {
@@ -82,8 +83,8 @@ export const formConfigsCreate: Record<string, FormConfig> = {
     confirmText: "Crear institución",
     storeKey: "createInstitution",
     fields: [
-      { type: "text", name: "name", label: "Nombre de la institución" },
-      { type: "text", name: "description", label: "Descripción" },
+      { type: "text", name: "name", label: "Nombre de la institución", validation: {required: true} },
+      { type: "text", name: "description", label: "Descripción", validation: {required: true} },
     ],
   },
   "/settings/roles": {
@@ -92,9 +93,9 @@ export const formConfigsCreate: Record<string, FormConfig> = {
     confirmText: "Crear rol",
     storeKey: "createRol",
     fields: [
-      { type: "text", name: "name", label: "Nombre del rol" },
-      { type: "text", name: "description", label: "Descripción" },
-      { type: "permissionSelect", name: "permissionId", label: "Permisos" },
+      { type: "text", name: "name", label: "Nombre del rol", validation: {required: true}},
+      { type: "text", name: "description", label: "Descripción", validation: {required: true} },
+      { type: "permissionSelect", name: "permissionId", label: "Permisos", validation: {required: true} },
     ],
   },
   "/settings/permissions": {
@@ -103,9 +104,9 @@ export const formConfigsCreate: Record<string, FormConfig> = {
     confirmText: "Crear permiso",
     storeKey: "createPermission",
     fields: [
-      { type: "text", name: "description", label: "Descripción" },
-      { type: "actionSelect", name: "action", label: "Acción" },
-      { type: "resourceSelect", name: "resource", label: "Recurso" },
+      { type: "text", name: "description", label: "Descripción", validation: {required: true} },
+      { type: "actionSelect", name: "action", label: "Acción", validation: {required: true} },
+      { type: "resourceSelect", name: "resource", label: "Recurso", validation: {required: true} },
     ],
   },
 };

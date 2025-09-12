@@ -23,6 +23,15 @@ export interface FormField {
   name: string;
   label: string;
   options?: { value: string; label: string }[];
+  validation?: FieldValidation
+}
+
+export interface FieldValidation {
+  required?: boolean;     
+  minLength?: number;     
+  maxLength?: number;     
+  email?: boolean;        
+  pattern?: RegExp;       
 }
 
 export interface FormConfig {
