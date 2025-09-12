@@ -8,7 +8,7 @@ const initialState: AuthState = {
     loading: false,
     error: null,
     isAuthenticated: !!localStorage.getItem('token'),
-    changePasswordActive: false
+    changePasswordActive: false,
 };
 
 export const authSlice = createSlice({
@@ -17,6 +17,7 @@ export const authSlice = createSlice({
     reducers: {
         logout(state) {
             state.user = null;
+            state.changePasswordActive = false
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             localStorage.removeItem('refreshToken');

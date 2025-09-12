@@ -4,8 +4,9 @@ import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import CustomInputComponent from "../../../components/core/forms/CustomInput";
 import { useToast } from "../../../config/hooks/useToast";
-import { useAppDispatch } from "../../../store";
+import { logout, useAppDispatch } from "../../../store";
 import { setLoading } from "../../../store";
+import { changePasswordThunk } from "../../../store/slices/auth/changePassword.thunk";
 
 export const ChangePasswordForm = ({
   title,
@@ -50,14 +51,13 @@ export const ChangePasswordForm = ({
           onSubmit={async (values, { setSubmitting }) => {
             dispatch(setLoading(true));
             try {
-              // Aquí iría tu dispatch al thunk
-              // await dispatch(
-              //   changePasswordThunk({
-              //     oldPassword: values.oldPassword,
-              //     newPassword: values.newPassword,
-              //   })
-              // ).unwrap();
-
+              await dispatch(
+                changePasswordThunk({
+                  oldPassword: values.oldPassword,
+                  newPassword: values.newPassword,
+                })
+              ).unwrap();
+              dispatch(logout())
               showToast("Contraseña actualizada con éxito", "success");
               navigate("/home");
             } catch (error) {

@@ -80,9 +80,7 @@ const router = createBrowserRouter([
         children: [
           {
             element: (
-              <NewUserGuard>
                 <PrivateLayoutContent />
-              </NewUserGuard>
             ),
             children: [
               {

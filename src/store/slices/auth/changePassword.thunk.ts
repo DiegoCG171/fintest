@@ -1,31 +1,35 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import {
-  ChangePasswordCredentials,
-  LoginResponse,
-} from "../../../config/interfaces";
+import { ChangePasswordCredentials } from "../../../config/interfaces";
 import { changePasswordService } from "../../../services/auth/changePassword.service";
+import { logout } from "./auth.slice";
 
 export const changePasswordThunk = createAsyncThunk<
-  LoginResponse,
+  void,
   ChangePasswordCredentials,
   { rejectValue: string }
 >(
-  "auth/login",
+  "auth/changePassword",
   async (
     changePasswordCredentials: ChangePasswordCredentials,
-    { rejectWithValue }
+    { dispatch, rejectWithValue }
   ) => {
     try {
-      const userData = await changePasswordService(changePasswordCredentials);
-      if (!userData.token) {
-        return rejectWithValue("Error en inicio de sesión");
-      } else {
-        localStorage.setItem("token", userData.token);
-        localStorage.setItem("user", JSON.stringify(userData));
-        return userData;
-      }
+      await changePasswordService(changePasswordCredentials);
+      ;
     } catch (error: unknown) {
-      return rejectWithValue(error as string);
+      let message = "Error desconocido";
+
+      if (typeof error === "string") {
+        message = error;
+      } else if (error instanceof Error) {
+        message = error.message;
+      }
+
+      if (message.includes("bloqueado")) {
+        dispatch(logout());
+      }
+
+      return rejectWithValue(message);
     }
   }
 );
