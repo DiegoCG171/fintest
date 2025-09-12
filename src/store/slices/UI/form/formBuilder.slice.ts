@@ -205,6 +205,21 @@ export const formBuilderSlice = createSlice({
       }
       state.tabForms[tabId].visibility = visibility;
     },
+    updateDependsOnId(
+      state,
+      action: PayloadAction<{ tabId: string; dependsOnId: string }>
+    ) {
+      const { tabId, dependsOnId } = action.payload;
+
+      if (!state.tabForms[tabId]) {
+        state.tabForms[tabId] = {
+          values: [],
+          originalValues: [],
+        };
+      }
+
+      state.tabForms[tabId].dependsOnId = dependsOnId;
+    },
   },
 });
 
@@ -218,6 +233,7 @@ export const {
   updateIsActiveRecursive,
   setVisibility,
   resetOriginalValues,
+  updateDependsOnId
 } = formBuilderSlice.actions;
 
 export default formBuilderSlice;

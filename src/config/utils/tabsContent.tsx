@@ -27,6 +27,13 @@ export const tabsContent = (
         canEdit,
         origin,
     },
+    {
+        label: "Dependencia",
+        templateId,
+        formType: "dependOnTransaction",
+        canEdit,
+        origin,
+    },
 ];
 
 export const extractLinkMenus = (data: MenuServiceInterface[]) => {
