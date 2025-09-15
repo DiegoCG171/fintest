@@ -1,4 +1,4 @@
-import { Box, Stack, Typography } from "@mui/material";
+import { Box, IconButton, Stack, Typography } from "@mui/material";
 import PlayCircleFilledWhiteIcon from "@mui/icons-material/PlayCircleFilledWhite";
 import PauseIcon from "@mui/icons-material/Pause";
 import StopIcon from "@mui/icons-material/Stop";
@@ -13,6 +13,9 @@ import {
 } from "../../store";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useToast } from "../../config/hooks/useToast";
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import { useParams } from "react-router-dom";
+import { toggleEmmisorModalConfig } from "../../store/slices/UI/emmisorModalConfig/emmisorModalConfig.slice";
 
 function MediaPlayer() {
   const dispatch = useAppDispatch();
@@ -25,8 +28,11 @@ function MediaPlayer() {
   const serverPort = useAppSelector((state) => state.server.server?.portNumber);
   const playError = useAppSelector((state) => state.server.error);
   const stopError = useAppSelector((state) => state.server.stopServererror);
+  const configHost = useAppSelector((state) => state.server.configHost);
+  const configPort = useAppSelector((state) => state.server.configPort);
   const [canStop, setCanStop] = useState<boolean>(() => Boolean(serverIP));
   const showToastRef = useRef(showToast);
+  const { type } = useParams();
 
   const [playerMessage, setPlayerMessage] = useState("Detenido...");
   const updateMessage = useCallback((msg: string) => {
@@ -100,9 +106,14 @@ function MediaPlayer() {
     setCanStop(Boolean(serverIP) && Boolean(serverId));
   }, [serverIP, serverId, playStatus]);
 
+  const handleToggleEmmisorModalConfig = () => {
+    dispatch(toggleEmmisorModalConfig(true));
+  };
+
   return (
     <Box
       sx={{
+        position: "relative",
         justifyContent: "center",
         alignItems: "center",
         borderRadius: 4,
@@ -111,6 +122,24 @@ function MediaPlayer() {
         borderColor: (theme) => theme.palette.background.default,
       }}
     >
+      {type === "emmisor" && (
+        <IconButton
+          sx={{
+            position: "absolute",
+            top: 4,
+            right: 4,
+          }}
+          size="small"
+          onClick={handleToggleEmmisorModalConfig}
+        >
+          <SettingsOutlinedIcon
+            sx={{
+              fontSize: 14,
+              color: (configHost && configPort) ? "#30b94cff" : "#f04747ff",
+            }}
+          />
+        </IconButton>
+      )}
       <Box
         sx={{
           overflow: "visible",
@@ -148,24 +177,26 @@ function MediaPlayer() {
         <PlayCircleFilledWhiteIcon
           sx={{
             fontSize: 36,
-            cursor: playStatus === "success" ? "not-allowed" : "pointer",
-            opacity: playStatus === "success" ? 0.5 : 1,
-            pointerEvents: playStatus === "success" ? "none" : "auto",
+            cursor: playStatus === "success" || !(configHost && configPort) ? "not-allowed" : "pointer",
+            opacity: playStatus === "success" || !(configHost && configPort) ? 0.5 : 1,
+            pointerEvents: playStatus === "success" || !(configHost && configPort) ? "none" : "auto",
             transition: "color 0.2s, transform 0.2s",
             "&:hover":
               playStatus === "success"
+              || !(configHost && configPort) 
                 ? {}
                 : {
                     transform: "scale(1.1)",
                   },
             "&:active":
               playStatus === "success"
+              || !(configHost && configPort)
                 ? {}
                 : {
                     transform: "scale(0.95)",
                   },
           }}
-          onClick={playStatus !== "success" ? startServer : undefined}
+          onClick={playStatus !== "success" || !(configHost && configPort) ? startServer : undefined}
         />
         <StopIcon
           sx={{

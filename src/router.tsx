@@ -10,6 +10,8 @@ import RouteGuard from "./config/guards/RouteGuard";
 import { JSX, lazy, Suspense } from "react";
 import LoaderComponent from "./components/core/LoaderComponent";
 import { SettingsPage } from "./pages/Catalogs/SettingsPage";
+import { ForceNewUserChangePasswordPage } from "./pages/ForceNewUserChangePasswordPage";
+import NewUserGuard from "./config/guards/NewUserGuard";
 
 const LoginComponent = lazy(() => import("./pages/Auth/login/LoginComponent"));
 const RegisterComponent = lazy(
@@ -28,9 +30,8 @@ const MainPage = lazy(() => import("./pages/Catalogs/MainPageComponent"));
 const DecisionComponent = lazy(() => import("./pages/DecisionComponent"));
 
 const withSuspense = (Component: JSX.Element) => (
-  <Suspense fallback={<LoaderComponent/>}>{Component}</Suspense>
+  <Suspense fallback={<LoaderComponent />}>{Component}</Suspense>
 );
-
 
 const router = createBrowserRouter([
   {
@@ -64,15 +65,11 @@ const router = createBrowserRouter([
             children: [
               {
                 path: "login",
-                element: (
-                  withSuspense(<LoginComponent/>)
-                ),
+                element: withSuspense(<LoginComponent />),
               },
               {
                 path: "register",
-                element: (
-                  withSuspense(<RegisterComponent />)
-                ),
+                element: withSuspense(<RegisterComponent />),
               },
             ],
           },
@@ -82,7 +79,9 @@ const router = createBrowserRouter([
         element: <PrivateGuard />,
         children: [
           {
-            element: <PrivateLayoutContent />,
+            element: (
+                <PrivateLayoutContent />
+            ),
             children: [
               {
                 path: ":method/:type/detalles",
@@ -94,31 +93,27 @@ const router = createBrowserRouter([
               },
               {
                 path: ":method/:type/categories/:categoryId",
-                element: (
-                  <RouteGuard>
-                    {withSuspense(<MainPage />)}
-                  </RouteGuard>
-                ),
+                element: <RouteGuard>{withSuspense(<MainPage />)}</RouteGuard>,
               },
               {
                 path: ":method/:type/collections/:caseId",
-                element: (
-                  <RouteGuard>
-                    {withSuspense(<MainPage />)}
-                  </RouteGuard>
-                ),
+                element: <RouteGuard>{withSuspense(<MainPage />)}</RouteGuard>,
               },
               {
                 path: "settings/:option",
-                element: (
-                    withSuspense(<SettingsPage />)
-                ),
+                element: withSuspense(<SettingsPage />),
               },
             ],
           },
           {
             path: "home",
-            element: withSuspense(<DecisionComponent />),
+            element: (
+              <NewUserGuard>{withSuspense(<DecisionComponent />)}</NewUserGuard>
+            ),
+          },
+          {
+            path: "change-password",
+            element: withSuspense(<ForceNewUserChangePasswordPage />),
           },
         ],
       },

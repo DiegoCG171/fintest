@@ -24,7 +24,7 @@ export interface CollectionResponse {
 }
 
 
-interface CollectionCase {
+export interface CollectionCase {
     name: string;
     uuid: string;
 }

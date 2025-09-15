@@ -10,6 +10,11 @@ export interface LoginCredentials {
     password: string;
 }
 
+export interface ChangePasswordCredentials{
+    oldPassword: string;
+    newPassword: string;
+}
+
 export interface LoginResponse {
     id: string
     username: string
@@ -33,6 +38,7 @@ export interface AuthState {
     loading: boolean;
     error: string | null;
     isAuthenticated: boolean;
+    changePasswordActive: boolean; 
 }
 
 export interface ResetPassword {

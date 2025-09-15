@@ -37,6 +37,7 @@ import { useParams } from "react-router-dom";
 import { resetOriginalValues } from "../../../store/slices/UI/form/formBuilder.slice";
 import { useAuth } from "../../../config/hooks/useAuth";
 import { hasPermission } from "../../../config/utils/permissions";
+import { DependsOnInput } from "../FormBuilder/DependsOnInput";
 
 function TabbedTableForm({
   tabs,
@@ -108,7 +109,6 @@ function TabbedTableForm({
 
   const isLoading = !isTabDataReady;
 
-  //Reglas
   useEffect(() => {
     if (!alreadyFetchedRules.current && statusRules === "idle") {
       dispatch(getRulesThunk());
@@ -162,7 +162,6 @@ function TabbedTableForm({
     templates,
   ]);
 
-  //Casos de prueba
   useEffect(() => {
     if (tabs[value].origin !== "collections") return;
 
@@ -201,7 +200,6 @@ function TabbedTableForm({
     testCases,
   ]);
 
-  //Handlers
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
@@ -217,7 +215,6 @@ function TabbedTableForm({
     }
   };
 
-  //Guardar plantilla
   const saveTemplates = async (tab: FormTabItem) => {
     dispatch(setLoading(true));
     const payload = preparePayload(valuesToSend, tab.formType);
@@ -241,7 +238,6 @@ function TabbedTableForm({
     }
   };
 
-  //Guardar caso de prueba
   const saveTestCases = async (tab: FormTabItem) => {
     dispatch(setLoading(true));
     const payload = preparePayload(valuesToSend, tab.formType);
@@ -266,10 +262,7 @@ function TabbedTableForm({
         direction="row"
         sx={{ justifyContent: "space-between", alignItems: "end" }}
       >
-        <TitleHeaderComponent
-          routeId={templateId}
-          origin={origin}
-        />
+        <TitleHeaderComponent routeId={templateId} origin={origin} />
         {canEdit && (
           <Button
             startIcon={<SaveOutlinedIcon />}
@@ -289,24 +282,29 @@ function TabbedTableForm({
         indicatorColor="primary"
         sx={{ maxHeight: "16px", padding: 0, mt: -1, mb: 2 }}
       >
-        {tabs.map((tab, index) => (
-          <Tab
-            key={`${index}-tab-chip`}
-            label={tab.label}
-            value={index}
-            sx={{
-              minHeight: "66px",
-              padding: "4px 12px",
-              fontSize: "12px",
-              "&.Mui-selected": {
-                color: "primary.main",
-                fontWeight: "bold",
-              },
-            }}
-          />
-        ))}
+        {tabs
+          .filter(
+            (template) =>
+              !template.label.includes("Depende") ||
+              template.origin === "collections"
+          )
+          .map((tab, index) => (
+            <Tab
+              key={`${index}-tab-chip`}
+              label={tab.label}
+              value={index}
+              sx={{
+                minHeight: "66px",
+                padding: "4px 12px",
+                fontSize: "12px",
+                "&.Mui-selected": {
+                  color: "primary.main",
+                  fontWeight: "bold",
+                },
+              }}
+            />
+          ))}
       </Tabs>
-
       <Box sx={{ flex: 1, overflow: "auto" }}>
         {isLoading ? (
           <Stack
@@ -317,18 +315,35 @@ function TabbedTableForm({
             <CircularProgress />
           </Stack>
         ) : (
-          tabs.map((template, index) => (
-            <CustomTabPanel
-              key={`${index}-tab-form-content`}
-              value={value}
-              index={index}
-            >
-              <CatalogsDataMiddleware
-                tabId={currentTabId}
-                template={template}
-              />
-            </CustomTabPanel>
-          ))
+          tabs
+            .filter(
+              (template) =>
+                !template.label.includes("Depende") ||
+                template.origin === "collections"
+            )
+            .map((template, index) => (
+              <CustomTabPanel
+                key={`${index}-tab-form-content`}
+                value={value}
+                index={index}
+              >
+                {template.label.includes("Depende") &&
+                  template.origin === "collections" && (
+                    <DependsOnInput
+                      tabId={`${template.templateId}-${template.formType}`}
+                      testCaseId={template.templateId}
+                    />
+                  )}
+                {(template.label.includes("Depende")
+                  ? template.origin === "collections" && tabForm?.dependsOnId
+                  : true) && (
+                  <CatalogsDataMiddleware
+                    tabId={currentTabId}
+                    template={template}
+                  />
+                )}
+              </CustomTabPanel>
+            ))
         )}
       </Box>
     </Box>

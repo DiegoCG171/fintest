@@ -16,20 +16,15 @@ import { SettingsButton } from "../components/UI/Settings/SettingsButton";
 
 function DecisionComponent() {
   const [flipped, setFlipped] = useState(false);
+  const [role, setRole] = useState<"acquirer" | "emmisor" | null>(null);
   const user = useAppSelector((state) => state.auth.user?.names);
   const title = `${user}, te damos la bienvenida a`;
   const dispatch = useAppDispatch();
+
   const firstCard = () => (
     <Stack spacing={8}>
-      <Stack
-        spacing={4}
-        alignItems="center"
-      >
-        <Typography
-          align="center"
-          variant="h6"
-          color="common.white"
-        >
+      <Stack spacing={4} alignItems="center">
+        <Typography align="center" variant="h6" color="common.white">
           {title}
         </Typography>
         <Box
@@ -56,14 +51,19 @@ function DecisionComponent() {
         <Button
           variant="contained"
           endIcon={<PersonAltOutlineOutlinedIcon />}
-          onClick={() => setFlipped(true)}
+          onClick={() => {
+            setRole("acquirer");
+            setFlipped(true);
+          }}
         >
           Soy adquirente
         </Button>
         <Button
           variant="contained"
-          // disabled={true}
-          onClick={() => setFlipped(true)}
+          onClick={() => {
+            setRole("emmisor");
+            setFlipped(true);
+          }}
           endIcon={<PeopleAltOutlinedIcon />}
         >
           Soy emisor
@@ -74,15 +74,8 @@ function DecisionComponent() {
 
   const secondCard = () => (
     <Stack spacing={8}>
-      <Stack
-        spacing={4}
-        alignItems="center"
-      >
-        <Typography
-          align="center"
-          variant="h6"
-          color="common.white"
-        >
+      <Stack spacing={4} alignItems="center">
+        <Typography align="center" variant="h6" color="common.white">
           {title}
         </Typography>
         <Box
@@ -108,15 +101,15 @@ function DecisionComponent() {
         <Button
           variant="contained"
           component={Link}
-          to="/pos/acquirer/detalles"
+          to={`/pos/${role}/detalles`}
           sx={{ minWidth: 160 }}
           onClick={() => {
-            dispatch(getCategoriesByMethodThunk("pos/acquirer"))
+            dispatch(getCategoriesByMethodThunk(`pos/${role}`))
               .unwrap()
               .catch((err) => console.error("Error cargando categorías:", err));
-            dispatch(getCollectionsThunk("pos/acquirer"))
+            dispatch(getCollectionsThunk(`pos/${role}`))
               .unwrap()
-              .catch((err) => console.error("Error cargando categorías:", err));
+              .catch((err) => console.error("Error cargando colecciones:", err));
           }}
         >
           POS
@@ -124,15 +117,15 @@ function DecisionComponent() {
         <Button
           variant="contained"
           component={Link}
-          to="/atm/acquirer/detalles"
+          to={`/atm/${role}/detalles`}
           sx={{ minWidth: 160 }}
           onClick={() => {
-            dispatch(getCategoriesByMethodThunk("atm/acquirer"))
+            dispatch(getCategoriesByMethodThunk(`atm/${role}`))
               .unwrap()
               .catch((err) => console.error("Error cargando categorías:", err));
-            dispatch(getCollectionsThunk("atm/acquirer"))
+            dispatch(getCollectionsThunk(`atm/${role}`))
               .unwrap()
-              .catch((err) => console.error("Error cargando categorías:", err));
+              .catch((err) => console.error("Error cargando colecciones:", err));
           }}
         >
           ATM
