@@ -11,7 +11,7 @@ function CategoriesFormJSON({
     onSetTemplateName,
     }: CategoriesFormJSONProps) {
     const categoriesMenu = useAppSelector(
-        (state) => state.sidebarMenu.categoriesMenu
+        (state) => state.sidebarMenu.menus["category"]
     );
 
     const handleChange = (

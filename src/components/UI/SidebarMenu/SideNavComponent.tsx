@@ -13,11 +13,6 @@ import {
   getLinksArray,
   transformCollectionsToMenu,
 } from "../../../config/utils";
-import {
-  setCategoriesData,
-  setCollapsedState,
-  setCollectionsData,
-} from "../../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
 import { getCollectionsThunk } from "../../../store/slices/collections/collections.thunk";
 import {
   setCategoriesRoutesThunk,
@@ -27,7 +22,7 @@ import SearchBar from "./SearchBar";
 import { RunnerSideBar } from "../Runner/RunnerSideBar";
 import { useLocation, useParams } from "react-router-dom";
 import { SidebarSettingsMenu } from "./SidebarSettingsMenu";
-
+import { setCollapsedState, setRecursiveMenuData } from "../../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
 export const drawerWidth = 240;
 
 function SideNavComponent() {
@@ -41,7 +36,7 @@ function SideNavComponent() {
   const { method, type } = params;
 
   useEffect(() => {
-    if (categories.status === "idle" && !location.pathname.includes('/settings/')) {
+    if (categories.status === "idle" && location.pathname !== '/settings/users') {
       dispatch(getCategoriesByMethodThunk(`${method}/${type}`))
         .unwrap()
         .catch((err) => console.error("Error cargando categorías:", err));
@@ -49,7 +44,7 @@ function SideNavComponent() {
   }, [dispatch, categories.status, method, type, location]);
 
   useEffect(() => {
-    if (collections.status === "idle" && !location.pathname.includes('/settings/')) {
+    if (collections.status === "idle" && location.pathname !== '/settings/users') {
       dispatch(getCollectionsThunk(`${method}/${type}`))
         .unwrap()
         .catch((err) => console.error("Error cargando categorías:", err));
@@ -57,25 +52,25 @@ function SideNavComponent() {
   }, [dispatch, collections.status, method, type, location]);
 
   useEffect(() => {
-    if (categories.status === "success" && categories.categories && !location.pathname.includes('/settings/')) {
+    if (categories.status === "success" && categories.categories && location.pathname !== '/settings/users') {
       const menuCategories = addLinkMenu(
         categories.categories,
         `${method}/${type}/categories`
       );
 
-      dispatch(setCategoriesData(menuCategories));
+      dispatch(setRecursiveMenuData({type: "category", items: menuCategories}));
       dispatch(setCategoriesRoutesThunk(getLinksArray(menuCategories)));
     }
   }, [dispatch, categories.status, categories.categories, method, type, location]);
 
   useEffect(() => {
-    if (collections.status === "success" && collections.collections && !location.pathname.includes('/settings/')) {
+    if (collections.status === "success" && collections.collections && location.pathname !== '/settings/users') {
       const transformCollections = transformCollectionsToMenu(
         collections.collections,
         `${method}/${type}/collections`
       );
 
-      dispatch(setCollectionsData(transformCollections));
+      dispatch(setRecursiveMenuData({type: "collection", items: transformCollections}));
       dispatch(setCollectionsRoutesThunk(getLinksArray(transformCollections)));
     }
   }, [dispatch, collections, method, type, location]);
@@ -111,7 +106,7 @@ function SideNavComponent() {
           onToggleMenu={toggleMenu}
           isHide={hideMenu}
         />
-        {(!hideMenu && !location.pathname.includes('/settings/')) &&  (
+        {(!hideMenu && location.pathname !== '/settings/users') &&  (
           <Box sx={{ px: 2, overflowY: "auto", flexGrow: 1, my: 4 }}>
             <SearchBar onSearch={handleSearch}></SearchBar>
             <SidebarBlock
@@ -124,7 +119,7 @@ function SideNavComponent() {
           </Box>
         )}
         {
-          (!hideMenu && location.pathname.includes('/settings/')) && (
+          (!hideMenu && location.pathname === '/settings/users') && (
             <SidebarSettingsMenu />
           )
         }

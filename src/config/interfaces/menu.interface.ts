@@ -14,6 +14,10 @@ export interface ItemsServiceMenu {
 }
 
 export interface MenuSidebarState {
+    isCollapsed: boolean;
+    menus: Record<string, MenuServiceInterface[]>;
+}
+/* export interface MenuSidebarState {
     categoriesMenu: MenuServiceInterface[],
     collectionsMenu: MenuServiceInterface[],
     isCollapsed: boolean,
@@ -22,7 +26,7 @@ export interface MenuSidebarState {
     updateCollection: MenuServiceInterface | null;
     loading: boolean;
     idTestCase: string;
-}
+} */
 
 //Menu props
 export interface MenuItem {
@@ -50,7 +54,35 @@ export interface RecursiveMenuItemProps {
     buildSubItemOptions?: (item: ItemsServiceMenu) => ContextMenuOption[];
     renderCreateChildEditor?: (item: MenuServiceInterface) => React.ReactNode;
     renderEditNodeEditor?: (item: MenuServiceInterface) => React.ReactNode;
+    renderChildrenEditNodeEditor?: (item: MenuServiceInterface) => React.ReactNode;
     draggable?: boolean;
+}
+
+export interface ItemsListSortableProps {
+    items: ItemsServiceMenu[];
+    optionsActive?: boolean;
+    onClick?: (item: MenuServiceInterface | ItemsServiceMenu) => void;
+    buildSubItemOptions?: (item: ItemsServiceMenu) => ContextMenuOption[];
+    renderEditNodeEditor?: (item: MenuServiceInterface) => React.ReactNode;
+    draggable?: boolean;
+}
+
+export interface FolderHeaderDroppableProps {
+    item: MenuServiceInterface;
+    depth: number;
+    expanded: boolean;
+    overId?: string | null;
+    optionsActive?: boolean;
+    onToggleExpand: () => void;
+    buildOptions?: (item: ItemsServiceMenu) => ContextMenuOption[];
+    buildSubItemOptions?: (item: ItemsServiceMenu) => ContextMenuOption[];
+    renderEditNodeEditor?: (item: MenuServiceInterface) => React.ReactNode;
+}
+
+export interface InlineCreateChildEditorProps {
+    depth: number;
+    item: MenuServiceInterface;
+    renderCreateChildEditor?: (item: MenuServiceInterface) => React.ReactNode;
 }
 
 export interface HeaderSidebarMenuProps {
@@ -62,10 +94,14 @@ export interface SeparatorMenuProps {
     onAction?: () => void;
     onDownload?: () => void;
     label: string;
-    permissions: {
-        action: string;
-        resource: string;
-    }[]
+}
+
+export interface SidebarSectionProps extends Omit<RecursiveMenuItemProps, "item" | "depth"> {
+    separatorMenuProps: SeparatorMenuProps;
+    searchTerm: string;
+    searchOnItem: boolean;
+    resource: MenuServiceInterface[];
+    renderSeparatorChildren?: () => React.ReactNode;
 }
 
 //Menu context
@@ -93,6 +129,7 @@ export interface PropsRecursiveMenuSubItem {
     buildOptions?: (item: ItemsServiceMenu) => ContextMenuOption[];
     parentId?: string;
     draggable: boolean;
+    renderEditNodeEditor?: (item: MenuServiceInterface) => React.ReactNode;
 }
 
 export interface ItemInlineEditorProps {

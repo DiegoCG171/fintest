@@ -1,38 +1,31 @@
 import { CircularProgress, IconButton, Stack, TextField } from "@mui/material";
-import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
 import CancelIcon from "@mui/icons-material/Cancel";
-import { useAppDispatch } from "../../../store";
 import { useState } from "react";
-import { createCollectionThunk } from "../../../store/slices/collections/collections.thunk";
-import { toggleCreateCollectionMenu } from "../../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
-import { useRefreshCollectionsMenu } from "../../../config/hooks/useRefreshCollectionsMenu";
-import { useCreateCollections } from "../../../config/hooks/useCreateCollections";
+import { ItemInlineEditorProps } from "../../config/interfaces";
 
-export const SidebarCreateCollection = () => {
-  const dispatch = useAppDispatch();
-  const [value, setValue] = useState("");
-  const refreshCollectionsMenu = useRefreshCollectionsMenu();
-  const params = useCreateCollections();
+function ItemInlineEditor({
+  initialValue = "",
+  placeholder = "Escribe un nombre",
+  onSubmit,
+  onCancel,
+}: ItemInlineEditorProps) {
+  const [value, setValue] = useState(initialValue);
   const [loading, setLoading] = useState(false);
+
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && value.trim() !== "") {
+      setLoading(true);
       try {
-        const name = value.trim();
-        const body = {
-          ...params,
-          name,
-        };
-        setLoading(true);
-        await dispatch(createCollectionThunk(body)).unwrap();
-        await refreshCollectionsMenu();
+        await onSubmit(value.trim());
         setValue("");
-        dispatch(toggleCreateCollectionMenu(false));
       } catch (error) {
-        console.error("Error al crear la colección:", error);
-        setLoading(false);
+        console.error("Error:", error);
       } finally {
         setLoading(false);
       }
+    }
+    if (e.key === "Escape") {
+      onCancel?.();
     }
   };
 
@@ -41,14 +34,15 @@ export const SidebarCreateCollection = () => {
       direction="row"
       spacing={1}
       alignItems="center"
-      sx={{ width: "90%", pl: 1.5, my: 1 }}
+      sx={{ width: "100%" }}
     >
-      <FolderOutlinedIcon sx={{ fontSize: 16, color: "text.disabled" }} />
       <TextField
         variant="standard"
         value={value}
+        disabled={loading}
         onChange={(e) => setValue(e.target.value)}
         onKeyDown={handleKeyDown}
+        placeholder={placeholder}
         sx={{
           "& .MuiInputBase-input": {
             fontSize: "12px",
@@ -60,10 +54,8 @@ export const SidebarCreateCollection = () => {
             endAdornment: (
               <IconButton
                 size="small"
-                onClick={() => {
-                  setValue("");
-                  dispatch(toggleCreateCollectionMenu(false));
-                }}
+                onClick={onCancel}
+                disabled={loading}
               >
                 {loading ? (
                   <CircularProgress size="10px" />
@@ -86,4 +78,6 @@ export const SidebarCreateCollection = () => {
       />
     </Stack>
   );
-};
+}
+
+export default ItemInlineEditor;

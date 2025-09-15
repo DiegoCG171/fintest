@@ -1,6 +1,6 @@
 // hooks/useSidebarDnd.ts
 import { useParams } from "react-router-dom";
-import { getTemplateByIdThunk, updateTemplateThunk, useAppDispatch } from "../../store";
+import { getCategoriesByMethodThunk, updateTemplateThunk, useAppDispatch } from "../../store";
 import { MenuServiceInterface } from "../interfaces";
 import { useToast } from "./useToast";
 import { useCallback, useState } from "react";
@@ -57,6 +57,15 @@ export function useSidebarDnd({
           over.id as string
         );
 
+      if (action === "move" && metadata?.sourceTree === "collections") {
+        setCategoriesTree(prevCategories);
+        setCollectionsTree(prevCollections);
+        showToast("Las colecciones solo pueden reordenarse dentro de su carpeta", "warning");
+        setActiveId(null);
+        setOverId(null);
+        return;
+      }
+
       // ✅ Actualiza UI al instante (optimista)
       setCategoriesTree(newCategories);
       setCollectionsTree(newCollections);
@@ -83,13 +92,13 @@ export function useSidebarDnd({
         }
 
         if (action === "move" && metadata?.sourceTree === "categories") {
-          const template = await dispatch(getTemplateByIdThunk(metadata.itemId!)).unwrap()
           await dispatch(
             updateTemplateThunk({
-              id: template.uuid,
+              id: metadata.itemId!,
               payload: { categoryId: metadata.targetParentId },
             })
           ).unwrap();
+          await dispatch(getCategoriesByMethodThunk(`${method}/${type}`)).unwrap();
           showToast("El template ha sido reubicado", "success");
         }
       } catch (err) {

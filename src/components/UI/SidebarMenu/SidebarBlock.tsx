@@ -1,54 +1,12 @@
 import { Box, Divider, Stack, Typography } from "@mui/material";
-import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
-import SeparatorMenu from "./SeparatorMenu";
-import RecursiveMenuItem from "../../navigation/RecursiveMenuItem";
-import {
-  createCategorieThunk,
-  createTemplateThunk,
-  getCategoriesByMethodThunk,
-  getTemplateByIdThunk,
-  getTemplatesThunk,
-  openModal,
-  setLoading,
-  updateCategorieThunk,
-  useAppDispatch,
-  useAppSelector,
-} from "../../../store";
-import {
-  ContextMenuOption,
-  ItemsServiceMenu,
-  MenuServiceInterface,
-} from "../../../config/interfaces";
-import { useCallback, useEffect, useState } from "react";
-import { useToast } from "../../../config/hooks/useToast";
-import { getCollectionsThunk } from "../../../store/slices/collections/collections.thunk";
+import SidebarSection from "./SidebarSection";
+import useCategoriesSidebar from "../../../config/hooks/sidebar/useCategoriesSidebar";
+import useCollectionsSidebar from "../../../config/hooks/sidebar/useCollectionsSidebar";
+import { useEffect, useState } from "react";
+import { useSidebarDnd } from "../../../config/hooks/useSidebarDnd";
+import { DndContext, DragOverlay } from "@dnd-kit/core";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
-import {
-  toggleCreateCollectionMenu,
-  updateCollection,
-  updateTestCase,
-} from "../../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
-import { SidebarCreateCollection } from "./SidebarCreateCollection";
-import {
-  CreateSessionPayload,
-  createSessionThunk,
-} from "../../../store/slices/sessions/session.thunk";
-import { cleanObject } from "../../../config/utils/cleandObject";
-import PermissionGuard from "../../../config/guards/PermissionGuard";
-import { hasPermission } from "../../../config/utils/permissions";
-import { useAuth } from "../../../config/hooks/useAuth";
-import { useParams } from "react-router-dom";
-import { getTemplatesBackup } from "../../../services";
-import { openConfirmDeleteModal } from "../../../store/slices/UI/confirmDeleteModal/confirmDeleteModal.slice";
-import ItemInlineEditor from "./ItemInlineEditor";
-import { DndContext, DragOverlay } from "@dnd-kit/core";
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { useSidebarDnd } from "../../../config/hooks/useSidebarDnd";
-import useFilterRecursive from "../../../config/hooks/sidebar/useFilterRecursive";
 
 function SidebarBlock({
   searchTerm,
@@ -57,29 +15,47 @@ function SidebarBlock({
   searchTerm: string;
   searchOnItem: boolean;
 }) {
-  const dispatch = useAppDispatch();
-  const { permissions } = useAuth();
 
-  const { method, type } = useParams();
+  //Llenado de secciones
+  const [editingCategoryId, setEditingCategoryId] = useState<string | null>(
+    null
+  );
+  const [renameTemplateId, setRenameTemplateId] = useState<
+    string | undefined
+  >();
+  const [creatingCategoryId, setCreatingCategoryId] = useState<
+    string | undefined
+  >();
+  const [editingCollectionId, setEditingCollectionId] = useState<
+    string | undefined
+  >();
+  const [renameTestCaseId, setRenameTestCaseId] = useState<
+    string | undefined
+  >();
+  const [isCreatingCollection, setIsCreatingCollection] =
+    useState<boolean>(false);
 
-  const categoriesMenu = useAppSelector(
-    (state) => state.sidebarMenu.categoriesMenu
-  );
-  const collectionsMenu = useAppSelector(
-    (state) => state.sidebarMenu.collectionsMenu
-  );
-  const createCollectionMenu = useAppSelector(
-    (state) => state.sidebarMenu.createCollectionMenu
-  );
-  const { showToast } = useToast();
+  const categories = useCategoriesSidebar({
+    setEditingCategoryId,
+    editingCategoryId,
+    creatingCategoryId,
+    setCreatingCategoryId,
+    renameTemplateId,
+    setRenameTemplateId,
+  });
 
-  const [creatingChildId, setCreatingChildId] = useState<string | undefined>(
-    undefined
-  );
+  const collections = useCollectionsSidebar({
+    editingCollectionId,
+    setEditingCollectionId,
+    renameTestCaseId,
+    setRenameTestCaseId,
+    isCreatingCollection,
+    setIsCreatingCollection,
+  });
 
-  const [editingItemId, setEditingItemId] = useState<string | null>(null);
-  const [categoriesTree, setCategoriesTree] = useState(categoriesMenu);
-  const [collectionsTree, setCollectionsTree] = useState(collectionsMenu);
+  //Drag and drop
+  const [categoriesTree, setCategoriesTree] = useState(categories.resource);
+  const [collectionsTree, setCollectionsTree] = useState(collections.resource);
 
   const { activeId, overId, dndContextProps } = useSidebarDnd({
     categoriesTree,
@@ -89,435 +65,31 @@ function SidebarBlock({
   });
 
   useEffect(() => {
-    setCategoriesTree(categoriesMenu);
-    setCollectionsTree(collectionsMenu);
-  }, [categoriesMenu, collectionsMenu]);
+    setCategoriesTree(categories.resource);
+  }, [categories.resource]);
 
-  const filteredCategories = useFilterRecursive(
-    categoriesTree,
-    searchTerm,
-    !searchOnItem
-  );
-
-  const renderEditNodeEditor = (item: MenuServiceInterface) => {
-    if (editingItemId !== item.id) return null;
-
-    return (
-      <ItemInlineEditor
-        icon={
-          <FolderOutlinedIcon sx={{ fontSize: 16, color: "text.disabled" }} />
-        }
-        initialValue={item.name}
-        placeholder="Nuevo nombre"
-        onSubmit={async (newName: string) => {
-          try {
-            await dispatch(
-              updateCategorieThunk({ id: item.id, data: { name: newName } })
-            ).unwrap();
-            await dispatch(
-              getCategoriesByMethodThunk(`${method}/${type}`)
-            ).unwrap();
-            setEditingItemId(null);
-            showToast("Categoría editada exitoramente", "success");
-          } catch (error) {
-            showToast(
-              error as string | "Error al renombrar categoría",
-              "error"
-            );
-          }
-        }}
-        onCancel={() => setEditingItemId(null)}
-      />
-    );
-  };
-
-  const renderCreateChildEditor = (item: MenuServiceInterface) => {
-    if (creatingChildId !== item.id) return null;
-
-    return (
-      <Box sx={{ pl: 1, mt: 0.5 }}>
-        <ItemInlineEditor
-          placeholder="Nombre de Categoría"
-          onSubmit={async (name: string) => {
-            await createCategory(name);
-          }}
-          onCancel={() => setCreatingChildId(undefined)}
-        />
-      </Box>
-    );
-  };
-
-  const createCategory = async (name: string): Promise<void> => {
-    if (!creatingChildId) return;
-    const body = {
-      name,
-      parent: creatingChildId,
-    };
-
-    try {
-      await dispatch(createCategorieThunk(body)).unwrap();
-      await dispatch(getCategoriesByMethodThunk(`${method}/${type}`)).unwrap();
-      showToast("Categoría creada exitoramente", "success");
-      setTimeout(() => {
-        setCreatingChildId(undefined);
-      }, 300);
-    } catch (error) {
-      showToast(error as string | "Error al crear la categoría", "error");
-      setCreatingChildId(undefined);
-    }
-  };
-
-  const addToCollections = (item: ItemsServiceMenu) => {
-    dispatch(
-      openModal({
-        componentKey: "ModalAddToCollection",
-        componentProps: { templateId: item.id },
-      })
-    );
-  };
-
-  /* const deleteCategorie = async (id: string) => {
-    try {
-      await dispatch(deleteCategorieThunk(id)).unwrap();
-      await dispatch(getCategoriesByMethodThunk(`${method}/${type}`)).unwrap();
-      showToast("Categoría eliminada exitoramente", "success");
-    } catch (error) {
-      showToast(error as string | "Error al eliminar la categoría", "error");
-    }
-  }; */
-
-  const handleSelectItem = useCallback(
-    async (item: MenuServiceInterface | ItemsServiceMenu) => {
-      dispatch(setLoading(true));
-      try {
-        await dispatch(getTemplateByIdThunk(item.id)).unwrap();
-        dispatch(
-          openModal({
-            componentKey: "ModalFormJson",
-            componentProps: { mode: "edit" },
-          })
-        );
-      } catch (error) {
-        showToast(error as string, "error");
-        console.error(error);
-      } finally {
-        dispatch(setLoading(false));
-      }
-    },
-    [dispatch, showToast]
-  );
-
-  const buildedOptions = (item: ItemsServiceMenu): ContextMenuOption[] => {
-    const options: ContextMenuOption[] = [];
-
-    if (hasPermission(permissions, "create", "category")) {
-      options.push({
-        item: { label: "Añadir", id: item.id },
-        action: () => setCreatingChildId(item.id),
-      });
-    }
-
-    if (hasPermission(permissions, "update", "category")) {
-      options.push({
-        item: { label: "Renombrar", id: item.id },
-        action: () => {
-          setCreatingChildId(undefined);
-          setEditingItemId(item.id);
-        },
-      });
-    }
-
-    if (hasPermission(permissions, "delete", "category")) {
-      options.push({
-        item: { label: "Eliminar", id: item.id },
-        action: () =>
-          dispatch(
-            openConfirmDeleteModal({ id: item.id, resource: "category" })
-          ),
-      });
-    }
-    /* if (hasPermission(permissions, "delete", "category")) {
-      options.push({
-        item: { label: "Eliminar", id: item.id },
-        action: () => deleteCategorie(item.id),
-      });
-    } */
-
-    return options;
-  };
-
-  const buildedTemplateOptions = (
-    item: ItemsServiceMenu
-  ): ContextMenuOption[] => {
-    const options: ContextMenuOption[] = [];
-
-    if (hasPermission(permissions, "create", "collection")) {
-      options.push({
-        item: { label: "Agregar a Colecciones", id: item.id },
-        action: () => addToCollections(item),
-      });
-    }
-
-    if (hasPermission(permissions, "create", "template")) {
-      options.push({
-        item: { label: "Duplicar", id: item.id },
-        action: async () => {
-          const originalTemplate = await dispatch(
-            getTemplateByIdThunk(item.id)
-          ).unwrap();
-
-          if (!originalTemplate) {
-            showToast("Template no encontrado", "error");
-            return;
-          }
-
-          const copyTemplate = cleanObject(originalTemplate);
-
-          try {
-            await dispatch(
-              createTemplateThunk({
-                template: {
-                  ...copyTemplate,
-                  name: `${copyTemplate.name} copia`,
-                },
-              })
-            ).unwrap();
-
-            showToast("Copia del template creada correctamente", "success");
-          } catch (error) {
-            showToast(error as string, "error");
-          } finally {
-            dispatch(getTemplatesThunk());
-            dispatch(getCategoriesByMethodThunk(`${method}/${type}`))
-              .unwrap()
-              .catch((err: string) =>
-                console.error("Error cargando categorías:", err)
-              );
-          }
-        },
-      });
-    }
-
-    if (hasPermission(permissions, "update", "template")) {
-      options.push({
-        item: { label: "Editar template", id: item.id },
-        action: () => handleSelectItem(item),
-      });
-    }
-
-    if (hasPermission(permissions, "delete", "template")) {
-      options.push({
-        item: { label: "Eliminar", id: item.id },
-        action: async () => {
-          dispatch(
-            openConfirmDeleteModal({ id: item.id, resource: "template" })
-          );
-        },
-      });
-    }
-
-    return options;
-  };
-
-  const buildedCollectionOptions = (
-    item: ItemsServiceMenu
-  ): ContextMenuOption[] => {
-    const options: ContextMenuOption[] = [];
-
-    if ((hasPermission(permissions, "create", "session"), type)) {
-      options.push({
-        item: { label: "Ejecutar", id: item.id },
-        action: () => {
-          const sessionPayload: CreateSessionPayload = {
-            processingMethod: type,
-            toExecute: [
-              {
-                runnableId: item.id,
-                runnableType: "collection",
-              },
-            ],
-          };
-
-          if (type === "emmisor") {
-            sessionPayload.ip = "1.2.3.4";
-            sessionPayload.portNumber = 1234;
-          }
-
-          dispatch(createSessionThunk(sessionPayload));
-        },
-      });
-    }
-
-    if (hasPermission(permissions, "update", "collection")) {
-      options.push({
-        item: { label: "Renombrar", id: item.id },
-        action: () => {
-          dispatch(updateCollection(item));
-          dispatch(getCollectionsThunk(`${method}/${type}`));
-        },
-      });
-    }
-
-    if (hasPermission(permissions, "delete", "collection")) {
-      options.push({
-        item: { label: "Eliminar", id: item.id },
-        action: async () => {
-          dispatch(
-            openConfirmDeleteModal({ id: item.id, resource: "collection" })
-          );
-        },
-      });
-    }
-
-    return options;
-  };
-
-  const buildedTestCaseOptions = (
-    item: ItemsServiceMenu
-  ): ContextMenuOption[] => {
-    const options: ContextMenuOption[] = [];
-
-    if (hasPermission(permissions, "create", "session") && type) {
-      options.push({
-        item: { label: "Ejecutar", id: item.id },
-        action: () => {
-          const sessionPayload: CreateSessionPayload = {
-            processingMethod: type,
-            toExecute: [
-              {
-                runnableId: item.id,
-                runnableType: "testCase",
-              },
-            ],
-          };
-
-          if (type === "emmisor") {
-            sessionPayload.ip = "1.2.3.4";
-            sessionPayload.portNumber = 1234;
-          }
-
-          dispatch(createSessionThunk(sessionPayload));
-        },
-      });
-    }
-
-    if (hasPermission(permissions, "update", "testCase")) {
-      options.push({
-        item: { label: "Renombrar", id: item.id },
-        action: () => dispatch(updateTestCase(item)),
-      });
-    }
-
-    if (hasPermission(permissions, "delete", "testCase")) {
-      options.push({
-        item: { label: "Eliminar", id: item.id },
-        action: async () => {
-          dispatch(
-            openConfirmDeleteModal({ id: item.id, resource: "testCase" })
-          );
-        },
-      });
-    }
-
-    return options;
-  };
-
-  const handleOpenCreateCollection = () => {
-    dispatch(toggleCreateCollectionMenu(true));
-  };
-
-  const handleModal = useCallback(() => {
-    dispatch(
-      openModal({
-        componentKey: "ModalFormJson",
-        componentProps: { mode: "create" },
-      })
-    );
-  }, [dispatch]);
+  useEffect(() => {
+    setCollectionsTree(collections.resource);
+  }, [collections.resource]);
 
   return (
     <DndContext {...dndContextProps}>
       <Box>
-        <Box
-          sx={{ px: 1, overflowY: "auto", flexGrow: 1, my: 4, marginRight: 1 }}
-          key={"box-catalogo"}
-        >
-          <PermissionGuard
-            permissions={[{ action: "read", resource: "template" }]}
-          >
-            <SeparatorMenu
-              label="Catálogo"
-              onAction={handleModal}
-              onDownload={() => getTemplatesBackup()}
-              permissions={[{ action: "create", resource: "template" }]}
-            />
-            <SortableContext
-              items={filteredCategories.map((i) => i.id)}
-              strategy={verticalListSortingStrategy}
-            >
-              {filteredCategories.length > 0 ? (
-                filteredCategories.map((rootItem, index) => (
-                  <RecursiveMenuItem
-                    key={`${index}-${rootItem.id}`}
-                    item={rootItem}
-                    optionsActive={true}
-                    onSelectItem={handleSelectItem}
-                    buildOptions={buildedOptions}
-                    buildSubItemOptions={buildedTemplateOptions}
-                    renderCreateChildEditor={renderCreateChildEditor}
-                    renderEditNodeEditor={renderEditNodeEditor}
-                    creatingChildId={creatingChildId}
-                    overId={overId!}
-                    draggable
-                  />
-                ))
-              ) : (
-                <Box sx={{ px: 2, py: 1, fontSize: 14, color: "gray" }}>
-                  Sin resultados
-                </Box>
-              )}
-            </SortableContext>
-          </PermissionGuard>
-        </Box>
+        <SidebarSection
+          searchOnItem={searchOnItem}
+          searchTerm={searchTerm}
+          overId={overId!}
+          {...categories}
+          resource={categoriesTree}
+        />
         <Divider />
-        <Box
-          sx={{ px: 1, overflowY: "auto", flexGrow: 1, my: 4, marginRight: 1 }}
-          key={"box-colecciones"}
-        >
-          <PermissionGuard
-            permissions={[{ action: "read", resource: "collection" }]}
-          >
-            <SeparatorMenu
-              permissions={[{ action: "create", resource: "collection" }]}
-              label="Colecciones"
-              onAction={handleOpenCreateCollection}
-            />
-            {createCollectionMenu && <SidebarCreateCollection />}
-            <SortableContext
-              items={collectionsTree.map((i) => i.id)}
-              strategy={verticalListSortingStrategy}
-            >
-              {collectionsTree.length > 0 ? (
-                collectionsTree.map((rootItem, index) => (
-                  <RecursiveMenuItem
-                    key={`${index}-${rootItem?.id ?? rootItem.name}`}
-                    item={rootItem}
-                    optionsActive={true}
-                    onSelectItem={handleSelectItem}
-                    buildOptions={buildedCollectionOptions}
-                    buildSubItemOptions={buildedTestCaseOptions}
-                    draggable
-                    overId={overId!}
-                  />
-                ))
-              ) : (
-                <Box sx={{ px: 2, py: 1, fontSize: 14, color: "gray" }}>
-                  Sin resultados
-                </Box>
-              )}
-            </SortableContext>
-          </PermissionGuard>
-        </Box>
+        <SidebarSection
+          searchOnItem={searchOnItem}
+          searchTerm={""}
+          overId={overId!}
+          {...collections}
+          resource={collectionsTree}
+        />
       </Box>
       <DragOverlay style={{ cursor: "grabbing" }}>
         {activeId ? (

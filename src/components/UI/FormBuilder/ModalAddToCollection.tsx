@@ -19,7 +19,6 @@ import {
   getLinksArray,
   transformCollectionsToMenu,
 } from "../../../config/utils";
-import { setCollectionsData } from "../../../store/slices/UI/sidebarMenu/sidebarMenu.slice";
 import { useParams } from "react-router-dom";
 import { useToast } from "../../../config/hooks/useToast";
 export const ModalAddToCollection = ({
@@ -29,7 +28,7 @@ export const ModalAddToCollection = ({
   const [collection, setCollection] = useState<string>("");
   const [collectionError, setCollectionError] = useState<boolean>(false);
   const collectionsMenu = useAppSelector(
-    (state) => state.sidebarMenu.collectionsMenu
+    (state) => state.sidebarMenu.menus["collection"]
   );
 
   const { loading } = useAppSelector((state) => state.modalForm);
@@ -63,8 +62,8 @@ export const ModalAddToCollection = ({
         `${method}/${type}/collections`
       );
       showToast("Template agregado correctamente", "success");
-      dispatch(setCollectionsData(transformed));
-      dispatch(setCollectionsRoutesThunk(getLinksArray(transformed)));
+      /* dispatch(setCollectionsData(transformed));
+      dispatch(setCollectionsRoutesThunk(getLinksArray(transformed))); */
     } catch (error) {
       console.error(error);
       showToast("Error al agregar template", "success");
