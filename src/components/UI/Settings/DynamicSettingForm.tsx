@@ -16,21 +16,20 @@ import {
 } from "../../../store/slices/admin/admin.slice";
 import { useFormConfig } from "../../../config/hooks/useFormConfig";
 import { useFormLogic } from "../../../config/hooks/useFormLogic";
-import { createSubmitHandlers } from "../../../config/utils/formSettingsHandlers";
+import { createSubmitHandlers, validateForm } from "../../../config/utils/formSettingsHandlers";
 import { GRID_STYLE, MODAL_STYLE } from "../../../config/constants/formSettings";
 import { createFieldComponent } from "./fields/fieldFactory";
 
-// Imports de los archivos separados
 
 export const DynamicSettingForm = () => {
   const dispatch = useAppDispatch();
   const { type } = useAppSelector((state) => state.admin);
   const [showPassword, setShowPassword] = useState(false);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
-  // Obtener configuración del formulario
+
   const config = useFormConfig();
   
-  // Lógica del formulario
   const {
     formData,
     setFormData,
@@ -39,21 +38,28 @@ export const DynamicSettingForm = () => {
     adminState,
   } = useFormLogic(config);
 
-  // Handlers de submit
   const submitHandlers = useMemo(
     () => createSubmitHandlers(dispatch, showToast),
     [dispatch, showToast]
   );
 
-  // Manejadores de eventos
   const handleConfirm = async () => {
-    const handler = submitHandlers[config.storeKey];
-    console.log(formData)
-    if (handler) {
-      await handler(formData);
-      dispatch(closeModalSettings());
-    }
-  };
+  const errors = validateForm(config.fields, formData);
+  setFormErrors(errors);
+
+  if (Object.keys(errors).length > 0) {
+    console.log("Errores de validación:", errors);
+    showToast("Corrige los campos obligatorios", "error");
+    return;
+  }
+
+  const handler = submitHandlers[config.storeKey];
+  if (handler) {
+    await handler(formData);
+    dispatch(closeModalSettings());
+  }
+};
+
 
   const handleCancel = () => {
     dispatch(resetPermissionsMenuOptions());
@@ -80,6 +86,7 @@ export const DynamicSettingForm = () => {
             additionalProps: {
               showPassword,
               setShowPassword,
+              formErrors,
               ...adminState,
             },
             key: field.name

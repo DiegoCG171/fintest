@@ -89,6 +89,7 @@ export interface FormBuilderState {
             visibility?: Record<string, boolean>;
             isSynced?: boolean;
             version?: number;
+            dependsOnId?: string
         };
     };
     config: ColumnConfigFormBuilder[];

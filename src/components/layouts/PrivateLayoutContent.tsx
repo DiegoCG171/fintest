@@ -6,6 +6,7 @@ import FullScreenModal from "../core/FullScreenModal";
 import { PopMenuProvider } from "../../config/context/PopMenuProvider";
 import { ModalConfirmSession } from "../UI/Runner/ModalConfirmSession";
 import { ModalConfirmDelete } from "../UI/SidebarMenu/ModalConfirmDelete";
+import { EmmisorModalConfig } from "../UI/EmmisorModalConfig";
 
 function PrivateLayoutContent() {
   const FOOTER_HEIGHT = 40;
@@ -44,6 +45,7 @@ function PrivateLayoutContent() {
       <FullScreenModal />
       <ModalConfirmSession />
       <ModalConfirmDelete />
+      <EmmisorModalConfig />
     </>
   );
 }

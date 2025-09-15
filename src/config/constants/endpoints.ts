@@ -7,6 +7,7 @@ export const ENDPOINTS = {
     resetPassword:getEndpoint('auth/reset-password'),
     recoveryToken:getEndpoint('auth/recovery-token'),
     renewToken:getEndpoint('auth/renew-token'),
+    changePassword:getEndpoint('auth/change-password'),
 
     //Breaker
     getIso: getEndpoint('interpreter/iso'),

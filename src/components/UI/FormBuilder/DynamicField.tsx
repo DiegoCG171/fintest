@@ -35,7 +35,6 @@ function extractIdBitMap(arr: TableRowDataFormBuilder[]): string[] {
     return [...current, ...children];
   });
 
-  // eliminar duplicados
   return Array.from(new Set(result));
 }
 
