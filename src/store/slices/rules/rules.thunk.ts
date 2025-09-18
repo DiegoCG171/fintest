@@ -11,9 +11,16 @@ export const getRulesThunk = createAsyncThunk<
     async (_, { rejectWithValue }) => {
         try {
             const rules = await getRules()
+            console.log(rules)
             return rules[0].fields
         } catch (error: unknown) {
-            return rejectWithValue(error as string)
-        } 
+            const message =
+                typeof error === "string"
+                    ? error
+                    : error instanceof Error
+                        ? error.message
+                        : "Error desconocido";
+            return rejectWithValue(message);
+        }
     }
 )
