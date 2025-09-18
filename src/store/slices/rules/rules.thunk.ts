@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import { Field } from "../../../config/interfaces"
-import { getRules } from "../../../services"
+import { getRuleById, getRules } from "../../../services"
 
 export const getRulesThunk = createAsyncThunk<
     Field[],
@@ -11,9 +11,39 @@ export const getRulesThunk = createAsyncThunk<
     async (_, { rejectWithValue }) => {
         try {
             const rules = await getRules()
+            console.log(rules)
             return rules[0].fields
         } catch (error: unknown) {
-            return rejectWithValue(error as string)
-        } 
+            const message =
+                typeof error === "string"
+                    ? error
+                    : error instanceof Error
+                        ? error.message
+                        : "Error desconocido";
+            return rejectWithValue(message);
+        }
+    }
+)
+
+export const getRuleByIdThunk = createAsyncThunk<
+    Field[],
+    { uuid: string },
+    { rejectValue: string }
+>(
+    'rules/getById',
+    async ({ uuid }, { rejectWithValue }) => {
+        try {
+            const rules = await getRuleById(uuid)
+            console.log(rules)
+            return rules.fields
+        } catch (error: unknown) {
+            const message =
+                typeof error === "string"
+                    ? error
+                    : error instanceof Error
+                        ? error.message
+                        : "Error desconocido";
+            return rejectWithValue(message);
+        }
     }
 )
