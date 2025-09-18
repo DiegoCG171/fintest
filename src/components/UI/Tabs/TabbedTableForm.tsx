@@ -12,7 +12,6 @@ import {
   addOrUpdateTestCases,
   clearRulesError,
   clearTemplateError,
-  getRulesThunk,
   setLoading,
   useAppDispatch,
   useAppSelector,
@@ -38,6 +37,7 @@ import { resetOriginalValues } from "../../../store/slices/UI/form/formBuilder.s
 import { useAuth } from "../../../config/hooks/useAuth";
 import { hasPermission } from "../../../config/utils/permissions";
 import { DependsOnInput } from "../FormBuilder/DependsOnInput";
+import { getRuleByIdThunk } from "../../../store/slices/rules/rules.thunk";
 
 function TabbedTableForm({
   tabs,
@@ -111,7 +111,7 @@ function TabbedTableForm({
 
   useEffect(() => {
     if (!alreadyFetchedRules.current && statusRules === "idle") {
-      dispatch(getRulesThunk());
+      dispatch(getRuleByIdThunk({uuid: 'b181c3a0-fa60-48c2-888a-7f8f6917c9b5'}));
       alreadyFetchedRules.current = true;
     }
   }, [dispatch, statusRules]);

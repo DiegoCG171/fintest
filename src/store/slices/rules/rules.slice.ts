@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { RulesState } from '../../../config/interfaces'
-import { getRulesThunk } from './rules.thunk'
+import { getRuleByIdThunk } from './rules.thunk'
 
 const initialState: RulesState = {
     rules: [],
@@ -22,15 +22,15 @@ export const rulesSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder 
-            .addCase(getRulesThunk.pending, (state) => {
+            .addCase(getRuleByIdThunk.pending, (state) => {
                 state.error = null;
                 state.status = 'loading';
             })
-            .addCase(getRulesThunk.fulfilled, (state, action) => {
+            .addCase(getRuleByIdThunk.fulfilled, (state, action) => {
                 state.rules = action.payload
                 state.status = 'success';
             })
-            .addCase(getRulesThunk.rejected, (state, action) => {
+            .addCase(getRuleByIdThunk.rejected, (state, action) => {
                 state.error = action.payload ?? "Error desconocido";
                 state.status = 'error';
             })
