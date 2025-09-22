@@ -13,7 +13,7 @@ import {
 } from "../../store";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useToast } from "../../config/hooks/useToast";
-import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import { useParams } from "react-router-dom";
 import { toggleEmmisorModalConfig } from "../../store/slices/UI/emmisorModalConfig/emmisorModalConfig.slice";
 
@@ -33,6 +33,17 @@ function MediaPlayer() {
   const [canStop, setCanStop] = useState<boolean>(() => Boolean(serverIP));
   const showToastRef = useRef(showToast);
   const { type } = useParams();
+
+  const isEmisorRoute = type === "emmisor";
+
+  const canPlayWithoutPort = () => {
+    if (!isEmisorRoute) {
+      return true;
+    }
+
+    const valid = Boolean(configHost && configPort);
+    return valid;
+  };
 
   const [playerMessage, setPlayerMessage] = useState("Detenido...");
   const updateMessage = useCallback((msg: string) => {
@@ -135,7 +146,7 @@ function MediaPlayer() {
           <SettingsOutlinedIcon
             sx={{
               fontSize: 14,
-              color: (configHost && configPort) ? "#30b94cff" : "#f04747ff",
+              color: configHost && configPort ? "#30b94cff" : "#f04747ff",
             }}
           />
         </IconButton>
@@ -177,26 +188,35 @@ function MediaPlayer() {
         <PlayCircleFilledWhiteIcon
           sx={{
             fontSize: 36,
-            cursor: playStatus === "success" || !(configHost && configPort) ? "not-allowed" : "pointer",
-            opacity: playStatus === "success" || !(configHost && configPort) ? 0.5 : 1,
-            pointerEvents: playStatus === "success" || !(configHost && configPort) ? "none" : "auto",
+            cursor:
+              playStatus === "success" || !canPlayWithoutPort()
+                ? "not-allowed"
+                : "pointer",
+            opacity:
+              playStatus === "success" || !canPlayWithoutPort() ? 0.5 : 1,
+            pointerEvents:
+              playStatus === "success" || !canPlayWithoutPort()
+                ? "none"
+                : "auto",
             transition: "color 0.2s, transform 0.2s",
             "&:hover":
-              playStatus === "success"
-              || !(configHost && configPort) 
+              playStatus === "success" || !canPlayWithoutPort()
                 ? {}
                 : {
                     transform: "scale(1.1)",
                   },
             "&:active":
-              playStatus === "success"
-              || !(configHost && configPort)
+              playStatus === "success" || !canPlayWithoutPort()
                 ? {}
                 : {
                     transform: "scale(0.95)",
                   },
           }}
-          onClick={playStatus !== "success" || !(configHost && configPort) ? startServer : undefined}
+          onClick={
+            playStatus !== "success" || canPlayWithoutPort()
+              ? startServer
+              : undefined
+          }
         />
         <StopIcon
           sx={{
