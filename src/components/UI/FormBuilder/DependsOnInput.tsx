@@ -23,19 +23,31 @@ export const DependsOnInput = ({ tabId, testCaseId }: Props) => {
   }, [collections, testCaseId]);
 
   return (
-    <Box sx={{ mb: 2,  width: "100%"}}>
-      <InputLabel 
+    <Box
+      sx={{
+        mb: 2,
+        width: {
+          xs: "100%", 
+          sm: "100%",
+          md: "30%", 
+        },
+        display: "flex",
+        alignItems: "baseline",
+        gap: 1,
+      }}
+    >
+      <InputLabel
         id="dependsOnd"
         sx={{
-          fontSize: "0.75rem",
-          height: "28px",
+          fontSize: "0.9rem",
         }}
-        >
-          Selecciona Caso de Prueba:
+      >
+        Selecciona el Caso de Prueba:
       </InputLabel>
       <Select
         labelId="dependsOnd"
         sx={{
+          flex: 1,
           fontSize: "0.75rem",
           height: "28px",
           borderRadius: 2,

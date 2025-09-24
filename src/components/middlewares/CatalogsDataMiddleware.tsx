@@ -24,6 +24,7 @@ import {
   getSelectionFunctionsThunk,
   getValidationFunctionsThunk,
 } from "../../store/slices/functionsSelect/functionsSelect.thunk";
+import { DependsOnInput } from "../UI/FormBuilder/DependsOnInput";
 
 function CatalogsDataMiddleware({
   tabId,
@@ -33,15 +34,21 @@ function CatalogsDataMiddleware({
   const { formType, templateId } = template;
   const { permissions } = useAuth();
 
-  const version = useAppSelector((state) => state.formBuilder.tabForms[tabId]?.version);
+  const version = useAppSelector(
+    (state) => state.formBuilder.tabForms[tabId]?.version
+  );
   const rawRules = useAppSelector((state) => state.rules.rules);
   const templates = useAppSelector((state) => state.templates.templates);
   const testCases = useAppSelector((state) => state.testCases.testCases);
   const formState = useAppSelector(
     (state) => state.formBuilder.tabForms[tabId]
   );
+  const dependsOnId = useAppSelector(
+    (state) => state.formBuilder.tabForms[tabId]?.dependsOnId || ""
+  );
 
   const alreadyInitialized = useRef(false);
+  const hasDependency = template.label === "Dependencia" ? true : false;
 
   // Functions Selects states
   const selectionState = useAppSelector(
@@ -77,24 +84,32 @@ function CatalogsDataMiddleware({
   useEffect(() => {
     if (template.formType === "generationTransaction") {
       dispatch(
-        setConfig(serviceConfig.rulesGeneration.columns as ColumnConfigFormBuilder[])
+        setConfig(
+          serviceConfig.rulesGeneration.columns as ColumnConfigFormBuilder[]
+        )
       );
-    } 
+    }
     if (template.formType === "selectionTransaction") {
       dispatch(
-        setConfig(serviceConfig.rulesSelection.columns as ColumnConfigFormBuilder[])
+        setConfig(
+          serviceConfig.rulesSelection.columns as ColumnConfigFormBuilder[]
+        )
       );
-    } 
+    }
     if (template.formType === "validationTransaction") {
       dispatch(
-        setConfig(serviceConfig.rulesValidation.columns as ColumnConfigFormBuilder[])
+        setConfig(
+          serviceConfig.rulesValidation.columns as ColumnConfigFormBuilder[]
+        )
       );
-    } 
+    }
     if (template.formType === "dependOnTransaction") {
       dispatch(
-        setConfig(serviceConfig.rulesDependsOn.columns as ColumnConfigFormBuilder[])
+        setConfig(
+          serviceConfig.rulesDependsOn.columns as ColumnConfigFormBuilder[]
+        )
       );
-    } 
+    }
   }, [dispatch, template, formType]);
 
   useEffect(() => {
@@ -111,13 +126,19 @@ function CatalogsDataMiddleware({
     if (selectionState === "idle") {
       dispatch(getSelectionFunctionsThunk());
     }
-    
+
     if (dependsOnState === "idle") {
       dispatch(getDependsOnTransactionFunctionsThunk());
     }
 
     functionsFetched.current = true;
-  }, [dispatch, generationState, validationState, selectionState, dependsOnState]);
+  }, [
+    dispatch,
+    generationState,
+    validationState,
+    selectionState,
+    dependsOnState,
+  ]);
 
   useEffect(() => {
     alreadyInitialized.current = false;
@@ -126,8 +147,12 @@ function CatalogsDataMiddleware({
   useEffect(() => {
     if (alreadyInitialized.current) return;
     if (!rawRules?.length || formState) return;
-    const data = transactionData?.length ? transactionData : rawRules
-    const values = combineTemplateData(data, mappedRules, !transactionData?.length);
+    const data = transactionData?.length ? transactionData : rawRules;
+    const values = combineTemplateData(
+      data,
+      mappedRules,
+      !transactionData?.length
+    );
     dispatch(setValuesForTab({ tabId, values, originalValues: values }));
     alreadyInitialized.current = true;
   }, [dispatch, tabId, rawRules, transactionData, mappedRules, formState]);
@@ -143,13 +168,35 @@ function CatalogsDataMiddleware({
     return false;
   }, [template.origin, permissions]);
 
-  return (
-    <FormBuilderContainer
-      key={`${tabId}-${version}`}
-      tabId={tabId}
-      canEdit={canEdit}
-    />
-  );
+  console.log(dependsOnId);
+
+  if (!hasDependency) {
+    return (
+      <FormBuilderContainer
+        key={`${tabId}-${version}`}
+        tabId={tabId}
+        canEdit={canEdit}
+      />
+    );
+  }
+  if (hasDependency) {
+    return (
+      <>
+        <DependsOnInput
+          tabId={tabId}
+          testCaseId={templateId}
+        />
+
+        {dependsOnId && (
+          <FormBuilderContainer
+            key={`${tabId}-${version}`}
+            tabId={tabId}
+            canEdit={canEdit}
+          />
+        )}
+      </>
+    );
+  }
 }
 
 export default CatalogsDataMiddleware;
