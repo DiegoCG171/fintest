@@ -34,25 +34,26 @@ function SideNavComponent() {
   const params = useParams();
   const location = useLocation()
   const { method, type } = params;
+  const isSettings = location.pathname.startsWith('/settings');
 
   useEffect(() => {
-    if (categories.status === "idle" && location.pathname !== '/settings/users') {
+    if (categories.status === "idle" && !isSettings) {
       dispatch(getCategoriesByMethodThunk(`${method}/${type}`))
         .unwrap()
         .catch((err) => console.error("Error cargando categorías:", err));
     }
-  }, [dispatch, categories.status, method, type, location]);
+  }, [dispatch, categories.status, method, type, location, isSettings]);
 
   useEffect(() => {
-    if (collections.status === "idle" && location.pathname !== '/settings/users') {
+    if (collections.status === "idle" && !isSettings) {
       dispatch(getCollectionsThunk(`${method}/${type}`))
         .unwrap()
         .catch((err) => console.error("Error cargando categorías:", err));
     }
-  }, [dispatch, collections.status, method, type, location]);
+  }, [dispatch, collections.status, method, type, location, isSettings]);
 
   useEffect(() => {
-    if (categories.status === "success" && categories.categories && location.pathname !== '/settings/users') {
+    if (categories.status === "success" && categories.categories && !isSettings) {
       const menuCategories = addLinkMenu(
         categories.categories,
         `${method}/${type}/categories`
@@ -61,10 +62,10 @@ function SideNavComponent() {
       dispatch(setRecursiveMenuData({type: "category", items: menuCategories}));
       dispatch(setCategoriesRoutesThunk(getLinksArray(menuCategories)));
     }
-  }, [dispatch, categories.status, categories.categories, method, type, location]);
+  }, [dispatch, categories.status, categories.categories, method, type, location, isSettings]);
 
   useEffect(() => {
-    if (collections.status === "success" && collections.collections && location.pathname !== '/settings/users') {
+    if (collections.status === "success" && collections.collections && !isSettings) {
       const transformCollections = transformCollectionsToMenu(
         collections.collections,
         `${method}/${type}/collections`
@@ -73,7 +74,7 @@ function SideNavComponent() {
       dispatch(setRecursiveMenuData({type: "collection", items: transformCollections}));
       dispatch(setCollectionsRoutesThunk(getLinksArray(transformCollections)));
     }
-  }, [dispatch, collections, method, type, location]);
+  }, [dispatch, collections, method, type, location, isSettings]);
 
   const toggleMenu = useCallback(() => {
     dispatch(setCollapsedState());
@@ -106,7 +107,7 @@ function SideNavComponent() {
           onToggleMenu={toggleMenu}
           isHide={hideMenu}
         />
-        {(!hideMenu && location.pathname !== '/settings/users') &&  (
+        {(!hideMenu && !isSettings) &&  (
           <Box sx={{ px: 2, overflowY: "auto", flexGrow: 1, my: 4 }}>
             <SearchBar onSearch={handleSearch}></SearchBar>
             <SidebarBlock
@@ -119,7 +120,7 @@ function SideNavComponent() {
           </Box>
         )}
         {
-          (!hideMenu && location.pathname === '/settings/users') && (
+          (!hideMenu && isSettings) && (
             <SidebarSettingsMenu />
           )
         }
