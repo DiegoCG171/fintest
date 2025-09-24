@@ -11,7 +11,6 @@ export const getRulesThunk = createAsyncThunk<
     async (_, { rejectWithValue }) => {
         try {
             const rules = await getRules()
-            console.log(rules)
             return rules[0].fields
         } catch (error: unknown) {
             const message =
@@ -34,7 +33,6 @@ export const getRuleByIdThunk = createAsyncThunk<
     async ({ uuid }, { rejectWithValue }) => {
         try {
             const rules = await getRuleById(uuid)
-            console.log(rules)
             return rules.fields
         } catch (error: unknown) {
             const message =

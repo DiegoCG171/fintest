@@ -48,12 +48,12 @@ function DynamicField({
   onlyRead,
 }: DynamicFieldProps) {
   const dispatch = useAppDispatch();
-  const dependsOn = column?.dependsOn;
-  const dependsValue = dependsOn ? row[dependsOn] : undefined;
+  const dependsOnForm = column?.dependsOn;
+  const dependsValue = dependsOnForm ? row[dependsOnForm] : undefined;
   const isChild = path.length > 1;
   const isParent =
     Array.isArray(row.breakingRules) && row.breakingRules.length > 0;
-  const { generation, validation, selection } = useAppSelector(
+  const { generation, validation, selection, dependsOn } = useAppSelector(
     (state) => state.functionSelect
   );
   const { values } = useAppSelector(
@@ -234,6 +234,7 @@ function DynamicField({
     if (tabId.includes("generationTransaction")) return generation;
     if (tabId.includes("validationTransaction")) return validation;
     if (tabId.includes("selectionTransaction")) return selection;
+    if (tabId.includes("dependOnTransaction")) return dependsOn;
 
     return [];
   };
@@ -251,6 +252,11 @@ function DynamicField({
 
     if (tabId.includes("selectionTransaction")) {
       const option = selection.find((sel) => sel.value === text);
+      return option?.label ?? text;
+    }
+    
+    if (tabId.includes("dependOnTransaction")) {
+      const option = dependsOn.find((dependsOn) => dependsOn.value === text);
       return option?.label ?? text;
     }
 
@@ -288,7 +294,6 @@ function DynamicField({
   }
 
   if (column.dynamicRender && dependsValue !== undefined) {
-    console.log(column.dynamicRender);
     const dynamic = column.dynamicRender[dependsValue as string];
     if (!dynamic?.render) return null;
     let options = dynamic.options ?? [];

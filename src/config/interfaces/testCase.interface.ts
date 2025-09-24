@@ -9,6 +9,7 @@ export interface testCaseInterface {
     validationTransaction: FieldValidation[]
     generationTransaction: FieldValidation[]
     selectionTransaction: FieldValidation[]
+    dependOnTransaction: FieldValidation[]
     templateId: string
     dependOn: string | null
     order: number

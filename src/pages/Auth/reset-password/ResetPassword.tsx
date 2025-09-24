@@ -81,7 +81,6 @@ function ResetPassword() {
                 );
                 navigate("/login");
               } catch (error) {
-                console.log(error)
                 showToast(
                   error as string ||
                     "Ocurrió un error al restablecer la contraseña",

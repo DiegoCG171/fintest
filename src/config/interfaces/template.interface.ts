@@ -10,6 +10,7 @@ export interface TemplateContextType {
     validationTransaction: FieldValidation[]
     generationTransaction: FieldValidation[]
     selectionTransaction: FieldValidation[]
+    dependOnTransaction: FieldValidation[]
     processingMethod: string
     uuid: string
     __v: number
@@ -18,7 +19,7 @@ export interface TemplateContextType {
     path: string[]
 }
 
-export type FormTypeKey = "generationTransaction" | "selectionTransaction" | "validationTransaction";
+export type FormTypeKey = "generationTransaction" | "selectionTransaction" | "validationTransaction" | "dependOnTransaction";
 
 export type CreateTemplate = Omit<TemplateContextType, "_id" | "uuid" | "__v" | "createdAt" | "updatedAt" | "type" | "path">;
 

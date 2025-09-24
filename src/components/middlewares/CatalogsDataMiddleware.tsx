@@ -19,6 +19,7 @@ import { getTransactionByType } from "../../config/utils";
 import { useAuth } from "../../config/hooks/useAuth";
 import { hasPermission } from "../../config/utils/permissions";
 import {
+  getDependsOnTransactionFunctionsThunk,
   getGenetationFunctionsThunk,
   getSelectionFunctionsThunk,
   getValidationFunctionsThunk,
@@ -51,6 +52,9 @@ function CatalogsDataMiddleware({
   );
   const generationState = useAppSelector(
     (state) => state.functionSelect.generationState
+  );
+  const dependsOnState = useAppSelector(
+    (state) => state.functionSelect.dependsOnState
   );
 
   const functionsFetched = useRef(false);
@@ -86,6 +90,11 @@ function CatalogsDataMiddleware({
         setConfig(serviceConfig.rulesValidation.columns as ColumnConfigFormBuilder[])
       );
     } 
+    if (template.formType === "dependOnTransaction") {
+      dispatch(
+        setConfig(serviceConfig.rulesDependsOn.columns as ColumnConfigFormBuilder[])
+      );
+    } 
   }, [dispatch, template, formType]);
 
   useEffect(() => {
@@ -102,9 +111,13 @@ function CatalogsDataMiddleware({
     if (selectionState === "idle") {
       dispatch(getSelectionFunctionsThunk());
     }
+    
+    if (dependsOnState === "idle") {
+      dispatch(getDependsOnTransactionFunctionsThunk());
+    }
 
     functionsFetched.current = true;
-  }, [dispatch, generationState, validationState, selectionState]);
+  }, [dispatch, generationState, validationState, selectionState, dependsOnState]);
 
   useEffect(() => {
     alreadyInitialized.current = false;

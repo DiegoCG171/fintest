@@ -36,7 +36,6 @@ import { useParams } from "react-router-dom";
 import { resetOriginalValues } from "../../../store/slices/UI/form/formBuilder.slice";
 import { useAuth } from "../../../config/hooks/useAuth";
 import { hasPermission } from "../../../config/utils/permissions";
-import { DependsOnInput } from "../FormBuilder/DependsOnInput";
 import { getRuleByIdThunk } from "../../../store/slices/rules/rules.thunk";
 
 function TabbedTableForm({
@@ -327,16 +326,7 @@ function TabbedTableForm({
                 value={value}
                 index={index}
               >
-                {template.label.includes("Depende") &&
-                  template.origin === "collections" && (
-                    <DependsOnInput
-                      tabId={`${template.templateId}-${template.formType}`}
-                      testCaseId={template.templateId}
-                    />
-                  )}
-                {(template.label.includes("Depende")
-                  ? template.origin === "collections" && tabForm?.dependsOnId
-                  : true) && (
+                { (
                   <CatalogsDataMiddleware
                     tabId={currentTabId}
                     template={template}

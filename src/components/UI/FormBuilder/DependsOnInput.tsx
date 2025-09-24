@@ -1,4 +1,4 @@
-import { Box, Select, MenuItem } from "@mui/material";
+import { Box, Select, MenuItem, InputLabel } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { useMemo } from "react";
 import { CollectionCase } from "../../../config/interfaces/collections.interface";
@@ -13,8 +13,8 @@ export const DependsOnInput = ({ tabId, testCaseId }: Props) => {
   const dispatch = useAppDispatch();
   const { collections } = useAppSelector((state) => state.collections);
   const dependsOnId = useAppSelector(
-  (state) => state.formBuilder.tabForms[tabId]?.dependsOnId || ""
-);
+    (state) => state.formBuilder.tabForms[tabId]?.dependsOnId || ""
+  );
 
   const matchedCollection = useMemo(() => {
     return collections?.find((col) =>
@@ -23,8 +23,18 @@ export const DependsOnInput = ({ tabId, testCaseId }: Props) => {
   }, [collections, testCaseId]);
 
   return (
-    <Box sx={{ mb: 2 }}>
+    <Box sx={{ mb: 2,  width: "100%"}}>
+      <InputLabel 
+        id="dependsOnd"
+        sx={{
+          fontSize: "0.75rem",
+          height: "28px",
+        }}
+        >
+          Selecciona Caso de Prueba:
+      </InputLabel>
       <Select
+        labelId="dependsOnd"
         sx={{
           fontSize: "0.75rem",
           height: "28px",
@@ -39,13 +49,20 @@ export const DependsOnInput = ({ tabId, testCaseId }: Props) => {
         }
         displayEmpty
       >
-        <MenuItem value="" sx={{ fontSize: "0.75rem" }}>
-          <em>Selecciona un caso de prueba</em>
+        <MenuItem
+          value=""
+          sx={{ fontSize: "0.75rem" }}
+        >
+          <em>...</em>
         </MenuItem>
         {matchedCollection?.cases
           ?.filter((c: CollectionCase) => c.uuid !== testCaseId)
           .map((c: CollectionCase) => (
-            <MenuItem key={c.uuid} value={c.uuid} sx={{ fontSize: "0.75rem" }}>
+            <MenuItem
+              key={c.uuid}
+              value={c.uuid}
+              sx={{ fontSize: "0.75rem" }}
+            >
               {c.name}
             </MenuItem>
           ))}
