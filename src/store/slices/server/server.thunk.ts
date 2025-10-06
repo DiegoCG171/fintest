@@ -1,16 +1,39 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
-import { StartServerSuccessResponse, StopServerSuccessResponse } from "../../../config/interfaces"
+import { ClientsConection, StartServerSuccessResponse, StopServerSuccessResponse } from "../../../config/interfaces"
 import { startServer, stopServer } from "../../../services/catalogs/server.service"
+import { startClient } from "../../../services";
+
+export interface startServerPayload {
+    processingMethod?: string;
+    ip?: string;
+    portNumber?: number;
+}
 
 export const startServerThunk = createAsyncThunk<
     StartServerSuccessResponse,
-    void,
+    startServerPayload,
     { rejectValue: string }
 >(
     'server/startServer',
-    async (_, { rejectWithValue }) => {
+    async (startServerPayload, { rejectWithValue }) => {
         try {
-            const server = await startServer();
+            const server = await startServer(startServerPayload);
+            return server;
+        } catch (error) {
+            return rejectWithValue(error as string)
+        }
+    }
+);
+
+export const startClientThunk = createAsyncThunk<
+    StartServerSuccessResponse,
+    ClientsConection,
+    { rejectValue: string }
+>(
+    'server/startClient',
+    async (startServerPayload, { rejectWithValue }) => {
+        try {
+            const server = await startClient(startServerPayload);
             return server;
         } catch (error) {
             return rejectWithValue(error as string)

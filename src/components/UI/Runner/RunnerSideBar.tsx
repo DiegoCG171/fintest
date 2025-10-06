@@ -19,10 +19,11 @@ import { RunnerDetailsPanel } from "./RunnerDetailsPanel";
 import { RunnerFooter } from "./RunnerFooter";
 import RunnerStepList from "./RunnerStepList";
 import { removeSessionThunk } from "../../../store/slices/sessions/session.thunk";
+import { useParams } from "react-router-dom";
 
 export const RunnerSideBar = () => {
   const dispatch = useAppDispatch();
-
+  const { type } = useParams();
   const {
     isActive,
     activeSession,
@@ -31,7 +32,7 @@ export const RunnerSideBar = () => {
     loading,
     id
   } = useAppSelector((state) => state.session);
-  const { server } = useAppSelector((state) => state.server);
+  const { server, configHost, configPort } = useAppSelector((state) => state.server);
 
   const [testCaseDetails, setTestCaseDetails] = useState<TestCaseDetails>({
     name: "",
@@ -70,7 +71,7 @@ export const RunnerSideBar = () => {
   };
 
   const handleStartServer = () => {
-    dispatch(startServerThunk());
+    dispatch(startServerThunk({processingMethod: type, ip: configHost, portNumber: configPort}));
   };
 
   const handleStopServer = () => {

@@ -19,6 +19,9 @@ export const DynamicSettingTable = () => {
     pagination,
     handleChangePage,
     handleChangeRowsPerPage,
+    handleRequestSort,
+    order,
+    sortBy,
   } = useDynamicTable();
 
   if (!config || !columns) {
@@ -28,7 +31,12 @@ export const DynamicSettingTable = () => {
   return (
     <TableContainer component={Paper} sx={{ mt: 4 }}>
       <Table stickyHeader>
-        <TableSettingsHeader columns={columns} />
+        <TableSettingsHeader
+          columns={columns}
+          order={order}
+          sortBy={sortBy}
+          onRequestSort={handleRequestSort}
+        />
         <TableBody>
           <TableSettingsRows
             data={config.data}

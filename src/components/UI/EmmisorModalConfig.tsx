@@ -47,6 +47,7 @@ export const EmmisorModalConfig = () => {
   const dispatch = useAppDispatch();
   const { showToast } = useToast();
   const { isOpen } = useAppSelector((state) => state.emmisorModalConfig);
+  const { configHost, configPort } = useAppSelector((state) => state.server);
 
   const handleCancel = () => {
     dispatch(toggleEmmisorModalConfig(false));
@@ -62,7 +63,7 @@ export const EmmisorModalConfig = () => {
           </Typography>
 
           <Formik
-            initialValues={{ host: "", port: "" }}
+            initialValues={{ host: configHost, port: configPort }}
             validationSchema={validationSchema}
             onSubmit={(values, { resetForm }) => {
               dispatch(

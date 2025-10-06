@@ -38,7 +38,7 @@ export const serverSlice = createSlice({
         },
         setEmmisorConfiguration: (state, action) => {
             state.configHost = action.payload.host
-            state.configPort = action.payload.port
+            state.configPort = +action.payload.port
         }
     },
     extraReducers: (builder) => {

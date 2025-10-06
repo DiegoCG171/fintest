@@ -5,6 +5,7 @@ import { Institution, UserDB } from "./users.interface";
 export interface TableColumn<T> {
   key: keyof T | string;
   label: string;
+  sortable?: boolean;
   render?: (row: T) => React.ReactNode;
 }
 

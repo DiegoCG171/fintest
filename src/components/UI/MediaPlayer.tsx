@@ -16,6 +16,7 @@ import { useToast } from "../../config/hooks/useToast";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import { useParams } from "react-router-dom";
 import { toggleEmmisorModalConfig } from "../../store/slices/UI/emmisorModalConfig/emmisorModalConfig.slice";
+import { startClientThunk } from "../../store/slices/server/server.thunk";
 
 function MediaPlayer() {
   const dispatch = useAppDispatch();
@@ -60,13 +61,16 @@ function MediaPlayer() {
   const startServer = useCallback(async () => {
     clearErrors();
     try {
-      await dispatch(startServerThunk()).unwrap();
+      if (type === "emmisor") { 
+        await dispatch(startClientThunk({processingMethod: type, ip: configHost, portNumber: configPort})).unwrap();
+      }
+      await dispatch(startServerThunk({processingMethod: type, ip: configHost, portNumber: configPort})).unwrap();
       setCanStop(true);
     } catch (error) {
       console.error("Error al iniciar el servidor:", error);
       showToastRef.current("Hubo un error al levantar la sesión", "error");
     }
-  }, [dispatch, clearErrors]);
+  }, [dispatch, clearErrors, type, configHost, configPort]);
 
   const stopServer = useCallback(async () => {
     clearErrors();

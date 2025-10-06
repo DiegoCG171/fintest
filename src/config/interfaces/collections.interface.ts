@@ -2,7 +2,8 @@ import { AsyncStatus } from ".";
 
 export interface CreateCollection {
     name: string;
-    origin?: string
+    origin?: string;
+    processingMethod?: string;
 }
 
 export interface PathCollection {
