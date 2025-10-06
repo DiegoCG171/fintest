@@ -16,7 +16,7 @@ import { useToast } from "../../config/hooks/useToast";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import { useParams } from "react-router-dom";
 import { toggleEmmisorModalConfig } from "../../store/slices/UI/emmisorModalConfig/emmisorModalConfig.slice";
-import { startClientThunk } from "../../store/slices/server/server.thunk";
+import { startClientThunk, stopClientThunk } from "../../store/slices/server/server.thunk";
 
 function MediaPlayer() {
   const dispatch = useAppDispatch();
@@ -76,6 +76,9 @@ function MediaPlayer() {
     clearErrors();
     if (!serverId) return;
     try {
+      if (type === "emmisor") {
+        await dispatch(stopClientThunk(serverId)).unwrap();
+      }
       await dispatch(stopServerThunk(serverId)).unwrap();
       setCanStop(false);
     } catch (error) {
@@ -84,7 +87,7 @@ function MediaPlayer() {
     } finally {
       dispatch(clearServer());
     }
-  }, [dispatch, clearErrors, serverId, showToast]);
+  }, [dispatch, clearErrors, serverId, showToast, type]);
 
   useEffect(() => {
     if (playStatus === "loading") {

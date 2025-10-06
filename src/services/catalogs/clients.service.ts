@@ -13,10 +13,10 @@ export const startClient = async (body: ClientsConection) => {
     }
 }
 
-export const stopClient = async (body: ClientsConection) => {
+export const stopClient = async (id: string) => {
     try{
-        const response = await api.post(ENDPOINTS.stopClient, body);
-        return response
+        const response = await api.post(ENDPOINTS.stopClient, {id});
+        return response.data;
     } catch(error) {
         console.error('Error al detener clientes:', error);
         throw error;
