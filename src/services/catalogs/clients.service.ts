@@ -1,22 +1,22 @@
 import api from "../../api/api";
 import { ENDPOINTS } from "../../config/constants/endpoints";
-import { clientsConection } from "../../config/interfaces";
+import { ClientsConection } from "../../config/interfaces";
 
 
-export const startClient = async (body: clientsConection) => {
+export const startClient = async (body: ClientsConection) => {
     try{
-        const response = await api.post(ENDPOINTS.startClient, body);
-        return response
+        const response = await api.post(ENDPOINTS.startClient, {"protocol": "TCP", ...body});
+        return response.data;
     } catch(error) {
         console.error('Error al iniciar clientes:', error);
         throw error;
     }
 }
 
-export const stopClient = async (body: clientsConection) => {
+export const stopClient = async (id: string) => {
     try{
-        const response = await api.post(ENDPOINTS.stopClient, body);
-        return response
+        const response = await api.post(ENDPOINTS.stopClient, {id});
+        return response.data;
     } catch(error) {
         console.error('Error al detener clientes:', error);
         throw error;

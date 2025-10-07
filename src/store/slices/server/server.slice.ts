@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { ServerState } from '../../../config/interfaces'
-import { startServerThunk, stopServerThunk } from './server.thunk';
+import { startClientThunk, startServerThunk, stopClientThunk, stopServerThunk } from './server.thunk';
 
 const initialState: ServerState = {
     server: null,
@@ -38,7 +38,7 @@ export const serverSlice = createSlice({
         },
         setEmmisorConfiguration: (state, action) => {
             state.configHost = action.payload.host
-            state.configPort = action.payload.port
+            state.configPort = +action.payload.port
         }
     },
     extraReducers: (builder) => {
@@ -65,6 +65,31 @@ export const serverSlice = createSlice({
                 state.stopServerStatus = 'success';
             })
             .addCase(stopServerThunk.rejected, (state, action) => {
+                state.stopServererror = action.payload ?? "Error desconocido";
+                state.stopServerStatus = 'error';
+            })
+            .addCase(startClientThunk.pending, (state) => {
+                state.error = null;
+                state.status = 'loading';
+            })
+            .addCase(startClientThunk.fulfilled, (state, action) => {
+                state.server = action.payload
+                state.status = 'success';
+            })
+            .addCase(startClientThunk.rejected, (state, action) => {
+                state.error = action.payload ?? "Error desconocido";
+                state.status = 'error';
+            })
+            .addCase(stopClientThunk.pending, (state) => {
+                state.stopServererror = null;
+                state.stopServerStatus = 'loading';
+            })
+            .addCase(stopClientThunk.fulfilled, (state, action) => {
+                state.server = null
+                state.stopServerResponse = action.payload
+                state.stopServerStatus = 'success';
+            })
+            .addCase(stopClientThunk.rejected, (state, action) => {
                 state.stopServererror = action.payload ?? "Error desconocido";
                 state.stopServerStatus = 'error';
             })

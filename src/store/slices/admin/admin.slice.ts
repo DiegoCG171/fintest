@@ -205,6 +205,7 @@ export const adminSlice = createSlice({
         (state, action: PayloadAction<UserDB>) => {
           state.users.data.push(action.payload);
           state.users.total += 1;
+          state.users.totalSearch += 1;
         }
       )
 
@@ -230,6 +231,7 @@ export const adminSlice = createSlice({
       .addCase(createInstitutionThunk.fulfilled, (state, action) => {
         state.institutions.data.push(action.payload);
         state.institutions.total += 1;
+        state.institutions.totalSearch += 1
       })
       .addCase(
         updateInstitutionsThunk.fulfilled,
@@ -253,6 +255,8 @@ export const adminSlice = createSlice({
         createSecurityRolThunk.fulfilled,
         (state, action: PayloadAction<Rol>) => {
           state.roles.data.push(action.payload);
+          state.roles.total += 1
+          state.roles.totalSearch += 1
         }
       )
       .addCase(
@@ -263,7 +267,7 @@ export const adminSlice = createSlice({
           );
           state.updateRol = undefined;
           state.roles.total -= 1
-          state.roles.totalSearch -= 1
+          state.roles.totalSearch -= 1 
         }
       )
       .addCase(
@@ -308,6 +312,8 @@ export const adminSlice = createSlice({
         createSecurityPermissionThunk.fulfilled,
         (state, action: PayloadAction<Permission>) => {
           state.permissions.data.push(action.payload);
+          state.permissions.total += 1
+          state.permissions.totalSearch += 1
         }
       )
       .addCase(
