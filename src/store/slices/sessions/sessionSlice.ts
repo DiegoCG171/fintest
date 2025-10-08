@@ -72,6 +72,7 @@ export const sessionSlice = createSlice({
       .addCase(createSessionThunk.fulfilled, (state, action) => {
         state.isActive = action.payload.type === "DEFAULT" ? true : false;
         state.id = action.payload.data.uuid;
+        console.log(action.payload)
         state.activeSession = mapRunSessionItems(
           action.payload.type === "DEFAULT"
             ? action.payload.data.toExecute
@@ -108,7 +109,7 @@ export const sessionSlice = createSlice({
         if (currentIndex !== -1) {
           const currentItem = state.activeSession[currentIndex];
 
-          currentItem.status = "Terminado";
+          currentItem.status = message.estado ? message.estado.toLowerCase() : "Terminado";
           currentItem.message = message;
           currentItem.incremental = socketMsg.incremental;
           state.completedCount += 1;
