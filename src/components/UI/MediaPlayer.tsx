@@ -13,9 +13,10 @@ import {
 } from "../../store";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useToast } from "../../config/hooks/useToast";
-import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import { useParams } from "react-router-dom";
 import { toggleEmmisorModalConfig } from "../../store/slices/UI/emmisorModalConfig/emmisorModalConfig.slice";
+import { startClientThunk, stopClientThunk } from "../../store/slices/server/server.thunk";
 
 function MediaPlayer() {
   const dispatch = useAppDispatch();
@@ -34,6 +35,17 @@ function MediaPlayer() {
   const showToastRef = useRef(showToast);
   const { type } = useParams();
 
+  const isEmisorRoute = type === "emmisor";
+
+  const canPlayWithoutPort = () => {
+    if (!isEmisorRoute) {
+      return true;
+    }
+
+    const valid = Boolean(configHost && configPort);
+    return valid;
+  };
+
   const [playerMessage, setPlayerMessage] = useState("Detenido...");
   const updateMessage = useCallback((msg: string) => {
     setPlayerMessage((prev) => {
@@ -49,18 +61,24 @@ function MediaPlayer() {
   const startServer = useCallback(async () => {
     clearErrors();
     try {
-      await dispatch(startServerThunk()).unwrap();
+      if (type === "emmisor") { 
+        await dispatch(startClientThunk({processingMethod: type, ip: configHost, portNumber: configPort})).unwrap();
+      }
+      await dispatch(startServerThunk({processingMethod: type, ip: configHost, portNumber: configPort})).unwrap();
       setCanStop(true);
     } catch (error) {
       console.error("Error al iniciar el servidor:", error);
       showToastRef.current("Hubo un error al levantar la sesión", "error");
     }
-  }, [dispatch, clearErrors]);
+  }, [dispatch, clearErrors, type, configHost, configPort]);
 
   const stopServer = useCallback(async () => {
     clearErrors();
     if (!serverId) return;
     try {
+      if (type === "emmisor") {
+        await dispatch(stopClientThunk(serverId)).unwrap();
+      }
       await dispatch(stopServerThunk(serverId)).unwrap();
       setCanStop(false);
     } catch (error) {
@@ -69,7 +87,7 @@ function MediaPlayer() {
     } finally {
       dispatch(clearServer());
     }
-  }, [dispatch, clearErrors, serverId, showToast]);
+  }, [dispatch, clearErrors, serverId, showToast, type]);
 
   useEffect(() => {
     if (playStatus === "loading") {
@@ -135,7 +153,7 @@ function MediaPlayer() {
           <SettingsOutlinedIcon
             sx={{
               fontSize: 14,
-              color: (configHost && configPort) ? "#30b94cff" : "#f04747ff",
+              color: configHost && configPort ? "#30b94cff" : "#f04747ff",
             }}
           />
         </IconButton>
@@ -177,26 +195,35 @@ function MediaPlayer() {
         <PlayCircleFilledWhiteIcon
           sx={{
             fontSize: 36,
-            cursor: playStatus === "success" || !(configHost && configPort) ? "not-allowed" : "pointer",
-            opacity: playStatus === "success" || !(configHost && configPort) ? 0.5 : 1,
-            pointerEvents: playStatus === "success" || !(configHost && configPort) ? "none" : "auto",
+            cursor:
+              playStatus === "success" || !canPlayWithoutPort()
+                ? "not-allowed"
+                : "pointer",
+            opacity:
+              playStatus === "success" || !canPlayWithoutPort() ? 0.5 : 1,
+            pointerEvents:
+              playStatus === "success" || !canPlayWithoutPort()
+                ? "none"
+                : "auto",
             transition: "color 0.2s, transform 0.2s",
             "&:hover":
-              playStatus === "success"
-              || !(configHost && configPort) 
+              playStatus === "success" || !canPlayWithoutPort()
                 ? {}
                 : {
                     transform: "scale(1.1)",
                   },
             "&:active":
-              playStatus === "success"
-              || !(configHost && configPort)
+              playStatus === "success" || !canPlayWithoutPort()
                 ? {}
                 : {
                     transform: "scale(0.95)",
                   },
           }}
-          onClick={playStatus !== "success" || !(configHost && configPort) ? startServer : undefined}
+          onClick={
+            playStatus !== "success" || canPlayWithoutPort()
+              ? startServer
+              : undefined
+          }
         />
         <StopIcon
           sx={{

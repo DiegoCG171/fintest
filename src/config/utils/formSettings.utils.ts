@@ -16,6 +16,7 @@ export const getInitialFormData = (storeKey: StoreKey, adminState: AdminInitialS
         email: updateUser?.email ?? "",
         status: updateUser?.status ?? "",
         roleIds: (updateUser?.roles ?? []).map(role => String(role.id)),
+        institutionId: updateUser?.institution
       };
     
     case "updateInstitution":

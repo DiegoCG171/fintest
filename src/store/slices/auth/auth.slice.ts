@@ -2,12 +2,16 @@ import { createSlice } from '@reduxjs/toolkit'
 import { AuthState } from "../../../config/interfaces";
 import { loginThunk } from './login.thunk';
 import { renewTokenThunk } from './renewTokenThunk.thunk';
+import { isTokenValid } from '../../../config/utils/isTokenValid';
+
+const token = localStorage.getItem('token');
+
 const initialState: AuthState = {
     user: JSON.parse(localStorage.getItem('user') || 'null'),
-    token: localStorage.getItem('token'),
+    token,
     loading: false,
     error: null,
-    isAuthenticated: !!localStorage.getItem('token'),
+    isAuthenticated: isTokenValid(token),
     changePasswordActive: false,
 };
 
