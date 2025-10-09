@@ -22,8 +22,9 @@ export const GRID_STYLE = {
   gridTemplateColumns: "1fr 1fr",
   gap: 3,
   px: 4,
-  py: 4,
+  py: 2,
 };
+
 
 export const SELECT_MENU_PROPS = {
   ...MENU_PROPS,

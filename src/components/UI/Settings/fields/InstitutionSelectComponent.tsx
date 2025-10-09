@@ -1,6 +1,13 @@
-import { FormControl, InputLabel, Select, MenuItem, FormHelperText } from "@mui/material";
+import {
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  FormHelperText,
+} from "@mui/material";
 import { Institution } from "../../../../config/interfaces/institutions.interface";
 import { FieldComponentProps } from "../../../../config/interfaces/formSettings.interface";
+import { useAppSelector } from "../../../../store";
 
 interface InstitutionSelectProps extends FieldComponentProps {
   institutions: {
@@ -16,7 +23,11 @@ export const InstitutionSelectComponent = ({
   institutions,
   formErrors,
 }: InstitutionSelectProps) => {
-  const value = formData[field.name] ?? "";
+  const { institution } = useAppSelector((state) => state.auth.user!);
+  const rawValue = institution ? "" : formData[field.name];
+  const value =
+    rawValue && typeof rawValue === "object" ? rawValue.id : rawValue ?? "";
+
   const error = formErrors?.[field.name] ?? "";
 
   return (
@@ -25,13 +36,18 @@ export const InstitutionSelectComponent = ({
       <Select
         label={field.label}
         value={value}
-        onChange={(e) =>
+        disabled={!!institution}
+        onChange={(e) => {
+          const selectedValue =
+            e.target.value === "null" ? null : e.target.value;
           setFormData((prev) => ({
             ...prev,
-            [field.name]: e.target.value,
-          }))
-        }
+            [field.name]: institution ? null : selectedValue,
+          }));
+        }}
       >
+        <MenuItem value="null">Sin institución</MenuItem>
+
         {institutions.data.map((inst) => (
           <MenuItem key={inst.id} value={inst.id}>
             {inst.name}

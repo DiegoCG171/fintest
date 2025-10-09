@@ -1,4 +1,5 @@
-export interface clientsConection {
-    host?: string
-    port: number
-    }
+export interface ClientsConection {
+    processingMethod?: string;
+    ip?: string;
+    portNumber?: number;
+}

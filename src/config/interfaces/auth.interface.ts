@@ -1,3 +1,5 @@
+import { Institution } from "./users.interface";
+
 export interface AuthContextType {
     user: LoginResponse | null;
     loading: boolean;
@@ -30,6 +32,7 @@ export interface LoginResponse {
     token: string;
     role: string;
     permissions: string[];
+    institution: Institution;
 }
 
 export interface AuthState {

@@ -2,10 +2,11 @@ import api from "../../api/api";
 import { ENDPOINTS } from "../../config/constants/endpoints";
 import { StartServerSuccessResponse, StopServerSuccessResponse } from "../../config/interfaces";
 import { handleAxiosError } from "../../config/utils/axiosErrorHandler";
+import { startServerPayload } from "../../store/slices/server/server.thunk";
 
-export const startServer = async (): Promise<StartServerSuccessResponse> => {
+export const startServer = async (startServerPayload: startServerPayload): Promise<StartServerSuccessResponse> => {
     try {
-        const response = await api.post(ENDPOINTS.startServer, {"protocol": "TCP"});
+        const response = await api.post(ENDPOINTS.startServer, {"protocol": "TCP", ...startServerPayload});
         return response.data;
     } catch (error) { 
         const errorMessage = handleAxiosError(error);
