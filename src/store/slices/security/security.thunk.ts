@@ -147,8 +147,8 @@ export const updateSecurityRolesThunk = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const user = await updateSecurityRoles(id, payload);
-      return user;
+      const roles = await updateSecurityRoles(id, payload);
+      return roles;
     } catch (error) {
       return rejectWithValue(error as string);
     }

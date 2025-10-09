@@ -31,6 +31,11 @@ export const useTableActions = () => {
           dispatch(setUpdatePermission({ type: "update", permission: selectedItem }));
         }
         break;
+      case "/settings/rule":
+        if (isPermission(selectedItem)) {
+          dispatch(setUpdatePermission({ type: "update", permission: selectedItem }));
+        }
+        break;
     }
   };
 

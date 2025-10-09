@@ -26,6 +26,10 @@ export const isPermission = (item: EntityType): item is Permission => {
   return "action" in item && "resource" in item;
 };
 
+export const isRule = (item: EntityType): item is Permission => {
+  return "version" in item && "type" in item;
+};
+
 export const renderCell = <T,>(
   column: TableColumn<T>,
   row: T,

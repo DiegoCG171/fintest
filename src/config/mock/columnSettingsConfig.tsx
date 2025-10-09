@@ -64,4 +64,8 @@ export const columnsSettingsConfig = {
       ),
     },
   ] as TableColumn<Permission>[],
+  "/settings/rule": [
+    { key: "version", label: "Versión", sortable: true },
+    { key: "type", label: "Tipo", sortable: true },
+  ] as TableColumn<Permission>[],
 };

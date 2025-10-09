@@ -3,6 +3,7 @@ import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
 import BusinessOutlinedIcon from "@mui/icons-material/BusinessOutlined";
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
 import VpnKeyOutlinedIcon from "@mui/icons-material/VpnKeyOutlined";
+import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { changeActiveMenuOption } from "../../../store/slices/UI/sidebarMenuSettings/sidebarMenuSettings.slice";
 import { useNavigate } from "react-router-dom";
@@ -19,6 +20,7 @@ const iconMap: Record<string, React.ElementType> = {
   BusinessOutlinedIcon: BusinessOutlinedIcon,
   AdminPanelSettingsOutlinedIcon: AdminPanelSettingsOutlinedIcon,
   VpnKeyOutlinedIcon: VpnKeyOutlinedIcon,
+  TuneOutlinedIcon: TuneOutlinedIcon
 };
 
 export const SidebarSettingsMenuItem = ({

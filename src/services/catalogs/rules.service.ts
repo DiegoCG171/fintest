@@ -1,6 +1,6 @@
 import api from "../../api/api";
 import { ENDPOINTS } from "../../config/constants/endpoints";
-import { RootRules, Rules } from "../../config/interfaces";
+import { GetFilters, RootRules, Rules } from "../../config/interfaces";
 import { handleAxiosError } from "../../config/utils/axiosErrorHandler";
 
 export const getRules = async (
@@ -15,6 +15,18 @@ export const getRules = async (
     }
 };
 
+export const getAllRules = async (filters?: GetFilters) => {
+  try {
+    const response = await api.get(`${ENDPOINTS.getRules}`, {
+      params: filters,
+    });
+    return response.data;
+  } catch (error) {
+    const errorMessage = handleAxiosError(error);
+    throw errorMessage;
+  }
+};
+
 export const getRuleById = async (
     uuid: string
 ): Promise<Rules> => {
@@ -25,4 +37,14 @@ export const getRuleById = async (
         const errorMessage = handleAxiosError(error);
         throw errorMessage;
     }
+};
+
+export const deleteRule = async (id: string) => {
+  try {
+    const response = await api.delete(`${ENDPOINTS.getRules}/${id}`);
+    return response;
+  } catch (error) {
+    const errorMessage = handleAxiosError(error);
+    throw errorMessage;
+  }
 };

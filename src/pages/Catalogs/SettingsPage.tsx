@@ -37,7 +37,6 @@ export const SettingsPage = () => {
       <Typography
         sx={{ marginLeft: 4, marginTop: 4, fontSize: 24, fontWeight: "bold" }}
       >
-        {/* Gestión de */}
       </Typography>
       <Box
         sx={{

@@ -5,14 +5,13 @@ import {
   Institutions,
 } from "../../../config/interfaces/institutions.interface";
 import {
-  Action,
   Actions,
   Permission,
   Permissions,
-  Resource,
   Resources,
   Rol,
   Roles,
+  Rules,
 } from "../../../config/interfaces/security.interface";
 import {
   createUserThunk,
@@ -39,88 +38,13 @@ import {
   updateSecurityPermissionThunk,
   updateSecurityRolesThunk,
 } from "../security/security.thunk";
+import { initialAdminState } from "./admin.state";
+import { deleteRuleThunk, getAllRulesThunk } from "../rules/rules.thunk";
 
-export interface AdminInitialState {
-  formActive: boolean;
-  users: Users;
-  updateUser?: UserDB;
-  institutions: Institutions;
-  updateInstitution?: Institution;
-  roles: Roles;
-  updateRol?: Rol;
-  permissions: Permissions;
-  updatePermission?: Permission;
-  actions: Actions;
-  updateAction?: Action;
-  resources: Resources;
-  updateResource?: Resource;
-  type?: "update" | "create";
-  searchTerm?: string;
-}
-
-const initialState: AdminInitialState = {
-  formActive: false,
-  users: {
-    data: [],
-    total: 0,
-    totalSearch: 0,
-    limit: 5,
-    page: 0,
-    pages: 0,
-  },
-  institutions: {
-    data: [],
-    total: 0,
-    totalSearch: 0,
-    limit: 5,
-    page: 0,
-    pages: 0,
-  },
-  roles: {
-    data: [],
-    total: 0,
-    totalSearch: 0,
-    limit: 5,
-    page: 0,
-    pages: 0,
-  },
-  permissions: {
-    data: [],
-    menuOptions: [],
-    total: 0,
-    totalSearch: 0,
-    limit: 5,
-    page: 0,
-    pages: 0,
-  },
-  actions: {
-    data: [],
-    total: 0,
-    totalSearch: 0,
-    limit: 5,
-    page: 0,
-    pages: 0,
-  },
-  resources: {
-    data: [],
-    total: 0,
-    totalSearch: 0,
-    limit: 5,
-    page: 0,
-    pages: 0,
-  },
-  updateUser: undefined,
-  updateInstitution: undefined,
-  updateRol: undefined,
-  updatePermission: undefined,
-  updateAction: undefined,
-  updateResource: undefined,
-  type: "update",
-};
 
 export const adminSlice = createSlice({
   name: "admin",
-  initialState,
+  initialState: initialAdminState,
   reducers: {
     setUpdateUser: (
       state,
@@ -362,7 +286,25 @@ export const adminSlice = createSlice({
           state.resources = action.payload;
           state.searchTerm = action.payload.searchTerm
         }
-      );
+      )
+      .addCase(
+        getAllRulesThunk.fulfilled,
+        (state, action: PayloadAction<Rules>) => {
+          state.rules = action.payload;
+          state.searchTerm = action.payload.searchTerm
+        }
+      )
+      .addCase(
+        deleteRuleThunk.fulfilled,
+        (state, action: PayloadAction<string>) => {
+          state.rules.data = state.rules.data.filter(
+            (perm) => perm.id !== action.payload
+          );
+          state.updatePermission = undefined;
+          state.rules.total -= 1
+          state.rules.totalSearch -= 1
+        }
+      )
   },
 });
 
