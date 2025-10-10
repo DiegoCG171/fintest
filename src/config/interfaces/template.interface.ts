@@ -43,6 +43,7 @@ export interface PatchGenerationTemplate {
     description?: string
     categoryId?: string
     type?: string
+    dependOn?: string
     generationTransaction?: FieldUpdateTemplate[]
     validationTransaction?: FieldUpdateTemplate[]
 }

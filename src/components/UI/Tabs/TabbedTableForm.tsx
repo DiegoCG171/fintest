@@ -73,11 +73,18 @@ function TabbedTableForm({
   const templates = useAppSelector((state) => state.templates.templates);
   const testCases = useAppSelector((state) => state.testCases.testCases);
 
+  console.log('[tabs[value]]', tabs[value])
+
   const currentTabId = useMemo(() => {
     return tabs[value]
       ? `${tabs[value].templateId}-${tabs[value].formType}`
       : "";
   }, [tabs, value]);
+
+  const dependsOnId = useAppSelector(
+    (state) => state.formBuilder.tabForms[currentTabId]?.dependsOnId || ""
+  );
+  console.log(dependsOnId, '::::::::::dependsOnId')
 
   const tabForm = useAppSelector(
     (state) => state.formBuilder.tabForms[currentTabId]
@@ -240,6 +247,11 @@ function TabbedTableForm({
   const saveTestCases = async (tab: FormTabItem) => {
     dispatch(setLoading(true));
     const payload = preparePayload(valuesToSend, tab.formType);
+    if(dependsOnId) {
+      payload.dependOn = dependsOnId
+    }
+    console.log(valuesToSend, ':::::::::::::::valuesToSend')
+    console.log(payload)
     const id = tab.templateId;
     try {
       await dispatch(updateTestCaseThunk({ id, payload })).unwrap();

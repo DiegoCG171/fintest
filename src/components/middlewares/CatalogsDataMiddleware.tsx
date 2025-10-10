@@ -168,8 +168,6 @@ function CatalogsDataMiddleware({
     return false;
   }, [template.origin, permissions]);
 
-  console.log(dependsOnId);
-
   if (!hasDependency) {
     return (
       <FormBuilderContainer

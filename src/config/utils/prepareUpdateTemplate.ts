@@ -28,8 +28,9 @@ function mapAllChildren(rows: TableRowDataFormBuilder[], typeForm: string): Fiel
 
 export function prepareUpdatePayload(
   rows: TableRowDataFormBuilder[],
-  typeForm: string
+  typeForm: string,
 ): PatchGenerationTemplate {
+  console.log('[typeForm]:', typeForm)
     const defaultFn = getDefaultFunctionByFormType(typeForm);
     const formattedRows: FieldUpdateTemplate[] = rows
         .filter((row) => row.isActive)
