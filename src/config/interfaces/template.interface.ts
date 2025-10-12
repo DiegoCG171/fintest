@@ -16,6 +16,7 @@ export interface TemplateContextType {
     createdAt: string
     updatedAt: string
     path: string[]
+    schemaId: string;
 }
 
 export type FormTypeKey = "generationTransaction" | "selectionTransaction" | "validationTransaction";
@@ -67,5 +68,6 @@ export interface TemplateState {
     getStatusById: AsyncStatus,
     getErrorById: null | string,
     templateById: TemplateContextType | null,
+    schemaId: string;
 
 }

@@ -92,6 +92,18 @@ function TabbedTableForm({
 
   const alreadyFetchedRules = useRef(false);
 
+  const schemaId = useMemo(() => {
+    const tab = tabs[value];
+    if (!tab) return null;
+
+    const source =
+      tab.origin === "categories"
+        ? templates.find((t) => t.uuid === tab.templateId)
+        : testCases.find((tc) => tc.uuid === tab.templateId);
+
+    return source?.schemaId ?? null;
+  }, [tabs, value, templates, testCases]);
+
   const templateExist = useMemo(() => {
     return tabs[value].origin === "categories"
       ? templates.some((template) => template.uuid === tabs[value].templateId)
@@ -110,11 +122,14 @@ function TabbedTableForm({
   const isLoading = !isTabDataReady;
 
   useEffect(() => {
+    if(!schemaId) return;
     if (!alreadyFetchedRules.current && statusRules === "idle") {
-      dispatch(getRuleByIdThunk({uuid: 'b181c3a0-fa60-48c2-888a-7f8f6917c9b5'}));
+      dispatch(
+        getRuleByIdThunk({ uuid: schemaId })
+      );
       alreadyFetchedRules.current = true;
     }
-  }, [dispatch, statusRules]);
+  }, [dispatch, statusRules, schemaId]);
 
   useEffect(() => {
     if (statusRules === "error" && rulesError) {
@@ -262,7 +277,10 @@ function TabbedTableForm({
         direction="row"
         sx={{ justifyContent: "space-between", alignItems: "end" }}
       >
-        <TitleHeaderComponent routeId={templateId} origin={origin} />
+        <TitleHeaderComponent
+          routeId={templateId}
+          origin={origin}
+        />
         {canEdit && (
           <Button
             startIcon={<SaveOutlinedIcon />}
