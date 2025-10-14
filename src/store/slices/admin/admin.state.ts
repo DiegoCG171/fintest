@@ -18,6 +18,7 @@ import {
 
 export interface AdminInitialState {
   formActive: boolean;
+  extractionRulesActive?: boolean;
   users: Users;
   updateUser?: UserDB;
   institutions: Institutions;
@@ -38,6 +39,7 @@ export interface AdminInitialState {
 
 export const initialAdminState: AdminInitialState = {
   formActive: false,
+  extractionRulesActive: false,
   users: {
     data: [],
     total: 0,

@@ -30,12 +30,12 @@ export const SidebarSettingsMenuItem = ({
   path,
 }: Props) => {
   const dispatch = useAppDispatch();
-  const { formActive } = useAppSelector((state) => state.admin);
+  const { formActive, extractionRulesActive } = useAppSelector((state) => state.admin);
   const navigate = useNavigate();
   const IconComponent = iconMap[icon] || null;
 
   const handleNavigate = () => {
-    if (formActive) return;
+    if (formActive || extractionRulesActive) return;
     dispatch(changeActiveMenuOption(label));
     navigate(`/settings/${path}`);
   };
@@ -54,11 +54,11 @@ export const SidebarSettingsMenuItem = ({
           border: "2px solid transparent",
           padding: 1,
           margin: 0.5,
-          cursor: formActive ? "default" : "pointer", // <-- cambio aquí
-          opacity: formActive ? 0.5 : 1, // <-- hace que parezca deshabilitado
+          cursor: formActive || extractionRulesActive ? "default" : "pointer",
+          opacity: formActive || extractionRulesActive ? 0.5 : 1,
           transition: "border-color 0.2s ease, opacity 0.2s ease",
           "&:hover": {
-            borderColor: !formActive
+            borderColor: !formActive || !extractionRulesActive
               ? (theme) => theme.palette.background.default
               : "transparent",
           },

@@ -27,6 +27,7 @@ import { sidebarMenuSettingsSlice } from "./slices/UI/sidebarMenuSettings/sideba
 import { institutionSlice } from "./slices/institutions/institutions.slice";
 import { securitySlice } from "./slices/security/security.slice";
 import { emmisorModalConfigSlice } from "./slices/UI/emmisorModalConfig/emmisorModalConfig.slice";
+import { extractionRulesSlice } from "./slices/extractionsRules/extractionRulesSlice";
 
 const appReducer = combineReducers({
     auth: authSlice.reducer,
@@ -54,7 +55,8 @@ const appReducer = combineReducers({
     sidebarMenuSettings: sidebarMenuSettingsSlice.reducer,
     institutions: institutionSlice.reducer,
     security: securitySlice.reducer,
-    emmisorModalConfig: emmisorModalConfigSlice.reducer
+    emmisorModalConfig: emmisorModalConfigSlice.reducer,
+    extractionRules: extractionRulesSlice.reducer
 });
 
 const rootReducer = (state: ReturnType<typeof appReducer> | undefined, action: UnknownAction) => {

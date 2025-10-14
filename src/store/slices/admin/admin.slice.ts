@@ -94,6 +94,9 @@ export const adminSlice = createSlice({
     resetPermissionsMenuOptions: (state) => {
       state.permissions.menuOptions = [];
     },
+    activExtractionRules: (state, action: PayloadAction<boolean>) => {
+      state.extractionRulesActive = action.payload;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -315,4 +318,5 @@ export const {
   setUpdatePermission,
   closeModalSettings,
   resetPermissionsMenuOptions,
+  activExtractionRules
 } = adminSlice.actions;

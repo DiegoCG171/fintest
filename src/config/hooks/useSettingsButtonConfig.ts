@@ -5,7 +5,7 @@ import VpnKeyOutlinedIcon from "@mui/icons-material/VpnKeyOutlined";
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import { useLocation } from "react-router-dom";
 import { useAppDispatch } from "../../store";
-import { setUpdateInstitution, setUpdatePermission, setUpdateRol, setUpdateUser } from "../../store/slices/admin/admin.slice";
+import { activExtractionRules, setUpdateInstitution, setUpdatePermission, setUpdateRol, setUpdateUser } from "../../store/slices/admin/admin.slice";
 import { OverridableComponent } from "@mui/material/OverridableComponent";
 import { SvgIconTypeMap } from "@mui/material";
 
@@ -56,7 +56,7 @@ export const useSettingsButtonConfig = (): ButtonConfig => {
       return {
       text: "Crear regla",
       icon: SaveOutlinedIcon,
-      onClick: () => console.log("Crear regla"),
+      onClick: () => dispatch(activExtractionRules(true)),
       requiredPermissions: [{action: "create", resource: "user"}],
     };
     }
