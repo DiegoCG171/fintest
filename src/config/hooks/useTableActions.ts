@@ -1,9 +1,10 @@
 import { useAppDispatch } from "../../store";
-import { setUpdateInstitution, setUpdatePermission, setUpdateRol, setUpdateUser } from "../../store/slices/admin/admin.slice";
+import { activExtractionRules, setUpdateInstitution, setUpdatePermission, setUpdateRol, setUpdateUser } from "../../store/slices/admin/admin.slice";
+import { getRuleByIdThunk } from "../../store/slices/rules/rules.thunk";
 import { openConfirmDeleteModal } from "../../store/slices/UI/confirmDeleteModal/confirmDeleteModal.slice";
 import { RESOURCE_MAP } from "../constants/tableSettings";
 import { EntityType, RouteType } from "../interfaces/tableSettings.interface";
-import { isInstitution, isPermission, isRol, isUserDB } from "../utils/tableSettings.utils";
+import { isInstitution, isPermission, isRol, isRule, isUserDB } from "../utils/tableSettings.utils";
 
 
 export const useTableActions = () => {
@@ -32,8 +33,9 @@ export const useTableActions = () => {
         }
         break;
       case "/settings/rule":
-        if (isPermission(selectedItem)) {
-          dispatch(setUpdatePermission({ type: "update", permission: selectedItem }));
+        if (isRule(selectedItem)) {
+          dispatch(getRuleByIdThunk({uuid: selectedItem.uuid})).unwrap()
+          dispatch(activExtractionRules(true))
         }
         break;
     }

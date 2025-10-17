@@ -1,7 +1,8 @@
 import api from "../../api/api";
 import { ENDPOINTS } from "../../config/constants/endpoints";
-import { GetFilters, RootRules, Rules } from "../../config/interfaces";
+import { GetFilters, RootRules } from "../../config/interfaces";
 import { handleAxiosError } from "../../config/utils/axiosErrorHandler";
+import { RuleState } from "../../store/slices/extractionsRules/extractionRulesSlice";
 
 export const getRules = async (
     params?: Record<string, string | number | boolean>
@@ -29,9 +30,9 @@ export const getAllRules = async (filters?: GetFilters) => {
 
 export const getRuleById = async (
     uuid: string
-): Promise<Rules> => {
+): Promise<RuleState> => {
     try {
-        const response = await api.get<Rules>(`${ENDPOINTS.getRules}/${uuid}`);
+        const response = await api.get<RuleState>(`${ENDPOINTS.getRules}/${uuid}`);
         return response.data;
     } catch (error) {
         const errorMessage = handleAxiosError(error);

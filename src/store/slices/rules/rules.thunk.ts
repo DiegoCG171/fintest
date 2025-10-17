@@ -3,6 +3,7 @@ import { Field, GetFilters } from "../../../config/interfaces";
 import { getAllRules, getRuleById, getRules } from "../../../services";
 import { deleteRule } from "../../../services/catalogs/rules.service";
 import { Rule } from "../../../config/interfaces/security.interface";
+import { RuleState } from "../extractionsRules/extractionRulesSlice";
 
 export const getRulesThunk = createAsyncThunk<
   Field[],
@@ -49,13 +50,13 @@ export const getAllRulesThunk = createAsyncThunk(
 );
 
 export const getRuleByIdThunk = createAsyncThunk<
-  Field[],
+  RuleState,
   { uuid: string },
   { rejectValue: string }
 >("rules/getById", async ({ uuid }, { rejectWithValue }) => {
   try {
     const rules = await getRuleById(uuid);
-    return rules.fields;
+    return rules;
   } catch (error: unknown) {
     const message =
       typeof error === "string"

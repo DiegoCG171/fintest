@@ -23,7 +23,10 @@ import LibraryAddOutlinedIcon from "@mui/icons-material/LibraryAddOutlined";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import EditNoteOutlinedIcon from "@mui/icons-material/EditNoteOutlined";
 import CheckOutlinedIcon from "@mui/icons-material/CheckOutlined";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAppDispatch, useAppSelector } from "../../../../store";
+import { activExtractionRules } from "../../../../store/slices/admin/admin.slice";
+import { RuleRow } from "../../../../store/slices/extractionsRules/extractionRulesSlice";
 
 const MODAL_STYLE = {
   position: "relative",
@@ -33,23 +36,15 @@ const MODAL_STYLE = {
   overflowY: "auto",
 };
 
-function createData(
-  id: string,
-  name: string,
-  field: string,
-  typeData: string,
-  subRules?: RuleRow[]
-): RuleRow {
-  return { id, name, field, typeData, subRules };
-}
-
-interface RuleRow {
-  id: string;
-  name: string;
-  field: string;
-  typeData: string;
-  subRules?: RuleRow[];
-}
+const ExpresionMap: Record<
+  "alphanumeric" | "alphanumeric_special" | "numeric" | "other",
+  string
+> = {
+  alphanumeric: "Alfanumérico",
+  alphanumeric_special: "Alfanumérico con Caracteres Especiales",
+  numeric: "Numérico",
+  other: "Otra",
+};
 
 const CollapsibleRow = ({
   row,
@@ -63,17 +58,38 @@ const CollapsibleRow = ({
   onUpdate?: (updatedRow: RuleRow) => void;
 }) => {
   const [open, setOpen] = useState(false);
-  const hasSubRules = row.subRules && row.subRules.length > 0;
+  const hasSubRules = row.breakingRules && row.breakingRules.length > 0;
   const canExpand = level < maxLevel;
 
-  const [editableId, setEditableId] = useState(row.id);
-  const [editableName, setEditableName] = useState(row.name);
+  const [editableId, setEditableId] = useState(row.idBitmap || row.id || "");
+  const [editableName, setEditableName] = useState(row.displayName);
   const [editableField, setEditableField] = useState(row.field);
-  const [editableTypeData, setEditableTypeData] = useState(row.typeData);
 
-  const [expresion, setExpresion] = useState("otra");
-  const [isLongitudVariable, setIsLongitudVariable] = useState(false);
-  const [posicionesLongitud, setPosicionesLongitud] = useState("");
+  const [expresion, setExpresion] = useState("other");
+  const [isLenghtVariable, setIsLenghtVariable] = useState(row.isLengthVariable);
+  const [posicionesLongitud, setPosicionesLongitud] = useState(row.positionsLength?.finalPos.toString() || "");
+  const [regex, setRegex] = useState(row.regex || "");
+
+  useEffect(() => {
+    if (row.regex === "^[a-zA-Z0-9]+$") {
+      setExpresion("alphanumeric");
+      return;
+    }
+
+    if (row.regex === "^[a-zA-Z0-9!@#$%&*()_+=[\\]{};:\\|,.<>/?\\s]+$") {
+      setExpresion("alphanumeric_special");
+      return;
+    }
+
+    if (row.regex === "^[0-9]+$") {
+      setExpresion("numeric");
+      return;
+    }
+
+    setIsLenghtVariable(row.isLengthVariable);
+    setPosicionesLongitud(row.positionsLength?.finalPos.toString() || "");
+    setExpresion("other");
+  }, [row.regex, row.isLengthVariable, row.positionsLength]);
 
   const getFontSize = () => {
     const sizes = ["0.8rem", "0.75rem", "0.7rem", "0.65rem"];
@@ -89,16 +105,16 @@ const CollapsibleRow = ({
   };
 
   const handleSubRuleUpdate = (index: number, updatedSubRule: RuleRow) => {
-    if (row.subRules && onUpdate) {
-      const newSubRules = [...row.subRules];
+    if (row.breakingRules && onUpdate) {
+      const newSubRules = [...row.breakingRules];
       newSubRules[index] = updatedSubRule;
       onUpdate({
         ...row,
-        id: editableId,
-        name: editableName,
+        idBitmap: editableId,
+        displayName: editableName,
         field: editableField,
-        typeData: editableTypeData,
-        subRules: newSubRules,
+        typeData: expresion,
+        breakingRules: newSubRules,
       });
     }
   };
@@ -106,54 +122,93 @@ const CollapsibleRow = ({
   return (
     <>
       <TableRow>
-        <TableCell sx={{ fontSize: getFontSize(), pl: getMarginLeftFields() }}>
+        <TableCell
+          sx={{
+            fontSize: getFontSize(),
+            pl: getMarginLeftFields(),
+            width: "20%",
+          }}
+        >
           {open ? (
             <OutlinedInput
               size="small"
               value={editableId}
               onChange={(e) => setEditableId(e.target.value)}
-              sx={{ fontSize: getFontSize() }}
+              sx={{ fontSize: getFontSize(), width: "100%" }}
             />
           ) : (
-            row.id
+            row.idBitmap || row.id
           )}
         </TableCell>
-        <TableCell sx={{ fontSize: getFontSize() }}>
+        <TableCell sx={{ fontSize: getFontSize(), width: "20%" }}>
           {open ? (
             <OutlinedInput
               size="small"
               value={editableName}
               onChange={(e) => setEditableName(e.target.value)}
-              sx={{ fontSize: getFontSize() }}
+              sx={{ fontSize: getFontSize(), width: "100%" }}
             />
           ) : (
-            row.name
+            row.displayName
           )}
         </TableCell>
-        <TableCell sx={{ fontSize: getFontSize() }}>
+        <TableCell sx={{ fontSize: getFontSize(), width: "20%" }}>
           {open ? (
             <OutlinedInput
               size="small"
               value={editableField}
               onChange={(e) => setEditableField(e.target.value)}
-              sx={{ fontSize: getFontSize() }}
+              sx={{ fontSize: getFontSize(), width: "100%" }}
             />
           ) : (
             row.field
           )}
         </TableCell>
-        <TableCell sx={{ fontSize: getFontSize() }}>
-          {open ? (
-            <OutlinedInput
-              size="small"
-              value={editableTypeData}
-              onChange={(e) => setEditableTypeData(e.target.value)}
-              sx={{ fontSize: getFontSize() }}
-            />
-          ) : (
-            row.typeData
-          )}
-        </TableCell>
+        {level == 1 && (
+          <TableCell sx={{ fontSize: getFontSize(), width: "20%" }}>
+            {open ? (
+              <Select
+                labelId="expresion-label"
+                size="small"
+                value={expresion}
+                onChange={(e) => setExpresion(e.target.value)}
+                sx={{ fontSize: getFontSize(), width: "100%" }}
+              >
+                <MenuItem sx={{ fontSize: getFontSize() }} value="alphanumeric">
+                  Alfanumérico
+                </MenuItem>
+                <MenuItem
+                  sx={{ fontSize: getFontSize() }}
+                  value="alphanumeric_special"
+                >
+                  Alfanumérico con Caracteres Especiales
+                </MenuItem>
+                <MenuItem sx={{ fontSize: getFontSize() }} value="numeric">
+                  Numérico
+                </MenuItem>
+                <MenuItem sx={{ fontSize: getFontSize() }} value="other">
+                  Otra
+                </MenuItem>
+              </Select>
+            ) : (
+              ExpresionMap[expresion as keyof typeof ExpresionMap]
+            )}
+          </TableCell>
+        )}
+        {level > 1 && (
+          <TableCell sx={{ fontSize: getFontSize(), width: "20%" }}>
+            {open ? (
+              <OutlinedInput
+                size="small"
+                value={editableName}
+                onChange={(e) => setEditableName(e.target.value)}
+                sx={{ fontSize: getFontSize(), width: "100%" }}
+              />
+            ) : (
+              row.length
+            )}
+          </TableCell>
+        )}
         <TableCell align="center">
           {canExpand ? (
             <IconButton
@@ -189,29 +244,10 @@ const CollapsibleRow = ({
                     <Box
                       sx={{
                         display: "grid",
-                        gridTemplateColumns: "repeat(4, 1fr)",
+                        gridTemplateColumns: "repeat(3, 1fr)",
                         gap: 2,
                       }}
                     >
-                      <FormControl size="small" fullWidth>
-                        <InputLabel id="expresion-label">
-                          Expresión Regular
-                        </InputLabel>
-                        <Select
-                          labelId="expresion-label"
-                          label="Expresión Regular"
-                          value={expresion}
-                          onChange={(e) => setExpresion(e.target.value)}
-                          sx={{ fontSize: getFontSize() }}
-                        >
-                          <MenuItem sx={{ fontSize: getFontSize() }} value="alfanumerico">Alfanumérico</MenuItem>
-                          <MenuItem sx={{ fontSize: getFontSize() }} value="alfanumerico_especial">
-                            Alfanumérico con Caracteres Especiales
-                          </MenuItem>
-                          <MenuItem sx={{ fontSize: getFontSize() }} value="numerico">Numérico</MenuItem>
-                          <MenuItem sx={{ fontSize: getFontSize() }} value="otra">Otra</MenuItem>
-                        </Select>
-                      </FormControl>
                       <FormControl size="small" fullWidth>
                         <InputLabel
                           htmlFor="longitud-input"
@@ -227,7 +263,7 @@ const CollapsibleRow = ({
                           sx={{ fontSize: getFontSize() }}
                         />
                       </FormControl>
-                      {isLongitudVariable && (
+                      {isLenghtVariable && (
                         <FormControl size="small" fullWidth>
                           <InputLabel
                             htmlFor="posiciones-input"
@@ -238,6 +274,7 @@ const CollapsibleRow = ({
                           <OutlinedInput
                             id="posiciones-input"
                             placeholder="1-3,5-7"
+                            type="number"
                             value={posicionesLongitud}
                             onChange={(e) =>
                               setPosicionesLongitud(e.target.value)
@@ -253,9 +290,9 @@ const CollapsibleRow = ({
                       >
                         <Checkbox
                           size="small"
-                          checked={isLongitudVariable}
+                          checked={isLenghtVariable}
                           onChange={(e) =>
-                            setIsLongitudVariable(e.target.checked)
+                            setIsLenghtVariable(e.target.checked)
                           }
                           sx={{ fontSize: getFontSize() }}
                         />
@@ -275,14 +312,12 @@ const CollapsibleRow = ({
                         gap: 2,
                       }}
                     >
-                      {expresion === "otra" && (
+                      {expresion === "other" && (
                         <FormControl
                           size="small"
                           fullWidth
                           sx={{
-                            gridColumn: !isLongitudVariable
-                              ? "span 1"
-                              : "span 2",
+                            gridColumn: !isLenghtVariable ? "span 1" : "span 2",
                           }}
                         >
                           <InputLabel
@@ -296,10 +331,12 @@ const CollapsibleRow = ({
                             placeholder="^ISO\\d{3}$"
                             label="Regex"
                             sx={{ fontSize: getFontSize() }}
+                            value={regex}
+                            onChange={(e) => setRegex(e.target.value)}
                           />
                         </FormControl>
                       )}
-                      {!isLongitudVariable && (
+                      {!isLenghtVariable && (
                         <FormControl size="small" fullWidth>
                           <InputLabel
                             sx={{ fontSize: getFontSize() }}
@@ -310,32 +347,20 @@ const CollapsibleRow = ({
                           <Select
                             labelId="operador-label"
                             label="Operador"
-                            defaultValue="equals"
+                            defaultValue="=="
                             sx={{ fontSize: getFontSize() }}
                           >
                             <MenuItem
                               sx={{ fontSize: getFontSize() }}
-                              value="equals"
+                              value="=="
                             >
-                              Igual
+                              Exactamente Igual
                             </MenuItem>
                             <MenuItem
                               sx={{ fontSize: getFontSize() }}
-                              value="not_includes"
+                              value="<="
                             >
-                              Incluye
-                            </MenuItem>
-                            <MenuItem
-                              sx={{ fontSize: getFontSize() }}
-                              value="includes"
-                            >
-                              No validar
-                            </MenuItem>
-                            <MenuItem
-                              sx={{ fontSize: getFontSize() }}
-                              value="compare_to"
-                            >
-                              Comparar
+                              Menor o Igual que
                             </MenuItem>
                           </Select>
                         </FormControl>
@@ -379,14 +404,14 @@ const CollapsibleRow = ({
                         <TableCell
                           sx={{ fontWeight: "bold", fontSize: getFontSize() }}
                         >
-                          Tipo de Dato
+                          Longitud
                         </TableCell>
                         <TableCell />
                       </TableRow>
                     </TableHead>
                     <TableBody>
                       {hasSubRules ? (
-                        row.subRules!.map((subRule, idx) => (
+                        row.breakingRules!.map((subRule, idx) => (
                           <CollapsibleRow
                             key={idx}
                             row={subRule}
@@ -436,7 +461,7 @@ const CollapsibleRow = ({
                             fontSize: getFontSize(),
                           }}
                         >
-                          Tipo de dato...
+                          Longitud...
                         </TableCell>
                         <TableCell align="center">
                           <IconButton color="primary" size="small">
@@ -462,41 +487,31 @@ const CollapsibleRow = ({
 };
 
 export default function RulesEditPage() {
-  const [version, setVersion] = useState<number>(1);
-  const [type, setType] = useState<string>("pos");
+  const dispatch = useAppDispatch();
+  const { updateExtractionRule } = useAppSelector(
+    (state) => state.extractionRules
+  );
 
-  const [rows, setRows] = useState<RuleRow[]>([
-    createData("HD-1", "Header ISO", "hdr.1", "Alfanúmerico", [
-      {
-        id: "HD-1.1",
-        name: "Versión ISO",
-        field: "hdr.1.1",
-        typeData: "Numérico",
-      },
-      {
-        id: "HD-1.2",
-        name: "Longitud mensaje",
-        field: "hdr.1.2",
-        typeData: "Numérico",
-      },
-    ]),
-    createData("HD-2", "Message Type", "hdr.2", "Numérico", [
-      {
-        id: "HD-2.1",
-        name: "Código MTI",
-        field: "hdr.2.1",
-        typeData: "Numérico",
-      },
-    ]),
-    createData("HD-3", "Bitmap", "hdr.3", "Hexadecimal", []),
-  ]);
+  const [version, setVersion] = useState(updateExtractionRule?.version ?? "");
+  const [type, setType] = useState(updateExtractionRule?.type ?? "");
+  const [rows, setRows] = useState<RuleRow[]>(
+    updateExtractionRule?.fields || []
+  );
+
+  useEffect(() => {
+    setVersion(updateExtractionRule?.version ?? "");
+    setType(updateExtractionRule?.type ?? "");
+  }, [updateExtractionRule?.version, updateExtractionRule?.type]);
+
+  useEffect(() => {
+    setRows(updateExtractionRule?.fields || []);
+  }, [updateExtractionRule]);
 
   const handleVersionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = Math.max(0, Number(e.target.value));
-    setVersion(value);
+    setVersion(e.target.value);
   };
 
-  const handleTipoChange = (e: SelectChangeEvent<string>) => {
+  const handleTypeChange = (e: SelectChangeEvent<string>) => {
     setType(e.target.value);
   };
 
@@ -518,7 +533,11 @@ export default function RulesEditPage() {
           </Typography>
         </Box>
         <Box>
-          <Button variant="outlined" startIcon={<SaveOutlinedIcon />}>
+          <Button
+            variant="outlined"
+            onClick={() => dispatch(activExtractionRules(false))}
+            startIcon={<SaveOutlinedIcon />}
+          >
             Guardar
           </Button>
         </Box>
@@ -543,7 +562,7 @@ export default function RulesEditPage() {
             id="select-tipo"
             value={type}
             label="Tipo"
-            onChange={handleTipoChange}
+            onChange={handleTypeChange}
           >
             <MenuItem value={"pos"}>POS</MenuItem>
             <MenuItem value={"atm"}>ATM</MenuItem>

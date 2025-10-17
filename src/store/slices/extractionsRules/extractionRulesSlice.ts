@@ -1,15 +1,16 @@
-import { createSlice} from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
+import { getRuleByIdThunk } from "../rules/rules.thunk";
 
 export interface BreakingRule {
-  id: string;
-  displayName: string;
-  length: number;
+  id?: string;
+  displayName?: string;
+  length?: number;
   idToken?: string;
   specification?: BreakingRule[];
 }
 
 export interface PositionsLength {
-  initPos: number; 
+  initPos: number;
   finalPos: number;
 }
 
@@ -18,30 +19,49 @@ export interface Field {
   displayName: string;
   length: number;
   operator: string;
+  field?: string;
   regex: string;
-  regexType?: 'alfanumerico' | 'alfanumerico_especial' | 'numerico' | 'otra';
+  regexType?: "alphanumeric" | "alphanumeric_special" | "numeric" | "other";
   isBreakeable?: boolean;
   breakingRules?: BreakingRule[];
   isLengthVariable?: boolean;
   positionsLength?: PositionsLength;
 }
 
+export interface RuleRow {
+  id?: string;
+  idBitmap: string;
+  displayName: string;
+  field: string;
+  typeData: string;
+  length?: number;
+  operator?: string;
+  regex?: string;
+  isBreakeable?: boolean;
+  isLengthVariable?: boolean;
+  breakingRules?: RuleRow[];
+  positionsLength?: PositionsLength;
+}
+
 export interface RuleState {
   version: number;
   type: string;
-  fields: Field[];
+  fields: RuleRow[];
 }
 
-const initialState: RuleState = {
-  version: 2,
-  type: 'pos',
-  fields: []
-};
+export interface ExtractionRulesState {
+  updateExtractionRule?: RuleState;
+}
+
+const initialState: ExtractionRulesState = {};
 
 export const extractionRulesSlice = createSlice({
-  name: 'rules',
+  name: "rules",
   initialState,
-  reducers: {
-  }
+  reducers: {},
+  extraReducers: (builder) => {
+    builder.addCase(getRuleByIdThunk.fulfilled, (state, action) => {
+      state.updateExtractionRule = action.payload
+    });
+  },
 });
-
