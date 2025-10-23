@@ -40,7 +40,7 @@ import {
 } from "../security/security.thunk";
 import { initialAdminState } from "./admin.state";
 import { deleteRuleThunk, getAllRulesThunk } from "../rules/rules.thunk";
-
+import { updateExtractionRulesThunk } from "../extractionsRules/extractionRules.thunk";
 
 export const adminSlice = createSlice({
   name: "admin",
@@ -96,7 +96,7 @@ export const adminSlice = createSlice({
     },
     activExtractionRules: (state, action: PayloadAction<boolean>) => {
       state.extractionRulesActive = action.payload;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -105,7 +105,7 @@ export const adminSlice = createSlice({
         getAllUsersThunk.fulfilled,
         (state, action: PayloadAction<Users>) => {
           state.users = action.payload;
-          state.searchTerm = action.payload.searchTerm
+          state.searchTerm = action.payload.searchTerm;
         }
       )
       .addCase(
@@ -141,7 +141,7 @@ export const adminSlice = createSlice({
         getAllInstitutionsThunk.fulfilled,
         (state, action: PayloadAction<Institutions>) => {
           state.institutions = action.payload;
-          state.searchTerm = action.payload.searchTerm
+          state.searchTerm = action.payload.searchTerm;
         }
       )
       .addCase(
@@ -151,14 +151,14 @@ export const adminSlice = createSlice({
             (inst) => inst.id !== action.payload
           );
           state.updateInstitution = undefined;
-          state.institutions.total -= 1
-          state.institutions.totalSearch -= 1
+          state.institutions.total -= 1;
+          state.institutions.totalSearch -= 1;
         }
       )
       .addCase(createInstitutionThunk.fulfilled, (state, action) => {
         state.institutions.data.push(action.payload);
         state.institutions.total += 1;
-        state.institutions.totalSearch += 1
+        state.institutions.totalSearch += 1;
       })
       .addCase(
         updateInstitutionsThunk.fulfilled,
@@ -175,15 +175,15 @@ export const adminSlice = createSlice({
         getAllSecurityRolesThunk.fulfilled,
         (state, action: PayloadAction<Roles>) => {
           state.roles = action.payload;
-          state.searchTerm = action.payload.searchTerm
+          state.searchTerm = action.payload.searchTerm;
         }
       )
       .addCase(
         createSecurityRolThunk.fulfilled,
         (state, action: PayloadAction<Rol>) => {
           state.roles.data.push(action.payload);
-          state.roles.total += 1
-          state.roles.totalSearch += 1
+          state.roles.total += 1;
+          state.roles.totalSearch += 1;
         }
       )
       .addCase(
@@ -193,8 +193,8 @@ export const adminSlice = createSlice({
             (rol) => rol.id !== action.payload
           );
           state.updateRol = undefined;
-          state.roles.total -= 1
-          state.roles.totalSearch -= 1 
+          state.roles.total -= 1;
+          state.roles.totalSearch -= 1;
         }
       )
       .addCase(
@@ -212,7 +212,7 @@ export const adminSlice = createSlice({
         getAllSecurityPermissionsThunk.fulfilled,
         (state, action: PayloadAction<Permissions>) => {
           state.permissions = { ...state.permissions, ...action.payload };
-          state.searchTerm = action.payload.searchTerm
+          state.searchTerm = action.payload.searchTerm;
         }
       )
       .addCase(
@@ -239,8 +239,8 @@ export const adminSlice = createSlice({
         createSecurityPermissionThunk.fulfilled,
         (state, action: PayloadAction<Permission>) => {
           state.permissions.data.push(action.payload);
-          state.permissions.total += 1
-          state.permissions.totalSearch += 1
+          state.permissions.total += 1;
+          state.permissions.totalSearch += 1;
         }
       )
       .addCase(
@@ -250,8 +250,8 @@ export const adminSlice = createSlice({
             (perm) => perm.id !== action.payload
           );
           state.updatePermission = undefined;
-          state.permissions.total -= 1
-          state.permissions.totalSearch -= 1
+          state.permissions.total -= 1;
+          state.permissions.totalSearch -= 1;
         }
       )
       .addCase(
@@ -279,7 +279,7 @@ export const adminSlice = createSlice({
         getAllSecurityActionsThunk.fulfilled,
         (state, action: PayloadAction<Actions>) => {
           state.actions = action.payload;
-          state.searchTerm = action.payload.searchTerm
+          state.searchTerm = action.payload.searchTerm;
         }
       )
       // ===== RESOURCE =====
@@ -287,14 +287,14 @@ export const adminSlice = createSlice({
         getAllSecurityResourcesThunk.fulfilled,
         (state, action: PayloadAction<Resources>) => {
           state.resources = action.payload;
-          state.searchTerm = action.payload.searchTerm
+          state.searchTerm = action.payload.searchTerm;
         }
       )
       .addCase(
         getAllRulesThunk.fulfilled,
         (state, action: PayloadAction<Rules>) => {
           state.rules = action.payload;
-          state.searchTerm = action.payload.searchTerm
+          state.searchTerm = action.payload.searchTerm;
         }
       )
       .addCase(
@@ -304,10 +304,32 @@ export const adminSlice = createSlice({
             (perm) => perm.id !== action.payload
           );
           state.updatePermission = undefined;
-          state.rules.total -= 1
-          state.rules.totalSearch -= 1
+          state.rules.total -= 1;
+          state.rules.totalSearch -= 1;
         }
       )
+      .addCase(
+        updateExtractionRulesThunk.fulfilled,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (state, action: PayloadAction<{ id: string; data: any }>) => {
+          const { id, data } = action.payload;
+
+          const index = state.rules.data.findIndex(
+            (rule) => String(rule.uuid) === String(id)
+          );
+
+          console.log("Buscando uuid:", id, "→ índice encontrado:", index);
+
+          if (index !== -1) {
+            state.rules.data[index] = {
+              ...state.rules.data[index],
+              ...data,
+            };
+          }
+
+          state.updateRules = undefined;
+        }
+      );
   },
 });
 
@@ -318,5 +340,5 @@ export const {
   setUpdatePermission,
   closeModalSettings,
   resetPermissionsMenuOptions,
-  activExtractionRules
+  activExtractionRules,
 } = adminSlice.actions;

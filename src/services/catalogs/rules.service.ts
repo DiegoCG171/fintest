@@ -40,6 +40,17 @@ export const getRuleById = async (
     }
 };
 
+
+export const updateRule = async (id: string, data: Partial<RuleState> ) => {
+  try {
+    const response = await api.patch<RuleState>(`${ENDPOINTS.getRules}/${id}`, data);
+    return response.data;
+  } catch (error) {
+    const errorMessage = handleAxiosError(error);
+    throw errorMessage;
+  }
+}
+
 export const deleteRule = async (id: string) => {
   try {
     const response = await api.delete(`${ENDPOINTS.getRules}/${id}`);

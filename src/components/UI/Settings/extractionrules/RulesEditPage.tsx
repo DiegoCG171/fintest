@@ -26,7 +26,15 @@ import CheckOutlinedIcon from "@mui/icons-material/CheckOutlined";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import { activExtractionRules } from "../../../../store/slices/admin/admin.slice";
-import { RuleRow } from "../../../../store/slices/extractionsRules/extractionRulesSlice";
+import {
+  RuleRow,
+  updateRule,
+  addSubRule,
+  addTopLevelRule,
+  setVersionForm,
+  setTypeForm,
+} from "../../../../store/slices/extractionsRules/extractionRulesSlice";
+import { updateExtractionRulesThunk } from "../../../../store/slices/extractionsRules/extractionRules.thunk";
 
 const MODAL_STYLE = {
   position: "relative",
@@ -51,12 +59,15 @@ const CollapsibleRow = ({
   level = 1,
   maxLevel = 3,
   onUpdate,
+  onAddSubRule,
 }: {
   row: RuleRow;
   level?: number;
   maxLevel?: number;
   onUpdate?: (updatedRow: RuleRow) => void;
+  onAddSubRule?: (parentId: string) => void;
 }) => {
+  const dispatch = useAppDispatch();
   const [open, setOpen] = useState(false);
   const hasSubRules = row.breakingRules && row.breakingRules.length > 0;
   const canExpand = level < maxLevel;
@@ -64,10 +75,16 @@ const CollapsibleRow = ({
   const [editableId, setEditableId] = useState(row.idBitmap || row.id || "");
   const [editableName, setEditableName] = useState(row.displayName);
   const [editableField, setEditableField] = useState(row.field);
+  const [editableLenght, setEditableLenght] = useState(row.length);
+  const [editableOperator, setEditableOperator] = useState(row.operator);
 
   const [expresion, setExpresion] = useState("other");
-  const [isLenghtVariable, setIsLenghtVariable] = useState(row.isLengthVariable);
-  const [posicionesLongitud, setPosicionesLongitud] = useState(row.positionsLength?.finalPos.toString() || "");
+  const [isLenghtVariable, setIsLenghtVariable] = useState(
+    row.isLengthVariable ?? false
+  );
+  const [positionsLength, setPositionsLength] = useState(
+    row.positionsLength?.finalPos.toString() || ""
+  );
   const [regex, setRegex] = useState(row.regex || "");
 
   useEffect(() => {
@@ -86,10 +103,30 @@ const CollapsibleRow = ({
       return;
     }
 
-    setIsLenghtVariable(row.isLengthVariable);
-    setPosicionesLongitud(row.positionsLength?.finalPos.toString() || "");
-    setExpresion("other");
+    setIsLenghtVariable(row.isLengthVariable ?? false);
+    setPositionsLength(row.positionsLength?.finalPos.toString() || "");
   }, [row.regex, row.isLengthVariable, row.positionsLength]);
+
+  const handleChangeExpresion = (e: SelectChangeEvent) => {
+    const newExpresion = e.target.value;
+    let newRegex = regex;
+
+    if (newExpresion === "alphanumeric") {
+      newRegex = "^[a-zA-Z0-9]+$";
+    } else if (newExpresion === "alphanumeric_special") {
+      newRegex = "^[a-zA-Z0-9!@#$%&*()_+=[\\]{};:\\|,.<>/?\\s]+$";
+    } else if (newExpresion === "numeric") {
+      newRegex = "^[0-9]+$";
+    }
+
+    setExpresion(newExpresion);
+    setRegex(newRegex);
+
+    handleUpdate({
+      typeData: newExpresion,
+      regex: newRegex,
+    });
+  };
 
   const getFontSize = () => {
     const sizes = ["0.8rem", "0.75rem", "0.7rem", "0.65rem"];
@@ -119,6 +156,11 @@ const CollapsibleRow = ({
     }
   };
 
+  const handleUpdate = (changes: Partial<RuleRow>) => {
+    const updatedRow: RuleRow = { ...row, ...changes };
+    dispatch(updateRule({ _id: row._id ?? "", updatedRow }));
+  };
+
   return (
     <>
       <TableRow>
@@ -134,6 +176,9 @@ const CollapsibleRow = ({
               size="small"
               value={editableId}
               onChange={(e) => setEditableId(e.target.value)}
+              onBlur={() =>
+                handleUpdate({ idBitmap: editableId, id: editableId })
+              }
               sx={{ fontSize: getFontSize(), width: "100%" }}
             />
           ) : (
@@ -146,6 +191,7 @@ const CollapsibleRow = ({
               size="small"
               value={editableName}
               onChange={(e) => setEditableName(e.target.value)}
+              onBlur={() => handleUpdate({ displayName: editableName })}
               sx={{ fontSize: getFontSize(), width: "100%" }}
             />
           ) : (
@@ -158,6 +204,7 @@ const CollapsibleRow = ({
               size="small"
               value={editableField}
               onChange={(e) => setEditableField(e.target.value)}
+              onBlur={() => handleUpdate({ field: editableField })}
               sx={{ fontSize: getFontSize(), width: "100%" }}
             />
           ) : (
@@ -171,7 +218,7 @@ const CollapsibleRow = ({
                 labelId="expresion-label"
                 size="small"
                 value={expresion}
-                onChange={(e) => setExpresion(e.target.value)}
+                onChange={handleChangeExpresion}
                 sx={{ fontSize: getFontSize(), width: "100%" }}
               >
                 <MenuItem sx={{ fontSize: getFontSize() }} value="alphanumeric">
@@ -200,8 +247,10 @@ const CollapsibleRow = ({
             {open ? (
               <OutlinedInput
                 size="small"
-                value={editableName}
-                onChange={(e) => setEditableName(e.target.value)}
+                type="number"
+                value={editableLenght}
+                onChange={(e) => setEditableLenght(+e.target.value)}
+                onBlur={() => handleUpdate({ length: editableLenght })}
                 sx={{ fontSize: getFontSize(), width: "100%" }}
               />
             ) : (
@@ -260,6 +309,11 @@ const CollapsibleRow = ({
                           type="number"
                           placeholder="5"
                           label="Longitud de Campo"
+                          value={editableLenght}
+                          onChange={(e) => setEditableLenght(+e.target.value)}
+                          onBlur={() =>
+                            handleUpdate({ length: editableLenght })
+                          }
                           sx={{ fontSize: getFontSize() }}
                         />
                       </FormControl>
@@ -275,10 +329,8 @@ const CollapsibleRow = ({
                             id="posiciones-input"
                             placeholder="1-3,5-7"
                             type="number"
-                            value={posicionesLongitud}
-                            onChange={(e) =>
-                              setPosicionesLongitud(e.target.value)
-                            }
+                            value={positionsLength}
+                            onChange={(e) => setPositionsLength(e.target.value)}
                             label="Posiciones de Longitud"
                             sx={{ fontSize: getFontSize() }}
                           />
@@ -291,9 +343,11 @@ const CollapsibleRow = ({
                         <Checkbox
                           size="small"
                           checked={isLenghtVariable}
-                          onChange={(e) =>
-                            setIsLenghtVariable(e.target.checked)
-                          }
+                          onChange={(e) => {
+                            const newValue = e.target.checked;
+                            setIsLenghtVariable(newValue);
+                            handleUpdate({ isLengthVariable: newValue });
+                          }}
                           sx={{ fontSize: getFontSize() }}
                         />
                         <Typography
@@ -333,6 +387,9 @@ const CollapsibleRow = ({
                             sx={{ fontSize: getFontSize() }}
                             value={regex}
                             onChange={(e) => setRegex(e.target.value)}
+                            onBlur={() =>
+                            handleUpdate({ regex: regex })
+                          }
                           />
                         </FormControl>
                       )}
@@ -349,6 +406,13 @@ const CollapsibleRow = ({
                             label="Operador"
                             defaultValue="=="
                             sx={{ fontSize: getFontSize() }}
+                            value={editableOperator}
+                            onChange={(e) =>
+                              setEditableOperator(e.target.value)
+                            }
+                            onBlur={() =>
+                              handleUpdate({ operator: editableOperator })
+                            }
                           >
                             <MenuItem
                               sx={{ fontSize: getFontSize() }}
@@ -420,6 +484,7 @@ const CollapsibleRow = ({
                             onUpdate={(updated) =>
                               handleSubRuleUpdate(idx, updated)
                             }
+                            onAddSubRule={onAddSubRule}
                           />
                         ))
                       ) : (
@@ -464,7 +529,13 @@ const CollapsibleRow = ({
                           Longitud...
                         </TableCell>
                         <TableCell align="center">
-                          <IconButton color="primary" size="small">
+                          <IconButton
+                            color="primary"
+                            size="small"
+                            onClick={() =>
+                              onAddSubRule?.(row._id || row.id || "")
+                            }
+                          >
                             <LibraryAddOutlinedIcon
                               style={{
                                 color: "gray",
@@ -488,7 +559,7 @@ const CollapsibleRow = ({
 
 export default function RulesEditPage() {
   const dispatch = useAppDispatch();
-  const { updateExtractionRule } = useAppSelector(
+  const { updateExtractionRule, updating } = useAppSelector(
     (state) => state.extractionRules
   );
 
@@ -497,6 +568,85 @@ export default function RulesEditPage() {
   const [rows, setRows] = useState<RuleRow[]>(
     updateExtractionRule?.fields || []
   );
+
+  const handleAddSubRule = (parentId: string) => {
+    const siblings = findRuleById(rows, parentId)?.breakingRules || [];
+    const parentIdBitmap =
+      findRuleById(rows, parentId)?.idBitmap ||
+      findRuleById(rows, parentId)?.id ||
+      "";
+
+    let nextNumber = 1;
+    if (siblings.length > 0) {
+      const existingNumbers = siblings
+        .map((s) => {
+          const parts = (s.idBitmap || s.id || "").split(".");
+          const lastPart = parts[parts.length - 1];
+          return parseInt(lastPart, 10);
+        })
+        .filter((n) => !isNaN(n));
+
+      nextNumber =
+        existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1;
+    }
+
+    const newSubRule: RuleRow = {
+      id: `${parentIdBitmap}.${nextNumber}`,
+      _id: `new-${Date.now()}`,
+      displayName: "Nueva Subregla",
+      specification: [],
+      length: 1,
+    };
+
+    dispatch(addSubRule({ parentId, newRule: newSubRule }));
+  };
+
+  const findRuleById = (rules: RuleRow[], id: string): RuleRow | null => {
+    for (const rule of rules) {
+      if (rule._id === id || rule.id === id) {
+        return rule;
+      }
+      if (rule.breakingRules && rule.breakingRules.length > 0) {
+        const found = findRuleById(rule.breakingRules, id);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+
+  const handleAddTopLevelRule = () => {
+    let nextNumber = 1;
+    if (rows.length > 0) {
+      const existingNumbers = rows
+        .map((r) => {
+          const parts = (r.idBitmap || r.id || "").split(".");
+          const firstPart = parts[0];
+          const match = firstPart.match(/-(\d+)$/);
+          return match ? parseInt(match[1], 10) : 0;
+        })
+        .filter((n) => !isNaN(n) && n > 0);
+
+      nextNumber =
+        existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1;
+    }
+
+    const prefix = type === "pos" ? "HD" : "DE";
+
+    const newRule: RuleRow = {
+      _id: `new-${Date.now()}`,
+      idBitmap: `${prefix}-${nextNumber}`,
+      displayName: "Nueva Regla",
+      field: "",
+      typeData: "other",
+      length: 0,
+      isLengthVariable: false,
+      regex: "",
+      operator: "==",
+      breakingRules: [],
+    };
+
+    dispatch(addTopLevelRule(newRule));
+  };
 
   useEffect(() => {
     setVersion(updateExtractionRule?.version ?? "");
@@ -508,7 +658,7 @@ export default function RulesEditPage() {
   }, [updateExtractionRule]);
 
   const handleVersionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setVersion(e.target.value);
+    setVersion(+e.target.value);
   };
 
   const handleTypeChange = (e: SelectChangeEvent<string>) => {
@@ -521,21 +671,29 @@ export default function RulesEditPage() {
     setRows(newRows);
   };
 
+  const updateRules = () => {
+    dispatch(activExtractionRules(false));
+    
+    if (updating) {
+      dispatch(updateExtractionRulesThunk(updateExtractionRule.uuid));
+    }
+  };
+
   return (
     <Box sx={MODAL_STYLE}>
       <Box sx={{ display: "flex", justifyContent: "space-between" }}>
         <Box>
           <Typography variant="h5" sx={{ fontWeight: 500, mb: 1 }}>
-            Creación de Reglas
+            {updating ? "Actualización de Reglas" :  "Creación de Reglas"  } 
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Creación de Reglas / {type.toUpperCase()} V{version}
+            {updating ? "Actualización de Reglas" :  "Creación de Reglas"  }  / {type.toUpperCase()} V{version}
           </Typography>
         </Box>
         <Box>
           <Button
             variant="outlined"
-            onClick={() => dispatch(activExtractionRules(false))}
+            onClick={updateRules}
             startIcon={<SaveOutlinedIcon />}
           >
             Guardar
@@ -551,10 +709,10 @@ export default function RulesEditPage() {
             label="Versión"
             value={version}
             onChange={handleVersionChange}
+            onBlur={(e) => dispatch(setVersionForm(+e.target.value))}
             inputProps={{ min: 1 }}
           />
         </FormControl>
-
         <FormControl sx={{ flex: 1 }}>
           <InputLabel id="select-label">Tipo</InputLabel>
           <Select
@@ -563,6 +721,7 @@ export default function RulesEditPage() {
             value={type}
             label="Tipo"
             onChange={handleTypeChange}
+            onBlur={(e) => dispatch(setTypeForm(e.target.value))}
           >
             <MenuItem value={"pos"}>POS</MenuItem>
             <MenuItem value={"atm"}>ATM</MenuItem>
@@ -586,6 +745,7 @@ export default function RulesEditPage() {
                 key={index}
                 row={row}
                 onUpdate={(updated) => handleRowUpdate(index, updated)}
+                onAddSubRule={handleAddSubRule}
               />
             ))}
             <TableRow>
@@ -602,7 +762,7 @@ export default function RulesEditPage() {
                 Tipo de dato...
               </TableCell>
               <TableCell align="center">
-                <IconButton color="primary">
+                <IconButton color="primary" onClick={handleAddTopLevelRule}>
                   <LibraryAddOutlinedIcon style={{ color: "gray" }} />
                 </IconButton>
               </TableCell>
