@@ -41,6 +41,16 @@ export const getRuleById = async (
 };
 
 
+export const createRule = async (data: Partial<RuleState> ) => {
+  try {
+    const response = await api.post<RuleState>(`${ENDPOINTS.getRules}`, data);
+    return response.data;
+  } catch (error) {
+    const errorMessage = handleAxiosError(error);
+    throw errorMessage;
+  }
+}
+
 export const updateRule = async (id: string, data: Partial<RuleState> ) => {
   try {
     const response = await api.patch<RuleState>(`${ENDPOINTS.getRules}/${id}`, data);

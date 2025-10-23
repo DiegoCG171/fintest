@@ -1,6 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { getRuleByIdThunk } from "../rules/rules.thunk";
-import { updateExtractionRulesThunk } from "./extractionRules.thunk";
+import {
+  createExtractionRuleThunk,
+  updateExtractionRulesThunk,
+} from "./extractionRules.thunk";
 
 export interface BreakingRule {
   id?: string;
@@ -47,7 +50,7 @@ export interface RuleRow {
 }
 
 export interface RuleState {
-  uuid: string
+  uuid: string;
   version: number;
   type: string;
   fields: RuleRow[];
@@ -59,9 +62,8 @@ export interface ExtractionRulesState {
 }
 
 export interface UpdateExtractionRulesPayload {
-    id: string;
+  id: string;
 }
-
 
 const initialState: ExtractionRulesState = {
   updateExtractionRule: {
@@ -70,7 +72,7 @@ const initialState: ExtractionRulesState = {
     version: 0,
     fields: [],
   },
-  updating: false
+  updating: false,
 };
 
 export const extractionRulesSlice = createSlice({
@@ -86,7 +88,6 @@ export const extractionRulesSlice = createSlice({
     setFields: (state, action: PayloadAction<RuleRow[]>) => {
       state.updateExtractionRule.fields = action.payload;
     },
-
     updateRule: (
       state,
       action: PayloadAction<{ _id: string; updatedRow: RuleRow }>
@@ -101,8 +102,8 @@ export const extractionRulesSlice = createSlice({
         for (let i = 0; i < rules.length; i++) {
           const rule = rules[i];
 
-          if (rule._id === targetId) {
-            rules[i] = updatedRow;
+          if (rule._id === targetId || rule.id === targetId) {
+            rules[i] = { ...updatedRow };
             return rules[i];
           }
 
@@ -114,13 +115,21 @@ export const extractionRulesSlice = createSlice({
             );
             if (updated) return updated;
           }
+
+          if (rule.specification && rule.specification.length > 0) {
+            const updated = mutateRuleById(
+              rule.specification,
+              targetId,
+              updatedRow
+            );
+            if (updated) return updated;
+          }
         }
         return undefined;
       }
 
       mutateRuleById(state.updateExtractionRule.fields, _id, updatedRow);
     },
-
     addSubRule: (
       state,
       action: PayloadAction<{ parentId: string; newRule: RuleRow }>
@@ -132,11 +141,18 @@ export const extractionRulesSlice = createSlice({
       ): RuleRow[] {
         return rules.map((rule) => {
           if (rule.id === parentId || rule._id === parentId) {
-            const updatedBreakingRules = [
-              ...(rule.breakingRules || []),
-              newRule,
-            ];
-            return { ...rule, breakingRules: updatedBreakingRules };
+            // Si ya tiene specification, agregamos ahí
+            if (rule.specification && rule.specification.length >= 0) {
+              return {
+                ...rule,
+                specification: [...(rule.specification || []), newRule],
+              };
+            }
+
+            return {
+              ...rule,
+              breakingRules: [...(rule.breakingRules || []), newRule],
+            };
           }
 
           if (rule.breakingRules && rule.breakingRules.length > 0) {
@@ -144,6 +160,17 @@ export const extractionRulesSlice = createSlice({
               ...rule,
               breakingRules: addSubRuleById(
                 rule.breakingRules,
+                parentId,
+                newRule
+              ),
+            };
+          }
+
+          if (rule.specification && rule.specification.length > 0) {
+            return {
+              ...rule,
+              specification: addSubRuleById(
+                rule.specification,
                 parentId,
                 newRule
               ),
@@ -163,45 +190,72 @@ export const extractionRulesSlice = createSlice({
     addTopLevelRule: (state, action: PayloadAction<RuleRow>) => {
       state.updateExtractionRule.fields.push(action.payload);
     },
-
-    removeRule: (state, action: PayloadAction<{ id: string }>) => {
-      function removeRuleById(rules: RuleRow[], targetId: string): RuleRow[] {
+    removeTopLevelRule: (state, action: PayloadAction<string>) => {
+      state.updateExtractionRule.fields =
+        state.updateExtractionRule.fields.filter(
+          (rule) => rule.id !== action.payload && rule._id !== action.payload
+        );
+    },
+    removeSubRule: (state, action: PayloadAction<string>) => {
+      function removeRuleById(
+        rules: RuleRow[] = [],
+        targetId: string
+      ): RuleRow[] {
         return rules
-          .filter((rule) => rule.id !== targetId)
-          .map((rule) => ({
-            ...rule,
-            breakingRules: rule.breakingRules
-              ? removeRuleById(rule.breakingRules, targetId)
-              : [],
-          }));
+          .map((rule) => {
+            const newRule: RuleRow = { ...rule };
+
+            if (rule.breakingRules) {
+              newRule.breakingRules = removeRuleById(
+                rule.breakingRules,
+                targetId
+              );
+            }
+
+            if (rule.specification) {
+              newRule.specification = removeRuleById(
+                rule.specification,
+                targetId
+              );
+            }
+
+            return newRule;
+          })
+          .filter((rule) => rule.id !== targetId && rule._id !== targetId);
       }
 
       state.updateExtractionRule.fields = removeRuleById(
         state.updateExtractionRule.fields,
-        action.payload.id
+        action.payload
       );
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(getRuleByIdThunk.fulfilled, (state, action) => {
-      state.updateExtractionRule = action.payload;
-      state.updating = true;
-    })
-    .addCase(updateExtractionRulesThunk.fulfilled, (state) => {
-      state.updateExtractionRule = initialState.updateExtractionRule;
-      state.updating = false;
-    })
+    builder
+      .addCase(getRuleByIdThunk.fulfilled, (state, action) => {
+        state.updateExtractionRule = action.payload;
+        state.updating = true;
+      })
+      .addCase(updateExtractionRulesThunk.fulfilled, (state) => {
+        state.updateExtractionRule = initialState.updateExtractionRule;
+        state.updating = false;
+      })
+      .addCase(createExtractionRuleThunk.fulfilled, (state) => {
+        state.updateExtractionRule = initialState.updateExtractionRule;
+        state.updating = false;
+      });
   },
 });
 
 export const {
   addSubRule,
-  removeRule,
+  removeSubRule,
   setFields,
   setTypeForm,
   setVersionForm,
   updateRule,
   addTopLevelRule,
+  removeTopLevelRule,
 } = extractionRulesSlice.actions;
 
 export default extractionRulesSlice.reducer;

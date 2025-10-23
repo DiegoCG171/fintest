@@ -23,6 +23,7 @@ import LibraryAddOutlinedIcon from "@mui/icons-material/LibraryAddOutlined";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import EditNoteOutlinedIcon from "@mui/icons-material/EditNoteOutlined";
 import CheckOutlinedIcon from "@mui/icons-material/CheckOutlined";
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import { activExtractionRules } from "../../../../store/slices/admin/admin.slice";
@@ -34,7 +35,12 @@ import {
   setVersionForm,
   setTypeForm,
 } from "../../../../store/slices/extractionsRules/extractionRulesSlice";
-import { updateExtractionRulesThunk } from "../../../../store/slices/extractionsRules/extractionRules.thunk";
+import {
+  createExtractionRuleThunk,
+  updateExtractionRulesThunk,
+} from "../../../../store/slices/extractionsRules/extractionRules.thunk";
+import { useToast } from "../../../../config/hooks/useToast";
+import { openConfirmDeleteModal } from "../../../../store/slices/UI/confirmDeleteModal/confirmDeleteModal.slice";
 
 const MODAL_STYLE = {
   position: "relative",
@@ -69,7 +75,8 @@ const CollapsibleRow = ({
 }) => {
   const dispatch = useAppDispatch();
   const [open, setOpen] = useState(false);
-  const hasSubRules = row.breakingRules && row.breakingRules.length > 0;
+  const childKey = level === 2 ? "specification" : "breakingRules";
+  // const hasSubRules = row[childKey] && row[childKey].length > 0;
   const canExpand = level < maxLevel;
 
   const [editableId, setEditableId] = useState(row.idBitmap || row.id || "");
@@ -107,6 +114,12 @@ const CollapsibleRow = ({
     setPositionsLength(row.positionsLength?.finalPos.toString() || "");
   }, [row.regex, row.isLengthVariable, row.positionsLength]);
 
+  useEffect(() => {
+    if (isLenghtVariable) {
+      setEditableOperator("<=");
+    }
+  }, [isLenghtVariable]);
+
   const handleChangeExpresion = (e: SelectChangeEvent) => {
     const newExpresion = e.target.value;
     let newRegex = regex;
@@ -142,16 +155,19 @@ const CollapsibleRow = ({
   };
 
   const handleSubRuleUpdate = (index: number, updatedSubRule: RuleRow) => {
-    if (row.breakingRules && onUpdate) {
-      const newSubRules = [...row.breakingRules];
-      newSubRules[index] = updatedSubRule;
+    if (onUpdate) {
+      const childKey = level === 2 ? "specification" : "breakingRules";
+      const children = row[childKey] || [];
+      const newChildren = [...children];
+      newChildren[index] = updatedSubRule;
+
       onUpdate({
         ...row,
         idBitmap: editableId,
         displayName: editableName,
         field: editableField,
         typeData: expresion,
-        breakingRules: newSubRules,
+        [childKey]: newChildren,
       });
     }
   };
@@ -160,6 +176,16 @@ const CollapsibleRow = ({
     const updatedRow: RuleRow = { ...row, ...changes };
     dispatch(updateRule({ _id: row._id ?? "", updatedRow }));
   };
+
+  const handleOpenDeleteModal = () => {
+    if (level > 1) {
+      console.log("current level:",level)
+      dispatch(openConfirmDeleteModal({ id: row._id, resource: "subRule" }))
+      return
+    }
+    
+    dispatch(openConfirmDeleteModal({ id: row._id, resource: "topRule" }))
+  }
 
   return (
     <>
@@ -259,7 +285,7 @@ const CollapsibleRow = ({
           </TableCell>
         )}
         <TableCell align="center">
-          {canExpand ? (
+          {level < 4 ? (
             <IconButton
               color="primary"
               onClick={() => setOpen(!open)}
@@ -276,8 +302,18 @@ const CollapsibleRow = ({
               <EditNoteOutlinedIcon style={{ color: "#ccc", fontSize: 18 }} />
             </IconButton>
           )}
+          {level < 4 && open && (
+            <IconButton
+              color="primary"
+              onClick={() => setOpen(!open)}
+              size="small"
+            >
+              <DeleteOutlinedIcon onClick={handleOpenDeleteModal} style={{ color: "gray" }} />
+            </IconButton>
+          )}
         </TableCell>
       </TableRow>
+
       {canExpand && (
         <TableRow style={{ paddingBottom: 0, paddingTop: 0, padding: 0 }}>
           <TableCell
@@ -333,6 +369,14 @@ const CollapsibleRow = ({
                             onChange={(e) => setPositionsLength(e.target.value)}
                             label="Posiciones de Longitud"
                             sx={{ fontSize: getFontSize() }}
+                            onBlur={() =>
+                              handleUpdate({
+                                positionsLength: {
+                                  initPos: 0,
+                                  finalPos: +positionsLength,
+                                },
+                              })
+                            }
                           />
                         </FormControl>
                       )}
@@ -387,9 +431,7 @@ const CollapsibleRow = ({
                             sx={{ fontSize: getFontSize() }}
                             value={regex}
                             onChange={(e) => setRegex(e.target.value)}
-                            onBlur={() =>
-                            handleUpdate({ regex: regex })
-                          }
+                            onBlur={() => handleUpdate({ regex: regex })}
                           />
                         </FormControl>
                       )}
@@ -432,6 +474,7 @@ const CollapsibleRow = ({
                     </Box>
                   </Box>
                 )}
+
                 <TableContainer
                   sx={{
                     tableLayout: "fixed",
@@ -474,8 +517,8 @@ const CollapsibleRow = ({
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {hasSubRules ? (
-                        row.breakingRules!.map((subRule, idx) => (
+                      {(row[childKey] || []).length > 0 ? (
+                        row[childKey]!.map((subRule, idx) => (
                           <CollapsibleRow
                             key={idx}
                             row={subRule}
@@ -562,6 +605,7 @@ export default function RulesEditPage() {
   const { updateExtractionRule, updating } = useAppSelector(
     (state) => state.extractionRules
   );
+  const { showToast } = useToast();
 
   const [version, setVersion] = useState(updateExtractionRule?.version ?? "");
   const [type, setType] = useState(updateExtractionRule?.type ?? "");
@@ -569,14 +613,35 @@ export default function RulesEditPage() {
     updateExtractionRule?.fields || []
   );
 
-  const handleAddSubRule = (parentId: string) => {
-    const siblings = findRuleById(rows, parentId)?.breakingRules || [];
-    const parentIdBitmap =
-      findRuleById(rows, parentId)?.idBitmap ||
-      findRuleById(rows, parentId)?.id ||
-      "";
+  const findRuleById = (rules: RuleRow[], id: string): RuleRow | null => {
+    for (const rule of rules) {
+      if (rule._id === id || rule.id === id) return rule;
 
+      // Buscar recursivamente tanto en breakingRules como en specification
+      const breakingFound =
+        rule.breakingRules && findRuleById(rule.breakingRules, id);
+      if (breakingFound) return breakingFound;
+
+      const specificationFound =
+        rule.specification && findRuleById(rule.specification, id);
+      if (specificationFound) return specificationFound;
+    }
+    return null;
+  };
+
+  const handleAddSubRule = (parentId: string) => {
+    const parent = findRuleById(rows, parentId);
+    if (!parent) return;
+
+    const level = (parent.idBitmap || parent.id || "").split(".").length;
+    console.log(2);
+    const childKey = level >= 2 ? "specification" : "breakingRules";
+
+    const siblings = parent[childKey] || [];
+
+    const parentIdBitmap = parent.idBitmap || parent.id || "";
     let nextNumber = 1;
+
     if (siblings.length > 0) {
       const existingNumbers = siblings
         .map((s) => {
@@ -590,28 +655,31 @@ export default function RulesEditPage() {
         existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1;
     }
 
-    const newSubRule: RuleRow = {
-      id: `${parentIdBitmap}.${nextNumber}`,
+    const newSubRuleBreakingRules: RuleRow = {
       _id: `new-${Date.now()}`,
+      id: `${parentIdBitmap}.${nextNumber}`,
       displayName: "Nueva Subregla",
-      specification: [],
+      field: "",
       length: 1,
+      typeData: "other",
+      specification: [],
     };
 
-    dispatch(addSubRule({ parentId, newRule: newSubRule }));
-  };
+    const newSubRuleSpecification: RuleRow = {
+      _id: `new-${Date.now()}`,
+      id: `${parentIdBitmap}.${nextNumber}`,
+      displayName: "Nueva Subregla",
+      field: "",
+      length: 1,
+      typeData: "other",
+    };
 
-  const findRuleById = (rules: RuleRow[], id: string): RuleRow | null => {
-    for (const rule of rules) {
-      if (rule._id === id || rule.id === id) {
-        return rule;
-      }
-      if (rule.breakingRules && rule.breakingRules.length > 0) {
-        const found = findRuleById(rule.breakingRules, id);
-        if (found) return found;
-      }
-    }
-    return null;
+    dispatch(
+      addSubRule({
+        parentId,
+        newRule: level >= 2 ? newSubRuleSpecification : newSubRuleBreakingRules,
+      })
+    );
   };
 
   const handleAddTopLevelRule = () => {
@@ -671,11 +739,27 @@ export default function RulesEditPage() {
     setRows(newRows);
   };
 
-  const updateRules = () => {
+  const updateRules = async () => {
     dispatch(activExtractionRules(false));
-    
-    if (updating) {
-      dispatch(updateExtractionRulesThunk(updateExtractionRule.uuid));
+
+    try {
+      if (updating) {
+        await dispatch(
+          updateExtractionRulesThunk(updateExtractionRule.uuid)
+        ).unwrap();
+        showToast("Regla actualizada correctamente", "success");
+      } else {
+        await dispatch(createExtractionRuleThunk()).unwrap();
+        showToast("Regla creada correctamente", "success");
+      }
+    } catch (error) {
+      console.error("Error al guardar la regla:", error);
+      showToast(
+        typeof error === "string"
+          ? error
+          : "Ocurrió un error al guardar la regla",
+        "error"
+      );
     }
   };
 
@@ -684,10 +768,11 @@ export default function RulesEditPage() {
       <Box sx={{ display: "flex", justifyContent: "space-between" }}>
         <Box>
           <Typography variant="h5" sx={{ fontWeight: 500, mb: 1 }}>
-            {updating ? "Actualización de Reglas" :  "Creación de Reglas"  } 
+            {updating ? "Actualización de Reglas" : "Creación de Reglas"}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {updating ? "Actualización de Reglas" :  "Creación de Reglas"  }  / {type.toUpperCase()} V{version}
+            {updating ? "Actualización de Reglas" : "Creación de Reglas"} /{" "}
+            {type.toUpperCase()} V{version}
           </Typography>
         </Box>
         <Box>

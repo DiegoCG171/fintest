@@ -40,7 +40,10 @@ import {
 } from "../security/security.thunk";
 import { initialAdminState } from "./admin.state";
 import { deleteRuleThunk, getAllRulesThunk } from "../rules/rules.thunk";
-import { updateExtractionRulesThunk } from "../extractionsRules/extractionRules.thunk";
+import {
+  createExtractionRuleThunk,
+  updateExtractionRulesThunk,
+} from "../extractionsRules/extractionRules.thunk";
 
 export const adminSlice = createSlice({
   name: "admin",
@@ -100,7 +103,6 @@ export const adminSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // ===== USERS =====
       .addCase(
         getAllUsersThunk.fulfilled,
         (state, action: PayloadAction<Users>) => {
@@ -136,7 +138,6 @@ export const adminSlice = createSlice({
         }
       )
 
-      // ===== INSTITUTIONS =====
       .addCase(
         getAllInstitutionsThunk.fulfilled,
         (state, action: PayloadAction<Institutions>) => {
@@ -169,8 +170,6 @@ export const adminSlice = createSlice({
           state.updateInstitution = undefined;
         }
       )
-
-      // ===== ROLES =====
       .addCase(
         getAllSecurityRolesThunk.fulfilled,
         (state, action: PayloadAction<Roles>) => {
@@ -274,7 +273,6 @@ export const adminSlice = createSlice({
         }
       )
 
-      // ===== ACTIONS =====
       .addCase(
         getAllSecurityActionsThunk.fulfilled,
         (state, action: PayloadAction<Actions>) => {
@@ -282,7 +280,6 @@ export const adminSlice = createSlice({
           state.searchTerm = action.payload.searchTerm;
         }
       )
-      // ===== RESOURCE =====
       .addCase(
         getAllSecurityResourcesThunk.fulfilled,
         (state, action: PayloadAction<Resources>) => {
@@ -295,6 +292,17 @@ export const adminSlice = createSlice({
         (state, action: PayloadAction<Rules>) => {
           state.rules = action.payload;
           state.searchTerm = action.payload.searchTerm;
+        }
+      )
+      .addCase(
+        createExtractionRuleThunk.fulfilled,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (state, action: PayloadAction<any>) => {
+          state.rules.data.push(action.payload);
+          state.rules.total += 1;
+          state.rules.totalSearch += 1;
+
+          state.updateRules = undefined;
         }
       )
       .addCase(
@@ -317,9 +325,6 @@ export const adminSlice = createSlice({
           const index = state.rules.data.findIndex(
             (rule) => String(rule.uuid) === String(id)
           );
-
-          console.log("Buscando uuid:", id, "→ índice encontrado:", index);
-
           if (index !== -1) {
             state.rules.data[index] = {
               ...state.rules.data[index],
