@@ -115,6 +115,7 @@ function CatalogsDataMiddleware({
     if (!rawRules?.length || formState) return;
     const data = transactionData?.length ? transactionData : rawRules
     const values = combineTemplateData(data, mappedRules, !transactionData?.length);
+    console.log(values)
     dispatch(setValuesForTab({ tabId, values, originalValues: values }));
     alreadyInitialized.current = true;
   }, [dispatch, tabId, rawRules, transactionData, mappedRules, formState]);
