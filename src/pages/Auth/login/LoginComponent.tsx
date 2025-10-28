@@ -1,7 +1,6 @@
 import { Box, Button, Stack, Typography } from "@mui/material";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { Formik } from "formik";
-import { Form } from "react-router-dom";
 import Link from "@mui/material/Link";
 import * as Yup from "yup";
 import CustomInputComponent from "../../../components/core/forms/CustomInput";
@@ -56,8 +55,8 @@ const LoginComponent = () => {
             }
           }}
         >
-          {({ errors, touched, getFieldProps, submitForm }) => (
-            <Form>
+          {({ errors, touched, getFieldProps, handleSubmit }) => (
+            <form onSubmit={handleSubmit}>
               <Stack spacing={2}>
                 <CustomInputComponent
                   label="Usuario"
@@ -93,7 +92,10 @@ const LoginComponent = () => {
                         "Revisa la información antes de enviarla.",
                         "info"
                       );
-                    } else submitForm()
+                    } else {
+                      e.preventDefault();
+                      handleSubmit()
+                    }
                   }}
                 >
                   Iniciar sesión
@@ -117,7 +119,7 @@ const LoginComponent = () => {
                   </Link>
                 </Stack>
               </Stack>
-            </Form>
+            </form>
           )}
         </Formik>
       </Box>
