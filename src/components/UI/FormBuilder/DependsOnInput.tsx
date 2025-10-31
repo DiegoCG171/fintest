@@ -1,20 +1,27 @@
 import { Box, Select, MenuItem, InputLabel } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../../store";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { CollectionCase } from "../../../config/interfaces/collections.interface";
 import { updateDependsOnId } from "../../../store/slices/UI/form/formBuilder.slice";
 
 interface Props {
   tabId: string;
   testCaseId: string;
+  dependsOn?: string
 }
 
-export const DependsOnInput = ({ tabId, testCaseId }: Props) => {
+export const DependsOnInput = ({ tabId, testCaseId, dependsOn }: Props) => {
   const dispatch = useAppDispatch();
   const { collections } = useAppSelector((state) => state.collections);
-  const dependsOnId = useAppSelector(
+  const dependsOnIdState = useAppSelector(
     (state) => state.formBuilder.tabForms[tabId]?.dependsOnId || ""
   );
+
+  useEffect(() => {
+    if (dependsOn && !dependsOnIdState) {
+      dispatch(updateDependsOnId({ tabId, dependsOnId: dependsOn }));
+    }
+  }, [dependsOn, dependsOnIdState, tabId, dispatch]);
 
   const matchedCollection = useMemo(() => {
     return collections?.find((col) =>
@@ -55,7 +62,7 @@ export const DependsOnInput = ({ tabId, testCaseId }: Props) => {
             padding: "4px 8px",
           },
         }}
-        value={dependsOnId}
+        value={dependsOnIdState}
         onChange={(e) =>
           dispatch(updateDependsOnId({ tabId, dependsOnId: e.target.value }))
         }

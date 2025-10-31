@@ -15,7 +15,7 @@ import {
   CatalogsDataMiddlewareProps,
   ColumnConfigFormBuilder,
 } from "../../config/interfaces";
-import { getTransactionByType } from "../../config/utils";
+import { getDependOnId, getTransactionByType } from "../../config/utils";
 import { useAuth } from "../../config/hooks/useAuth";
 import { hasPermission } from "../../config/utils/permissions";
 import {
@@ -80,6 +80,11 @@ function CatalogsDataMiddleware({
       return result;
     }
   }, [templates, templateId, formType, template, testCases]);
+
+  const dependsOn = useMemo(() => {
+    if (template.origin === "categories") return '';
+    return getDependOnId(testCases, templateId)
+  }, [template.origin, templateId, testCases])
 
   useEffect(() => {
     if (template.formType === "generationTransaction") {
@@ -183,6 +188,7 @@ function CatalogsDataMiddleware({
         <DependsOnInput
           tabId={tabId}
           testCaseId={templateId}
+          dependsOn={dependsOn}
         />
 
         {dependsOnId && (
