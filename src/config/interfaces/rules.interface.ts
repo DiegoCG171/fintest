@@ -1,15 +1,26 @@
 import { AsyncStatus } from "."
-
-export type RootRules = Rules[]
-
-export interface Rules {
-    _id: string
-    version: number
-    type: string
-    fields: Field[]
-    __v: number
+export interface RootRules {
+    data: Rules[]
+    totalSearch: number
+    total: number
+    limit: number
+    page: number
+    pages: number
+    order: string
 }
 
+export interface Rules {
+    schemaId: string
+    _id: string
+    uuid: string
+    version: number
+    type: string
+    deleteAt: string
+    __v: number
+    createdAt: string
+    updatedAt: string
+    fields: Field[]
+}
 export interface Field {
     positionsLength?: PositionsLength
     idBitmap: string
@@ -48,4 +59,13 @@ export interface RulesState {
     rules: Field[];
     status: AsyncStatus;
     error: string | null;
-}  
+}
+
+
+export interface AllRulesState {
+    allRulles: Rules[];
+    page: number;
+    hasMore: boolean;
+    status: AsyncStatus;
+    error: string | null;
+}

@@ -12,9 +12,15 @@ export interface ModalAddToCollectionProps {
     templateId?: string;
 }
 
+export interface ModaProfileProps {
+    id?: string
+}
+
 export interface ModalComponentPropsMap {
     ModalFormJson: ModalFormProps;
     ModalAddToCollection: ModalAddToCollectionProps
+    ModalProfile: ModaProfileProps
+    SessionWarning: ModaProfileProps
 }
 
 

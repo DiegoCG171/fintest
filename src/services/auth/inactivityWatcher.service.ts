@@ -1,10 +1,10 @@
+import { openModal } from "../../store";
 import { AppStore } from "../../store/store";
 import { ensureValidToken, getTokenTimeLeft } from "./tokenManager.service";
 
-
-const CHECK_INTERVAL_MS = 30 * 1000; 
-const REFRESH_THRESHOLD = 60; 
-const MAX_IDLE_BEFORE_SKIP = 5 * 60 * 1000; 
+const CHECK_INTERVAL_MS = 30 * 1000;
+const REFRESH_THRESHOLD = 60;
+const MAX_IDLE_BEFORE_SKIP = 1 * 60 * 1000;
 
 let lastActivity = Date.now();
 let intervalId: NodeJS.Timeout | null = null;
@@ -14,7 +14,7 @@ function resetActivity() {
 }
 
 export function startInactivityWatcher(store: AppStore) {
-    if (intervalId) return; 
+    if (intervalId) return;
 
     ["click", "keydown", "mousemove", "scroll"].forEach((evt) =>
         window.addEventListener(evt, resetActivity)
@@ -27,14 +27,23 @@ export function startInactivityWatcher(store: AppStore) {
         const timeLeft = getTokenTimeLeft(token);
         const idleMs = Date.now() - lastActivity;
 
-        if (timeLeft <= REFRESH_THRESHOLD && idleMs < MAX_IDLE_BEFORE_SKIP) {
+        if (idleMs >= MAX_IDLE_BEFORE_SKIP) {
+            store.dispatch(
+                openModal({
+                    componentKey: "SessionWarning"
+                })
+            );
+        }
+        if (timeLeft <= REFRESH_THRESHOLD) {
             await ensureValidToken(store);
         }
     }, CHECK_INTERVAL_MS);
 }
 
 export function stopInactivityWatcher() {
-    if (intervalId) clearInterval(intervalId);
+    if (intervalId) {
+        clearInterval(intervalId);
+    }
     intervalId = null;
 
     ["click", "keydown", "mousemove", "scroll"].forEach((evt) =>

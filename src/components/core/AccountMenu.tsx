@@ -7,7 +7,7 @@ import {
   Typography,
 } from "@mui/material";
 import React from "react";
-import { logout, useAppDispatch, useAppSelector } from "../../store";
+import { logout, openModal, useAppDispatch, useAppSelector } from "../../store";
 import { activeChangePassword } from "../../store/slices/auth/auth.slice";
 import { useNavigate } from "react-router-dom";
 
@@ -33,7 +33,7 @@ const BadgeContent = () => {
 
 function AccountMenu() {
   const dispatch = useAppDispatch();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const user = useAppSelector((state) => state.auth.user);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -54,23 +54,56 @@ function AccountMenu() {
   const handleChangePassword = () => {
     handleClose();
     dispatch(activeChangePassword());
-    navigate('/change-password')
+    navigate("/change-password");
+  };
+
+  const handleProfile = () => {
+    handleClose();
+    dispatch(
+      openModal({
+        componentKey: "ModalProfile",
+        componentProps: { id: 'id '},
+      })
+    );
   };
 
   return (
-    <Stack spacing={2} direction="row">
+    <Stack
+      spacing={2}
+      direction="row"
+    >
       <BadgeContent></BadgeContent>
       <ButtonBase onClick={handleClick}>
-        <Stack spacing={0} alignItems="flex-start">
+        <Stack
+          spacing={0}
+          alignItems="flex-start"
+        >
           <Typography variant="subtitle2">{`${user?.names} ${user?.surnames}`}</Typography>
           <Typography variant="caption">{`${user?.username} `}</Typography>
         </Stack>
       </ButtonBase>
-      <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-        <MenuItem onClick={handleChangePassword} sx={{ fontSize: "0.75rem" }}>
+      <Menu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+      >
+        <MenuItem
+          onClick={handleProfile}
+          sx={{ fontSize: "0.75rem" }}
+        >
+          Perfil
+        </MenuItem>
+        <MenuItem
+          onClick={handleChangePassword}
+          sx={{ fontSize: "0.75rem" }}
+        >
           Cambiar contraseña
         </MenuItem>
-        <MenuItem onClick={handleLogout} sx={{ fontSize: "0.75rem" }}>
+        
+        <MenuItem
+          onClick={handleLogout}
+          sx={{ fontSize: "0.75rem" }}
+        >
           Cerrar sesión
         </MenuItem>
       </Menu>
