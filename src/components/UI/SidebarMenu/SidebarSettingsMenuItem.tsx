@@ -37,7 +37,7 @@ export const SidebarSettingsMenuItem = ({
   const handleNavigate = () => {
     if (formActive || extractionRulesActive) return;
     dispatch(changeActiveMenuOption(label));
-    navigate(`/settings/${path}`);
+    navigate(`/settings/${path}`, { replace: true });
   };
 
   return (

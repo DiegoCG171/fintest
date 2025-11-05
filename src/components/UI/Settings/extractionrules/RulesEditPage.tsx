@@ -23,7 +23,7 @@ import LibraryAddOutlinedIcon from "@mui/icons-material/LibraryAddOutlined";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import EditNoteOutlinedIcon from "@mui/icons-material/EditNoteOutlined";
 import CheckOutlinedIcon from "@mui/icons-material/CheckOutlined";
-import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import { activExtractionRules } from "../../../../store/slices/admin/admin.slice";
@@ -75,8 +75,9 @@ const CollapsibleRow = ({
 }) => {
   const dispatch = useAppDispatch();
   const [open, setOpen] = useState(false);
+  const { changes, updating } = useAppSelector((state) => state.extractionRules);
+  const hasChanges = Boolean(changes[row._id || row.id || ""]);
   const childKey = level === 2 ? "specification" : "breakingRules";
-  // const hasSubRules = row[childKey] && row[childKey].length > 0;
   const canExpand = level < maxLevel;
 
   const [editableId, setEditableId] = useState(row.idBitmap || row.id || "");
@@ -179,17 +180,20 @@ const CollapsibleRow = ({
 
   const handleOpenDeleteModal = () => {
     if (level > 1) {
-      console.log("current level:",level)
-      dispatch(openConfirmDeleteModal({ id: row._id, resource: "subRule" }))
-      return
+      dispatch(openConfirmDeleteModal({ id: row._id, resource: "subRule" }));
+      return;
     }
-    
-    dispatch(openConfirmDeleteModal({ id: row._id, resource: "topRule" }))
-  }
+
+    dispatch(openConfirmDeleteModal({ id: row._id, resource: "topRule" }));
+  };
 
   return (
     <>
-      <TableRow>
+      <TableRow
+        sx={{
+          backgroundColor: hasChanges && updating ? "#fff7d6" : "inherit",
+        }}
+      >
         <TableCell
           sx={{
             fontSize: getFontSize(),
@@ -202,9 +206,12 @@ const CollapsibleRow = ({
               size="small"
               value={editableId}
               onChange={(e) => setEditableId(e.target.value)}
-              onBlur={() =>
-                handleUpdate({ idBitmap: editableId, id: editableId })
-              }
+              onBlur={() => {
+                const payload: Partial<RuleRow> =
+                  level < 2 ? { idBitmap: editableId } : { id: editableId };
+
+                handleUpdate(payload);
+              }}
               sx={{ fontSize: getFontSize(), width: "100%" }}
             />
           ) : (
@@ -218,7 +225,10 @@ const CollapsibleRow = ({
               value={editableName}
               onChange={(e) => setEditableName(e.target.value)}
               onBlur={() => handleUpdate({ displayName: editableName })}
-              sx={{ fontSize: getFontSize(), width: "100%" }}
+              sx={{
+                fontSize: getFontSize(),
+                width: "100%",
+              }}
             />
           ) : (
             row.displayName
@@ -308,7 +318,10 @@ const CollapsibleRow = ({
               onClick={() => setOpen(!open)}
               size="small"
             >
-              <DeleteOutlinedIcon onClick={handleOpenDeleteModal} style={{ color: "gray" }} />
+              <DeleteOutlinedIcon
+                onClick={handleOpenDeleteModal}
+                style={{ color: "gray" }}
+              />
             </IconButton>
           )}
         </TableCell>
@@ -602,7 +615,7 @@ const CollapsibleRow = ({
 
 export default function RulesEditPage() {
   const dispatch = useAppDispatch();
-  const { updateExtractionRule, updating } = useAppSelector(
+  const { updateExtractionRule, updating, changes } = useAppSelector(
     (state) => state.extractionRules
   );
   const { showToast } = useToast();
@@ -613,11 +626,14 @@ export default function RulesEditPage() {
     updateExtractionRule?.fields || []
   );
 
+  const ruleId = updateExtractionRule?.uuid || "root";
+  const hasVersionChanges = changes?.[ruleId]?.["version"] !== undefined;
+  const hasTypeChanges = changes?.[ruleId]?.["type"] !== undefined;
+
   const findRuleById = (rules: RuleRow[], id: string): RuleRow | null => {
     for (const rule of rules) {
       if (rule._id === id || rule.id === id) return rule;
 
-      // Buscar recursivamente tanto en breakingRules como en specification
       const breakingFound =
         rule.breakingRules && findRuleById(rule.breakingRules, id);
       if (breakingFound) return breakingFound;
@@ -634,7 +650,6 @@ export default function RulesEditPage() {
     if (!parent) return;
 
     const level = (parent.idBitmap || parent.id || "").split(".").length;
-    console.log(2);
     const childKey = level >= 2 ? "specification" : "breakingRules";
 
     const siblings = parent[childKey] || [];
@@ -796,9 +811,20 @@ export default function RulesEditPage() {
             onChange={handleVersionChange}
             onBlur={(e) => dispatch(setVersionForm(+e.target.value))}
             inputProps={{ min: 1 }}
+            sx={{
+              "& .MuiOutlinedInput-input": {
+                backgroundColor: hasVersionChanges && updating
+                  ? "#fff7d6"
+                  : "inherit",
+              },
+            }}
           />
         </FormControl>
-        <FormControl sx={{ flex: 1 }}>
+        <FormControl
+          sx={{
+            flex: 1,
+          }}
+        >
           <InputLabel id="select-label">Tipo</InputLabel>
           <Select
             labelId="select-label"
@@ -807,6 +833,13 @@ export default function RulesEditPage() {
             label="Tipo"
             onChange={handleTypeChange}
             onBlur={(e) => dispatch(setTypeForm(e.target.value))}
+            sx={{
+              "& .MuiSelect-select": {
+                backgroundColor: hasTypeChanges && updating
+                  ? "#fff7d6"
+                  : "inherit",
+              },
+            }}
           >
             <MenuItem value={"pos"}>POS</MenuItem>
             <MenuItem value={"atm"}>ATM</MenuItem>

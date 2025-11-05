@@ -4,7 +4,7 @@ import { getAllUsersThunk, useAppDispatch} from "../../store";
 import { getAllInstitutionsThunk } from "../../store/slices/institutions/institutions.thunk";
 import { getAllSecurityActionsThunk, getAllSecurityPermissionsThunk, getAllSecurityResourcesThunk, getAllSecurityRolesThunk } from "../../store/slices/security/security.thunk";
 import { useAuth } from "./useAuth";
-import { getAllRulesThunk } from "../../store/slices/rules/rules.thunk";
+import { getAllExtractionRulesThunk } from "../../store/slices/extractionsRules/extractionRules.thunk";
 
 export const useLoadSettingsData = () => {
   const dispatch = useAppDispatch();
@@ -24,7 +24,7 @@ export const useLoadSettingsData = () => {
       dispatch(getAllSecurityPermissionsThunk());
     }
     if (hasPermission(userPermissions, "read", "rol")) {
-      dispatch(getAllRulesThunk());
+      dispatch(getAllExtractionRulesThunk());
     }
     dispatch(getAllSecurityActionsThunk());
     dispatch(getAllSecurityResourcesThunk());

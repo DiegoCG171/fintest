@@ -127,7 +127,6 @@ function TabTableComponent({
         overflow: "hidden",
       }}
     >
-      {/* Header de Tabs */}
       <Box
         sx={{
           overflowX: "auto",
@@ -197,8 +196,6 @@ function TabTableComponent({
           })}
         </Tabs>
       </Box>
-
-      {/* Contenido de la Tab */}
       <Box
         sx={{
           flexGrow: 1,

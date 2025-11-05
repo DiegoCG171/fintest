@@ -1,8 +1,7 @@
 import api from "../../api/api";
 import { ENDPOINTS } from "../../config/constants/endpoints";
-import { GetFilters, RootRules } from "../../config/interfaces";
+import { RootRules, Rules } from "../../config/interfaces";
 import { handleAxiosError } from "../../config/utils/axiosErrorHandler";
-import { RuleState } from "../../store/slices/extractionsRules/extractionRulesSlice";
 
 export const getRules = async (
     params?: Record<string, string | number | boolean>
@@ -16,57 +15,14 @@ export const getRules = async (
     }
 };
 
-export const getAllRules = async (filters?: GetFilters) => {
-  try {
-    const response = await api.get(`${ENDPOINTS.getRules}`, {
-      params: filters,
-    });
-    return response.data;
-  } catch (error) {
-    const errorMessage = handleAxiosError(error);
-    throw errorMessage;
-  }
-};
-
 export const getRuleById = async (
     uuid: string
-): Promise<RuleState> => {
+): Promise<Rules> => {
     try {
-        const response = await api.get<RuleState>(`${ENDPOINTS.getRules}/${uuid}`);
+        const response = await api.get<Rules>(`${ENDPOINTS.getRules}/${uuid}`);
         return response.data;
     } catch (error) {
         const errorMessage = handleAxiosError(error);
         throw errorMessage;
     }
-};
-
-
-export const createRule = async (data: Partial<RuleState> ) => {
-  try {
-    const response = await api.post<RuleState>(`${ENDPOINTS.getRules}`, data);
-    return response.data;
-  } catch (error) {
-    const errorMessage = handleAxiosError(error);
-    throw errorMessage;
-  }
-}
-
-export const updateRule = async (id: string, data: Partial<RuleState> ) => {
-  try {
-    const response = await api.patch<RuleState>(`${ENDPOINTS.getRules}/${id}`, data);
-    return response.data;
-  } catch (error) {
-    const errorMessage = handleAxiosError(error);
-    throw errorMessage;
-  }
-}
-
-export const deleteRule = async (id: string) => {
-  try {
-    const response = await api.delete(`${ENDPOINTS.getRules}/${id}`);
-    return response;
-  } catch (error) {
-    const errorMessage = handleAxiosError(error);
-    throw errorMessage;
-  }
 };

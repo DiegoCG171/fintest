@@ -39,9 +39,10 @@ import {
   updateSecurityRolesThunk,
 } from "../security/security.thunk";
 import { initialAdminState } from "./admin.state";
-import { deleteRuleThunk, getAllRulesThunk } from "../rules/rules.thunk";
 import {
   createExtractionRuleThunk,
+  deleteExtractionRuleThunk,
+  getAllExtractionRulesThunk,
   updateExtractionRulesThunk,
 } from "../extractionsRules/extractionRules.thunk";
 
@@ -288,7 +289,7 @@ export const adminSlice = createSlice({
         }
       )
       .addCase(
-        getAllRulesThunk.fulfilled,
+        getAllExtractionRulesThunk.fulfilled,
         (state, action: PayloadAction<Rules>) => {
           state.rules = action.payload;
           state.searchTerm = action.payload.searchTerm;
@@ -306,7 +307,7 @@ export const adminSlice = createSlice({
         }
       )
       .addCase(
-        deleteRuleThunk.fulfilled,
+        deleteExtractionRuleThunk.fulfilled,
         (state, action: PayloadAction<string>) => {
           state.rules.data = state.rules.data.filter(
             (perm) => perm.id !== action.payload

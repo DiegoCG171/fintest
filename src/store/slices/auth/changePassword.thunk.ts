@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { ChangePasswordCredentials } from "../../../config/interfaces";
 import { changePasswordService } from "../../../services/auth/changePassword.service";
-import { logout } from "./auth.slice";
+import { logoutThunk } from "./login.thunk";
 
 export const changePasswordThunk = createAsyncThunk<
   void,
@@ -26,7 +26,7 @@ export const changePasswordThunk = createAsyncThunk<
       }
 
       if (message.includes("bloqueado")) {
-        dispatch(logout());
+        dispatch(logoutThunk());
       }
 
       return rejectWithValue(message);

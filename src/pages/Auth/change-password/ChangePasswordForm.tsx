@@ -4,9 +4,10 @@ import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import CustomInputComponent from "../../../components/core/forms/CustomInput";
 import { useToast } from "../../../config/hooks/useToast";
-import { logout, useAppDispatch } from "../../../store";
+import { useAppDispatch } from "../../../store";
 import { setLoading } from "../../../store";
 import { changePasswordThunk } from "../../../store/slices/auth/changePassword.thunk";
+import { logoutThunk } from "../../../store/slices/auth/login.thunk";
 
 export const ChangePasswordForm = ({
   title,
@@ -57,7 +58,7 @@ export const ChangePasswordForm = ({
                   newPassword: values.newPassword,
                 })
               ).unwrap();
-              dispatch(logout())
+              dispatch(logoutThunk())
               showToast("Contraseña actualizada con éxito", "success");
               navigate("/home");
             } catch (error) {

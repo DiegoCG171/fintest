@@ -14,7 +14,7 @@ import {
   getAllSecurityPermissionsThunk,
   getAllSecurityRolesThunk,
 } from "../../store/slices/security/security.thunk";
-import { getAllRulesThunk } from "../../store/slices/rules/rules.thunk";
+import { getAllExtractionRulesThunk } from "../../store/slices/extractionsRules/extractionRules.thunk";
 
 export const useDynamicTable = () => {
   const dispatch = useAppDispatch();
@@ -128,7 +128,7 @@ export const useDynamicTable = () => {
             sortBy: newSortBy,
             order: newOrder.toUpperCase(),
           });
-          return getAllRulesThunk(filters);
+          return getAllExtractionRulesThunk(filters);
         },
       };
 

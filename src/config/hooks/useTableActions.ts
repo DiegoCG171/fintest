@@ -6,7 +6,7 @@ import {
   setUpdateRol,
   setUpdateUser,
 } from "../../store/slices/admin/admin.slice";
-import { getRuleByIdThunk } from "../../store/slices/rules/rules.thunk";
+import { getExtractionRuleByIdThunk } from "../../store/slices/extractionsRules/extractionRules.thunk";
 import { openConfirmDeleteModal } from "../../store/slices/UI/confirmDeleteModal/confirmDeleteModal.slice";
 import { RESOURCE_MAP } from "../constants/tableSettings";
 import { EntityType, RouteType } from "../interfaces/tableSettings.interface";
@@ -50,7 +50,7 @@ export const useTableActions = () => {
       case "/settings/rule":
         if (isRule(selectedItem)) {
           dispatch(setLoading(true));
-          dispatch(getRuleByIdThunk({ uuid: selectedItem.uuid }))
+          dispatch(getExtractionRuleByIdThunk({ uuid: selectedItem.uuid }))
             .unwrap()
             .finally(() => {
               dispatch(setLoading(false));

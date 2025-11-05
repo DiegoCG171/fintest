@@ -1,9 +1,9 @@
 import { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from "axios";
 import { jwtDecode } from "jwt-decode";
 import { AppStore } from "../store/store";
-import { logout } from "../store";
 import { renewTokenThunk } from "../store/slices/auth/renewTokenThunk.thunk";
 import { emitToast } from "../config/utils/toastEmitter";
+import { logoutThunk } from "../store/slices/auth/login.thunk";
 
 const ONE_MINUTE_IN_SECONDS = 60;
 
@@ -40,7 +40,7 @@ export const setupAxiosInterceptors = (api: AxiosInstance, store: AppStore) => {
       const timeLeft = decoded.exp - currentTime;
 
       if (timeLeft <= 0) {
-        store.dispatch(logout());
+        store.dispatch(logoutThunk());
         return Promise.reject(new Error("Token expired"));
       }
 
@@ -64,7 +64,7 @@ export const setupAxiosInterceptors = (api: AxiosInstance, store: AppStore) => {
           config.headers.Authorization = `Bearer ${newToken}`;
         } catch (err) {
           emitToast("Error al renovar token", "error");
-          store.dispatch(logout());
+          store.dispatch(logoutThunk());
           return Promise.reject(err);
         } finally {
           isRefreshing = false;

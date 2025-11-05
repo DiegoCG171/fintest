@@ -14,8 +14,8 @@ import { useEffect, useState } from "react";
 import { deleteTemplateThunk } from "../../../store/slices/templates/templates.thunk";
 import { deleteInstitutionsThunk } from "../../../store/slices/institutions/institutions.thunk";
 import { deleteSecurityPermissionsThunk, deleteSecurityRolesThunk } from "../../../store/slices/security/security.thunk";
-import { deleteRuleThunk } from "../../../store/slices/rules/rules.thunk";
 import { removeSubRule, removeTopLevelRule } from "../../../store/slices/extractionsRules/extractionRulesSlice";
+import { deleteExtractionRuleThunk } from "../../../store/slices/extractionsRules/extractionRules.thunk";
 
 const resourceActions = {
   testCase: {
@@ -67,7 +67,7 @@ const resourceActions = {
     title: "¿Estás seguro de que deseas eliminar el permiso?",
   },
   rule: {
-    deleteThunk: deleteRuleThunk,
+    deleteThunk: deleteExtractionRuleThunk,
     toastMessage: "Regla eliminada correctamente",
     title: "¿Estás seguro de que deseas eliminar la regla?",
   },

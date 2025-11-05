@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { login as loginService } from "../../../services";
+import { login as loginService, logout as LogoutService } from "../../../services";
 import { LoginCredentials, LoginResponse } from "../../../config/interfaces";
 
 export const loginThunk = createAsyncThunk<
@@ -19,5 +19,24 @@ export const loginThunk = createAsyncThunk<
         } catch (error: unknown) {
             return rejectWithValue(error as string);
         } 
+    }
+);
+
+
+export const logoutThunk = createAsyncThunk<
+    void,
+    void,
+    { rejectValue: string }
+>(
+    'auth/logout',
+    async (_, { rejectWithValue }) => {
+        try {
+            await LogoutService();
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            localStorage.removeItem('refreshToken');
+        } catch (error: unknown) {
+            return rejectWithValue(error as string);
+        }
     }
 );

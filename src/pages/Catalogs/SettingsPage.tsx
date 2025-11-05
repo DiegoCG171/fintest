@@ -9,7 +9,7 @@ import { useLoadSettingsData } from "../../config/hooks/useLoadSettingsData";
 import { useLoadSecurityPermissionOptions } from "../../config/hooks/useLoadSecurityPermissionOptions";
 import { useSettingsSearch } from "../../config/hooks/useSettingsSearch";
 import { SettingsSearchBar } from "../../components/UI/Settings/SettingsSearchBar";
-import RulesEditPage from "../../components/UI/Settings/extractionrules/RulesEditPage";
+import { RulesEditPage } from "../../components/UI/Settings/extractionRulesSection/RulesEditPage";
 
 export const SettingsPage = () => {
   const { formActive, extractionRulesActive } = useAppSelector(
