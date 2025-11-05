@@ -42,7 +42,7 @@ export const DependsOnInput = ({ tabId, testCaseId }: Props) => {
           fontSize: "0.9rem",
         }}
       >
-        Selecciona el Caso de Prueba:
+        Depende del Caso:
       </InputLabel>
       <Select
         labelId="dependsOnd"
@@ -65,7 +65,7 @@ export const DependsOnInput = ({ tabId, testCaseId }: Props) => {
           value=""
           sx={{ fontSize: "0.75rem" }}
         >
-          <em>...</em>
+          <em>No Aplica</em>
         </MenuItem>
         {matchedCollection?.cases
           ?.filter((c: CollectionCase) => c.uuid !== testCaseId)
