@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { geSelectiontFunctions, getGenetationFunctions, getValidationFunctions } from "../../../services/catalogs/functionSelect.service";
+import { geSelectiontFunctions, getDependsOnFunctions, getGenetationFunctions, getValidationFunctions } from "../../../services/catalogs/functionSelect.service";
 
 export const getGenetationFunctionsThunk = createAsyncThunk(
   "functionsSelect/getAllGeneration",
@@ -40,16 +40,7 @@ export const getDependsOnTransactionFunctionsThunk = createAsyncThunk(
   "functionsSelect/DependsOnTransaction",
   async (_, { rejectWithValue }) => {
     try {
-      const options = [
-        {
-          "value": "de_request",
-          "label": "Petición"
-        },
-        {
-          "value": "de_response",
-          "label": "Respuesta"
-        }
-      ];
+      const options = await getDependsOnFunctions();
       return options;
     } catch (error: unknown) {
       return rejectWithValue(error as string);

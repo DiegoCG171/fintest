@@ -31,3 +31,13 @@ export const geSelectiontFunctions = async () => {
         throw errorMessage;
     }
 }
+
+export const getDependsOnFunctions = async () => {
+    try {
+        const {data} = await api.get(`${ENDPOINTS.template}/functions/dependOn` );
+        return data;
+    } catch (error) {
+        const errorMessage = handleAxiosError(error);
+        throw errorMessage;
+    }
+}
