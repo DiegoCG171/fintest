@@ -12,20 +12,16 @@ export function getTransactionByType(
   if (!template) {
     return null;
   }
-  const templateWithDepend = {
-    ...template,
-    dependOnTransaction: template.dependOnTransaction ?? [],
-  };
 
   switch (formType) {
     case "validationTransaction":
-      return templateWithDepend.validationTransaction ?? [];
+      return template.validationTransaction ?? [];
     case "generationTransaction":
-      return templateWithDepend.generationTransaction ?? [];
+      return template.generationTransaction ?? [];
     case "selectionTransaction":
-      return templateWithDepend.selectionTransaction ?? [];
+      return template.selectionTransaction ?? [];
     case "dependOnTransaction":
-      return templateWithDepend.dependOnTransaction ?? [];
+      return template.dependOnTransaction ?? [];
     default:
       return null;
   }
@@ -45,6 +41,21 @@ export function getTemplateID(
   }
 
   return template._id
+}
+
+export function getDependOnId(
+  templates: testCaseInterface[],
+  templateId: string,
+) {
+  const template = templates.find(
+    (t) => t._id?.toString() === templateId.toString() || t.uuid?.toString() === templateId.toString()
+  );
+
+  if (!template) {
+    return undefined;
+  }
+
+  return template.dependOn || ''
 }
 
 

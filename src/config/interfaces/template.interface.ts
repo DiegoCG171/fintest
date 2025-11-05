@@ -5,6 +5,7 @@ export interface TemplateContextType {
     _id: string
     name: string
     description: string
+    dependOn: string
     categoryId: string
     type: string
     validationTransaction: FieldValidation[]
