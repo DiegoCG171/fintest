@@ -1,6 +1,6 @@
 import { combineReducers, UnknownAction } from "@reduxjs/toolkit";
 
-import { authSlice } from "./slices/auth/auth.slice";
+import { authSlice, logout } from "./slices/auth/auth.slice";
 import { categoriesSlice } from "./slices/categories/categories.slice";
 import { formBuilderSlice } from "./slices/UI/form/formBuilder.slice";
 import { jsonTemplateDraftSlice } from "./slices/UI/form/jsonTemplateDraft.slice";
@@ -27,7 +27,6 @@ import { institutionSlice } from "./slices/institutions/institutions.slice";
 import { securitySlice } from "./slices/security/security.slice";
 import { emmisorModalConfigSlice } from "./slices/UI/emmisorModalConfig/emmisorModalConfig.slice";
 import { extractionRulesSlice } from "./slices/extractionsRules/extractionRulesSlice";
-import { logoutThunk } from "./slices/auth/login.thunk";
 
 const appReducer = combineReducers({
     auth: authSlice.reducer,
@@ -60,7 +59,7 @@ const appReducer = combineReducers({
 });
 
 const rootReducer = (state: ReturnType<typeof appReducer> | undefined, action: UnknownAction) => {
-    if (action.type === logoutThunk.fulfilled.type) {
+    if (action.type === logout.type) {
         state = undefined;
     }
     return appReducer(state, action);

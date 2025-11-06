@@ -30,11 +30,10 @@ export const logoutThunk = createAsyncThunk<
 >(
     'auth/logout',
     async (_, { rejectWithValue }) => {
+        console.log("Logout successful");
         try {
             await LogoutService();
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            localStorage.removeItem('refreshToken');
+            return;
         } catch (error: unknown) {
             return rejectWithValue(error as string);
         }

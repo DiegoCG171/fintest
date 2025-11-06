@@ -19,6 +19,15 @@ export const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
+    logout(state) {
+      state.user = null;
+      state.changePasswordActive = false;
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      localStorage.removeItem("refreshToken");
+      state.isAuthenticated = false;
+      localStorage.clear();
+    },
     clearAuthError(state) {
       state.error = null;
     },
@@ -54,14 +63,16 @@ export const authSlice = createSlice({
         state.token = null;
         state.isAuthenticated = false;
         state.changePasswordActive = false;
-        localStorage.clear();
       })
       .addCase(logoutThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload ?? "Error desconocido";
+        state.user = null;
+        state.token = null;
+        state.isAuthenticated = false;
+        state.changePasswordActive = false;
       });
   },
 });
 
-export const { clearAuthError, activeChangePassword } =
-  authSlice.actions;
+export const { clearAuthError, activeChangePassword, logout } = authSlice.actions;

@@ -288,7 +288,6 @@ function DynamicField({
   }
 
   if (column.dynamicRender && dependsValue !== undefined) {
-    console.log(column.dynamicRender);
     const dynamic = column.dynamicRender[dependsValue as string];
     if (!dynamic?.render) return null;
     let options = dynamic.options ?? [];
