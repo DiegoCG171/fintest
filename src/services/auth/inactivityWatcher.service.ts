@@ -4,7 +4,7 @@ import { ensureValidToken, getTokenTimeLeft } from "./tokenManager.service";
 
 const CHECK_INTERVAL_MS = 30 * 1000;
 const REFRESH_THRESHOLD = 60;
-const MAX_IDLE_BEFORE_SKIP = 1 * 60 * 1000;
+const MAX_IDLE_BEFORE_SKIP = 5 * 60 * 1000;
 
 let lastActivity = Date.now();
 let intervalId: NodeJS.Timeout | null = null;

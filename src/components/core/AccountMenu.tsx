@@ -91,7 +91,7 @@ function AccountMenu() {
           onClick={handleProfile}
           sx={{ fontSize: "0.75rem" }}
         >
-          Perfil
+          Configuración
         </MenuItem>
         <MenuItem
           onClick={handleChangePassword}
