@@ -48,6 +48,7 @@ function CatalogsDataMiddleware({
   );
 
   const alreadyInitialized = useRef(false);
+  
   const hasDependency = template.label === "Dependencia" ? true : false;
 
   // Functions Selects states

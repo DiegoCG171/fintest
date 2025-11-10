@@ -1,13 +1,19 @@
-import { Box, Select, MenuItem, InputLabel } from "@mui/material";
+import {
+  Box,
+  Select,
+  MenuItem,
+  InputLabel,
+  SelectChangeEvent,
+} from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../../store";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { CollectionCase } from "../../../config/interfaces/collections.interface";
 import { updateDependsOnId } from "../../../store/slices/UI/form/formBuilder.slice";
 
 interface Props {
   tabId: string;
   testCaseId: string;
-  dependsOn?: string
+  dependsOn?: string;
 }
 
 export const DependsOnInput = ({ tabId, testCaseId, dependsOn }: Props) => {
@@ -17,9 +23,12 @@ export const DependsOnInput = ({ tabId, testCaseId, dependsOn }: Props) => {
     (state) => state.formBuilder.tabForms[tabId]?.dependsOnId || ""
   );
 
+  const initialized = useRef(false);
+
   useEffect(() => {
-    if (dependsOn && !dependsOnIdState) {
+    if (!initialized.current && dependsOn && !dependsOnIdState) {
       dispatch(updateDependsOnId({ tabId, dependsOnId: dependsOn }));
+      initialized.current = true;
     }
   }, [dependsOn, dependsOnIdState, tabId, dispatch]);
 
@@ -29,14 +38,18 @@ export const DependsOnInput = ({ tabId, testCaseId, dependsOn }: Props) => {
     );
   }, [collections, testCaseId]);
 
+  const handleChange = (e: SelectChangeEvent<string>) => {
+    dispatch(updateDependsOnId({ tabId, dependsOnId: e.target.value }));
+  };
+
   return (
     <Box
       sx={{
         mb: 2,
         width: {
-          xs: "100%", 
+          xs: "100%",
           sm: "100%",
-          md: "30%", 
+          md: "30%",
         },
         display: "flex",
         alignItems: "baseline",
@@ -47,6 +60,10 @@ export const DependsOnInput = ({ tabId, testCaseId, dependsOn }: Props) => {
         id="dependsOnd"
         sx={{
           fontSize: "0.9rem",
+          whiteSpace: "normal",
+          overflow: "visible",
+          textOverflow: "unset",
+          flexShrink: 0,
         }}
       >
         Depende del Caso:
@@ -60,12 +77,15 @@ export const DependsOnInput = ({ tabId, testCaseId, dependsOn }: Props) => {
           borderRadius: 2,
           "& .MuiSelect-select": {
             padding: "4px 8px",
+            display: "block",
+            maxWidth: "20ch",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
           },
         }}
         value={dependsOnIdState}
-        onChange={(e) =>
-          dispatch(updateDependsOnId({ tabId, dependsOnId: e.target.value }))
-        }
+        onChange={handleChange}
         displayEmpty
       >
         <MenuItem
@@ -80,7 +100,13 @@ export const DependsOnInput = ({ tabId, testCaseId, dependsOn }: Props) => {
             <MenuItem
               key={c.uuid}
               value={c.uuid}
-              sx={{ fontSize: "0.75rem" }}
+              sx={{
+                fontSize: "0.75rem",
+                maxWidth: "20ch",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
             >
               {c.name}
             </MenuItem>

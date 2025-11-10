@@ -73,8 +73,6 @@ function TabbedTableForm({
   const templates = useAppSelector((state) => state.templates.templates);
   const testCases = useAppSelector((state) => state.testCases.testCases);
 
-  console.log('[tabs[value]]', tabs[value])
-
   const currentTabId = useMemo(() => {
     return tabs[value]
       ? `${tabs[value].templateId}-${tabs[value].formType}`
@@ -84,7 +82,6 @@ function TabbedTableForm({
   const dependsOnId = useAppSelector(
     (state) => state.formBuilder.tabForms[currentTabId]?.dependsOnId || ""
   );
-  console.log(dependsOnId, '::::::::::dependsOnId')
 
   const tabForm = useAppSelector(
     (state) => state.formBuilder.tabForms[currentTabId]
@@ -117,7 +114,9 @@ function TabbedTableForm({
 
   useEffect(() => {
     if (!alreadyFetchedRules.current && statusRules === "idle") {
-      dispatch(getRuleByIdThunk({uuid: 'b181c3a0-fa60-48c2-888a-7f8f6917c9b5'}));
+      dispatch(
+        getRuleByIdThunk({ uuid: "b181c3a0-fa60-48c2-888a-7f8f6917c9b5" })
+      );
       alreadyFetchedRules.current = true;
     }
   }, [dispatch, statusRules]);
@@ -246,13 +245,17 @@ function TabbedTableForm({
 
   const saveTestCases = async (tab: FormTabItem) => {
     dispatch(setLoading(true));
+
     const payload = preparePayload(valuesToSend, tab.formType);
-    if(dependsOnId) {
-      payload.dependOn = dependsOnId
+    if (dependsOnId && dependsOnId !== "none" && dependsOnId.trim() !== "") {
+      payload.dependOn = dependsOnId;
+    } else {
+      payload.dependOn = "";
+      payload.dependOnTransaction  = [];
     }
-    console.log(valuesToSend, ':::::::::::::::valuesToSend')
-    console.log(payload)
+
     const id = tab.templateId;
+
     try {
       await dispatch(updateTestCaseThunk({ id, payload })).unwrap();
       dispatch(getCollectionsThunk(`${method}/${type}`));
@@ -273,7 +276,10 @@ function TabbedTableForm({
         direction="row"
         sx={{ justifyContent: "space-between", alignItems: "end" }}
       >
-        <TitleHeaderComponent routeId={templateId} origin={origin} />
+        <TitleHeaderComponent
+          routeId={templateId}
+          origin={origin}
+        />
         {canEdit && (
           <Button
             startIcon={<SaveOutlinedIcon />}
@@ -338,12 +344,12 @@ function TabbedTableForm({
                 value={value}
                 index={index}
               >
-                { (
+                {
                   <CatalogsDataMiddleware
                     tabId={currentTabId}
                     template={template}
                   />
-                )}
+                }
               </CustomTabPanel>
             ))
         )}

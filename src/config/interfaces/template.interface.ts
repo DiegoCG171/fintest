@@ -40,6 +40,7 @@ export interface FieldValidation {
 // PATCH
 
 export interface PatchGenerationTemplate {
+    dependOnTransaction: FieldUpdateTemplate[]
     name?: string
     description?: string
     categoryId?: string
