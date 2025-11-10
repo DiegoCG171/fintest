@@ -17,6 +17,7 @@ export interface testCaseInterface {
     createdAt: string
     updatedAt: string
     __v: number
+    schemaId: string
 }
 
 import { ReactNode } from "react";

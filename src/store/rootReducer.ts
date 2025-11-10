@@ -27,6 +27,7 @@ import { sidebarMenuSettingsSlice } from "./slices/UI/sidebarMenuSettings/sideba
 import { institutionSlice } from "./slices/institutions/institutions.slice";
 import { securitySlice } from "./slices/security/security.slice";
 import { emmisorModalConfigSlice } from "./slices/UI/emmisorModalConfig/emmisorModalConfig.slice";
+import { allRulesSlice } from "./slices/rules/allRules.slice";
 
 const appReducer = combineReducers({
     auth: authSlice.reducer,
@@ -39,6 +40,7 @@ const appReducer = combineReducers({
     modalForm: modalFormSlice.reducer,
     recovery: recoveryPsswSlice.reducer,
     rules: rulesSlice.reducer,
+    allRules: allRulesSlice.reducer,
     server: serverSlice.reducer,
     sidebarMenu: sidebarMenuSlice.reducer,
     tabs: tabSlice.reducer,

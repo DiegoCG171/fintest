@@ -135,7 +135,8 @@ export default function CategoriesTreeSelector({
   return (
     <Box
       sx={{
-        height: "70%",
+        maxHeight: "70%",
+        height: "60%",
         minWidth: 250,
         overflowY: "auto",
         backgroundColor: (theme) => theme.palette.background.paper,

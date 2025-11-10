@@ -1,6 +1,7 @@
 import { Box, Button, Stack, Typography } from "@mui/material";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import ArrowForwardIosRoundedIcon from "@mui/icons-material/ArrowForwardIosRounded";
+import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
 import FormJSON from "./FormJSON";
 import {
   ModalFormProps,
@@ -25,16 +26,21 @@ import { deepClean } from "../../../config/utils/deepClean";
 import { useEffect, useState } from "react";
 import CategoriesFormJSON from "./CategoriesFormJSON";
 import { useParams } from "react-router-dom";
-import { assignDefaultFunctions, setTabFormFromTemplate } from "../../../config/utils/setTabFormFromTemplate";
+import {
+  assignDefaultFunctions,
+  setTabFormFromTemplate,
+} from "../../../config/utils/setTabFormFromTemplate";
 import { addOrUpdateTemplate } from "../../../store/slices/templates/template.slice";
+import RulesSelector from "./RulesSelector";
 
 function ModalFormJson({ mode = "create" }: ModalFormProps) {
-  const [step, setStep] = useState<1 | 2>(1);
+  const [step, setStep] = useState<number>(1);
   const [categoryError, setCategoryError] = useState<boolean>(false);
   const dispatch = useAppDispatch();
   const { showToast } = useToast();
   const templateData = useAppSelector((state) => state.templates.templateById);
   const [category, setCategory] = useState<string | null>(null);
+  const [ruleSelected, setRuleSelected] = useState<string | null>(null);
   const templateName = useAppSelector((state) => state.jsonTemplate.data.name);
   const categoryId = useAppSelector(
     (state) => state.jsonTemplate.data.categoryId
@@ -47,6 +53,8 @@ function ModalFormJson({ mode = "create" }: ModalFormProps) {
   const templateId = useAppSelector(
     (state) => state.templates.templateById?.uuid
   );
+
+  const [ruleError, setRuleError] = useState(false);
 
   const params = useParams();
   const { method, type } = params;
@@ -62,7 +70,6 @@ function ModalFormJson({ mode = "create" }: ModalFormProps) {
     description =
       "Completa los campos necesarios para crear un nuevo template que podrás utilizar más adelante. Asegúrate de que toda la información esté correcta antes de guardar.";
   }
-
 
   useEffect(() => {
     if (isEditMode && templateName) {
@@ -88,6 +95,10 @@ function ModalFormJson({ mode = "create" }: ModalFormProps) {
         "uuid",
         "path",
       ]);
+
+      if (cleanTemplate.schemaId) {
+        setRuleSelected(cleanTemplate.schemaId);
+      }
       dispatch(setJsonTemplate(cleanTemplate));
     }
   }, [mode, templateData, dispatch]);
@@ -95,19 +106,32 @@ function ModalFormJson({ mode = "create" }: ModalFormProps) {
   const jsonData = useAppSelector((state) => state.jsonTemplate.data);
   const mutableJsonData = JSON.parse(JSON.stringify(jsonData));
 
-
   const handleSubmit = () => {
     if (mode === "create") {
       if (!category) {
         setCategoryError(true);
-      } else createTemplate();
-    } else editTemplate();
+        return;
+      }
+      if (!ruleSelected) {
+        setRuleError(true);
+        return;
+      }
+      createTemplate();
+    } else {
+      if (!ruleSelected) {
+        setRuleError(true);
+        return;
+      }
+      editTemplate();
+    }
   };
 
   const createTemplate = async () => {
     if (!category) return;
     mutableJsonData.categoryId = category;
     mutableJsonData.name = newTemplateName;
+    mutableJsonData.schemaId = ruleSelected;
+    mutableJsonData.processingMethod = type;
     assignDefaultFunctions(mutableJsonData);
     try {
       await dispatch(
@@ -130,6 +154,7 @@ function ModalFormJson({ mode = "create" }: ModalFormProps) {
     if (!category) return null;
     mutableJsonData.name = newTemplateName;
     mutableJsonData.categoryId = category;
+    mutableJsonData.schemaId = ruleSelected;
     assignDefaultFunctions(mutableJsonData);
     try {
       const result = await dispatch(
@@ -139,7 +164,7 @@ function ModalFormJson({ mode = "create" }: ModalFormProps) {
         })
       ).unwrap();
       const template = result;
-      dispatch(addOrUpdateTemplate(template as TemplateContextType))
+      dispatch(addOrUpdateTemplate(template as TemplateContextType));
       if (template) {
         setTabFormFromTemplate(
           template as TemplateContextType,
@@ -171,15 +196,17 @@ function ModalFormJson({ mode = "create" }: ModalFormProps) {
         .catch((err) => console.error("Error cargando categorías:", err));
     }
   };
+
   return (
-    <Stack spacing={2}>
+    <Stack
+      spacing={2}
+      sx={{ overflow: "visible" }}
+    >
       <Box>
         <Typography
           variant="body1"
           gutterBottom
-          sx={{
-            fontWeight: "bold",
-          }}
+          sx={{ fontWeight: "bold" }}
         >
           {title}
         </Typography>
@@ -189,6 +216,7 @@ function ModalFormJson({ mode = "create" }: ModalFormProps) {
         >
           {description}
         </Typography>
+
         {categoryError && (
           <Typography
             variant="body2"
@@ -198,43 +226,83 @@ function ModalFormJson({ mode = "create" }: ModalFormProps) {
             Es necesario seleccionar una categoría.
           </Typography>
         )}
+        {/* navegación */}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: step > 1 ? "space-between" : "flex-end",
+            mt: 2,
+          }}
+        >
+          {step > 1 && (
+            <Button
+              startIcon={<ArrowBackIosNewRoundedIcon />}
+              sx={{ fontSize: "12px", flexShrink: 0, paddingX: 2 }}
+              onClick={() => setStep(step - 1)}
+            >
+              Atrás
+            </Button>
+          )}
 
-        <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
           <Button
-            startIcon={
-              step === 1 ? <ArrowForwardIosRoundedIcon /> : <SaveOutlinedIcon />
-            }
+            startIcon={step === 3 ? <SaveOutlinedIcon /> : null}
             sx={{ paddingX: 2, fontSize: "12px", flexShrink: 0 }}
             onClick={() => {
               if (step === 1) {
                 setStep(2);
-              } else {
-                handleSubmit();
+                return;
               }
+              
+              if (step === 2) {
+                const hasName = !!newTemplateName.trim();
+                const hasCategory = !!category;
+
+                setShowTemplateNameError(!hasName);
+                setCategoryError(!hasCategory);
+
+                if (!hasName || !hasCategory) {
+                  return;
+                }
+
+                setStep(3);
+                return;
+              }
+
+              handleSubmit();
             }}
+            endIcon={step === 3 ? null : <ArrowForwardIosRoundedIcon />}
           >
-            {step === 1 ? "Siguiente" : "Guardar"}
+            {step === 3 ? "Guardar" : "Siguiente"}
           </Button>
         </Box>
       </Box>
-      <Box>
+
+      {/* contenido dinámico */}
+      <Box sx={{ overflow: "visible" }}>
         {step === 1 && <FormJSON />}
         {step === 2 && (
           <CategoriesFormJSON
             showError={showTemplateNameError}
             templateName={newTemplateName ?? ""}
             preselectedItemId={preselectedItemId}
-            onSelectCategory={(id) => {
-              setCategory(id);
-            }}
+            onSelectCategory={(id) => setCategory(id)}
             onSetTemplateName={(name: string) => {
               setVewTemplateName(name);
               setShowTemplateNameError(!name);
             }}
           />
         )}
+        {step === 3 && (
+          <RulesSelector
+            showError={ruleError}
+            setShowError={setRuleError}
+            ruleSelected={ruleSelected}
+            onSelectRule={(id: string) => setRuleSelected(id)}
+          />
+        )}
       </Box>
     </Stack>
   );
 }
+
 export default ModalFormJson;
