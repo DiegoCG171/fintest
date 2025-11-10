@@ -31,13 +31,13 @@ import {
   setTabFormFromTemplate,
 } from "../../../config/utils/setTabFormFromTemplate";
 import { addOrUpdateTemplate } from "../../../store/slices/templates/template.slice";
-import RulesSelector from "./RulesSelector";
 
 function ModalFormJson({ mode = "create" }: ModalFormProps) {
   const [step, setStep] = useState<number>(1);
   const [categoryError, setCategoryError] = useState<boolean>(false);
   const dispatch = useAppDispatch();
   const { showToast } = useToast();
+
   const templateData = useAppSelector((state) => state.templates.templateById);
   const [category, setCategory] = useState<string | null>(null);
   const [ruleSelected, setRuleSelected] = useState<string | null>(null);
@@ -53,7 +53,6 @@ function ModalFormJson({ mode = "create" }: ModalFormProps) {
   const templateId = useAppSelector(
     (state) => state.templates.templateById?.uuid
   );
-
   const [ruleError, setRuleError] = useState(false);
 
   const params = useParams();
@@ -61,24 +60,16 @@ function ModalFormJson({ mode = "create" }: ModalFormProps) {
 
   const isEditMode = mode === "edit";
   const title = isEditMode ? "Actualizar template" : "Crear nuevo template";
-  let description = "";
+  const description = isEditMode
+    ? "Edita el contenido del templete en formato JSON. Asegúrate de que los cambios cumplan con el formato y la estructura requerida antes de guardar."
+    : "Completa los campos necesarios para crear un nuevo template que podrás utilizar más adelante. Asegúrate de que toda la información esté correcta antes de guardar.";
 
-  if (isEditMode) {
-    description =
-      "Edita el contenido del templete en formato JSON. Asegúrate de que los cambios cumplan con el formato y la estructura requerida antes de guardar.";
-  } else {
-    description =
-      "Completa los campos necesarios para crear un nuevo template que podrás utilizar más adelante. Asegúrate de que toda la información esté correcta antes de guardar.";
-  }
-
+  // sincroniza nombre inicial
   useEffect(() => {
-    if (isEditMode && templateName) {
-      setVewTemplateName(templateName);
-    } else if (!isEditMode) {
-      setVewTemplateName(templateName);
-    }
-  }, [templateName, isEditMode]);
+    if (templateName) setVewTemplateName(templateName);
+  }, [templateName]);
 
+  // carga inicial
   useEffect(() => {
     if (mode === "create") {
       dispatch(setJsonTemplate(saleTemplate));
@@ -150,8 +141,7 @@ function ModalFormJson({ mode = "create" }: ModalFormProps) {
   };
 
   const editTemplate = async () => {
-    if (!templateId) return null;
-    if (!category) return null;
+    if (!templateId || !category) return;
     mutableJsonData.name = newTemplateName;
     mutableJsonData.categoryId = category;
     mutableJsonData.schemaId = ruleSelected;
@@ -217,7 +207,7 @@ function ModalFormJson({ mode = "create" }: ModalFormProps) {
           {description}
         </Typography>
 
-        {categoryError && (
+        {categoryError && !category && (
           <Typography
             variant="body2"
             gutterBottom
@@ -226,55 +216,41 @@ function ModalFormJson({ mode = "create" }: ModalFormProps) {
             Es necesario seleccionar una categoría.
           </Typography>
         )}
+
         {/* navegación */}
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: step > 1 ? "space-between" : "flex-end",
-            mt: 2,
-          }}
-        >
-          {step > 1 && (
-            <Button
-              startIcon={<ArrowBackIosNewRoundedIcon />}
-              sx={{ fontSize: "12px", flexShrink: 0, paddingX: 2 }}
-              onClick={() => setStep(step - 1)}
-            >
-              Atrás
-            </Button>
-          )}
+<Box
+  sx={{
+    display: "flex",
+    justifyContent: step > 1 ? "space-between" : "flex-end",
+    mt: 2,
+  }}
+>
+  {step > 1 && (
+    <Button
+      startIcon={<ArrowBackIosNewRoundedIcon />}
+      sx={{ fontSize: "12px", flexShrink: 0, paddingX: 2 }}
+      onClick={() => setStep(step - 1)}
+    >
+      Atrás
+    </Button>
+  )}
 
-          <Button
-            startIcon={step === 3 ? <SaveOutlinedIcon /> : null}
-            sx={{ paddingX: 2, fontSize: "12px", flexShrink: 0 }}
-            onClick={() => {
-              if (step === 1) {
-                setStep(2);
-                return;
-              }
-              
-              if (step === 2) {
-                const hasName = !!newTemplateName.trim();
-                const hasCategory = !!category;
+  <Button
+    startIcon={step === 2 ? <SaveOutlinedIcon /> : null}
+    endIcon={step === 1 ? <ArrowForwardIosRoundedIcon /> : null}
+    sx={{ paddingX: 2, fontSize: "12px", flexShrink: 0 }}
+    onClick={() => {
+      if (step === 1) {
+        setStep(2);
+        return;
+      }
+      handleSubmit();
+    }}
+  >
+    {step === 1 ? "Siguiente" : "Guardar"}
+  </Button>
+</Box>
 
-                setShowTemplateNameError(!hasName);
-                setCategoryError(!hasCategory);
-
-                if (!hasName || !hasCategory) {
-                  return;
-                }
-
-                setStep(3);
-                return;
-              }
-
-              handleSubmit();
-            }}
-            endIcon={step === 3 ? null : <ArrowForwardIosRoundedIcon />}
-          >
-            {step === 3 ? "Guardar" : "Siguiente"}
-          </Button>
-        </Box>
       </Box>
 
       {/* contenido dinámico */}
@@ -282,6 +258,10 @@ function ModalFormJson({ mode = "create" }: ModalFormProps) {
         {step === 1 && <FormJSON />}
         {step === 2 && (
           <CategoriesFormJSON
+            showRuleError={ruleError}
+            setShowError={setRuleError}
+            ruleSelected={ruleSelected}
+            onSelectRule={(id: string) => setRuleSelected(id)}
             showError={showTemplateNameError}
             templateName={newTemplateName ?? ""}
             preselectedItemId={preselectedItemId}
@@ -290,14 +270,6 @@ function ModalFormJson({ mode = "create" }: ModalFormProps) {
               setVewTemplateName(name);
               setShowTemplateNameError(!name);
             }}
-          />
-        )}
-        {step === 3 && (
-          <RulesSelector
-            showError={ruleError}
-            setShowError={setRuleError}
-            ruleSelected={ruleSelected}
-            onSelectRule={(id: string) => setRuleSelected(id)}
           />
         )}
       </Box>

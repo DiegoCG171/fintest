@@ -1,4 +1,4 @@
-import { Box, Button, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, Stack, SxProps, TextField, Typography } from "@mui/material";
 import Link from "@mui/material/Link";
 import CancelIcon from "@mui/icons-material/Cancel";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
@@ -7,23 +7,30 @@ import { useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import { closeModal, useAppDispatch, useAppSelector } from "../../../store";
 import { activeChangePassword } from "../../../store/slices/auth/auth.slice";
-
-interface ProfileFormData {
-    nombre: string;
-    apellido: string;
-    usuario: string;
-    email: string;
-}
+import { ProfileFormData } from "../../../config/interfaces";
+import { Theme } from "@emotion/react";
 
 export function ModalProfile() {
     const dispatch = useAppDispatch();
     const user = useAppSelector((state) => state.auth.user);
 
     const [formData, setFormData] = useState<ProfileFormData>({
-        nombre: user?.names || '',
-        apellido: user?.surnames || '',
-        usuario: user?.username || '',
-        email: user?.email || '',
+        nombre: user?.names || "",
+        apellido: user?.surnames || "",
+        usuario: user?.username || "",
+        email: user?.email || "",
+        portNumber: user?.portNumber?.toString?.() ?? "",
+        host: "",
+    });
+    
+    const getLabelColorStyle = (hasValue: boolean): SxProps<Theme> => ({
+        "& .MuiInputLabel-root": {
+        color: hasValue ? "text.primary" : "text.disabled",
+        transition: "color 0.2s ease",
+        },
+        "& .Mui-focused .MuiInputLabel-root": {
+        color: "primary.main",
+        },
     });
 
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -36,23 +43,23 @@ export function ModalProfile() {
         };
 
     const validate = () => {
-    const newErrors: Record<string, string> = {};
+        const newErrors: Record<string, string> = {};
 
-    Object.entries(formData).forEach(([key, value]) => {
+        Object.entries(formData).forEach(([key, value]) => {
         if (!value.trim()) {
-        newErrors[key] = "Campo obligatorio";
+            newErrors[key] = "Campo obligatorio";
         }
-    });
+        });
 
-    if (formData.email.trim()) {
+        if (formData.email.trim()) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(formData.email)) {
-        newErrors.email = "Correo electrónico inválido";
+            newErrors.email = "Correo electrónico inválido";
         }
-    }
+        }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
     };
 
     const handleSave = () => {
@@ -85,6 +92,7 @@ export function ModalProfile() {
                 onChange={handleChange("usuario")}
                 error={Boolean(errors.usuario)}
                 helperText={errors.usuario}
+                sx={getLabelColorStyle(!!formData.usuario)}
             />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
@@ -96,6 +104,7 @@ export function ModalProfile() {
                 onChange={handleChange("email")}
                 error={Boolean(errors.email)}
                 helperText={errors.email}
+                sx={getLabelColorStyle(!!formData.email)}
             />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
@@ -106,6 +115,7 @@ export function ModalProfile() {
                 onChange={handleChange("nombre")}
                 error={Boolean(errors.nombre)}
                 helperText={errors.nombre}
+                sx={getLabelColorStyle(!!formData.nombre)}
             />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
@@ -116,6 +126,29 @@ export function ModalProfile() {
                 onChange={handleChange("apellido")}
                 error={Boolean(errors.apellido)}
                 helperText={errors.apellido}
+                sx={getLabelColorStyle(!!formData.apellido)}
+            />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+            <TextField
+                fullWidth
+                label="Host (IP)"
+                value={formData.host}
+                onChange={handleChange("host")}
+                error={Boolean(errors.host)}
+                helperText={errors.host}
+                sx={getLabelColorStyle(!!formData.host)}
+            />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+            <TextField
+                fullWidth
+                label="Puerto"
+                value={formData.portNumber}
+                onChange={handleChange("portNumber")}
+                error={Boolean(errors.portNumber)}
+                helperText={errors.portNumber}
+                sx={getLabelColorStyle(!!formData.portNumber)}
             />
             </Grid>
             <Grid sx={{ display: "flex", justifyContent: "flex-end" }}>

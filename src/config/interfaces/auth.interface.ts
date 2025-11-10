@@ -12,7 +12,11 @@ export interface LoginCredentials {
     password: string;
 }
 
-export interface ChangePasswordCredentials{
+export interface LogoutResponse {
+    success: boolean;
+}
+
+export interface ChangePasswordCredentials {
     oldPassword: string;
     newPassword: string;
 }
@@ -23,6 +27,7 @@ export interface LoginResponse {
     email: string
     names: string
     surnames: string
+    portNumber: string | null
     status: string
     isOnline: boolean
     attemps: number
@@ -41,7 +46,7 @@ export interface AuthState {
     loading: boolean;
     error: string | null;
     isAuthenticated: boolean;
-    changePasswordActive: boolean; 
+    changePasswordActive: boolean;
 }
 
 export interface ResetPassword {
@@ -50,5 +55,5 @@ export interface ResetPassword {
 }
 
 export interface RecoveryTokenResponse {
-  message: string;
+    message: string;
 }

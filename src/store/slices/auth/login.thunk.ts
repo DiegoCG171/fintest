@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { login as loginService } from "../../../services";
+import { login as loginService, logout as logoutService } from "../../../services";
+import { logout } from "./auth.slice";
 import { LoginCredentials, LoginResponse } from "../../../config/interfaces";
 
 export const loginThunk = createAsyncThunk<
@@ -11,13 +12,38 @@ export const loginThunk = createAsyncThunk<
     async (credentials: LoginCredentials, { rejectWithValue }) => {
         try {
             const userData = await loginService(credentials);
-            if(!userData.token) {return rejectWithValue('Error en inicio de sesión')} else {
+            if (!userData.token) { return rejectWithValue('Error en inicio de sesión') } else {
                 localStorage.setItem('token', userData.token);
                 localStorage.setItem('user', JSON.stringify(userData));
                 return userData;
             }
         } catch (error: unknown) {
             return rejectWithValue(error as string);
-        } 
+        }
     }
 );
+
+export const logoutThunk = createAsyncThunk(
+    "auth/logout",
+    async (_, { dispatch, rejectWithValue }) => {
+        try {
+            const token = localStorage.getItem("token");
+
+            if (!token) {
+                return rejectWithValue("No hay sesión activa para cerrar.");
+            }
+            const response = await logoutService();
+
+            if (response.success) {
+                dispatch(logout());
+                return "Logout exitoso";
+            }
+
+            return rejectWithValue("Error al cerrar sesión.");
+        } catch (error: unknown) {
+            return rejectWithValue(error as string || "Error desconocido");
+        }
+    }
+);
+
+

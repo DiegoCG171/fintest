@@ -1,6 +1,11 @@
-import { Box, Typography, CircularProgress } from "@mui/material";
-import { useEffect } from "react";
-import { useAppDispatch, useAppSelector, getRulesThunk } from "../../../store";
+import {
+  Autocomplete,
+  TextField,
+  FormControl,
+  FormHelperText,
+} from "@mui/material";
+import { useEffect, useState, useMemo } from "react";
+import { getRulesThunk, useAppDispatch, useAppSelector } from "../../../store";
 
 interface RulesSelectorProps {
   ruleSelected: string | null;
@@ -20,103 +25,76 @@ function RulesSelector({
     (state) => state.allRules
   );
   const loading = status === "loading";
+  const [open, setOpen] = useState(false);
 
-
-  // carga inicial
   useEffect(() => {
     if (allRulles.length === 0) {
       dispatch(getRulesThunk(1));
-    } 
+    }
   }, [dispatch, allRulles.length]);
 
-  useEffect(() => {
-    if (!ruleSelected || allRulles.length === 0) return;
-
-    const foundByMongoId = allRulles.find((r) => r._id === ruleSelected);
-    const foundByUuid = allRulles.find((r) => r.uuid === ruleSelected);
-
-    if (!foundByMongoId && !foundByUuid && hasMore && !loading) {
-      dispatch(getRulesThunk(page + 1));
-    }
-  }, [ruleSelected, allRulles, dispatch, hasMore, loading, page]);
-
-  // scroll infinito
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const target = e.currentTarget;
-    const isBottom =
-      target.scrollTop + target.clientHeight >= target.scrollHeight - 50;
-
-    if (isBottom && hasMore && !loading) {
-      dispatch(getRulesThunk(page + 1));
-    }
-  };
+  const selectedRule = useMemo(
+    () =>
+      allRulles.find(
+        (r: { _id: string; uuid: string }) =>
+          r._id === ruleSelected || r.uuid === ruleSelected
+      ) ?? null,
+    [allRulles, ruleSelected]
+  );
 
   return (
-    <Box
-      sx={{
-        backgroundColor: (theme) => theme.palette.background.default,
-        p: 4,
-        height: "55vh",
-        borderRadius: 2,
-      }}
-    >
-      <Typography sx={{ mb: 1, fontSize: "14px", fontWeight: "bold" }}>
-        Selecciona una regla: <span style={{ color: "red" }}>*</span>
-      </Typography>
-      {showError && (
-        <Typography sx={{ color: "red", fontSize: "12px", mb: 2}}>
-          Debes seleccionar una regla.
-        </Typography>
-      )}
-
-      <Box
-        sx={{
-          height: "40vh",
-          overflowY: "auto",
-          borderRadius: 2,
-          backgroundColor: (theme) => theme.palette.background.paper,
-          border: "1px solid #D1D1D1",
+    <FormControl fullWidth error={showError}>
+      <Autocomplete
+        disablePortal
+        size="small"
+        open={open}
+        onOpen={() => setOpen(true)}
+        onClose={() => setOpen(false)}
+        options={allRulles}
+        value={selectedRule}
+        loading={loading}
+        isOptionEqualToValue={(option, value) => option._id === value._id}
+        getOptionLabel={(option) =>
+          `${option.uuid || "Sin UUID"} (v${option.version})`
+        }
+        noOptionsText="No hay reglas disponibles"
+        onChange={(_, newValue) => {
+          if (newValue) {
+            onSelectRule(newValue._id);
+            setShowError(false);
+          }
         }}
-        onScroll={handleScroll}
-      >
-        {allRulles.map((rule) => {
-          const isSelected =
-            rule._id === ruleSelected || rule.uuid === ruleSelected;
-
-          return (
-            <Box
-              key={rule._id}
-              onClick={() => {
-                onSelectRule(rule._id);
-                setShowError(false);
-              }}
-              sx={{
-                p: 1,
-                fontSize: 12,
-                cursor: "pointer",
-                transition: "background-color 0.2s ease",
-                backgroundColor: isSelected
-                  ? "rgba(25,118,210,0.15)"
-                  : "transparent",
-                "&:hover": {
-                  backgroundColor: isSelected
-                    ? "rgba(25,118,210,0.25)"
-                    : "#e3f2fd",
-                },
-              }}
-            >
-              {rule.uuid} (v{rule.version})
-            </Box>
-          );
-        })}
-
-        {loading && (
-          <Box sx={{ display: "flex", justifyContent: "center", p: 2 }}>
-            <CircularProgress size={20} />
-          </Box>
+        slotProps={{
+          listbox: {
+            sx: {
+              maxHeight: 200,
+              overflowY: "auto",
+              py: 0.5,
+              "& li": { fontSize: 14 },
+            },
+            onScroll: (e: React.UIEvent<HTMLUListElement>) => {
+              const target = e.currentTarget;
+              const isBottom =
+                target.scrollTop + target.clientHeight >=
+                target.scrollHeight - 50;
+              if (isBottom && hasMore && !loading) {
+                dispatch(getRulesThunk(page + 1));
+              }
+            },
+          }
+        }}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            placeholder="Selecciona una regla"
+            error={showError}
+          />
         )}
-      </Box>
-    </Box>
+      />
+      {showError && (
+        <FormHelperText>Debes seleccionar una regla.</FormHelperText>
+      )}
+    </FormControl>
   );
 }
 

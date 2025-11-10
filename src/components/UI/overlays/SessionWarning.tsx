@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Box, Button, Stack, Typography } from "@mui/material";
-import { closeModal, logout, useAppDispatch } from "../../../store";
+import { closeModal, useAppDispatch } from "../../../store";
 import { useToast } from "../../../config/hooks/useToast";
+import { logoutThunk } from "../../../store/slices/auth/login.thunk";
 
 export function SessionWarning() {
     const dispatch = useAppDispatch();
@@ -13,7 +14,7 @@ export function SessionWarning() {
         if (!timerActive) return;
 
         if (secondsLeft <= 0) {
-        dispatch(logout());
+        dispatch(logoutThunk());
         showToast("La sesión se ha cerrado", "warning");
         return;
         }
@@ -27,7 +28,7 @@ export function SessionWarning() {
 
     function handleLogout(): void {
         setTimerActive(false);
-        dispatch(logout());
+        dispatch(logoutThunk());
         showToast("La sesión se ha cerrado", "warning");
     }
 

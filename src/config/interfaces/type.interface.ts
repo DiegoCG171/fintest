@@ -137,21 +137,34 @@ export interface CategoriesTreeSelectorProps {
 }
 
 export interface CategoriesFormJSONProps {
-    onSelectCategory: (categoryId: string) => void;
-    onSetTemplateName: (name: string) => void;
-    templateName: string;
-    showError: boolean;
-    preselectedItemId?: string;
+  onSelectCategory: (categoryId: string) => void;
+  onSetTemplateName: (name: string) => void;
+  templateName: string;
+  showError: boolean;
+  preselectedItemId?: string;
+  ruleSelected: string | null;
+  setShowError: (value: boolean) => void;
+  showRuleError: boolean;
+  onSelectRule: (id: string) => void;
 }
 
 export type BreadcrumbComponentProps = {
-    pathNames: string[]
+  pathNames: string[]
 };
 
-export interface GetFilters  {
+export interface GetFilters {
   order?: string;
   search?: string;
   sortBy?: string;
   page?: number;
   limit?: number;
+}
+
+export interface ProfileFormData {
+  nombre: string;
+  apellido: string;
+  usuario: string;
+  email: string;
+  portNumber: string;
+  host: string
 }
