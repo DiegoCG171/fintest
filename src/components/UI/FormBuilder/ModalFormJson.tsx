@@ -258,6 +258,7 @@ function ModalFormJson({ mode = "create" }: ModalFormProps) {
         {step === 1 && <FormJSON />}
         {step === 2 && (
           <CategoriesFormJSON
+            onlyRead= {isEditMode}
             showRuleError={ruleError}
             setShowError={setRuleError}
             ruleSelected={ruleSelected}

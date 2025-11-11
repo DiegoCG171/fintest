@@ -15,6 +15,7 @@ function CategoriesFormJSON({
   onSelectRule,
   setShowError,
   showRuleError,
+  onlyRead
 }: CategoriesFormJSONProps) {
   const categoriesMenu = useAppSelector(
     (state) => state.sidebarMenu.menus["category"]
@@ -79,6 +80,7 @@ function CategoriesFormJSON({
       setShowError={setShowError}
       ruleSelected={ruleSelected}
       onSelectRule={onSelectRule}
+      onlyRead={onlyRead}
     />
   </Grid>
 

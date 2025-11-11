@@ -146,6 +146,7 @@ export interface CategoriesFormJSONProps {
   setShowError: (value: boolean) => void;
   showRuleError: boolean;
   onSelectRule: (id: string) => void;
+  onlyRead?: boolean
 }
 
 export type BreadcrumbComponentProps = {

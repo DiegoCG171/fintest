@@ -12,6 +12,7 @@ interface RulesSelectorProps {
   onSelectRule: (id: string) => void;
   showError: boolean;
   setShowError: (value: boolean) => void;
+  onlyRead?: boolean;
 }
 
 function RulesSelector({
@@ -19,6 +20,7 @@ function RulesSelector({
   onSelectRule,
   showError,
   setShowError,
+  onlyRead = false,
 }: RulesSelectorProps) {
   const dispatch = useAppDispatch();
   const { allRulles, page, hasMore, status } = useAppSelector(
@@ -33,6 +35,14 @@ function RulesSelector({
     }
   }, [dispatch, allRulles.length]);
 
+  useEffect(() => {
+    if (allRulles.length > 0 && !ruleSelected) {
+      const firstRule = allRulles[0];
+      onSelectRule(firstRule._id);
+      setShowError(false);
+    }
+  }, [allRulles, ruleSelected, onSelectRule, setShowError]);
+
   const selectedRule = useMemo(
     () =>
       allRulles.find(
@@ -43,13 +53,17 @@ function RulesSelector({
   );
 
   return (
-    <FormControl fullWidth error={showError}>
+    <FormControl
+      fullWidth
+      error={showError}
+    >
       <Autocomplete
         disablePortal
         size="small"
-        open={open}
-        onOpen={() => setOpen(true)}
-        onClose={() => setOpen(false)}
+        disabled={onlyRead}
+        open={onlyRead ? false : open}
+        onOpen={() => !onlyRead && setOpen(true)}
+        onClose={() => !onlyRead && setOpen(false)}
         options={allRulles}
         value={selectedRule}
         loading={loading}
@@ -81,7 +95,7 @@ function RulesSelector({
                 dispatch(getRulesThunk(page + 1));
               }
             },
-          }
+          },
         }}
         renderInput={(params) => (
           <TextField
