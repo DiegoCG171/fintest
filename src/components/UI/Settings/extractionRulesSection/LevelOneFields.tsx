@@ -55,8 +55,20 @@ export const LevelOneFields = ({
             onBlur={() => handleUpdate({ length: state.editableLength })}
             sx={{
               fontSize: styles.fontSize,
-              "& .MuiOutlinedInput-input": {
-                backgroundColor: hasChanges?.length ? "#fff7d6" : "inherit",
+              "& .MuiOutlinedInput-notchedOutline": {
+                borderColor: hasChanges?.length
+                  ? "#f1c232"
+                  : "rgba(0, 0, 0, 0.23)",
+                borderRadius: "8px",
+                borderWidth: "2px",
+              },
+              "&:hover .MuiOutlinedInput-notchedOutline": {
+                borderColor: hasChanges?.length
+                  ? "#d6a300"
+                  : "rgba(0, 0, 0, 0.87)",
+              },
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                borderColor: hasChanges?.length ? "#f1c232" : "#1976d2",
               },
             }}
           />
@@ -79,10 +91,22 @@ export const LevelOneFields = ({
               label="Posiciones de Longitud"
               sx={{
                 fontSize: styles.fontSize,
-                "& .MuiOutlinedInput-input": {
-                  backgroundColor: hasChanges?.positionsLength
-                    ? "#fff7d6"
-                    : "inherit",
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: hasChanges?.positionsLength
+                    ? "#f1c232"
+                    : "rgba(0, 0, 0, 0.23)",
+                  borderRadius: "8px",
+                  borderWidth: "2px",
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: hasChanges?.positionsLength
+                    ? "#d6a300"
+                    : "rgba(0, 0, 0, 0.87)",
+                },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: hasChanges?.positionsLength
+                    ? "#f1c232"
+                    : "#1976d2",
                 },
               }}
               onBlur={() =>
@@ -138,8 +162,20 @@ export const LevelOneFields = ({
               label="Regex"
               sx={{
                 fontSize: styles.fontSize,
-                "& .MuiOutlinedInput-input": {
-                  backgroundColor: hasChanges?.regex ? "#fff7d6" : "inherit",
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: hasChanges?.regex
+                    ? "#f1c232"
+                    : "rgba(0, 0, 0, 0.23)",
+                  borderRadius: "8px",
+                  borderWidth: "2px",
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: hasChanges?.regex
+                    ? "#d6a300"
+                    : "rgba(0, 0, 0, 0.87)",
+                },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: hasChanges?.regex ? "#f1c232" : "#1976d2",
                 },
               }}
               value={state.regex}
@@ -160,8 +196,23 @@ export const LevelOneFields = ({
               defaultValue="=="
               sx={{
                 fontSize: styles.fontSize,
-                "& .MuiSelect-select": {
-                  backgroundColor: hasChanges?.operator ? "#fff7d6" : "inherit",
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: hasChanges?.operator
+                    ? "#f1c232"
+                    : "rgba(0, 0, 0, 0.23)",
+                  borderRadius: "8px",
+                  borderWidth: "2px",
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: hasChanges?.operator
+                    ? "#d6a300"
+                    : "rgba(0, 0, 0, 0.87)",
+                },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: hasChanges?.operator ? "#f1c232" : "#1976d2",
+                },
+                "& .MuiSelect-icon": {
+                  color: hasChanges?.operator ? "#a67c00" : "inherit",
                 },
               }}
               value={state.editableOperator}

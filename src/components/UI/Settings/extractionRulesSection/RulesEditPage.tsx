@@ -197,10 +197,23 @@ export const RulesEditPage = () => {
             onBlur={(e) => dispatch(setVersionForm(+e.target.value))}
             inputProps={{ min: 1 }}
             sx={{
-              "& .MuiOutlinedInput-input": {
-                backgroundColor:
-                  hasVersionChanges && updating ? "#fff7d6" : "inherit",
-              },
+              "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: hasVersionChanges && updating
+                    ? "#f1c232"
+                    : "rgba(0, 0, 0, 0.23)",
+                  borderRadius: "8px",
+                  borderWidth: "2px",
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: hasVersionChanges && updating
+                    ? "#d6a300"
+                    : "rgba(0, 0, 0, 0.87)",
+                },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: hasVersionChanges && updating
+                    ? "#f1c232"
+                    : "#1976d2",
+                },
             }}
           />
         </FormControl>
@@ -215,10 +228,24 @@ export const RulesEditPage = () => {
             onChange={handleTypeChange}
             onBlur={(e) => dispatch(setTypeForm(e.target.value))}
             sx={{
-              "& .MuiSelect-select": {
-                backgroundColor:
-                  hasTypeChanges && updating ? "#fff7d6" : "inherit",
-              },
+              "& .MuiOutlinedInput-notchedOutline": {
+                    borderColor: hasTypeChanges && updating
+                      ? "#f1c232"
+                      : "rgba(0, 0, 0, 0.23)",
+                    borderRadius: "8px",
+                    borderWidth: "2px",
+                  },
+                  "&:hover .MuiOutlinedInput-notchedOutline": {
+                    borderColor: hasTypeChanges && updating
+                      ? "#d6a300"
+                      : "rgba(0, 0, 0, 0.87)",
+                  },
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                    borderColor: hasTypeChanges && updating ? "#f1c232" : "#1976d2",
+                  },
+                  "& .MuiSelect-icon": {
+                    color: hasTypeChanges && updating ? "#a67c00" : "inherit",
+                  },
             }}
           >
             <MenuItem value="pos">POS</MenuItem>

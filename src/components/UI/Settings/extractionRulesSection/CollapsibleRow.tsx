@@ -142,11 +142,25 @@ export const CollapsibleRow = ({
               sx={{
                 fontSize: styles.fontSize,
                 width: "100%",
-                "& .MuiOutlinedInput-input": {
-                  backgroundColor:
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor:
                     rowChanges?.id || rowChanges?.idBitmap
-                      ? "#fff7d6"
-                      : "inherit",
+                      ? "#f1c232"
+                      : "rgba(0, 0, 0, 0.23)",
+                  borderRadius: "8px",
+                  borderWidth: "2px",
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor:
+                    rowChanges?.id || rowChanges?.idBitmap
+                      ? "#d6a300"
+                      : "rgba(0, 0, 0, 0.87)",
+                },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor:
+                    rowChanges?.id || rowChanges?.idBitmap
+                      ? "#f1c232"
+                      : "#1976d2",
                 },
               }}
             />
@@ -165,10 +179,20 @@ export const CollapsibleRow = ({
               sx={{
                 fontSize: styles.fontSize,
                 width: "100%",
-                "& .MuiOutlinedInput-input": {
-                  backgroundColor: rowChanges?.displayName
-                    ? "#fff7d6"
-                    : "inherit",
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: rowChanges?.displayName
+                    ? "#f1c232"
+                    : "rgba(0, 0, 0, 0.23)",
+                  borderRadius: "8px",
+                  borderWidth: "2px",
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: rowChanges?.displayName
+                    ? "#d6a300"
+                    : "rgba(0, 0, 0, 0.87)",
+                },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: rowChanges?.displayName ? "#f1c232" : "#1976d2",
                 },
               }}
             />
@@ -201,10 +225,23 @@ export const CollapsibleRow = ({
                 sx={{
                   fontSize: styles.fontSize,
                   width: "100%",
-                  "& .MuiSelect-select": {
-                    backgroundColor: rowChanges?.typeData
-                      ? "#fff7d6"
-                      : "inherit",
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderColor: rowChanges?.typeData
+                      ? "#f1c232"
+                      : "rgba(0, 0, 0, 0.23)",
+                    borderRadius: "8px",
+                    borderWidth: "2px",
+                  },
+                  "&:hover .MuiOutlinedInput-notchedOutline": {
+                    borderColor: rowChanges?.typeData
+                      ? "#d6a300"
+                      : "rgba(0, 0, 0, 0.87)",
+                  },
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                    borderColor: rowChanges?.typeData ? "#f1c232" : "#1976d2",
+                  },
+                  "& .MuiSelect-icon": {
+                    color: rowChanges?.typeData ? "#a67c00" : "inherit",
                   },
                 }}
               >

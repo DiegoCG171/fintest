@@ -190,20 +190,44 @@ export const extractionRulesSlice = createSlice({
         }
       };
 
+      // Nueva función para buscar la regla original por ID en cualquier nivel
+      function findOriginalRuleById(
+        rules: RuleRow[],
+        targetId: string
+      ): RuleRow | undefined {
+        for (const rule of rules) {
+          if (rule._id === targetId || rule.id === targetId) {
+            return rule;
+          }
+
+          if (rule.breakingRules?.length) {
+            const found = findOriginalRuleById(rule.breakingRules, targetId);
+            if (found) return found;
+          }
+
+          if (rule.specification?.length) {
+            const found = findOriginalRuleById(rule.specification, targetId);
+            if (found) return found;
+          }
+        }
+        return undefined;
+      }
+
       function mutateRuleById(
         rules: RuleRow[],
         targetId: string,
-        updatedRow: RuleRow,
-        originalRules: RuleRow[] = []
+        updatedRow: RuleRow
       ): RuleRow | undefined {
         for (let i = 0; i < rules.length; i++) {
           const rule = rules[i];
 
-          const originalRule = originalRules.find(
-            (r) => r._id === rule._id || r.id === rule.id
-          );
-
           if (rule._id === targetId || rule.id === targetId) {
+            // Buscar la regla original específica para este targetId
+            const originalRule = findOriginalRuleById(
+              state.originalExtractionRule.fields,
+              targetId
+            );
+
             const existingChanges = state.changes?.[targetId] || {};
             const newChanges: Record<string, { oldValue: any; newValue: any }> =
               {};
@@ -214,9 +238,10 @@ export const extractionRulesSlice = createSlice({
               }
 
               const newVal = updatedRow[key];
-
               const fieldExistsInOriginal = originalRule && key in originalRule;
 
+              // Si ya existe un cambio previo, mantener el oldValue original
+              // Si no, tomar el valor de la regla original
               const originalVal = existingChanges[key as string]
                 ? existingChanges[key as string].oldValue
                 : fieldExistsInOriginal
@@ -238,10 +263,12 @@ export const extractionRulesSlice = createSlice({
               }
             }
 
+            // Actualizar la regla actual
             for (const key of Object.keys(updatedRow) as (keyof RuleRow)[]) {
               (rule as any)[key] = updatedRow[key];
             }
 
+            // Guardar o limpiar cambios
             if (Object.keys(newChanges).length > 0) {
               state.changes = {
                 ...state.changes,
@@ -261,8 +288,7 @@ export const extractionRulesSlice = createSlice({
             const updated = mutateRuleById(
               rule.breakingRules,
               targetId,
-              updatedRow,
-              originalRule?.breakingRules || []
+              updatedRow
             );
             if (updated) return updated;
           }
@@ -271,8 +297,7 @@ export const extractionRulesSlice = createSlice({
             const updated = mutateRuleById(
               rule.specification,
               targetId,
-              updatedRow,
-              originalRule?.specification || []
+              updatedRow
             );
             if (updated) return updated;
           }
@@ -284,8 +309,7 @@ export const extractionRulesSlice = createSlice({
       mutateRuleById(
         state.updateExtractionRule.fields,
         _id,
-        updatedRow,
-        state.originalExtractionRule.fields
+        updatedRow
       );
     },
 
