@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { login as loginService, logout as logoutService } from "../../../services";
-import { logout } from "./auth.slice";
 import { LoginCredentials, LoginResponse } from "../../../config/interfaces";
+import { logout } from "./auth.slice";
 
 export const loginThunk = createAsyncThunk<
     LoginResponse,
@@ -31,15 +31,15 @@ export const logoutThunk = createAsyncThunk(
 
             if (!token) {
                 return rejectWithValue("No hay sesión activa para cerrar.");
-            }
-            const response = await logoutService();
+            } else {
 
-            if (response.success) {
-                dispatch(logout());
-                return "Logout exitoso";
+                const response = await logoutService();
+                if (response.success) {
+                    dispatch(logout());
+                    return "Logout exitoso";
+                }
             }
 
-            return rejectWithValue("Error al cerrar sesión.");
         } catch (error: unknown) {
             return rejectWithValue(error as string || "Error desconocido");
         }
