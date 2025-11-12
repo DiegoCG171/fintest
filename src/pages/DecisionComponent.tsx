@@ -2,7 +2,7 @@ import { Box, Button, Stack, Typography } from "@mui/material";
 import backgroundImage from "../assets/bg-fintest.svg";
 import logo from "../assets/logo.svg";
 import SplashComponent from "../components/UI/SplashComponent";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PersonAltOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import {
@@ -13,6 +13,7 @@ import {
 import { Link } from "react-router-dom";
 import { getCollectionsThunk } from "../store/slices/collections/collections.thunk";
 import { SettingsButton } from "../components/UI/Settings/SettingsButton";
+import { activExtractionRules } from "../store/slices/admin/admin.slice";
 
 function DecisionComponent() {
   const [flipped, setFlipped] = useState(false);
@@ -20,6 +21,10 @@ function DecisionComponent() {
   const user = useAppSelector((state) => state.auth.user?.names);
   const title = `${user}, te damos la bienvenida a`;
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(activExtractionRules(false));
+    }, [dispatch]);
 
   const firstCard = () => (
     <Stack spacing={8}>

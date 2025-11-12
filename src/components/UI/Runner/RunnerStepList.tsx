@@ -24,6 +24,11 @@ interface RunnerStepListProps {
   onCloseSession: () => void;
 }
 
+const typeLabels: Record<string, string> = {
+  validation: 'validación',
+  extraction: 'extracción'
+};
+
 const RunnerStepList = ({
   isActive,
   activeSession,
@@ -66,7 +71,7 @@ const RunnerStepList = ({
                       fontWeight: 500,
                     }}
                   >
-                    {session.status}
+                    {["validation", "extraction"].includes(session.status) ? `Error en ${typeLabels[session.status]}` : session.status}
                   </Typography>
                 )
               }

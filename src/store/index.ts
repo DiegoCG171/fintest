@@ -2,7 +2,7 @@
 export { useAppDispatch, useAppSelector } from './hooks'
 
 //Autenticación
-export { authSlice, logout, clearAuthError } from './slices/auth/auth.slice'
+export { authSlice, clearAuthError } from './slices/auth/auth.slice'
 export { loginThunk } from './slices/auth/login.thunk'
 export { clearRecoveryState, clearRecoveryError } from './slices/recoveryPssw/recovery.slice'
 export * from './slices/recoveryPssw/recovery.thunk'

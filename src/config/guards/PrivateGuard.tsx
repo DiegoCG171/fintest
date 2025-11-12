@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useAppSelector, useAppDispatch } from "../../store";
+import { useAppSelector, useAppDispatch} from "../../store";
 import { useEffect } from "react";
 import { logoutThunk } from "../../store/slices/auth/login.thunk";
 

@@ -25,6 +25,11 @@ interface Props {
   loading: boolean;
 }
 
+const typeLabels: Record<string, string> = {
+  validation: 'validación',
+  extraction: 'extracción'
+};
+
 export const RunnerDetailsPanel = ({
   visible,
   testCaseDetails,
@@ -50,7 +55,7 @@ export const RunnerDetailsPanel = ({
             fontStyle: "italic",
           }}
         >
-          {testCaseDetails.status}
+          {["validation", "extraction"].includes(testCaseDetails.status) ? `Error en ${typeLabels[testCaseDetails.status]}` : testCaseDetails.status}
         </span>
       </Typography>
       <Button

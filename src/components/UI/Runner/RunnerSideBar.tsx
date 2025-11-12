@@ -45,7 +45,7 @@ export const RunnerSideBar = () => {
   };
 
   const handleSetTestCaseDetails = (test: TestCaseDetails) => {
-    dispatch(toggleSessionDetails(test.status === "Terminado"));
+    dispatch(toggleSessionDetails(test.status));
     setTestCaseDetails(test);
   };
 

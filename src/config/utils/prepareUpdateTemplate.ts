@@ -5,22 +5,28 @@ import {
 } from "../interfaces";
 import { getDefaultFunctionByFormType } from "./setTabFormFromTemplate";
 
-
-function mapAllChildren(rows: TableRowDataFormBuilder[], typeForm: string): FieldUpdateTemplate[] {
-    const defaultFn = getDefaultFunctionByFormType(typeForm);
-    return rows.map((row) => {
-        const base = {
-            idBitmap: row.idBitmap ?? '',
-            ...(typeForm !== 'generationTransaction' && { isRequired: Boolean(row.isRequired) }),
-            function: !row.function?.trim() ? defaultFn : row.function,
-            value: row.value ?? '',
-        };
-        const children = Array.isArray(row.breakingRules)
-            ? mapAllChildren(row.breakingRules as TableRowDataFormBuilder[], typeForm)
-            : [];
-      /* return children.length > 0
-            ? { ...base, fields: children }
-            : base; */
+function mapAllChildren(
+  rows: TableRowDataFormBuilder[],
+  typeForm: string
+): FieldUpdateTemplate[] {
+  const defaultFn = getDefaultFunctionByFormType(typeForm);
+  return rows
+    .filter((row) => row.isActive)
+    .map((row) => {
+      const base = {
+        idBitmap: row.idBitmap ?? "",
+        ...(typeForm !== "generationTransaction" && {
+          isRequired: Boolean(row.isRequired),
+        }),
+        function: !row.function?.trim() ? defaultFn : row.function,
+        value: row.value ?? "",
+      };
+      const children = Array.isArray(row.breakingRules)
+        ? mapAllChildren(
+            row.breakingRules as TableRowDataFormBuilder[],
+            typeForm
+          )
+        : [];
 
       return { ...base, fields: children };
     });

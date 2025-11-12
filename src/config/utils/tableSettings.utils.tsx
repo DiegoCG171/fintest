@@ -2,7 +2,7 @@
 
 import { RESOURCE_MAP } from "../constants/tableSettings";
 import { Institution, UserDB } from "../interfaces";
-import { Permission, Rol } from "../interfaces/security.interface";
+import { Permission, Rol, Rule } from "../interfaces/security.interface";
 import { EntityType, RouteType, TableColumn } from "../interfaces/tableSettings.interface";
 import { HighlightText } from "./HighlightText";
 
@@ -24,6 +24,10 @@ export const isRol = (item: EntityType): item is Rol => {
 
 export const isPermission = (item: EntityType): item is Permission => {
   return "action" in item && "resource" in item;
+};
+
+export const isRule = (item: EntityType): item is Rule => {
+  return "version" in item && "type" in item;
 };
 
 export const renderCell = <T,>(

@@ -97,3 +97,23 @@ export interface Resource {
   updatedAt: Date;
   deletedAt: null;
 }
+
+export interface Rules {
+  data: Rule[];
+  totalSearch: number;
+  total: number;
+  limit: number;
+  page: number;
+  pages: number;
+  searchTerm?: string;
+}
+
+export interface Rule {
+  id: string;
+  uuid: string;
+  version: string;
+  type: string;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: null;
+}

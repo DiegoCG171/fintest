@@ -53,7 +53,6 @@ function SidebarBlock({
     setIsCreatingCollection,
   });
 
-  //Drag and drop
   const [categoriesTree, setCategoriesTree] = useState(categories.resource);
   const [collectionsTree, setCollectionsTree] = useState(collections.resource);
 

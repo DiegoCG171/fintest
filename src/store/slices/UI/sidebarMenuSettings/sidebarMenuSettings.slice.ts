@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 const settingsMenu = [
   {
-    label: "Users",
+    label: "Usuarios",
     active: true,
     icon: "GroupsOutlinedIcon",
     path: "users",
@@ -14,7 +14,7 @@ const settingsMenu = [
     ],
   },
   {
-    label: "Institutions",
+    label: "Instituciones",
     active: false,
     icon: "BusinessOutlinedIcon",
     path: "institutions",
@@ -38,7 +38,7 @@ const settingsMenu = [
     ],
   },
   {
-    label: "Permissions",
+    label: "Permisos",
     active: false,
     icon: "VpnKeyOutlinedIcon",
     path: "permissions",
@@ -47,6 +47,18 @@ const settingsMenu = [
       { action: "create", resource: "permission" },
       { action: "update", resource: "permission" },
       { action: "delete", resource: "permission" },
+    ],
+  },
+  {
+    label: "Reglas",
+    active: false,
+    icon: "TuneOutlinedIcon",
+    path: "rule",
+    requiredPermissions: [
+      { action: "read", resource: "rule" },
+      { action: "create", resource: "rule" },
+      { action: "update", resource: "rule" },
+      { action: "delete", resource: "rule" },
     ],
   },
 ];
@@ -65,7 +77,7 @@ interface MenuOptions {
   icon: string;
   active: boolean;
   path: string;
-  requiredPermissions?: PermissionRequirement[]; // ✅ ahora es opcional
+  requiredPermissions?: PermissionRequirement[];
 }
 
 const initialState: InitialState = {

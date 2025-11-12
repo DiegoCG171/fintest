@@ -21,6 +21,7 @@ export const updateTestCaseThunk = createAsyncThunk<
   { rejectValue: string }
 >("test-case/update", async ({ id, payload }, { rejectWithValue }) => {
   try {
+    console.log(payload)
     const testCase = await updateTestCase(id, payload);
     return testCase;
   } catch (error) {

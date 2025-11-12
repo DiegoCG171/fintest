@@ -1,10 +1,22 @@
-import { useAppDispatch } from "../../store";
-import { setUpdateInstitution, setUpdatePermission, setUpdateRol, setUpdateUser } from "../../store/slices/admin/admin.slice";
+import { setLoading, useAppDispatch } from "../../store";
+import {
+  activExtractionRules,
+  setUpdateInstitution,
+  setUpdatePermission,
+  setUpdateRol,
+  setUpdateUser,
+} from "../../store/slices/admin/admin.slice";
+import { getExtractionRuleByIdThunk } from "../../store/slices/extractionsRules/extractionRules.thunk";
 import { openConfirmDeleteModal } from "../../store/slices/UI/confirmDeleteModal/confirmDeleteModal.slice";
 import { RESOURCE_MAP } from "../constants/tableSettings";
 import { EntityType, RouteType } from "../interfaces/tableSettings.interface";
-import { isInstitution, isPermission, isRol, isUserDB } from "../utils/tableSettings.utils";
-
+import {
+  isInstitution,
+  isPermission,
+  isRol,
+  isRule,
+  isUserDB,
+} from "../utils/tableSettings.utils";
 
 export const useTableActions = () => {
   const dispatch = useAppDispatch();
@@ -18,7 +30,9 @@ export const useTableActions = () => {
         break;
       case "/settings/institutions":
         if (isInstitution(selectedItem)) {
-          dispatch(setUpdateInstitution({ type: "update", institution: selectedItem }));
+          dispatch(
+            setUpdateInstitution({ type: "update", institution: selectedItem })
+          );
         }
         break;
       case "/settings/roles":
@@ -28,7 +42,20 @@ export const useTableActions = () => {
         break;
       case "/settings/permissions":
         if (isPermission(selectedItem)) {
-          dispatch(setUpdatePermission({ type: "update", permission: selectedItem }));
+          dispatch(
+            setUpdatePermission({ type: "update", permission: selectedItem })
+          );
+        }
+        break;
+      case "/settings/rule":
+        if (isRule(selectedItem)) {
+          dispatch(setLoading(true));
+          dispatch(getExtractionRuleByIdThunk({ uuid: selectedItem.uuid }))
+            .unwrap()
+            .finally(() => {
+              dispatch(setLoading(false));
+            });
+          dispatch(activExtractionRules(true));
         }
         break;
     }

@@ -1,7 +1,6 @@
 import { combineReducers, UnknownAction } from "@reduxjs/toolkit";
-import { logout } from "./slices/auth/auth.slice";
 
-import { authSlice } from "./slices/auth/auth.slice";
+import { authSlice, logout } from "./slices/auth/auth.slice";
 import { categoriesSlice } from "./slices/categories/categories.slice";
 import { formBuilderSlice } from "./slices/UI/form/formBuilder.slice";
 import { jsonTemplateDraftSlice } from "./slices/UI/form/jsonTemplateDraft.slice";
@@ -27,6 +26,7 @@ import { sidebarMenuSettingsSlice } from "./slices/UI/sidebarMenuSettings/sideba
 import { institutionSlice } from "./slices/institutions/institutions.slice";
 import { securitySlice } from "./slices/security/security.slice";
 import { emmisorModalConfigSlice } from "./slices/UI/emmisorModalConfig/emmisorModalConfig.slice";
+import { extractionRulesSlice } from "./slices/extractionsRules/extractionRulesSlice";
 import { allRulesSlice } from "./slices/rules/allRules.slice";
 
 const appReducer = combineReducers({
@@ -56,7 +56,8 @@ const appReducer = combineReducers({
     sidebarMenuSettings: sidebarMenuSettingsSlice.reducer,
     institutions: institutionSlice.reducer,
     security: securitySlice.reducer,
-    emmisorModalConfig: emmisorModalConfigSlice.reducer
+    emmisorModalConfig: emmisorModalConfigSlice.reducer,
+    extractionRules: extractionRulesSlice.reducer
 });
 
 const rootReducer = (state: ReturnType<typeof appReducer> | undefined, action: UnknownAction) => {

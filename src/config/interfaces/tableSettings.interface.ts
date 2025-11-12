@@ -1,4 +1,4 @@
-import { Permission, Rol } from "./security.interface";
+import { Permission, Rol, Rule } from "./security.interface";
 import { Institution, UserDB } from "./users.interface";
 
 
@@ -17,8 +17,8 @@ export interface PaginationData {
   pages: number;
 }
 
-export type EntityType = UserDB | Institution | Rol | Permission;
-export type RouteType = "/settings/users" | "/settings/institutions" | "/settings/roles" | "/settings/permissions";
+export type EntityType = UserDB | Institution | Rol | Permission | Rule;
+export type RouteType = "/settings/users" | "/settings/institutions" | "/settings/roles" | "/settings/permissions" | "/settings/rule";
 
 export interface TableConfig<T extends EntityType> {
   columns: TableColumn<T>[];
