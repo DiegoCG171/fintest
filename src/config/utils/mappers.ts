@@ -121,9 +121,10 @@ export const combineTemplateData = (
             : rule.breakingRules,
       };
 
-      return updatedRule;
-    });
-  };
+            return updatedRule;
+        });
+    };
 
-  return updateRules(mappedRules, mapData);
+
+    return updateRules(mappedRules, mapData);
 };
