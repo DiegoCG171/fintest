@@ -7,9 +7,10 @@ import {
   Typography,
 } from "@mui/material";
 import React from "react";
-import { logout, useAppDispatch, useAppSelector } from "../../store";
+import { useAppDispatch, useAppSelector } from "../../store";
 import { activeChangePassword } from "../../store/slices/auth/auth.slice";
 import { useNavigate } from "react-router-dom";
+import { logoutThunk } from "../../store/slices/auth/login.thunk";
 
 const BadgeContent = () => {
   return (
@@ -48,7 +49,7 @@ function AccountMenu() {
 
   const handleLogout = () => {
     handleClose();
-    dispatch(logout());
+    dispatch(logoutThunk());
   };
 
   const handleChangePassword = () => {

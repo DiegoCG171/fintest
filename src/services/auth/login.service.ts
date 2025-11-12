@@ -16,3 +16,11 @@ export const login = async (body: LoginCredentials): Promise<LoginResponse> => {
     }
 };
 
+export const logout = async (): Promise<void> => {
+    try {
+        await api.get(ENDPOINTS.logout);
+    } catch (error) {
+        const errorMessage = handleAxiosError(error);
+        throw errorMessage;
+    }
+}

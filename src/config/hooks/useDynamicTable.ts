@@ -14,6 +14,7 @@ import {
   getAllSecurityPermissionsThunk,
   getAllSecurityRolesThunk,
 } from "../../store/slices/security/security.thunk";
+import { getAllExtractionRulesThunk } from "../../store/slices/extractionsRules/extractionRules.thunk";
 
 export const useDynamicTable = () => {
   const dispatch = useAppDispatch();
@@ -28,6 +29,7 @@ export const useDynamicTable = () => {
     [ROUTES.INSTITUTIONS]: "institutionFilters",
     [ROUTES.ROLES]: "roleFilters",
     [ROUTES.PERMISSIONS]: "permissionFilters",
+    [ROUTES.RULES]: 'ruleFilters'
   };
 
   const storageKey = filterKeyMap[pathname];
@@ -120,6 +122,13 @@ export const useDynamicTable = () => {
             order: newOrder.toUpperCase(),
           });
           return getAllSecurityPermissionsThunk(filters);
+        },
+        [ROUTES.RULES]: () => {
+          const filters = updateFilters<GetFilters>("ruleFilters", {
+            sortBy: newSortBy,
+            order: newOrder.toUpperCase(),
+          });
+          return getAllExtractionRulesThunk(filters);
         },
       };
 

@@ -1,9 +1,9 @@
 import { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from "axios";
 import { jwtDecode } from "jwt-decode";
 import { AppStore } from "../store/store";
-import { logout } from "../store";
 import { renewTokenThunk } from "../store/slices/auth/renewTokenThunk.thunk";
 import { emitToast } from "../config/utils/toastEmitter";
+import { logout } from "../store/slices/auth/auth.slice";
 
 const ONE_MINUTE_IN_SECONDS = 60;
 

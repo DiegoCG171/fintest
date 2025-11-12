@@ -4,7 +4,7 @@ import { useAppSelector } from "../../store";
 import { ROUTES } from "../constants/tableSettings";
 
 export const useTableData = () => {
-  const { users, institutions, roles, permissions } = useAppSelector(
+  const { users, institutions, roles, permissions, rules } = useAppSelector(
     (state) => state.admin
   );
 
@@ -49,5 +49,15 @@ export const useTableData = () => {
         pages: permissions?.pages ?? 1,
       },
     },
-  }), [users, institutions, roles, permissions]);
+    [ROUTES.RULES]: {
+      data: rules?.data ?? [],
+      pagination: {
+        total: rules?.totalSearch ?? 0,
+        totalAll: rules?.total ?? 0,
+        limit: rules?.limit ?? 10,
+        page: rules?.page ?? 1,
+        pages: rules?.pages ?? 1,
+      },
+    },
+  }), [users, institutions, roles, permissions, rules]);
 };

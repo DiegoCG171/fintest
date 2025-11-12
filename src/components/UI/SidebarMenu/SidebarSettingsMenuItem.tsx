@@ -3,6 +3,7 @@ import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
 import BusinessOutlinedIcon from "@mui/icons-material/BusinessOutlined";
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
 import VpnKeyOutlinedIcon from "@mui/icons-material/VpnKeyOutlined";
+import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { changeActiveMenuOption } from "../../../store/slices/UI/sidebarMenuSettings/sidebarMenuSettings.slice";
 import { useNavigate } from "react-router-dom";
@@ -19,6 +20,7 @@ const iconMap: Record<string, React.ElementType> = {
   BusinessOutlinedIcon: BusinessOutlinedIcon,
   AdminPanelSettingsOutlinedIcon: AdminPanelSettingsOutlinedIcon,
   VpnKeyOutlinedIcon: VpnKeyOutlinedIcon,
+  TuneOutlinedIcon: TuneOutlinedIcon
 };
 
 export const SidebarSettingsMenuItem = ({
@@ -28,14 +30,14 @@ export const SidebarSettingsMenuItem = ({
   path,
 }: Props) => {
   const dispatch = useAppDispatch();
-  const { formActive } = useAppSelector((state) => state.admin);
+  const { formActive, extractionRulesActive } = useAppSelector((state) => state.admin);
   const navigate = useNavigate();
   const IconComponent = iconMap[icon] || null;
 
   const handleNavigate = () => {
-    if (formActive) return;
+    if (formActive || extractionRulesActive) return;
     dispatch(changeActiveMenuOption(label));
-    navigate(`/settings/${path}`);
+    navigate(`/settings/${path}`, { replace: true });
   };
 
   return (
@@ -52,11 +54,11 @@ export const SidebarSettingsMenuItem = ({
           border: "2px solid transparent",
           padding: 1,
           margin: 0.5,
-          cursor: formActive ? "default" : "pointer", // <-- cambio aquí
-          opacity: formActive ? 0.5 : 1, // <-- hace que parezca deshabilitado
+          cursor: formActive || extractionRulesActive ? "default" : "pointer",
+          opacity: formActive || extractionRulesActive ? 0.5 : 1,
           transition: "border-color 0.2s ease, opacity 0.2s ease",
           "&:hover": {
-            borderColor: !formActive
+            borderColor: !formActive || !extractionRulesActive
               ? (theme) => theme.palette.background.default
               : "transparent",
           },

@@ -14,6 +14,8 @@ import { useEffect, useState } from "react";
 import { deleteTemplateThunk } from "../../../store/slices/templates/templates.thunk";
 import { deleteInstitutionsThunk } from "../../../store/slices/institutions/institutions.thunk";
 import { deleteSecurityPermissionsThunk, deleteSecurityRolesThunk } from "../../../store/slices/security/security.thunk";
+import { removeSubRule, removeTopLevelRule } from "../../../store/slices/extractionsRules/extractionRulesSlice";
+import { deleteExtractionRuleThunk } from "../../../store/slices/extractionsRules/extractionRules.thunk";
 
 const resourceActions = {
   testCase: {
@@ -63,7 +65,22 @@ const resourceActions = {
     deleteThunk: deleteSecurityPermissionsThunk,
     toastMessage: "Permiso eliminado correctamente",
     title: "¿Estás seguro de que deseas eliminar el permiso?",
-  }
+  },
+  rule: {
+    deleteThunk: deleteExtractionRuleThunk,
+    toastMessage: "Regla eliminada correctamente",
+    title: "¿Estás seguro de que deseas eliminar la regla?",
+  },
+  topRule: {
+    deleteThunk: removeTopLevelRule,
+    toastMessage: "Subelemento eliminado correctamente",
+    title: "¿Estás seguro de que deseas eliminar el Subelemento?",
+  },
+  subRule: {
+    deleteThunk: removeSubRule,
+    toastMessage: "Subelemento eliminado correctamente",
+    title: "¿Estás seguro de que deseas eliminar el Subelemento?",
+  },
 } as const;
 
 type ResourceKey = keyof typeof resourceActions;

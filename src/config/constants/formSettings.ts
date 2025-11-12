@@ -2,6 +2,7 @@ export const MODAL_STYLE = {
   p: 3,
   width: "100%",
   mt: 4,
+  overflowY: "auto"
 };
 
 export const MENU_PROPS = {

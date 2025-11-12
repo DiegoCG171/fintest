@@ -6,6 +6,7 @@ interface RunnableItem {
 }
 
 export const mapRunSessionItems = (runnables: RunnableItem[]) => {
+  console.log(runnables)
   let foundFirstUnrun = false;
 
   return runnables.map((runnable) => {

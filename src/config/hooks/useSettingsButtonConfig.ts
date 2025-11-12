@@ -2,9 +2,10 @@ import PersonAddOutlinedIcon from "@mui/icons-material/PersonAddOutlined";
 import AddModeratorOutlinedIcon from "@mui/icons-material/AddModeratorOutlined";
 import DomainAddOutlinedIcon from "@mui/icons-material/DomainAddOutlined";
 import VpnKeyOutlinedIcon from "@mui/icons-material/VpnKeyOutlined";
+import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import { useLocation } from "react-router-dom";
 import { useAppDispatch } from "../../store";
-import { setUpdateInstitution, setUpdatePermission, setUpdateRol, setUpdateUser } from "../../store/slices/admin/admin.slice";
+import { activExtractionRules, setUpdateInstitution, setUpdatePermission, setUpdateRol, setUpdateUser } from "../../store/slices/admin/admin.slice";
 import { OverridableComponent } from "@mui/material/OverridableComponent";
 import { SvgIconTypeMap } from "@mui/material";
 
@@ -50,6 +51,14 @@ export const useSettingsButtonConfig = (): ButtonConfig => {
         onClick: () => dispatch(setUpdatePermission({ type: "create" })),
         requiredPermissions: [{ action: "create", resource: "permission" }],
       };
+    }
+    if (location.pathname.includes("/settings/rule")) {
+      return {
+      text: "Crear regla",
+      icon: SaveOutlinedIcon,
+      onClick: () => dispatch(activExtractionRules(true)),
+      requiredPermissions: [{action: "create", resource: "user"}],
+    };
     }
     return {
       text: "Acción",

@@ -87,38 +87,46 @@ export const mapValidationTemplate = (validation: FieldValidation[], isActive: b
         };
     });
 
-export const combineTemplateData = (data: FieldValidation[] | null, mappedRules: TableRowDataFormBuilder[], isActive: boolean): TableRowDataFormBuilder[] => {
-    const mapData = mapValidationTemplate(data ?? [], isActive);
-    const updateRules = (
-        rules: TableRowDataFormBuilder[],
-        data: TableRowDataFormBuilder[],
-        level = 0
-    ): TableRowDataFormBuilder[] => {
-        return rules.map((rule) => {
-            const matched = data.find(
-                (d) =>
-                    d.idBitmap?.trim().toLowerCase() === rule.idBitmap?.trim().toLowerCase()
-            );
-            const updatedRule: TableRowDataFormBuilder = {
-                ...rule,
-                isRequired: matched?.isRequired ?? rule.isRequired,
-                isActive: matched?.isActive ?? rule.isActive,
-                function: matched?.function ??  rule.function,
-                value: matched?.value ??  rule.value,
-                breakingRules:
-                    Array.isArray(rule.breakingRules) && rule.breakingRules.length > 0
-                        ? updateRules(
-                            rule.breakingRules as TableRowDataFormBuilder[],
-                            (matched?.breakingRules as TableRowDataFormBuilder[]) ?? [],
-                            level + 1
-                        )
-                        : rule.breakingRules,
-            };
+export const combineTemplateData = (
+  data: FieldValidation[] | null,
+  mappedRules: TableRowDataFormBuilder[],
+  isActive: boolean
+): TableRowDataFormBuilder[] => {
+  const mapData = mapValidationTemplate(data ?? [], isActive);
 
-            return updatedRule;
-        });
-    };
+  const updateRules = (
+    rules: TableRowDataFormBuilder[],
+    data: TableRowDataFormBuilder[],
+    level = 0
+  ): TableRowDataFormBuilder[] => {
+    return rules.map((rule) => {
+      const matched = data.find(
+        (d) =>
+          d.idBitmap?.trim().toLowerCase() ===
+          rule.idBitmap?.trim().toLowerCase()
+      );
 
+      const hasChildren =
+        Array.isArray(rule.breakingRules) && rule.breakingRules.length > 0;
 
-    return updateRules(mappedRules, mapData);
+      const updatedRule: TableRowDataFormBuilder = {
+        ...rule,
+        isActive: matched ? true : rule.isActive,
+        isRequired: matched?.isRequired ?? rule.isRequired,
+        function: matched?.function ?? rule.function,
+        value: matched?.value ?? rule.value,
+        breakingRules: hasChildren
+          ? updateRules(
+              rule.breakingRules as TableRowDataFormBuilder[],
+              (matched?.breakingRules as TableRowDataFormBuilder[]) ?? [],
+              level + 1
+            )
+          : rule.breakingRules,
+      };
+
+      return updatedRule;
+    });
+  };
+
+  return updateRules(mappedRules, mapData);
 };
