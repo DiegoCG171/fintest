@@ -38,7 +38,7 @@ function RulesSelector({
   useEffect(() => {
     if (allRulles.length > 0 && !ruleSelected) {
       const firstRule = allRulles[0];
-      onSelectRule(firstRule._id);
+      onSelectRule(firstRule.uuid);
       setShowError(false);
     }
   }, [allRulles, ruleSelected, onSelectRule, setShowError]);
@@ -46,8 +46,8 @@ function RulesSelector({
   const selectedRule = useMemo(
     () =>
       allRulles.find(
-        (r: { _id: string; uuid: string }) =>
-          r._id === ruleSelected || r.uuid === ruleSelected
+        (r: { uuid: string}) =>
+          r.uuid === ruleSelected 
       ) ?? null,
     [allRulles, ruleSelected]
   );
@@ -74,7 +74,7 @@ function RulesSelector({
         noOptionsText="No hay reglas disponibles"
         onChange={(_, newValue) => {
           if (newValue) {
-            onSelectRule(newValue._id);
+            onSelectRule(newValue.uuid);
             setShowError(false);
           }
         }}

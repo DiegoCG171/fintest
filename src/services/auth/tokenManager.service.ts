@@ -1,8 +1,8 @@
 import { jwtDecode } from "jwt-decode";
-import { logout } from "../../store";
 import { renewTokenThunk } from "../../store/slices/auth/renewTokenThunk.thunk";
 import { emitToast } from "../../config/utils/toastEmitter";
 import { AppStore } from "../../store/store";
+import { logoutThunk } from "../../store/slices/auth/login.thunk";
 
 interface JwtPayload { exp: number }
 
@@ -39,7 +39,7 @@ export async function ensureValidToken(store: AppStore): Promise<string | null> 
     const timeLeft = getTokenTimeLeft(token);
 
     if (timeLeft <= 0) {
-        store.dispatch(logout());
+        store.dispatch(logoutThunk());
         return null;
     }
 
@@ -64,7 +64,7 @@ export async function ensureValidToken(store: AppStore): Promise<string | null> 
         return newToken;
     } catch (err) {
         emitToast(err as string || "Error al renovar token", "error");
-        store.dispatch(logout());
+        store.dispatch(logoutThunk());
         return null;
     } finally {
         isRefreshing = false;
