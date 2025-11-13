@@ -42,8 +42,9 @@ function MediaPlayer() {
       return true;
     }
 
-    const valid = Boolean(configHost && configPort);
-    return valid;
+    // const valid = Boolean(configHost && configPort);
+    // return valid;
+    return false
   };
 
   const [playerMessage, setPlayerMessage] = useState("Detenido...");
