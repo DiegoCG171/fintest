@@ -34,20 +34,20 @@ function mapAllChildren(
 
 export function prepareUpdatePayload(
   rows: TableRowDataFormBuilder[],
-  typeForm: string
+  typeForm: string,
 ): PatchGenerationTemplate {
-  const defaultFn = getDefaultFunctionByFormType(typeForm);
-  const formattedRows: FieldUpdateTemplate[] = rows
-    .filter((row) => row.isActive)
-    .map((row) => {
-      const base = {
-        idBitmap: row.idBitmap ?? "",
-        ...(typeForm === "validationTransaction" && {
-          isRequired: Boolean(row.isRequired),
-        }),
-        function: !row.function?.trim() ? defaultFn : row.function,
-        value: row.value ?? "",
-      };
+  console.log('[typeForm]:', typeForm)
+    const defaultFn = getDefaultFunctionByFormType(typeForm);
+    const formattedRows: FieldUpdateTemplate[] = rows
+        .filter((row) => row.isActive)
+        .map((row) => {
+
+        const base = {
+            idBitmap: row.idBitmap ?? '',
+            ...(typeForm === 'validationTransaction' && { isRequired: Boolean(row.isRequired) }),
+            function: !row.function?.trim() ? defaultFn : row.function,
+            value: row.value ?? ''
+        };
 
       const children = Array.isArray(row.breakingRules)
         ? mapAllChildren(

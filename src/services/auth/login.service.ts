@@ -2,7 +2,7 @@ import api from "../../api/api";
 import { ENDPOINTS } from "../../config/constants/endpoints";
 import { getEncrypted } from "../../config/utils/passwordEncrypt";
 import { handleAxiosError } from "../../config/utils/axiosErrorHandler";
-import { LoginCredentials, LoginResponse } from "../../config/interfaces";
+import { LoginCredentials, LoginResponse, LogoutResponse } from "../../config/interfaces";
 
 
 export const login = async (body: LoginCredentials): Promise<LoginResponse> => {
@@ -16,11 +16,16 @@ export const login = async (body: LoginCredentials): Promise<LoginResponse> => {
     }
 };
 
-export const logout = async (): Promise<void> => {
+export const logout = async (): Promise<LogoutResponse> => {
     try {
-        await api.get(ENDPOINTS.logout);
+        const response = await api.get<boolean>(ENDPOINTS.logout);
+        const success = response.data === true || response.status === 200;
+        return { success };
     } catch (error) {
         const errorMessage = handleAxiosError(error);
-        throw errorMessage;
+        console.error("Logout error:", errorMessage);
+        return { success: false };
     }
-}
+};
+
+

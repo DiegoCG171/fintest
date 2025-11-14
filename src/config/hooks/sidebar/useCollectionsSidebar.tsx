@@ -120,7 +120,7 @@ const useCollectionsSidebar = ({
     return {
         resource: colectionsMenu,
         separatorMenuProps: {
-        label: "Categorías",
+        label: "Colecciones",
         onAction: canCreate ? () => setIsCreatingCollection(true) : undefined,
         },
         optionsActive: true,

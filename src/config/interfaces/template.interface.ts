@@ -5,20 +5,23 @@ export interface TemplateContextType {
     _id: string
     name: string
     description: string
+    dependOn: string
     categoryId: string
     type: string
     validationTransaction: FieldValidation[]
     generationTransaction: FieldValidation[]
     selectionTransaction: FieldValidation[]
+    dependOnTransaction: FieldValidation[]
     processingMethod: string
     uuid: string
     __v: number
     createdAt: string
     updatedAt: string
     path: string[]
+    schemaId: string;
 }
 
-export type FormTypeKey = "generationTransaction" | "selectionTransaction" | "validationTransaction";
+export type FormTypeKey = "generationTransaction" | "selectionTransaction" | "validationTransaction" | "dependOnTransaction";
 
 export type CreateTemplate = Omit<TemplateContextType, "_id" | "uuid" | "__v" | "createdAt" | "updatedAt" | "type" | "path">;
 
@@ -38,10 +41,12 @@ export interface FieldValidation {
 // PATCH
 
 export interface PatchGenerationTemplate {
+    dependOnTransaction: FieldUpdateTemplate[]
     name?: string
     description?: string
     categoryId?: string
     type?: string
+    dependOn?: string
     generationTransaction?: FieldUpdateTemplate[]
     validationTransaction?: FieldUpdateTemplate[]
 }
@@ -67,5 +72,6 @@ export interface TemplateState {
     getStatusById: AsyncStatus,
     getErrorById: null | string,
     templateById: TemplateContextType | null,
+    schemaId: string;
 
 }

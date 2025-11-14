@@ -15,14 +15,16 @@ import {
   CatalogsDataMiddlewareProps,
   ColumnConfigFormBuilder,
 } from "../../config/interfaces";
-import { getTransactionByType } from "../../config/utils";
+import { getDependOnId, getTransactionByType } from "../../config/utils";
 import { useAuth } from "../../config/hooks/useAuth";
 import { hasPermission } from "../../config/utils/permissions";
 import {
+  getDependsOnTransactionFunctionsThunk,
   getGenetationFunctionsThunk,
   getSelectionFunctionsThunk,
   getValidationFunctionsThunk,
 } from "../../store/slices/functionsSelect/functionsSelect.thunk";
+import { DependsOnInput } from "../UI/FormBuilder/DependsOnInput";
 
 function CatalogsDataMiddleware({
   tabId,
@@ -32,15 +34,22 @@ function CatalogsDataMiddleware({
   const { formType, templateId } = template;
   const { permissions } = useAuth();
 
-  const version = useAppSelector((state) => state.formBuilder.tabForms[tabId]?.version);
+  const version = useAppSelector(
+    (state) => state.formBuilder.tabForms[tabId]?.version
+  );
   const rawRules = useAppSelector((state) => state.rules.rules);
   const templates = useAppSelector((state) => state.templates.templates);
   const testCases = useAppSelector((state) => state.testCases.testCases);
   const formState = useAppSelector(
     (state) => state.formBuilder.tabForms[tabId]
   );
+  const dependsOnId = useAppSelector(
+    (state) => state.formBuilder.tabForms[tabId]?.dependsOnId || ""
+  );
 
   const alreadyInitialized = useRef(false);
+  
+  const hasDependency = template.label === "Dependencia" ? true : false;
 
   // Functions Selects states
   const selectionState = useAppSelector(
@@ -51,6 +60,9 @@ function CatalogsDataMiddleware({
   );
   const generationState = useAppSelector(
     (state) => state.functionSelect.generationState
+  );
+  const dependsOnState = useAppSelector(
+    (state) => state.functionSelect.dependsOnState
   );
 
   const functionsFetched = useRef(false);
@@ -70,22 +82,40 @@ function CatalogsDataMiddleware({
     }
   }, [templates, templateId, formType, template, testCases]);
 
+  const dependsOn = useMemo(() => {
+    if (template.origin === "categories") return '';
+    return getDependOnId(testCases, templateId)
+  }, [template.origin, templateId, testCases])
+
   useEffect(() => {
     if (template.formType === "generationTransaction") {
       dispatch(
-        setConfig(serviceConfig.rulesGeneration.columns as ColumnConfigFormBuilder[])
+        setConfig(
+          serviceConfig.rulesGeneration.columns as ColumnConfigFormBuilder[]
+        )
       );
-    } 
+    }
     if (template.formType === "selectionTransaction") {
       dispatch(
-        setConfig(serviceConfig.rulesSelection.columns as ColumnConfigFormBuilder[])
+        setConfig(
+          serviceConfig.rulesSelection.columns as ColumnConfigFormBuilder[]
+        )
       );
-    } 
+    }
     if (template.formType === "validationTransaction") {
       dispatch(
-        setConfig(serviceConfig.rulesValidation.columns as ColumnConfigFormBuilder[])
+        setConfig(
+          serviceConfig.rulesValidation.columns as ColumnConfigFormBuilder[]
+        )
       );
-    } 
+    }
+    if (template.formType === "dependOnTransaction") {
+      dispatch(
+        setConfig(
+          serviceConfig.rulesDependsOn.columns as ColumnConfigFormBuilder[]
+        )
+      );
+    }
   }, [dispatch, template, formType]);
 
   useEffect(() => {
@@ -103,8 +133,18 @@ function CatalogsDataMiddleware({
       dispatch(getSelectionFunctionsThunk());
     }
 
+    if (dependsOnState === "idle") {
+      dispatch(getDependsOnTransactionFunctionsThunk());
+    }
+
     functionsFetched.current = true;
-  }, [dispatch, generationState, validationState, selectionState]);
+  }, [
+    dispatch,
+    generationState,
+    validationState,
+    selectionState,
+    dependsOnState,
+  ]);
 
   useEffect(() => {
     alreadyInitialized.current = false;
@@ -113,9 +153,12 @@ function CatalogsDataMiddleware({
   useEffect(() => {
     if (alreadyInitialized.current) return;
     if (!rawRules?.length || formState) return;
-    const data = transactionData?.length ? transactionData : rawRules
-    const values = combineTemplateData(data, mappedRules, !transactionData?.length);
-    console.log(values)
+    const data = transactionData?.length ? transactionData : rawRules;
+    const values = combineTemplateData(
+      data,
+      mappedRules,
+      !transactionData?.length
+    );
     dispatch(setValuesForTab({ tabId, values, originalValues: values }));
     alreadyInitialized.current = true;
   }, [dispatch, tabId, rawRules, transactionData, mappedRules, formState]);
@@ -131,13 +174,34 @@ function CatalogsDataMiddleware({
     return false;
   }, [template.origin, permissions]);
 
-  return (
-    <FormBuilderContainer
-      key={`${tabId}-${version}`}
-      tabId={tabId}
-      canEdit={canEdit}
-    />
-  );
+  if (!hasDependency) {
+    return (
+      <FormBuilderContainer
+        key={`${tabId}-${version}`}
+        tabId={tabId}
+        canEdit={canEdit}
+      />
+    );
+  }
+  if (hasDependency) {
+    return (
+      <>
+        <DependsOnInput
+          tabId={tabId}
+          testCaseId={templateId}
+          dependsOn={dependsOn}
+        />
+
+        {dependsOnId && (
+          <FormBuilderContainer
+            key={`${tabId}-${version}`}
+            tabId={tabId}
+            canEdit={canEdit}
+          />
+        )}
+      </>
+    );
+  }
 }
 
 export default CatalogsDataMiddleware;

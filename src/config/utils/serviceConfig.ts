@@ -106,6 +106,41 @@ export const serviceConfig = {
             { id: "breakingRules", label: "", width: "5%", type: "static" as const }
         ],
     },
+    rulesDependsOn: {
+        columns: [
+            { id: "isActive", label: "", affects: ["isRequired"], width: "5%", type: "checkbox" as const },
+            { id: "idBitmap", label: "Campo", width: "10%", type: "static" as const },
+            { id: "displayName", label: "Nombre", width: "35%", type: "static" as const },
+            {
+                id: "isRequired",
+                label: "Requerido",
+                dependsOn: "isActive",
+                width: "10%",
+                type: "checkbox" as const
+            },
+            {
+                id: "function",
+                label: "Función",
+                options: ["ignore", "includes", "equals" ],
+                affects: ["value"],
+                width: "20%",
+                type: "select" as const,
+                hide: true
+            },
+            {
+                id: "value",
+                label: "Parámetro",
+                dependsOn: "function",
+                dynamicRender: {
+                    "de_request": { render: true, type: "auto-complete" as const, options: [] },
+                    "de_response": { render: true, type: "auto-complete" as const, options: [] },
+                },
+                width: "20%",
+                type: "dynamic" as const
+            },
+            { id: "breakingRules", label: "", width: "5%", type: "static" as const }
+        ],
+    },
 };
 
 

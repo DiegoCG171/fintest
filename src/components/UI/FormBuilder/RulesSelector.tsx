@@ -1,0 +1,115 @@
+import {
+  Autocomplete,
+  TextField,
+  FormControl,
+  FormHelperText,
+} from "@mui/material";
+import { useEffect, useState, useMemo } from "react";
+import { getRulesThunk, useAppDispatch, useAppSelector } from "../../../store";
+
+interface RulesSelectorProps {
+  ruleSelected: string | null;
+  onSelectRule: (id: string) => void;
+  showError: boolean;
+  setShowError: (value: boolean) => void;
+  onlyRead?: boolean;
+}
+
+function RulesSelector({
+  ruleSelected,
+  onSelectRule,
+  showError,
+  setShowError,
+  onlyRead = false,
+}: RulesSelectorProps) {
+  const dispatch = useAppDispatch();
+  const { allRulles, page, hasMore, status } = useAppSelector(
+    (state) => state.allRules
+  );
+  const loading = status === "loading";
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (allRulles.length === 0) {
+      dispatch(getRulesThunk(1));
+    }
+  }, [dispatch, allRulles.length]);
+
+  useEffect(() => {
+    if (allRulles.length > 0 && !ruleSelected) {
+      const firstRule = allRulles[0];
+      onSelectRule(firstRule.uuid);
+      setShowError(false);
+    }
+  }, [allRulles, ruleSelected, onSelectRule, setShowError]);
+
+  const selectedRule = useMemo(
+    () =>
+      allRulles.find(
+        (r: { uuid: string}) =>
+          r.uuid === ruleSelected 
+      ) ?? null,
+    [allRulles, ruleSelected]
+  );
+
+  return (
+    <FormControl
+      fullWidth
+      error={showError}
+    >
+      <Autocomplete
+        disablePortal
+        size="small"
+        disabled={onlyRead}
+        open={onlyRead ? false : open}
+        onOpen={() => !onlyRead && setOpen(true)}
+        onClose={() => !onlyRead && setOpen(false)}
+        options={allRulles}
+        value={selectedRule}
+        loading={loading}
+        isOptionEqualToValue={(option, value) => option._id === value._id}
+        getOptionLabel={(option) =>
+          `${option.uuid || "Sin UUID"} (v${option.version})`
+        }
+        noOptionsText="No hay reglas disponibles"
+        onChange={(_, newValue) => {
+          if (newValue) {
+            onSelectRule(newValue.uuid);
+            setShowError(false);
+          }
+        }}
+        slotProps={{
+          listbox: {
+            sx: {
+              maxHeight: 200,
+              overflowY: "auto",
+              py: 0.5,
+              "& li": { fontSize: 14 },
+            },
+            onScroll: (e: React.UIEvent<HTMLUListElement>) => {
+              const target = e.currentTarget;
+              const isBottom =
+                target.scrollTop + target.clientHeight >=
+                target.scrollHeight - 50;
+              if (isBottom && hasMore && !loading) {
+                dispatch(getRulesThunk(page + 1));
+              }
+            },
+          },
+        }}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            placeholder="Selecciona una regla"
+            error={showError}
+          />
+        )}
+      />
+      {showError && (
+        <FormHelperText>Debes seleccionar una regla.</FormHelperText>
+      )}
+    </FormControl>
+  );
+}
+
+export default RulesSelector;

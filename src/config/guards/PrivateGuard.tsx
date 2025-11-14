@@ -1,7 +1,7 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useAppSelector, useAppDispatch} from "../../store";
 import { useEffect } from "react";
-import { logout } from "../../store/slices/auth/auth.slice";
+import { logoutThunk } from "../../store/slices/auth/login.thunk";
 
 const PrivateGuard = () => {
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
@@ -9,8 +9,8 @@ const PrivateGuard = () => {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      console.debug("Usuario no autenticado, ejecutando logoutThunk()");
-      dispatch(logout());
+      console.debug("Usuario no autenticado, ejecutando logout()");
+      dispatch(logoutThunk());
     }
   }, [isAuthenticated, dispatch]);
 

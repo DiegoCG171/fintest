@@ -9,6 +9,7 @@ export interface testCaseInterface {
     validationTransaction: FieldValidation[]
     generationTransaction: FieldValidation[]
     selectionTransaction: FieldValidation[]
+    dependOnTransaction: FieldValidation[]
     templateId: string
     dependOn: string | null
     order: number
@@ -16,6 +17,7 @@ export interface testCaseInterface {
     createdAt: string
     updatedAt: string
     __v: number
+    schemaId: string
 }
 
 import { ReactNode } from "react";

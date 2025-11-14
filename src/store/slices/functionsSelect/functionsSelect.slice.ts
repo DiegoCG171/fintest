@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getGenetationFunctionsThunk, getSelectionFunctionsThunk, getValidationFunctionsThunk } from "./functionsSelect.thunk";
+import { getDependsOnTransactionFunctionsThunk, getGenetationFunctionsThunk, getSelectionFunctionsThunk, getValidationFunctionsThunk } from "./functionsSelect.thunk";
 import { AsyncStatus } from "../../../config/interfaces";
 
 interface InitialState {
@@ -9,6 +9,8 @@ interface InitialState {
     validationState: AsyncStatus;
     selection: FunctionSelect[];
     selectionState: AsyncStatus;
+    dependsOn: FunctionSelect[];
+    dependsOnState: AsyncStatus;
 }
 
 interface FunctionSelect {
@@ -23,6 +25,8 @@ const initialState: InitialState = {
     validationState: 'idle',
     selection: [],
     selectionState: 'idle',
+    dependsOn: [],
+    dependsOnState: 'idle',
 }
 
 export const functionsSelectSlice = createSlice({
@@ -65,6 +69,18 @@ export const functionsSelectSlice = createSlice({
             })
             .addCase(getSelectionFunctionsThunk.rejected, (state) => {
                 state.selectionState = 'error';
+            })
+
+            // DependsOn
+            .addCase(getDependsOnTransactionFunctionsThunk.pending, (state) => {
+                state.selectionState = 'loading';
+            })
+            .addCase(getDependsOnTransactionFunctionsThunk.fulfilled, (state, action) => {
+                state.dependsOn = action.payload;
+                state.dependsOnState = 'success';
+            })
+            .addCase(getDependsOnTransactionFunctionsThunk.rejected, (state) => {
+                state.dependsOnState = 'error';
             });
     }
 

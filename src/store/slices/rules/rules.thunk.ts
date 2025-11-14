@@ -1,18 +1,17 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
-import { Field } from "../../../config/interfaces"
+import { Field, RootRules } from "../../../config/interfaces"
 import { getRuleById, getRules } from "../../../services"
 
 export const getRulesThunk = createAsyncThunk<
-    Field[],
-    void,
+    RootRules,
+    number | undefined,
     { rejectValue: string }
 >(
-    'rules/getAll',
-    async (_, { rejectWithValue }) => {
+    "rules/fetch",
+    async (page = 1, { rejectWithValue }) => {
         try {
-            const rules = await getRules()
-            console.log(rules)
-            return rules[0].fields
+            const rules = await getRules({ page, limit: 10, order: "ASC" });
+            return rules;
         } catch (error: unknown) {
             const message =
                 typeof error === "string"
@@ -23,7 +22,7 @@ export const getRulesThunk = createAsyncThunk<
             return rejectWithValue(message);
         }
     }
-)
+);
 
 export const getRuleByIdThunk = createAsyncThunk<
     Field[],
@@ -34,7 +33,6 @@ export const getRuleByIdThunk = createAsyncThunk<
     async ({ uuid }, { rejectWithValue }) => {
         try {
             const rules = await getRuleById(uuid)
-            console.log(rules)
             return rules.fields
         } catch (error: unknown) {
             const message =

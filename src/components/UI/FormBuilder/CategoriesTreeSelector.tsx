@@ -135,12 +135,13 @@ export default function CategoriesTreeSelector({
   return (
     <Box
       sx={{
-        height: "70%",
-        minWidth: 250,
         overflowY: "auto",
         backgroundColor: (theme) => theme.palette.background.paper,
         borderRadius: 2,
         border: "1px solid #D1D1D1",
+        p: 0.5,
+        minHeight: "20vh",
+        maxHeight: { lg: "30vh", xl: "60vh" },
       }}
     >
       {root.length > 0 ? (
