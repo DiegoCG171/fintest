@@ -39,7 +39,9 @@ export async function ensureValidToken(store: AppStore): Promise<string | null> 
     const timeLeft = getTokenTimeLeft(token);
 
     if (timeLeft <= 0) {
-        store.dispatch(logoutThunk());
+        if (window.location.pathname !== "/login") {
+            store.dispatch(logoutThunk());
+        }
         return null;
     }
 
