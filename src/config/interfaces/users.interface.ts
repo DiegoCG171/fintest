@@ -1,3 +1,4 @@
+
 import { AsyncStatus } from ".";
 
 export interface createUserInterface {
@@ -12,6 +13,17 @@ export interface createUserInterface {
 export interface UserState {
   status: AsyncStatus;
   error: null | string;
+  configuration: UserConfiguration
+}
+
+export interface UserConfiguration {
+  portNumber?: number,
+  targetHost?: string,
+  targetPort?: number,
+};
+
+export interface UserConfigPayload extends UserConfiguration {
+  userId: string;
 }
 
 export interface Users {

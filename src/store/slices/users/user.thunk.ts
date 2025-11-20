@@ -35,8 +35,6 @@ export const getAllUsersThunk = createAsyncThunk(
   }
 );
 
-
-
 export const deleteUserThunk = createAsyncThunk('users/remove', async (id: string, {rejectWithValue}) => {
     try {
        await deleteUser(id)

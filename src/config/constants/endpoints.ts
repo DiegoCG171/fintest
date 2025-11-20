@@ -36,6 +36,7 @@ export const ENDPOINTS = {
 
     //Users
     user: getEndpoint('users'),
+    userConfig: getEndpoint('users/config'),
     
     //Collections
     collections: getEndpoint('collection'),

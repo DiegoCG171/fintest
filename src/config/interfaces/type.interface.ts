@@ -166,6 +166,7 @@ export interface ProfileFormData {
   apellido: string;
   usuario: string;
   email: string;
+  targetHost: string;
+  targetPort: string
   portNumber: string;
-  host: string
 }

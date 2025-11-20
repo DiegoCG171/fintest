@@ -37,7 +37,7 @@ export const getAllUsers = async (filters?: GetFilters) => {
 };
 
 export const createUser = async (body: createUserInterface) => {
-  const password = getEncrypted(body.password);
+  const password = getEncrypted(body.password!);
   const user = {
     ...body,
     password,
