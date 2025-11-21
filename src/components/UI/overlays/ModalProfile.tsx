@@ -23,7 +23,7 @@ import { activeChangePassword } from "../../../store/slices/auth/auth.slice";
 import { ProfileFormData } from "../../../config/interfaces";
 import { Theme } from "@emotion/react";
 import { useAuth } from "../../../config/hooks/useAuth";
-import { hasPermission } from "../../../config/utils/permissions";
+import { hasPermission, hasSomePermission } from "../../../config/utils/permissions";
 import { updateConfigUserThunk } from "../../../store/slices/users/userConfiguration.thunk";
 import { useToast } from "../../../config/hooks/useToast";
 
@@ -31,10 +31,10 @@ export function ModalProfile() {
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.auth.user);
   const { configuration } = useAppSelector((state) => state.user);
-  const { permissions } = useAuth();
+  const { permissions: userPermissions } = useAuth();
   const { showToast } = useToast();
 
-  const isReadOnly = !hasPermission(permissions, "update", "userConfiguration");
+  const isReadOnly = !hasPermission(userPermissions, "update", "userConfiguration");
 
   const [formData, setFormData] = useState<ProfileFormData>({
     nombre: user?.names || "",
@@ -116,27 +116,30 @@ export function ModalProfile() {
 
   const handleSave = async () => {
     if (!validate()) return;
-
     try {
-      await dispatch(
-        updateUserThunk({
-          id: user?.id || "",
-          payload: {
-            names: formData.nombre,
-            surnames: formData.apellido,
-            username: formData.usuario,
-            email: formData.email,
-          },
-        })
-      ).unwrap();
-      await dispatch(
-        updateConfigUserThunk({
-          userId: user?.id || "",
-          targetHost: formData.targetHost,
-          targetPort: Number(formData.targetPort),
-          portNumber: Number(formData.portNumber),
-        })
-      ).unwrap();
+      if (hasSomePermission(userPermissions, [{action: "update", resource: "user"}])) {
+        await dispatch(
+          updateUserThunk({
+            id: user?.id || "",
+            payload: {
+              names: formData.nombre,
+              surnames: formData.apellido,
+              username: formData.usuario,
+              email: formData.email,
+            },
+          })
+        ).unwrap();
+      }
+      if (hasSomePermission(userPermissions, [{action: "update", resource: "userConfiguration"}])) {
+        await dispatch(
+          updateConfigUserThunk({
+            userId: user?.id || "",
+            targetHost: formData.targetHost,
+            targetPort: Number(formData.targetPort),
+            portNumber: Number(formData.portNumber),
+          })
+        ).unwrap();
+      }
       showToast("Información actualizada correctamente", "success");
     } catch (error) {
       showToast(String(error), "error");
@@ -191,8 +194,8 @@ export function ModalProfile() {
                     ...getReadOnlyStyles(true),
                   } as SxProps<Theme>
                 }
-                disabled={isReadOnly}
-                slotProps={{ input: { readOnly: isReadOnly } }}
+                disabled={true}
+                slotProps={{ input: { readOnly: true } }}
               />
             </Grid>
 
