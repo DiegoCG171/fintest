@@ -38,6 +38,7 @@ export const SettingsButton = () => {
         { action: "update", resource: "resource" },
         { action: "delete", resource: "resource" },
       ]}
+      requireAll={true}
     >
       <Box sx={{ position: "absolute", top: 24, right: 24, cursor: "pointer" }}>
           <SettingsOutlinedIcon onClick={() => navigate("/settings/users")} />

@@ -9,6 +9,7 @@ export const createUserThunk = createAsyncThunk<
 >(
     'users/create',
     async (user: createUserInterface, { rejectWithValue }) => {
+      console.log(user)
         try {
           return await createUser(user)
         } catch (error) {
@@ -34,8 +35,6 @@ export const getAllUsersThunk = createAsyncThunk(
     }
   }
 );
-
-
 
 export const deleteUserThunk = createAsyncThunk('users/remove', async (id: string, {rejectWithValue}) => {
     try {

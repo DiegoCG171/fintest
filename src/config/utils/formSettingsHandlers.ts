@@ -91,6 +91,7 @@ export const createSubmitHandlers = (
         email: formData.email,
         password: formData.password,
         institutionId: formData.institutionId,
+        roleIds: formData.roleIds
       };
       
       try {

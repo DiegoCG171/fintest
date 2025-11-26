@@ -125,7 +125,7 @@ export const adminSlice = createSlice({
         updateUserThunk.fulfilled,
         (state, action: PayloadAction<UserDB>) => {
           state.users.data = state.users.data.map((user) =>
-            user.id === action.payload.id ? action.payload : user
+            user.id === action.payload.id ? {...user, ...action.payload} : user
           );
           state.updateUser = undefined;
         }
