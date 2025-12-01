@@ -1,10 +1,7 @@
 import { Badge as BaseBadge, Divider, Stack } from '@mui/material';
-import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
 import AccountMenu from '../core/AccountMenu';
-import { HeaderComponentProps } from '../../config/interfaces';
 
 function HeaderComponent(
-  { alerts }: HeaderComponentProps
 ) {
   return (
     <Stack 
@@ -19,9 +16,7 @@ function HeaderComponent(
         justifyContent: 'flex-end',
         boxShadow: '2px 2px 2px 1px rgba(0, 0, 0, 0.1)'
       }}>
-      <BaseBadge badgeContent={alerts}>
-        <NotificationsNoneOutlinedIcon/>
-      </BaseBadge>
+      <BaseBadge></BaseBadge>
       <BaseBadge>
       <AccountMenu/>
       </BaseBadge>
