@@ -1,6 +1,14 @@
-import { BreakingRule, Field, FieldValidation, Specification, TableRowDataFormBuilder } from "../interfaces";
+import {
+  BreakingRule,
+  Field,
+  FieldValidation,
+  Specification,
+  TableRowDataFormBuilder,
+} from "../interfaces";
 
-export const mapFieldRulesToFormStructure = (fields: Field[]): TableRowDataFormBuilder[] =>
+export const mapFieldRulesToFormStructure = (
+  fields: Field[]
+): TableRowDataFormBuilder[] =>
   fields.map((rule: Field) => {
     const level3Children = (children: BreakingRule) =>
       children.specification?.map((spec: Specification) => ({
@@ -8,23 +16,23 @@ export const mapFieldRulesToFormStructure = (fields: Field[]): TableRowDataFormB
         displayName: spec.displayName,
         isRequired: false,
         isActive: false,
-        function: '',
-        value: '',
-        breakingRules: '' as string,
+        function: "",
+        value: "",
+        breakingRules: "" as string,
         _id: spec._id,
       })) ?? [];
 
     const level2Children = Array.isArray(rule.breakingRules)
       ? rule.breakingRules.map((br: BreakingRule) => ({
-        idBitmap: br.id,
-        displayName: br.displayName,
-        isRequired: false,
-        isActive: false,
-        function: '',
-        value: '',
-        breakingRules: level3Children(br),
-        _id: br._id,
-      }))
+          idBitmap: br.id,
+          displayName: br.displayName,
+          isRequired: false,
+          isActive: false,
+          function: "",
+          value: "",
+          breakingRules: level3Children(br),
+          _id: br._id,
+        }))
       : [];
 
     return {
@@ -32,64 +40,70 @@ export const mapFieldRulesToFormStructure = (fields: Field[]): TableRowDataFormB
       displayName: rule.displayName,
       isRequired: false,
       isActive: false,
-      function: '',
-      value: '',
+      function: "",
+      value: "",
       breakingRules: level2Children,
       _id: rule._id,
     };
   });
 
-export const mapValidationTemplate = (validation: FieldValidation[], isActive: boolean): TableRowDataFormBuilder[] =>
+export const mapValidationTemplate = (
+  validation: FieldValidation[],
+  isActive: boolean
+): TableRowDataFormBuilder[] =>
   validation.map((v: FieldValidation) => {
     const level4Children = (children: FieldValidation) =>
       children.fields?.map((field: FieldValidation) => ({
-        idBitmap: field.idBitmap ?? '',
-        displayName: '',
+        idBitmap: field.idBitmap ?? "",
+        displayName: "",
         isRequired: Boolean(field.isRequired),
-        function: field.function ?? '',
-        value: field.value ?? '',
-        breakingRules: '' as string,
+        function: field.function ?? "",
+        value: field.value ?? "",
+        breakingRules: "" as string,
+        isActive: isActive ? false : Boolean(v),
         _id: field._id,
       })) ?? [];
 
     const level3Children = (children: FieldValidation) =>
       children.fields?.map((field: FieldValidation) => ({
-        idBitmap: field.idBitmap ?? '',
-        displayName: '',
+        idBitmap: field.idBitmap ?? "",
+        displayName: "",
         isRequired: Boolean(field.isRequired),
-        function: field.function ?? '',
-        value: field.value ?? '',
+        function: field.function ?? "",
+        value: field.value ?? "",
         breakingRules: level4Children(field),
+        isActive: isActive ? false : Boolean(v),
         _id: field._id,
       })) ?? [];
 
     const level2Children = Array.isArray(v.fields)
       ? v.fields.map((field: FieldValidation) => ({
-        idBitmap: field.idBitmap ?? '',
-        displayName: '',
-        isRequired: Boolean(field.isRequired),
-        function: field.function ?? '',
-        value: field.value ?? '',
-        breakingRules: level3Children(field),
-        _id: field._id,
-      }))
+          idBitmap: field.idBitmap ?? "",
+          displayName: "",
+          isRequired: Boolean(field.isRequired),
+          function: field.function ?? "",
+          value: field.value ?? "",
+          breakingRules: level3Children(field),
+          isActive: isActive ? false : Boolean(v),
+          _id: field._id,
+        }))
       : [];
 
     return {
-      idBitmap: v.idBitmap ?? '',
-      displayName: '',
+      idBitmap: v.idBitmap ?? "",
+      displayName: "",
       isRequired: Boolean(v.isRequired),
       isActive: isActive ? false : Boolean(v),
-      function: v.function ?? '',
-      value: v.value ?? '',
+      function: v.function ?? "",
+      value: v.value ?? "",
       breakingRules: level2Children,
       _id: v._id,
     };
   });
 
 export const combineTemplateData = (
-  data: FieldValidation[] | null, 
-  mappedRules: TableRowDataFormBuilder[], 
+  data: FieldValidation[] | null,
+  mappedRules: TableRowDataFormBuilder[],
   isActive: boolean
 ): TableRowDataFormBuilder[] => {
   const mapData = mapValidationTemplate(data ?? [], isActive);
@@ -102,7 +116,7 @@ export const combineTemplateData = (
     return rules.map((rule) => {
       const matched = data.find(
         (d) =>
-          d.idBitmap?.trim().toLowerCase() === 
+          d.idBitmap?.trim().toLowerCase() ===
           rule.idBitmap?.trim().toLowerCase()
       );
       const updatedRule: TableRowDataFormBuilder = {
@@ -114,17 +128,16 @@ export const combineTemplateData = (
         breakingRules:
           Array.isArray(rule.breakingRules) && rule.breakingRules.length > 0
             ? updateRules(
-              rule.breakingRules as TableRowDataFormBuilder[],
-              (matched?.breakingRules as TableRowDataFormBuilder[]) ?? [],
-              level + 1
-            )
+                rule.breakingRules as TableRowDataFormBuilder[],
+                (matched?.breakingRules as TableRowDataFormBuilder[]) ?? [],
+                level + 1
+              )
             : rule.breakingRules,
       };
 
-            return updatedRule;
-        });
-    };
+      return updatedRule;
+    });
+  };
 
-
-    return updateRules(mappedRules, mapData);
+  return updateRules(mappedRules, mapData);
 };

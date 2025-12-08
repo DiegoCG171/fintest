@@ -30,9 +30,11 @@ export const RunnerSideBar = () => {
     isOpenDetails,
     completedCount,
     loading,
-    id
+    id,
   } = useAppSelector((state) => state.session);
-  const { server, configHost, configPort } = useAppSelector((state) => state.server);
+  const { server, configHost, configPort } = useAppSelector(
+    (state) => state.server
+  );
 
   const [testCaseDetails, setTestCaseDetails] = useState<TestCaseDetails>({
     name: "",
@@ -63,15 +65,22 @@ export const RunnerSideBar = () => {
 
   const handleCloseSession = () => {
     if (activeSession.length === completedCount) {
-      dispatch(closeSession())
-      return
+      dispatch(closeSession());
+      return;
     }
 
     dispatch(removeSessionThunk(id));
+    if (server) dispatch(stopServerThunk(server.id));
   };
 
   const handleStartServer = () => {
-    dispatch(startServerThunk({processingMethod: type, ip: configHost, portNumber: configPort}));
+    dispatch(
+      startServerThunk({
+        processingMethod: type,
+        ip: configHost,
+        portNumber: configPort,
+      })
+    );
   };
 
   const handleStopServer = () => {
@@ -133,11 +142,16 @@ export const RunnerSideBar = () => {
                 activeSession={activeSession}
                 completedCount={completedCount}
                 onTestCaseSelect={handleSetTestCaseDetails}
-                onCloseSession={ handleCloseSession}
+                onCloseSession={handleCloseSession}
               />
 
               <Typography
-                sx={{ fontSize: 12, color: "#9e9e9e", alignSelf: "end", marginBottom: 1 }}
+                sx={{
+                  fontSize: 12,
+                  color: "#9e9e9e",
+                  alignSelf: "end",
+                  marginBottom: 1,
+                }}
               >
                 {completedCount} de {activeSession.length} Completados
               </Typography>
@@ -160,4 +174,3 @@ export const RunnerSideBar = () => {
     </Box>
   );
 };
-
