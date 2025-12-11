@@ -414,7 +414,10 @@ export function ModalProfile() {
                   } as SxProps<Theme>
                 }
                 disabled={isReadOnly}
-                slotProps={{ input: { readOnly: isReadOnly } }}
+                slotProps={{ input: { readOnly: isReadOnly }, htmlInput: {
+                    min: 0,
+                    step: 100,
+                  }, }}
               />
             </Grid>
           </Grid>
