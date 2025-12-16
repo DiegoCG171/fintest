@@ -20,6 +20,7 @@ export interface UserConfiguration {
   portNumber?: number,
   targetHost?: string,
   targetPort?: number,
+  delayTime?: number
 };
 
 export interface UserConfigPayload extends UserConfiguration {

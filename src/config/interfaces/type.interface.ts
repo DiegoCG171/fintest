@@ -169,4 +169,5 @@ export interface ProfileFormData {
   targetHost: string;
   targetPort: string
   portNumber: string;
+  delayTime: string;
 }

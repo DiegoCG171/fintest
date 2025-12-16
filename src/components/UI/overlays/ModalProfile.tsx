@@ -23,7 +23,10 @@ import { activeChangePassword } from "../../../store/slices/auth/auth.slice";
 import { ProfileFormData } from "../../../config/interfaces";
 import { Theme } from "@emotion/react";
 import { useAuth } from "../../../config/hooks/useAuth";
-import { hasPermission, hasSomePermission } from "../../../config/utils/permissions";
+import {
+  hasPermission,
+  hasSomePermission,
+} from "../../../config/utils/permissions";
 import { updateConfigUserThunk } from "../../../store/slices/users/userConfiguration.thunk";
 import { useToast } from "../../../config/hooks/useToast";
 
@@ -34,7 +37,11 @@ export function ModalProfile() {
   const { permissions: userPermissions } = useAuth();
   const { showToast } = useToast();
 
-  const isReadOnly = !hasPermission(userPermissions, "update", "userConfiguration");
+  const isReadOnly = !hasPermission(
+    userPermissions,
+    "update",
+    "userConfiguration"
+  );
 
   const [formData, setFormData] = useState<ProfileFormData>({
     nombre: user?.names || "",
@@ -44,6 +51,7 @@ export function ModalProfile() {
     targetPort: configuration?.targetPort?.toString?.() ?? "",
     targetHost: configuration?.targetHost || "",
     portNumber: configuration?.portNumber?.toString?.() ?? "",
+    delayTime: configuration?.delayTime?.toString?.() ?? "",
   });
 
   const getLabelColorStyle = (hasValue: boolean): SxProps<Theme> => ({
@@ -56,7 +64,6 @@ export function ModalProfile() {
     },
   });
 
-  // ReadOnly / Disabled
   const getReadOnlyStyles = (isReadOnly: boolean): SxProps<Theme> => {
     if (!isReadOnly) return {};
 
@@ -110,6 +117,10 @@ export function ModalProfile() {
       }
     }
 
+    if (formData.delayTime.trim() && isNaN(Number(formData.delayTime))) {
+      newErrors.delayTime = "Debe ser un número válido";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -117,7 +128,11 @@ export function ModalProfile() {
   const handleSave = async () => {
     if (!validate()) return;
     try {
-      if (hasSomePermission(userPermissions, [{action: "update", resource: "user"}])) {
+      if (
+        hasSomePermission(userPermissions, [
+          { action: "update", resource: "user" },
+        ])
+      ) {
         await dispatch(
           updateUserThunk({
             id: user?.id || "",
@@ -130,16 +145,23 @@ export function ModalProfile() {
           })
         ).unwrap();
       }
-      if (hasSomePermission(userPermissions, [{action: "update", resource: "userConfiguration"}])) {
+
+      if (
+        hasSomePermission(userPermissions, [
+          { action: "update", resource: "userConfiguration" },
+        ])
+      ) {
         await dispatch(
           updateConfigUserThunk({
             userId: user?.id || "",
             targetHost: formData.targetHost,
             targetPort: Number(formData.targetPort),
             portNumber: Number(formData.portNumber),
+            delayTime: Number(formData.delayTime),
           })
         ).unwrap();
       }
+
       showToast("Información actualizada correctamente", "success");
     } catch (error) {
       showToast(String(error), "error");
@@ -190,7 +212,7 @@ export function ModalProfile() {
                 helperText={errors.usuario}
                 sx={
                   {
-                    ...getLabelColorStyle(!!formData.portNumber),
+                    ...getLabelColorStyle(!!formData.usuario),
                     ...getReadOnlyStyles(true),
                   } as SxProps<Theme>
                 }
@@ -212,6 +234,7 @@ export function ModalProfile() {
                 sx={getLabelColorStyle(!!formData.email)}
               />
             </Grid>
+
             <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 fullWidth
@@ -274,7 +297,7 @@ export function ModalProfile() {
                 helperText={errors.targetHost}
                 sx={
                   {
-                    ...getLabelColorStyle(!!formData.portNumber),
+                    ...getLabelColorStyle(!!formData.targetHost),
                     ...getReadOnlyStyles(isReadOnly),
                   } as SxProps<Theme>
                 }
@@ -282,6 +305,7 @@ export function ModalProfile() {
                 slotProps={{ input: { readOnly: isReadOnly } }}
               />
             </Grid>
+
             <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 fullWidth
@@ -293,7 +317,7 @@ export function ModalProfile() {
                 helperText={errors.targetPort}
                 sx={
                   {
-                    ...getLabelColorStyle(!!formData.portNumber),
+                    ...getLabelColorStyle(!!formData.targetPort),
                     ...getReadOnlyStyles(isReadOnly),
                   } as SxProps<Theme>
                 }
@@ -325,6 +349,7 @@ export function ModalProfile() {
             Configuración Adquiriente
           </Typography>
         </Box>
+
         <Box p={2}>
           <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
@@ -345,6 +370,53 @@ export function ModalProfile() {
               disabled={isReadOnly}
               slotProps={{ input: { readOnly: isReadOnly } }}
             />
+          </Grid>
+        </Box>
+      </Paper>
+      <Paper
+        elevation={0}
+        sx={{
+          border: "1px solid",
+          borderColor: "divider",
+          borderRadius: 2,
+          mb: 3,
+        }}
+      >
+        <Box
+          px={2}
+          py={1}
+          bgcolor="#EEF7FF"
+          borderRadius="8px 8px 0 0"
+          borderBottom="1px solid"
+          borderColor="divider"
+        >
+          <Typography variant="subtitle1" fontWeight="bold" color="#1C4D8C">
+            Configuración de Retraso
+          </Typography>
+        </Box>
+
+        <Box p={2}>
+          <Grid container spacing={2}>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                fullWidth
+                autoComplete="off"
+                type="number"
+                label="Tiempo de retraso (ms)"
+                value={formData.delayTime}
+                onChange={handleChange("delayTime")}
+                error={Boolean(errors.delayTime)}
+                helperText={errors.delayTime}
+                sx={
+                  {
+                    ...getLabelColorStyle(!!formData.delayTime),
+                    ...getReadOnlyStyles(isReadOnly),
+                  } as SxProps<Theme>
+                }
+                disabled={isReadOnly}
+                slotProps={{ input: { readOnly: isReadOnly } }}
+              />
+            </Grid>
           </Grid>
         </Box>
       </Paper>
@@ -371,6 +443,7 @@ export function ModalProfile() {
         >
           Cancelar
         </Button>
+
         <Button
           startIcon={<SaveOutlinedIcon />}
           variant="contained"

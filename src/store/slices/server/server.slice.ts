@@ -63,6 +63,7 @@ export const serverSlice = createSlice({
                 state.server = null
                 state.stopServerResponse = action.payload
                 state.stopServerStatus = 'success';
+                state.status = 'idle'
             })
             .addCase(stopServerThunk.rejected, (state, action) => {
                 state.stopServererror = action.payload ?? "Error desconocido";
