@@ -51,7 +51,7 @@ export function ModalProfile() {
     targetPort: configuration?.targetPort?.toString?.() ?? "",
     targetHost: configuration?.targetHost || "",
     portNumber: configuration?.portNumber?.toString?.() ?? "",
-    delayTime: configuration?.delayTime?.toString?.() ?? "",
+    responseDelay: configuration?.responseDelay?.toString?.() ?? "",
   });
 
   const getLabelColorStyle = (hasValue: boolean): SxProps<Theme> => ({
@@ -117,8 +117,8 @@ export function ModalProfile() {
       }
     }
 
-    if (formData.delayTime.trim() && isNaN(Number(formData.delayTime))) {
-      newErrors.delayTime = "Debe ser un número válido";
+    if (formData.responseDelay.trim() && isNaN(Number(formData.responseDelay))) {
+      newErrors.responseDelay = "Debe ser un número válido";
     }
 
     setErrors(newErrors);
@@ -157,7 +157,7 @@ export function ModalProfile() {
             targetHost: formData.targetHost,
             targetPort: Number(formData.targetPort),
             portNumber: Number(formData.portNumber),
-            delayTime: Number(formData.delayTime),
+            responseDelay: Number(formData.responseDelay),
           })
         ).unwrap();
       }
@@ -403,18 +403,21 @@ export function ModalProfile() {
                 autoComplete="off"
                 type="number"
                 label="Tiempo de retraso (ms)"
-                value={formData.delayTime}
-                onChange={handleChange("delayTime")}
+                value={formData.responseDelay}
+                onChange={handleChange("responseDelay")}
                 error={Boolean(errors.delayTime)}
-                helperText={errors.delayTime}
+                helperText={errors.responseDelay}
                 sx={
                   {
-                    ...getLabelColorStyle(!!formData.delayTime),
+                    ...getLabelColorStyle(!!formData.responseDelay),
                     ...getReadOnlyStyles(isReadOnly),
                   } as SxProps<Theme>
                 }
                 disabled={isReadOnly}
-                slotProps={{ input: { readOnly: isReadOnly } }}
+                slotProps={{ input: { readOnly: isReadOnly }, htmlInput: {
+                    min: 0,
+                    step: 100,
+                  }, }}
               />
             </Grid>
           </Grid>
