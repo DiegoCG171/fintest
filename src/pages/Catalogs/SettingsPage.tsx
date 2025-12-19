@@ -10,12 +10,13 @@ import { useLoadSecurityPermissionOptions } from "../../config/hooks/useLoadSecu
 import { useSettingsSearch } from "../../config/hooks/useSettingsSearch";
 import { SettingsSearchBar } from "../../components/UI/Settings/SettingsSearchBar";
 import { RulesEditPage } from "../../components/UI/Settings/extractionRulesSection/RulesEditPage";
+import { getSearchTermFromStorage } from "../../store/slices/admin/admin.state";
 
 export const SettingsPage = () => {
   const { formActive, extractionRulesActive } = useAppSelector(
     (state) => state.admin
   );
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState(getSearchTermFromStorage() || "");
 
   useLoadSettingsData();
   useLoadSecurityPermissionOptions();

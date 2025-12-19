@@ -33,7 +33,6 @@ import { useToast } from "../../../config/hooks/useToast";
 export function ModalProfile() {
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.auth.user);
-  const { configuration } = useAppSelector((state) => state.user);
   const { permissions: userPermissions } = useAuth();
   const { showToast } = useToast();
 
@@ -48,10 +47,10 @@ export function ModalProfile() {
     apellido: user?.surnames || "",
     usuario: user?.username || "",
     email: user?.email || "",
-    targetPort: configuration?.targetPort?.toString?.() ?? "",
-    targetHost: configuration?.targetHost || "",
-    portNumber: configuration?.portNumber?.toString?.() ?? "",
-    responseDelay: configuration?.responseDelay?.toString?.() ?? "",
+    targetPort: user?.userConfiguration?.targetPort?.toString?.() ?? "",
+    targetHost: user?.userConfiguration?.targetHost || "",
+    portNumber: user?.userConfiguration?.portNumber?.toString?.() ?? "",
+    responseDelay: user?.userConfiguration?.responseDelay?.toString?.() ?? "",
   });
 
   const getLabelColorStyle = (hasValue: boolean): SxProps<Theme> => ({

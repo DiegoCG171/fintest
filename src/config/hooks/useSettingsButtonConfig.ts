@@ -57,7 +57,7 @@ export const useSettingsButtonConfig = (): ButtonConfig => {
       text: "Crear regla",
       icon: SaveOutlinedIcon,
       onClick: () => dispatch(activExtractionRules(true)),
-      requiredPermissions: [{action: "create", resource: "user"}],
+      requiredPermissions: [{action: "create", resource: "rule"}],
     };
     }
     return {

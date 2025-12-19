@@ -8,12 +8,11 @@ import { renderCell } from "../../../config/utils/tableSettings.utils";
 interface TableSettingsRowsProps {
   data: EntityType[];
   columns: TableColumn<EntityType>[];
-  searchTerm?: string;
   onMenuClick: (e: React.MouseEvent<HTMLButtonElement>, item: EntityType) => void;
   pathname: string;
 }
 
-export const TableSettingsRows = ({ data, columns, searchTerm = "", onMenuClick, pathname }: TableSettingsRowsProps) => {
+export const TableSettingsRows = ({ data, columns,  onMenuClick, pathname }: TableSettingsRowsProps) => {
   if (data.length === 0) {
     return (
       <TableRow>
@@ -30,7 +29,7 @@ export const TableSettingsRows = ({ data, columns, searchTerm = "", onMenuClick,
         <TableRow key={row.id || idx}>
           {columns.map((col) => (
             <TableCell key={col.key as string}>
-              {renderCell(col, row, searchTerm)}
+              {renderCell(col, row)}
             </TableCell>
           ))}
           <ActionsCell 

@@ -1,6 +1,6 @@
 import { CircularProgress, IconButton, Stack, TextField } from "@mui/material";
 import CancelIcon from "@mui/icons-material/Cancel";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ItemInlineEditorProps } from "../../config/interfaces";
 
 function ItemInlineEditor({
@@ -11,6 +11,12 @@ function ItemInlineEditor({
 }: ItemInlineEditorProps) {
   const [value, setValue] = useState(initialValue);
   const [loading, setLoading] = useState(false);
+
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
 
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && value.trim() !== "") {
@@ -43,6 +49,7 @@ function ItemInlineEditor({
         onChange={(e) => setValue(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
+        inputRef={inputRef}
         sx={{
           "& .MuiInputBase-input": {
             fontSize: "12px",

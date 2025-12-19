@@ -9,7 +9,6 @@ export const DynamicSettingTable = () => {
   const {
     config,
     columns,
-    searchTerm,
     pathname,
     anchorEl,
     handleMenuClick,
@@ -28,6 +27,7 @@ export const DynamicSettingTable = () => {
     return <p>No table config for this route</p>;
   }
 
+
   return (
     <TableContainer component={Paper} sx={{ mt: 4 }}>
       <Table stickyHeader>
@@ -41,7 +41,6 @@ export const DynamicSettingTable = () => {
           <TableSettingsRows
             data={config.data}
             columns={columns}
-            searchTerm={searchTerm}
             onMenuClick={handleMenuClick}
             pathname={pathname}
           />

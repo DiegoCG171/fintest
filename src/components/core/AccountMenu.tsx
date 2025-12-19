@@ -50,7 +50,6 @@ function AccountMenu() {
   const handleLogout = () => {
     handleClose();
     dispatch(logoutThunk());
-    dispatch(logoutThunk());
   };
 
   const handleChangePassword = () => {

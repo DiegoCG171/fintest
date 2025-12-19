@@ -19,7 +19,11 @@ export const updateConfigUserThunk = createAsyncThunk(
   'users/updateConfigUser',
   async (updateConfig: UserConfigPayload, { rejectWithValue }) => {
     try {
-    
+      const user = JSON.parse(localStorage.getItem("user") || "null");
+      if (user.id === updateConfig.userId) {
+        const updatedUser = { ...user, userConfiguration: updateConfig };
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+      }
       const userConfig = await updateUserConfig(updateConfig)
       return userConfig;
     } catch (error) {

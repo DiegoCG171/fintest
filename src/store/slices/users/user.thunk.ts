@@ -1,6 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { createUserInterface, GetFilters, UserDB } from "../../../config/interfaces";
 import { createUser, deleteUser, getAllUsers, updateUser } from "../../../services";
+import { getEncrypted } from "../../../config/utils/passwordEncrypt";
 
 export const createUserThunk = createAsyncThunk<
     UserDB,
@@ -46,8 +47,16 @@ export const deleteUserThunk = createAsyncThunk('users/remove', async (id: strin
 })
 
 export const updateUserThunk = createAsyncThunk("user/update", async ({ id, payload }: {id: string, payload: createUserInterface}, { rejectWithValue }) => {
+  
+  let passwordEncrypted: string | undefined;
+  const { password } = payload;
+  
+  if (password) {
+    passwordEncrypted = getEncrypted(password);
+  }
+
   try {
-    const user = await updateUser(id, payload);
+    const user = await updateUser(id, { ...payload, password: passwordEncrypted });
     return user;
   } catch (error) {
     return rejectWithValue(error as string);

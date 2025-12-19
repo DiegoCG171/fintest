@@ -9,7 +9,7 @@ type SinglePermissionProps = {
   children: React.ReactNode;
   fallback?: React.ReactNode;
   redirectTo?: string;
-  redirect?: boolean; // si se usa para rutas
+  redirect?: boolean;
 };
 
 type MultiplePermissionProps = {
@@ -18,7 +18,7 @@ type MultiplePermissionProps = {
   children: React.ReactNode;
   fallback?: React.ReactNode;
   redirectTo?: string;
-  redirect?: boolean; // si se usa para rutas
+  redirect?: boolean;
 };
 
 type Props = SinglePermissionProps | MultiplePermissionProps;

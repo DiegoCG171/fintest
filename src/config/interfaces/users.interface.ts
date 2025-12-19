@@ -13,7 +13,6 @@ export interface createUserInterface {
 export interface UserState {
   status: AsyncStatus;
   error: null | string;
-  configuration: UserConfiguration
 }
 
 export interface UserConfiguration {

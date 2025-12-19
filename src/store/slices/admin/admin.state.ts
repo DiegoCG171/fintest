@@ -37,6 +37,13 @@ export interface AdminInitialState {
   searchTerm?: string;
 }
 
+export const getSearchTermFromStorage = (): string | undefined => {
+  const storedAdminState = localStorage.getItem("userFilters")
+    ? JSON.parse(localStorage.getItem("userFilters") || "{}")
+    : null;
+  return storedAdminState?.search || undefined;
+}
+
 export const initialAdminState: AdminInitialState = {
   formActive: false,
   extractionRulesActive: false,
@@ -104,4 +111,5 @@ export const initialAdminState: AdminInitialState = {
   updateAction: undefined,
   updateResource: undefined,
   type: "update",
+  searchTerm: getSearchTermFromStorage(),
 };

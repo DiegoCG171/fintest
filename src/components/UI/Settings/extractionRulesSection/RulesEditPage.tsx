@@ -1,15 +1,48 @@
 import { useCallback, useEffect, useState } from "react";
 import { useToast } from "../../../../config/hooks/useToast";
 import { useAppDispatch, useAppSelector } from "../../../../store";
-import { addSubRule, addTopLevelRule, RuleRow, setTypeForm, setVersionForm } from "../../../../store/slices/extractionsRules/extractionRulesSlice";
-import { Box, Button, FormControl, IconButton, InputLabel, MenuItem, OutlinedInput, Paper, Select, SelectChangeEvent, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
+import {
+  addSubRule,
+  addTopLevelRule,
+  resetForm,
+  RuleRow,
+  setTypeForm,
+  setVersionForm,
+} from "../../../../store/slices/extractionsRules/extractionRulesSlice";
+import {
+  Box,
+  Button,
+  FormControl,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  OutlinedInput,
+  Paper,
+  Select,
+  SelectChangeEvent,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+} from "@mui/material";
 import { activExtractionRules } from "../../../../store/slices/admin/admin.slice";
-import { createExtractionRuleThunk, updateExtractionRulesThunk } from "../../../../store/slices/extractionsRules/extractionRules.thunk";
+import {
+  createExtractionRuleThunk,
+  updateExtractionRulesThunk,
+} from "../../../../store/slices/extractionsRules/extractionRules.thunk";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import LibraryAddOutlinedIcon from "@mui/icons-material/LibraryAddOutlined";
 import { MODAL_STYLE } from "../../../../config/constants/extactionRulesPage";
-import { getChildKey, getDisplayId } from "../../../../config/utils/extractionRules.utils";
+import {
+  getChildKey,
+  getDisplayId,
+} from "../../../../config/utils/extractionRules.utils";
 import { CollapsibleRow } from "./CollapsibleRow";
+import CancelIcon from "@mui/icons-material/Cancel";
 
 export const RulesEditPage = () => {
   const dispatch = useAppDispatch();
@@ -20,7 +53,9 @@ export const RulesEditPage = () => {
 
   const [version, setVersion] = useState(updateExtractionRule?.version ?? "");
   const [type, setType] = useState(updateExtractionRule?.type ?? "");
-  const [rows, setRows] = useState<RuleRow[]>(updateExtractionRule?.fields || []);
+  const [rows, setRows] = useState<RuleRow[]>(
+    updateExtractionRule?.fields || []
+  );
 
   const ruleId = updateExtractionRule?.uuid || "root";
   const hasVersionChanges = changes?.[ruleId]?.["version"] !== undefined;
@@ -138,6 +173,11 @@ export const RulesEditPage = () => {
     });
   }, []);
 
+  const closeUpdate = () => {
+    dispatch(activExtractionRules(false));
+    dispatch(resetForm())
+  };
+
   const updateRules = useCallback(async () => {
     dispatch(activExtractionRules(false));
 
@@ -174,7 +214,7 @@ export const RulesEditPage = () => {
             {type.toUpperCase()} V{version}
           </Typography>
         </Box>
-        <Box>
+        <Stack spacing={2} direction="row" justifyContent="end" mt={4}>
           <Button
             variant="outlined"
             onClick={updateRules}
@@ -182,7 +222,14 @@ export const RulesEditPage = () => {
           >
             Guardar
           </Button>
-        </Box>
+          <Button
+            variant="outlined"
+            onClick={closeUpdate}
+            startIcon={<CancelIcon />}
+          >
+            Cancelar
+          </Button>
+        </Stack>
       </Box>
 
       <Box sx={{ display: "flex", gap: 2, mt: 4 }}>
@@ -198,22 +245,23 @@ export const RulesEditPage = () => {
             inputProps={{ min: 1 }}
             sx={{
               "& .MuiOutlinedInput-notchedOutline": {
-                  borderColor: hasVersionChanges && updating
+                borderColor:
+                  hasVersionChanges && updating
                     ? "#f1c232"
                     : "rgba(0, 0, 0, 0.23)",
-                  borderRadius: "8px",
-                  borderWidth: "2px",
-                },
-                "&:hover .MuiOutlinedInput-notchedOutline": {
-                  borderColor: hasVersionChanges && updating
+                borderRadius: "8px",
+                borderWidth: "2px",
+              },
+              "&:hover .MuiOutlinedInput-notchedOutline": {
+                borderColor:
+                  hasVersionChanges && updating
                     ? "#d6a300"
                     : "rgba(0, 0, 0, 0.87)",
-                },
-                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                  borderColor: hasVersionChanges && updating
-                    ? "#f1c232"
-                    : "#1976d2",
-                },
+              },
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                borderColor:
+                  hasVersionChanges && updating ? "#f1c232" : "#1976d2",
+              },
             }}
           />
         </FormControl>
@@ -229,23 +277,25 @@ export const RulesEditPage = () => {
             onBlur={(e) => dispatch(setTypeForm(e.target.value))}
             sx={{
               "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: hasTypeChanges && updating
-                      ? "#f1c232"
-                      : "rgba(0, 0, 0, 0.23)",
-                    borderRadius: "8px",
-                    borderWidth: "2px",
-                  },
-                  "&:hover .MuiOutlinedInput-notchedOutline": {
-                    borderColor: hasTypeChanges && updating
-                      ? "#d6a300"
-                      : "rgba(0, 0, 0, 0.87)",
-                  },
-                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                    borderColor: hasTypeChanges && updating ? "#f1c232" : "#1976d2",
-                  },
-                  "& .MuiSelect-icon": {
-                    color: hasTypeChanges && updating ? "#a67c00" : "inherit",
-                  },
+                borderColor:
+                  hasTypeChanges && updating
+                    ? "#f1c232"
+                    : "rgba(0, 0, 0, 0.23)",
+                borderRadius: "8px",
+                borderWidth: "2px",
+              },
+              "&:hover .MuiOutlinedInput-notchedOutline": {
+                borderColor:
+                  hasTypeChanges && updating
+                    ? "#d6a300"
+                    : "rgba(0, 0, 0, 0.87)",
+              },
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                borderColor: hasTypeChanges && updating ? "#f1c232" : "#1976d2",
+              },
+              "& .MuiSelect-icon": {
+                color: hasTypeChanges && updating ? "#a67c00" : "inherit",
+              },
             }}
           >
             <MenuItem value="pos">POS</MenuItem>
@@ -298,4 +348,5 @@ export const RulesEditPage = () => {
       </TableContainer>
     </Box>
   );
-}
+};
+

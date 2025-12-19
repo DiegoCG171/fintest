@@ -1,9 +1,4 @@
-import {
-  Box,
-  Button,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Stack, Typography } from "@mui/material";
 import { useMemo, useState } from "react";
 import CancelIcon from "@mui/icons-material/Cancel";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
@@ -16,10 +11,15 @@ import {
 } from "../../../store/slices/admin/admin.slice";
 import { useFormConfig } from "../../../config/hooks/useFormConfig";
 import { useFormLogic } from "../../../config/hooks/useFormLogic";
-import { createSubmitHandlers, validateForm } from "../../../config/utils/formSettingsHandlers";
-import { GRID_STYLE, MODAL_STYLE } from "../../../config/constants/formSettings";
+import {
+  createSubmitHandlers,
+  validateForm,
+} from "../../../config/utils/formSettingsHandlers";
+import {
+  GRID_STYLE,
+  MODAL_STYLE,
+} from "../../../config/constants/formSettings";
 import { createFieldComponent } from "./fields/fieldFactory";
-
 
 export const DynamicSettingForm = () => {
   const dispatch = useAppDispatch();
@@ -27,16 +27,10 @@ export const DynamicSettingForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
-
   const config = useFormConfig();
-  
-  const {
-    formData,
-    setFormData,
-    initKey,
-    showToast,
-    adminState,
-  } = useFormLogic(config);
+
+  const { formData, setFormData, initKey, showToast, adminState } =
+    useFormLogic(config);
 
   const submitHandlers = useMemo(
     () => createSubmitHandlers(dispatch, showToast),
@@ -44,22 +38,21 @@ export const DynamicSettingForm = () => {
   );
 
   const handleConfirm = async () => {
-  const errors = validateForm(config.fields, formData);
-  setFormErrors(errors);
+    const errors = validateForm(config.fields, formData);
+    setFormErrors(errors);
 
-  if (Object.keys(errors).length > 0) {
-    console.log("Errores de validación:", errors);
-    showToast("Corrige los campos obligatorios", "error");
-    return;
-  }
+    if (Object.keys(errors).length > 0) {
+      console.log("Errores de validación:", errors);
+      showToast("Corrige los campos obligatorios", "error");
+      return;
+    }
 
-  const handler = submitHandlers[config.storeKey];
-  if (handler) {
-    await handler(formData);
-    dispatch(closeModalSettings());
-  }
-};
-
+    const handler = submitHandlers[config.storeKey];
+    if (handler) {
+      await handler(formData);
+      dispatch(closeModalSettings());
+    }
+  };
 
   const handleCancel = () => {
     dispatch(resetPermissionsMenuOptions());
@@ -89,14 +82,16 @@ export const DynamicSettingForm = () => {
               formErrors,
               ...adminState,
             },
-            key: field.name
+            key: field.name,
           })
         )}
       </Box>
 
       <Stack spacing={2} direction="row" justifyContent="end" mt={4}>
         <Button
-          startIcon={type === "update" ? <SaveAsOutlinedIcon /> : <SaveOutlinedIcon />}
+          startIcon={
+            type === "update" ? <SaveAsOutlinedIcon /> : <SaveOutlinedIcon />
+          }
           onClick={handleConfirm}
           variant="contained"
           color="error"

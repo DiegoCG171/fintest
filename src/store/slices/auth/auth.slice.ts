@@ -4,6 +4,7 @@ import { loginThunk, logoutThunk } from "./login.thunk";
 import { renewTokenThunk } from "./renewTokenThunk.thunk";
 import { isTokenValid } from "../../../config/utils/isTokenValid";
 import { updateUserThunk } from "../users/user.thunk";
+import { updateConfigUserThunk } from "../users/userConfiguration.thunk";
 
 const token = localStorage.getItem("token");
 
@@ -72,10 +73,20 @@ export const authSlice = createSlice({
         state.token = null;
         state.isAuthenticated = false;
         state.changePasswordActive = false;
-      }).addCase(updateUserThunk.fulfilled, (state, action) => {
-        state.user = {...state.user, ...action.payload};
       })
+      .addCase(updateUserThunk.fulfilled, (state, action) => {
+        state.user =
+          state.user?.id === action.payload.id
+            ? { ...state.user, ...action.payload }
+            : state.user;
+      })
+      .addCase(updateConfigUserThunk.fulfilled, (state, action) => {
+        if (state.user) {
+          state.user.userConfiguration = action.payload;
+        }
+      });
   },
 });
 
-export const { clearAuthError, activeChangePassword, logout } = authSlice.actions;
+export const { clearAuthError, activeChangePassword, logout } =
+  authSlice.actions;

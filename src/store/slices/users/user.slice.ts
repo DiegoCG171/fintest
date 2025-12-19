@@ -1,16 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { UserState } from "../../../config/interfaces";
 import { createUserThunk } from "./user.thunk";
-import { getConfigUserThunk, updateConfigUserThunk } from "./userConfiguration.thunk";
 
 const initialState: UserState = {
     status: 'idle',
     error: null,
-    configuration: {
-        portNumber: 0,
-        targetHost: "",
-        targetPort: 0
-    }
 };
 
 export const userSlice = createSlice({
@@ -29,12 +23,6 @@ export const userSlice = createSlice({
             .addCase(createUserThunk.rejected, (state, action) => {
                 state.error = action.payload ?? "Error desconocido";
                 state.status = 'error'
-            })
-            .addCase(getConfigUserThunk.fulfilled, (state, action) => {
-                state.configuration = action.payload;
-            })
-            .addCase(updateConfigUserThunk.fulfilled, (state, action) => {
-                state.configuration = action.payload;
             })
     }
 })

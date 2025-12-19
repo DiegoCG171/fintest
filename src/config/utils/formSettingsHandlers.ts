@@ -27,6 +27,7 @@ export const createSubmitHandlers = (
         status: formData.status,
         institutionId: Number(formData.institutionId),
         roleIds: formData.roleIds,
+        password: formData.password || undefined,
       };
       
       try {

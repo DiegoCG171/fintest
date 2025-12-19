@@ -1,5 +1,6 @@
 // utils/table.utils.ts
 
+import { getSearchTermFromStorage } from "../../store/slices/admin/admin.state";
 import { RESOURCE_MAP } from "../constants/tableSettings";
 import { Institution, UserDB } from "../interfaces";
 import { Permission, Rol, Rule } from "../interfaces/security.interface";
@@ -33,14 +34,12 @@ export const isRule = (item: EntityType): item is Rule => {
 export const renderCell = <T,>(
   column: TableColumn<T>,
   row: T,
-  searchTerm?: string
 ): React.ReactNode => {
   if (column.render) {
     return column.render(row);
   }
-
   const value = row[column.key as keyof T];
   if (value === null || value === undefined) return "—";
 
-  return <HighlightText text={String(value)} query={searchTerm ?? ""} />;
+  return <HighlightText text={String(value)} query={getSearchTermFromStorage() ?? ""} />;
 };

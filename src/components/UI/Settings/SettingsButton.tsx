@@ -12,6 +12,7 @@ export const SettingsButton = () => {
 
   return (
     <PermissionGuard
+      
       permissions={[
         { action: "read", resource: "user" },
         { action: "create", resource: "user" },
