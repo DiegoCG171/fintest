@@ -7,6 +7,7 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import ItemsListSortable from "../../navigation/ItemsListSortable";
 
 function SidebarSection({
   separatorMenuProps,
@@ -25,11 +26,17 @@ function SidebarSection({
   renderSeparatorChildren,
   overId,
 }: SidebarSectionProps) {
-  const filteredResourses = useFilterRecursive(
+  
+  const filteredResources = useFilterRecursive(
     resource,
     searchTerm,
     !searchOnItem
   );
+
+  const isFlat =
+    filteredResources.length > 0 && 
+    Boolean(filteredResources[0].linkMenu);
+
   return (
     <Box>
       <Box
@@ -37,38 +44,48 @@ function SidebarSection({
         key={"box-catalogo"}
       >
         <SeparatorMenu {...separatorMenuProps} />
-            {renderSeparatorChildren && renderSeparatorChildren()}
-        <SortableContext
-          items={filteredResourses.map((i) => i.id)}
-          strategy={verticalListSortingStrategy}
-        >
-          {filteredResourses.length > 0 ? (
-            filteredResourses.map((rootItem, index) => (
-              <RecursiveMenuItem
-                key={`${index}-${rootItem.id}`}
-                item={rootItem}
-                {...{
-                  optionsActive,
-                  creatingChildId,
-                  onSelectItem,
-                  buildOptions,
-                  buildSubItemOptions,
-                  renderCreateChildEditor,
-                  renderEditNodeEditor,
-                  renderChildrenEditNodeEditor,
-                  draggable,
-                  overId,
-                }}
-              />
-            ))
-          ) : (
-            <Box sx={{ px: 2, py: 1, fontSize: 14, color: "gray" }}>
-              Sin resultados
-            </Box>
-          )}
-        </SortableContext>
+        {renderSeparatorChildren && renderSeparatorChildren()}
+        {isFlat ? (
+          <ItemsListSortable
+            items={filteredResources}
+            optionsActive={optionsActive}
+            onClick={onSelectItem}
+            buildSubItemOptions={buildSubItemOptions}
+            renderEditNodeEditor={renderChildrenEditNodeEditor}
+            draggable={draggable}
+          />
+        ) : (
+          <SortableContext
+            items={filteredResources.map((i) => i.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            {filteredResources.length > 0 ? (
+              filteredResources.map((rootItem, index) => (
+                <RecursiveMenuItem
+                  key={`${index}-${rootItem.id}`}
+                  item={rootItem}
+                  optionsActive={optionsActive}
+                  creatingChildId={creatingChildId}
+                  onSelectItem={onSelectItem}
+                  buildOptions={buildOptions}
+                  buildSubItemOptions={buildSubItemOptions}
+                  renderCreateChildEditor={renderCreateChildEditor}
+                  renderEditNodeEditor={renderEditNodeEditor}
+                  renderChildrenEditNodeEditor={renderChildrenEditNodeEditor}
+                  draggable={draggable}
+                  overId={overId}
+                />
+              ))
+            ) : (
+              <Box sx={{ px: 2, py: 1, fontSize: 14, color: "gray" }}>
+                Sin resultados
+              </Box>
+            )}
+          </SortableContext>
+        )}
       </Box>
     </Box>
   );
 }
+
 export default SidebarSection;

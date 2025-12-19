@@ -12,7 +12,11 @@ import { activeChangePassword } from "../../store/slices/auth/auth.slice";
 import { useNavigate } from "react-router-dom";
 import { logoutThunk } from "../../store/slices/auth/login.thunk";
 
-const BadgeContent = () => {
+interface BadgeContentProps {
+  capital: string
+}
+
+const BadgeContent = ({capital}: BadgeContentProps) => {
   return (
     <Box
       component="span"
@@ -24,11 +28,18 @@ const BadgeContent = () => {
         maxWidth: 40,
         maxHeight: 40,
         borderRadius: "12px",
-        background: (theme) => theme.palette.primary.light,
+        background: (theme) => theme.palette.primary.dark,
         display: "inline-block",
         verticalAlign: "middle",
+        alignContent: "center",
+        textAlign: "center",
+        textTransform: "uppercase",
+        color: (theme) => theme.palette.primary.light,
+        fontSize: 24
       }}
-    />
+  >
+    {capital}
+  </Box>
   );
 };
 
@@ -73,7 +84,8 @@ function AccountMenu() {
       spacing={2}
       direction="row"
     >
-      <BadgeContent></BadgeContent>
+      <BadgeContent capital={user?.names.charAt(0) || ''}>
+      </BadgeContent>
       <ButtonBase onClick={handleClick}>
         <Stack
           spacing={0}

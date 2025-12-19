@@ -3,9 +3,11 @@ import {
   TextField,
   FormControl,
   FormHelperText,
+  SxProps,
 } from "@mui/material";
 import { useEffect, useState, useMemo } from "react";
 import { getRulesThunk, useAppDispatch, useAppSelector } from "../../../store";
+import { Theme } from "@emotion/react";
 
 interface RulesSelectorProps {
   ruleSelected: string | null;
@@ -14,6 +16,40 @@ interface RulesSelectorProps {
   setShowError: (value: boolean) => void;
   onlyRead?: boolean;
 }
+
+const getReadOnlyStyles = (isReadOnly: boolean): SxProps<Theme> => {
+  if (!isReadOnly) return {};
+
+  return {
+    "& .MuiOutlinedInput-root.Mui-disabled": {
+      backgroundColor: "#dfdfdfde !important",
+      borderRadius: "8px",
+      color: "#4d4d4d",
+      cursor: "default",
+    },
+
+    "& .MuiOutlinedInput-root.Mui-disabled .MuiOutlinedInput-input": {
+      backgroundColor: "transparent !important",
+      WebkitTextFillColor: "#4d4d4d !important",
+      borderRadius: "8px",
+    },
+
+    "& .MuiOutlinedInput-root.Mui-disabled fieldset": {
+      borderColor: "#9e9e9ede !important",
+    },
+
+    "& .MuiInputLabel-root.Mui-disabled": {
+      color: "#4d4d4d",
+    },
+
+    "& .MuiAutocomplete-endAdornment": {
+      display: "none", 
+    },
+
+    pointerEvents: "none",
+  };
+};
+
 
 function RulesSelector({
   ruleSelected,
@@ -60,8 +96,11 @@ function RulesSelector({
       <Autocomplete
         disablePortal
         size="small"
-        disabled={onlyRead}
         open={onlyRead ? false : open}
+        disabled={onlyRead}
+        sx={
+          getReadOnlyStyles(onlyRead)
+        }
         onOpen={() => !onlyRead && setOpen(true)}
         onClose={() => !onlyRead && setOpen(false)}
         options={allRulles}

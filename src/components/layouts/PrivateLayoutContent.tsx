@@ -27,7 +27,7 @@ function PrivateLayoutContent() {
           }}
         >
           <Box sx={{ position: "sticky", top: 0, zIndex: 800 }}>
-            <HeaderComponent alerts={9} />
+            <HeaderComponent  />
           </Box>
 
           <Box
