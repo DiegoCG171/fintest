@@ -35,6 +35,7 @@ export const RunnerSideBar = () => {
   const { server, configHost, configPort } = useAppSelector(
     (state) => state.server
   );
+  const serverId = useAppSelector((state) => state.server.server?.id);
 
   const [testCaseDetails, setTestCaseDetails] = useState<TestCaseDetails>({
     name: "",
@@ -80,11 +81,12 @@ export const RunnerSideBar = () => {
         ip: configHost,
         portNumber: configPort,
       })
-    );
+    ).unwrap();
   };
 
   const handleStopServer = () => {
-    if (server) dispatch(stopServerThunk(server.id));
+    if (!serverId) return;
+    if (server) dispatch(stopServerThunk(serverId));
   };
 
   useEffect(() => {

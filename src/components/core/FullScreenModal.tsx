@@ -52,17 +52,35 @@ export default function FullScreenModal() {
         >
             <Box
             sx={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                width: "50%",
-                bgcolor: "background.paper",
-                borderRadius: 2,
-                boxShadow: 24,
-                p: 3,
-                outline: "none",
-            }}
+                        position: "absolute",
+                        top: "48%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                        width: {
+                            xs: "95%",
+                            sm: "85%",
+                            md: "70%",
+                            lg: "60%",
+                            xl: "50%",
+                        },
+                        maxHeight: {
+                            xs: "90vh",
+                            sm: "85vh",
+                            md: "80vh",
+                            lg: "90vh",
+                        },
+                        bgcolor: "background.paper",
+                        borderRadius: 2,
+                        boxShadow: 24,
+                        p: {
+                            xs: 2,
+                            sm: 2.5,
+                            md: 3,
+                        },
+                        outline: "none",
+                        overflowY: "auto",
+                        overflowX: "hidden",
+                    }}
             >
             <DynamicComponent
                 {...(componentProps as ModalComponentPropsMap[keyof ModalComponentPropsMap])}

@@ -24,6 +24,7 @@ export const InstitutionSelectComponent = ({
   formErrors,
 }: InstitutionSelectProps) => {
   const { institution } = useAppSelector((state) => state.auth.user!);
+  const { type } = useAppSelector((state) => state.admin);
   const rawValue = institution ? "" : formData[field.name];
   const value =
     rawValue && typeof rawValue === "object" ? rawValue.id : rawValue ?? "";
@@ -35,7 +36,7 @@ export const InstitutionSelectComponent = ({
       <InputLabel>{field.label}</InputLabel>
       <Select
         label={field.label}
-        value={value}
+        value={type === "create" ? institution.id : value}
         disabled={!!institution}
         onChange={(e) => {
           const selectedValue =

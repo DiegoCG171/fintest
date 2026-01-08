@@ -3,6 +3,7 @@ import {
   MenuServiceInterface,
   MenuSidebarState,
 } from "../../../../config/interfaces/menu.interface";
+import { deleteCollectionThunk } from "../../collections/collections.thunk";
 
 export const initialState: MenuSidebarState = {
   isCollapsed: false,
@@ -11,6 +12,7 @@ export const initialState: MenuSidebarState = {
     collection: [],
     testCase: [],
   },
+  loading: false,
 };
 
 export const sidebarMenuSlice = createSlice({
@@ -29,6 +31,17 @@ export const sidebarMenuSlice = createSlice({
     setCollapsedState(state) {
       state.isCollapsed = !state.isCollapsed;
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(deleteCollectionThunk.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(deleteCollectionThunk.fulfilled, (state) => {
+      state.loading = false;
+    });
+    builder.addCase(deleteCollectionThunk.rejected, (state) => {
+      state.loading = false;
+    });
   }
 });
 

@@ -16,6 +16,7 @@ export interface ItemsServiceMenu {
 export interface MenuSidebarState {
     isCollapsed: boolean;
     menus: Record<string, MenuServiceInterface[]>;
+    loading: boolean;
 }
 /* export interface MenuSidebarState {
     categoriesMenu: MenuServiceInterface[],

@@ -111,35 +111,41 @@ export const ModalConfirmDelete = () => {
   const { isOpen, id, resource } = useAppSelector(
     (state) => state.confirmDeleteModal
   );
+  const [isDeleting, setIsDeleting] = useState(false);
   const [titleText, setTitleText] = useState(
     "¿Estás seguro de que deseas eliminar esto?"
   );
 
   const handleConfirm = async () => {
     if (!isValidResource(resource)) return;
-
-    const config = resourceActions[resource];
-    const { origin } = config
-
-    await dispatch<unknown>(config.deleteThunk(id));
- 
-    if (config.hasTab) {
-      const route = `${method}/${type}/${origin}`;
-      const deletedTabRoute = `/${route}/${id}`;
-
-      dispatch(removeTab(`${route}/${id}`));
-
-      if (location.pathname === deletedTabRoute) {
-        navigate(`/${method}/${type}/detalles`, { replace: true });
+    try {
+      setIsDeleting(true);
+      const config = resourceActions[resource];
+      const { origin } = config
+  
+      await dispatch<unknown>(config.deleteThunk(id));
+   
+      if (config.hasTab) {
+        const route = `${method}/${type}/${origin}`;
+        const deletedTabRoute = `/${route}/${id}`;
+  
+        dispatch(removeTab(`${route}/${id}`));
+  
+        if (location.pathname === deletedTabRoute) {
+          navigate(`/${method}/${type}/detalles`, { replace: true });
+        }
       }
+  
+      if (method && type) {
+        await dispatch(getCollectionsThunk(`${method}/${type}`));
+        await dispatch(getCategoriesByMethodThunk(`${method}/${type}`))
+      }
+      dispatch(closeConfirmDeleteModal());
+      showToast(config.toastMessage, "success");
+      
+    } finally{
+      setIsDeleting(false);
     }
-
-    if (method && type) {
-      await dispatch(getCollectionsThunk(`${method}/${type}`));
-      await dispatch(getCategoriesByMethodThunk(`${method}/${type}`))
-    }
-    dispatch(closeConfirmDeleteModal());
-    showToast(config.toastMessage, "success");
   };
 
   const handleCancel = () => {
@@ -166,6 +172,7 @@ export const ModalConfirmDelete = () => {
               onClick={handleConfirm}
               variant="contained"
               color="error"
+              loading={isDeleting}
             >
               Eliminar
             </Button>
@@ -173,6 +180,7 @@ export const ModalConfirmDelete = () => {
               startIcon={<CancelIcon />}
               onClick={handleCancel}
               variant="contained"
+              disabled={isDeleting}
             >
               Cancelar
             </Button>

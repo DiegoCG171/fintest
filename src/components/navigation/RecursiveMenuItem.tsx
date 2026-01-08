@@ -92,7 +92,7 @@ export default function RecursiveMenuItem({
         buildSubItemOptions={buildSubItemOptions}
         renderEditNodeEditor={renderEditNodeEditor}
       />
-
+  
       {expanded && creatingChildId === item.id && (
         <InlineCreateChildEditor
           depth={depth}

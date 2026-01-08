@@ -174,7 +174,7 @@ export function ModalProfile() {
 
   return (
     <Box>
-      <Typography variant="h6" mb={4}>
+      <Typography variant="h6" mb={2}>
         Configuración de Perfil
       </Typography>
       <Paper
@@ -183,7 +183,7 @@ export function ModalProfile() {
           border: "1px solid",
           borderColor: "divider",
           borderRadius: 2,
-          mb: 3,
+          mb: 1,
         }}
       >
         <Box
@@ -198,7 +198,7 @@ export function ModalProfile() {
             Datos del Usuario
           </Typography>
         </Box>
-        <Box p={2}>
+        <Box p={2} >
           <Grid container spacing={2}>
             <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
@@ -268,12 +268,12 @@ export function ModalProfile() {
           border: "1px solid",
           borderColor: "divider",
           borderRadius: 2,
-          mb: 3,
+          mb: 1,
         }}
       >
         <Box
           px={2}
-          py={1}
+          py={0}
           bgcolor="#EEF7FF"
           borderRadius="8px 8px 0 0"
           borderBottom="1px solid"
@@ -333,7 +333,7 @@ export function ModalProfile() {
           border: "1px solid",
           borderColor: "divider",
           borderRadius: 2,
-          mb: 3,
+          mb: 1,
         }}
       >
         <Box
