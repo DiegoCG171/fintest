@@ -173,6 +173,7 @@ export const ModalConfirmDelete = () => {
               variant="contained"
               color="error"
               loading={isDeleting}
+              loadingPosition="start"
             >
               Eliminar
             </Button>

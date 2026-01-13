@@ -198,7 +198,7 @@ export function ModalProfile() {
             Datos del Usuario
           </Typography>
         </Box>
-        <Box p={2} >
+        <Box p={1}>
           <Grid container spacing={2}>
             <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
@@ -283,7 +283,7 @@ export function ModalProfile() {
             Configuración Emisor
           </Typography>
         </Box>
-        <Box p={2}>
+        <Box p={1}>
           <Grid container spacing={2}>
             <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
@@ -349,7 +349,7 @@ export function ModalProfile() {
           </Typography>
         </Box>
 
-        <Box p={2}>
+        <Box p={1}>
           <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
               fullWidth
@@ -378,7 +378,7 @@ export function ModalProfile() {
           border: "1px solid",
           borderColor: "divider",
           borderRadius: 2,
-          mb: 3,
+          mb: 1,
         }}
       >
         <Box
@@ -422,7 +422,7 @@ export function ModalProfile() {
           </Grid>
         </Box>
       </Paper>
-      <Grid sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
+      <Grid sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}>
         <Link
           sx={{ alignSelf: "center", cursor: "pointer" }}
           component={RouterLink}
@@ -431,7 +431,6 @@ export function ModalProfile() {
         >
           Cambiar Contraseña
         </Link>
-      </Grid>
       <Stack
         direction={{ xs: "column", sm: "row" }}
         spacing={2}
@@ -455,6 +454,7 @@ export function ModalProfile() {
           Guardar
         </Button>
       </Stack>
+      </Grid>
     </Box>
   );
 }
