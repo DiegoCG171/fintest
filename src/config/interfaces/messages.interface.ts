@@ -2,7 +2,8 @@ import { TableRowData } from ".";
 
 export interface MessagesState {
   activeMessage: ActiveMessage;
-  events: TableRowData[];
+  eventsEmmisor: TableRowData[];
+  eventsAcquirer: TableRowData[];
   route?: string
 }
 

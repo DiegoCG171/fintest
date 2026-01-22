@@ -8,6 +8,7 @@ import {
   createSessionThunk,
   removeSessionThunk,
 } from "../../../store/slices/sessions/session.thunk";
+import { resolveTargetFromRoute } from "../../../config/utils/resolveTargetFromRoute";
 
 export const ModalConfirmSession = () => {
   const dispatch = useAppDispatch();
@@ -26,6 +27,7 @@ export const ModalConfirmSession = () => {
       .unwrap()
       .then(() => {
         dispatch(createSessionThunk(prevConfigCreateSession));
+        localStorage.removeItem(`session-results-${resolveTargetFromRoute()}`);
       })
       .catch((error) => {
         console.error("Error al eliminar sesión:", error);

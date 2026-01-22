@@ -20,6 +20,7 @@ import { RunnerFooter } from "./RunnerFooter";
 import RunnerStepList from "./RunnerStepList";
 import { removeSessionThunk } from "../../../store/slices/sessions/session.thunk";
 import { useParams } from "react-router-dom";
+import { resolveTargetFromRoute } from "../../../config/utils/resolveTargetFromRoute";
 
 export const RunnerSideBar = () => {
   const dispatch = useAppDispatch();
@@ -65,8 +66,7 @@ export const RunnerSideBar = () => {
   };
 
   const handleCloseSession = () => {
-    localStorage.removeItem(`events`);
-    localStorage.removeItem(`session-results`);
+    localStorage.removeItem(`session-results-${resolveTargetFromRoute()}`);
     if (activeSession.length === completedCount) {
       dispatch(closeSession());
       return;

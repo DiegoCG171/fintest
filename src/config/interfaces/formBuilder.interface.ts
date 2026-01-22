@@ -24,6 +24,13 @@ export interface StaticTabItem {
 export interface TabTableComponentProps {
     tabs: StaticTabItem[];
     initialTabIndex?: number;
+    actions?: ReactNode[];
+}
+
+export interface TabTableActionsProps {
+    onClick: () => void;
+    icon: ReactNode;
+    tooltip?: string;
 }
 
 export interface TabTableFormComponentProps {

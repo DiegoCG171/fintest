@@ -12,6 +12,7 @@ import {
 import { setMessage } from "../messages/messages.slice";
 import { mapSocketMessageToTableRowData } from "../../../config/utils/messages.utils";
 import { IncomingSocketMessage } from "../../../config/interfaces/messages.interface";
+import { resolveTargetFromRoute } from "../../../config/utils/resolveTargetFromRoute";
 
 interface sessionInitialState {
   isActive: boolean;
@@ -62,11 +63,11 @@ const saveResultToLocalStorage = (result: {
 
   parsed.push(result);
 
-  localStorage.setItem(key, JSON.stringify(parsed));
+  localStorage.setItem(`session-results-${resolveTargetFromRoute()}`, JSON.stringify(parsed));
 };
 
 const loadResultsFromLocalStorage = (): RunnableToExecuteItem[] => {
-  const raw = localStorage.getItem("session-results");
+  const raw = localStorage.getItem(`session-results-${resolveTargetFromRoute()}`);
   if (!raw) return [];
 
   try {
@@ -171,7 +172,7 @@ export const sessionSlice = createSlice({
         }
 
         if (state.completedCount >= state.activeSession.length) {
-          localStorage.removeItem("session-results");
+          localStorage.removeItem(`session-results-${resolveTargetFromRoute()}`);
         }
 
         state.loading = false;

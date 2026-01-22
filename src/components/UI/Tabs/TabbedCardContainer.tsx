@@ -2,6 +2,7 @@ import { Box, Card } from "@mui/material";
 import TabTableComponent from "./TabTableComponent";
 import { TabbedCardContainerProps } from "../../../config/interfaces";
 import { useAppSelector } from "../../../store";
+import { ClearMessages } from "./ClearMessages";
 
 const TabbedCardContainer = ({
     tabs,
@@ -28,7 +29,6 @@ const TabbedCardContainer = ({
             my:2
         }}
         >
-        {/* Card para Detalles y Errores */}
         <Card
             sx={{
             flex: 7,
@@ -44,8 +44,6 @@ const TabbedCardContainer = ({
                 initialTabIndex={initialTabIndex}
                 />
         </Card>
-
-        {/* Card para Eventos */}
         <Card
             sx={{
             flex: 3,
@@ -59,6 +57,9 @@ const TabbedCardContainer = ({
             <TabTableComponent
                 tabs={eventTabs}
                 initialTabIndex={0}
+                actions={[
+                    <ClearMessages />
+                ]}
                 />
         </Card>
         </Box>

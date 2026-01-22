@@ -10,6 +10,7 @@ import DeveloperBoardIcon from "@mui/icons-material/DeveloperBoard";
 function TabTableComponent({
   tabs = [],
   initialTabIndex = 0,
+  actions = [],
 }: TabTableComponentProps) {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -129,10 +130,11 @@ function TabTableComponent({
     >
       <Box
         sx={{
-          overflowX: "auto",
+          display: "flex",
+          alignItems: "center",
           borderBottom: 1,
           borderColor: "divider",
-          overflowY: "hidden",
+          overflow: "hidden",
         }}
       >
         <Tabs
@@ -143,6 +145,7 @@ function TabTableComponent({
           allowScrollButtonsMobile
           textColor="inherit"
           sx={{
+            flexGrow: 1,
             minHeight: "40px",
             "& .MuiTabs-scroller": { overflowX: "auto", overflowY: "hidden" },
             "& .MuiTab-root": { minHeight: "40px" },
@@ -159,11 +162,7 @@ function TabTableComponent({
               <Tab
                 key={`tab-${index}`}
                 label={
-                  <Box
-                    display="flex"
-                    alignItems="flex-end"
-                    gap={2}
-                  >
+                  <Box display="flex" alignItems="flex-end" gap={2}>
                     <Icon
                       fontSize="small"
                       sx={{ color: isTemplate ? "inherit" : "transparent" }}
@@ -171,10 +170,7 @@ function TabTableComponent({
                       <DeveloperBoardIcon />
                     </Icon>
 
-                    <Typography
-                      variant="body2"
-                      noWrap
-                    >
+                    <Typography variant="body2" noWrap>
                       {tab.label}
                     </Typography>
                     <Icon>{iconAction(index)}</Icon>
@@ -195,6 +191,21 @@ function TabTableComponent({
             );
           })}
         </Tabs>
+        {actions?.length > 0 && (
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              px: 1,
+              gap: 0.5,
+              flexShrink: 0,
+            }}
+          >
+            {actions?.map((action, index) => (
+              <Box key={index}>{action}</Box>
+            ))}
+          </Box>
+        )}
       </Box>
       <Box
         sx={{

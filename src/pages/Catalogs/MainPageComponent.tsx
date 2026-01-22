@@ -10,6 +10,7 @@ import { StatusRender } from "../../components/UI/table/StatusRender";
 import TabbedCardContainer from "../../components/UI/Tabs/TabbedCardContainer";
 import { addTab } from "../../store";
 import { getConfigTab } from "../../config/utils/tabsContent";
+import { resolveTargetFromRoute } from "../../config/utils/resolveTargetFromRoute";
 const generateStaticTabs = (messagesData: MessagesState): StaticTabItem[] => [
   {
     label: "Detalles",
@@ -43,7 +44,7 @@ const generateEventTabs = (messagesData: MessagesState): StaticTabItem[] => [
     content: (
       <BasicTable
         customRenderers={{ estado: StatusRender }}
-        initialRows={messagesData.events}
+        initialRows={resolveTargetFromRoute() === 'emmisor' ? messagesData.eventsEmmisor : messagesData.eventsAcquirer}
       />
     ),
     canEdit: true,
