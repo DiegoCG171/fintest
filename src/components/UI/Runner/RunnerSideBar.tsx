@@ -65,6 +65,8 @@ export const RunnerSideBar = () => {
   };
 
   const handleCloseSession = () => {
+    localStorage.removeItem(`events`);
+    localStorage.removeItem(`session-results`);
     if (activeSession.length === completedCount) {
       dispatch(closeSession());
       return;
@@ -72,6 +74,7 @@ export const RunnerSideBar = () => {
 
     dispatch(removeSessionThunk(id));
     if (server) dispatch(stopServerThunk(server.id));
+
   };
 
   const handleStartServer = () => {

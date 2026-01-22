@@ -20,9 +20,7 @@ export const createSessionThunk = createAsyncThunk(
   "auth/createSession",
   async (createSessionPayload: CreateSessionPayload, { rejectWithValue, dispatch }) => {
     try {
-      console.debug(createSessionPayload)
       const {type, data} = await createSession(createSessionPayload);
-
       if(type === 'SESSION_CONFLICT') {
         dispatch(toggleConfirmSessionModal(true));
       }

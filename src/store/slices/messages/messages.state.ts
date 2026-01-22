@@ -6,5 +6,5 @@ export const messagesInitialState: MessagesState = {
       detail: [],
       errors: [],
     },
-    events: [],
+    events: JSON.parse(localStorage.getItem("events") || "[]"),
   };

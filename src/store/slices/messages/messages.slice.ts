@@ -1,12 +1,17 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { TableRowData } from "../../../config/interfaces";
 import { messagesInitialState } from "./messages.state";
-import { mapSocketMessageToTableRowData, mapToActiveFields, mapToErroredFields } from "../../../config/utils/messages.utils";
+import {
+  mapSocketMessageToTableRowData,
+  mapToActiveFields,
+  mapToErroredFields,
+} from "../../../config/utils/messages.utils";
 import { IncomingSocketMessage } from "../../../config/interfaces/messages.interface";
 
 interface ActiveMessage {
   id?: number | string;
-  data: TableRowData[]
+  data: TableRowData[];
+  
 }
 
 export const messagesSlice = createSlice({
@@ -14,8 +19,13 @@ export const messagesSlice = createSlice({
   initialState: messagesInitialState,
   reducers: {
     setMessage: (state, action: PayloadAction<IncomingSocketMessage>) => {
-      const message = mapSocketMessageToTableRowData(action.payload)
-      state.events.unshift(message as TableRowData);
+      const message = mapSocketMessageToTableRowData(action.payload);
+      const MAX_EVENTS = 100;
+
+      state.events.unshift(message);
+      state.events = state.events.slice(0, MAX_EVENTS);
+
+      localStorage.setItem("events", JSON.stringify(state.events));
     },
     setActiveMessage: (state, action: PayloadAction<ActiveMessage>) => {
       state.activeMessage.id = action.payload.id || 0;
@@ -25,4 +35,4 @@ export const messagesSlice = createSlice({
   },
 });
 
-export const { setMessage,  setActiveMessage } = messagesSlice.actions;
+export const { setMessage, setActiveMessage } = messagesSlice.actions;

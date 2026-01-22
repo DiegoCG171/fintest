@@ -5,14 +5,31 @@ interface RunnableItem {
   _id: string;
 }
 
-export const mapRunSessionItems = (runnables: RunnableItem[]) => {
-  console.log(runnables)
+export interface RunnableToExecuteItem {
+  messageId: string;
+  message: any;
+  caseId: string;
+  status: string;
+}
+
+export const mapRunSessionItems = (
+  runnables: RunnableItem[],
+  runnableToExecute?: RunnableToExecuteItem[]
+) => {
   let foundFirstUnrun = false;
 
   return runnables.map((runnable) => {
-    let status = "pendiente...";
+    let status = "Pendiente...";
 
-    if (runnable.hasRun) {
+    const toExecute = runnableToExecute?.find(
+      r => r.caseId === runnable.runnableId
+    );
+
+    console.log(toExecute);
+
+    if (toExecute) {
+      status = toExecute.status;
+    } else if (runnable.hasRun) {
       status = "Terminado";
     } else if (!foundFirstUnrun) {
       status = "En progreso...";
@@ -23,7 +40,10 @@ export const mapRunSessionItems = (runnables: RunnableItem[]) => {
       runnableId: runnable.runnableId,
       status,
       name: runnable.name,
-      message: {}
+      message: toExecute?.message ?? {},
     };
   });
 };
+
+
+

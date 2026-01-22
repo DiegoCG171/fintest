@@ -5,7 +5,10 @@ import {
   createSessionThunk,
   removeSessionThunk,
 } from "./session.thunk";
-import { mapRunSessionItems } from "../../../config/utils/sessions.utils";
+import {
+  mapRunSessionItems,
+  RunnableToExecuteItem,
+} from "../../../config/utils/sessions.utils";
 import { setMessage } from "../messages/messages.slice";
 import { mapSocketMessageToTableRowData } from "../../../config/utils/messages.utils";
 import { IncomingSocketMessage } from "../../../config/interfaces/messages.interface";
@@ -41,10 +44,42 @@ const initialState: sessionInitialState = {
   processedIncrementals: [],
   prevConfigCreateSession: {
     processingMethod: "",
-    ip: '',
+    ip: "",
     portNumber: 0,
     toExecute: [],
   },
+};
+
+const saveResultToLocalStorage = (result: {
+  caseId: string;
+  status: string;
+  message: TableRowData;
+}) => {
+  const key = "session-results";
+
+  const existing = localStorage.getItem(key);
+  const parsed = existing ? JSON.parse(existing) : [];
+
+  parsed.push(result);
+
+  localStorage.setItem(key, JSON.stringify(parsed));
+};
+
+const loadResultsFromLocalStorage = (): RunnableToExecuteItem[] => {
+  const raw = localStorage.getItem("session-results");
+  if (!raw) return [];
+
+  try {
+    const parsed = JSON.parse(raw);
+
+    return parsed.map((r: any) => ({
+      message: r.message,
+      caseId: r.caseId ?? r.incremental,
+      status: r.status,
+    }));
+  } catch {
+    return [];
+  }
 };
 
 export const sessionSlice = createSlice({
@@ -70,15 +105,19 @@ export const sessionSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(createSessionThunk.fulfilled, (state, action) => {
-        state.isActive = action.payload.type === "DEFAULT" ? true : false;
+        state.isActive = action.payload.type === "DEFAULT";
         state.id = action.payload.data.uuid;
-        console.log(action.payload)
+
+        const storedResults = loadResultsFromLocalStorage();
         state.activeSession = mapRunSessionItems(
-          action.payload.type === "DEFAULT"
-            ? action.payload.data.toExecute
-            : action.payload.data.toExecute
+          action.payload.data.toExecute,
+          storedResults.length > 0 ? storedResults : action.payload.data.result,
         );
-        state.completedCount = 0;
+        state.completedCount = state.activeSession.filter(
+          (item) =>
+            item.status !== "Pendiente..." && item.status !== "En progreso...",
+        ).length;
+
         state.prevConfigCreateSession = action.payload.sessionPayload;
       })
       .addCase(removeSessionThunk.fulfilled, (state) => {
@@ -103,22 +142,36 @@ export const sessionSlice = createSlice({
         }
 
         const currentIndex = state.activeSession.findIndex(
-          (item) => item.status === "En progreso..."
+          (item) => item.status === "En progreso...",
         );
 
         if (currentIndex !== -1) {
           const currentItem = state.activeSession[currentIndex];
 
-          currentItem.status = message.estado ? message.estado.toLowerCase() : "Terminado";
+          const status = message.estado
+            ? message.estado.toLowerCase()
+            : "Terminado";
+
+          currentItem.status = status;
           currentItem.message = message;
           currentItem.incremental = socketMsg.incremental;
-          state.completedCount += 1;
 
+          state.completedCount += 1;
           state.processedIncrementals.push(socketMsg.incremental);
+
+          saveResultToLocalStorage({
+            caseId: currentItem.runnableId,
+            status,
+            message,
+          });
 
           if (state.activeSession[currentIndex + 1]) {
             state.activeSession[currentIndex + 1].status = "En progreso...";
           }
+        }
+
+        if (state.completedCount >= state.activeSession.length) {
+          localStorage.removeItem("session-results");
         }
 
         state.loading = false;

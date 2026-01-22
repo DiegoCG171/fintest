@@ -13,10 +13,10 @@ import { useNavigate } from "react-router-dom";
 import { logoutThunk } from "../../store/slices/auth/login.thunk";
 
 interface BadgeContentProps {
-  capital: string
+  capital: string;
 }
 
-const BadgeContent = ({capital}: BadgeContentProps) => {
+const BadgeContent = ({ capital }: BadgeContentProps) => {
   return (
     <Box
       component="span"
@@ -35,11 +35,11 @@ const BadgeContent = ({capital}: BadgeContentProps) => {
         textAlign: "center",
         textTransform: "uppercase",
         color: (theme) => theme.palette.primary.light,
-        fontSize: 24
+        fontSize: 24,
       }}
-  >
-    {capital}
-  </Box>
+    >
+      {capital}
+    </Box>
   );
 };
 
@@ -74,49 +74,29 @@ function AccountMenu() {
     dispatch(
       openModal({
         componentKey: "ModalProfile",
-        componentProps: { id: 'id '},
+        componentProps: { id: "id " },
       })
     );
   };
 
   return (
-    <Stack
-      spacing={2}
-      direction="row"
-    >
-      <BadgeContent capital={user?.names.charAt(0) || ''}>
-      </BadgeContent>
+    <Stack spacing={2} direction="row">
+      <BadgeContent capital={user?.names?.charAt(0) || ""}></BadgeContent>
       <ButtonBase onClick={handleClick}>
-        <Stack
-          spacing={0}
-          alignItems="flex-start"
-        >
+        <Stack spacing={0} alignItems="flex-start">
           <Typography variant="subtitle2">{`${user?.names} ${user?.surnames}`}</Typography>
           <Typography variant="caption">{`${user?.username} `}</Typography>
         </Stack>
       </ButtonBase>
-      <Menu
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-      >
-        <MenuItem
-          onClick={handleProfile}
-          sx={{ fontSize: "0.75rem" }}
-        >
+      <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+        <MenuItem onClick={handleProfile} sx={{ fontSize: "0.75rem" }}>
           Configuración
         </MenuItem>
-        <MenuItem
-          onClick={handleChangePassword}
-          sx={{ fontSize: "0.75rem" }}
-        >
+        <MenuItem onClick={handleChangePassword} sx={{ fontSize: "0.75rem" }}>
           Cambiar contraseña
         </MenuItem>
-        
-        <MenuItem
-          onClick={handleLogout}
-          sx={{ fontSize: "0.75rem" }}
-        >
+
+        <MenuItem onClick={handleLogout} sx={{ fontSize: "0.75rem" }}>
           Cerrar sesión
         </MenuItem>
       </Menu>

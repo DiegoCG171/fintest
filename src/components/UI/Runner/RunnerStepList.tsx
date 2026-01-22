@@ -36,6 +36,7 @@ const RunnerStepList = ({
   onTestCaseSelect,
   onCloseSession,
 }: RunnerStepListProps) => {
+
   return (
     <Box sx={{ width: "100%" }}>
       <Stepper activeStep={4} orientation="vertical" sx={{ py: 2 }}>
